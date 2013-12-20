@@ -87,8 +87,8 @@ Letter.prototype.draw = function(context,transformMatrix)
 		{
 			context.save();
 			context.beginPath();
-			context.moveTo(this.textWidth - 2,0);
-			context.lineTo(this.textWidth - 2,this.textHeight);
+			context.moveTo(this.textWidth,0);
+			context.lineTo(this.textWidth,this.textHeight);
 			context.stroke();
 			context.restore();
 		}

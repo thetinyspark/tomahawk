@@ -3,7 +3,10 @@
  * @author Thot
 */
 
-function EventDispatcher(){}
+function EventDispatcher()
+{
+	this._listeners = new Array();
+}
 
 Tomahawk.registerClass( EventDispatcher, "EventDispatcher" );
 

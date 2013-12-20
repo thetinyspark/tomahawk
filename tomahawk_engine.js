@@ -1343,7 +1343,10 @@ Event.REMOVED_FROM_STAGE= "removedFromStage";
  * @author Thot
 */
 
-function EventDispatcher(){}
+function EventDispatcher()
+{
+	this._listeners = new Array();
+}
 
 Tomahawk.registerClass( EventDispatcher, "EventDispatcher" );
 
@@ -2341,35 +2344,36 @@ Matrix2D.DEG_TO_RAD = Math.PI/180;
  * @author Hatshepsout
  */
 
-function BaseInputTextField()
+function InputTextField()
 {
-	BaseSelectableTextField.apply(this);
+	SelectableTextField.apply(this);
 	Stage.getInstance().addEventListener( KeyEvent.KEY_DOWN, this, this._keyHandler );
 }
 
-Tomahawk.registerClass(BaseInputTextField,"BaseInputTextField");
-Tomahawk.extend("BaseInputTextField","BaseSelectableTextField");
+Tomahawk.registerClass(InputTextField,"InputTextField");
+Tomahawk.extend("InputTextField","SelectableTextField");
 
 
-BaseInputTextField.prototype._keyHandler = function(event)
+InputTextField.prototype._keyHandler = function(event)
 {
+	
 	var range = this.getSelectionRange();
 	
-	if( this._focused == false )
+	if( this.getFocus() == false )
 		return;
-	
-	if( this.isSelected() && event.keyCode != Keyboard.LEFT && event.keyCode != Keyboard.RIGHT )
+		
+	if( this.isSelected() == true && event.keyCode != Keyboard.LEFT && event.keyCode != Keyboard.RIGHT )
 	{
 		this.removeTextBetween( range.start, range.end );
 	}
-		
+	
 	if( event.keyCode == Keyboard.BACKSPACE )
 	{
-		this.removeCharAt(this.getCurrentIndex() - 1);
-	}
-	else if( event.keyCode = Keyboard.SUPPR )
-	{
 		this.removeCharAt(this.getCurrentIndex());
+	}
+	else if( event.keyCode == Keyboard.SUPPR )
+	{
+		this.removeCharAt(this.getCurrentIndex() + 1);
 	}
 	else if( event.keyCode == Keyboard.LEFT || event.keyCode == Keyboard.RIGHT)
 	{
@@ -2378,7 +2382,7 @@ BaseInputTextField.prototype._keyHandler = function(event)
 	}
 	else if( event.isCharacter == true )
 	{
-		// special select all
+		 //special select all
 		if( event.keyCode == Keyboard.A && event.ctrlKey )
 		{
 			this.selectAll();
@@ -2386,698 +2390,25 @@ BaseInputTextField.prototype._keyHandler = function(event)
 		}
 		
 		var text = event.value;
-		this.removeTextBetween( range.start, range.end );
 		
 		if( event.keyCode == Keyboard.V && event.ctrlKey )
 		{
 			text = window.prompt ("Copy to clipboard: Ctrl+C, Enter", "");
-		}
-		
-		this.addTextAt(text,this.getCurrentIndex() + 1);
-	}
-};
-
-
-
-
-
-/**
- * ...
- * @author Hatshepsout
- */
-
-function BaseSelectableTextField()
-{
-	BaseTextField.apply(this);
-	this.mouseEnabled = true;
-	Stage.getInstance().addEventListener( MouseEvent.MOUSE_DOWN, this, this._mouseEventHandler,true );
-	Stage.getInstance().addEventListener( MouseEvent.DOUBLE_CLICK, this, this._mouseEventHandler,true );
-	this.addEventListener( MouseEvent.CLICK, this, this._mouseEventHandler );
-	this.addEventListener( MouseEvent.MOUSE_DOWN, this, this._mouseEventHandler );
-	Stage.getInstance().addEventListener( MouseEvent.MOUSE_UP, this, this._mouseEventHandler, true );
-	Stage.getInstance().addEventListener( MouseEvent.MOUSE_MOVE, this, this._mouseEventHandler, true );
-}
-
-Tomahawk.registerClass(BaseSelectableTextField,"BaseSelectableTextField");
-Tomahawk.extend("BaseSelectableTextField","BaseTextField");
-
-BaseSelectableTextField.prototype._ignoreNextClick = false;
-BaseSelectableTextField.prototype._startPoint = null;
-BaseSelectableTextField.prototype._down = false;
-
-BaseSelectableTextField.prototype.getObjectUnder = function(x,y)
-{
-	if( DisplayObject.prototype.hitTest.apply(this,[x,y] ) )
-		return this;
-		
-	return null;
-};
-
-BaseSelectableTextField.prototype._selectCurrentWord = function()
-{
-	this.unSelect();
-	var range = this.getWordRangeAt(this.getCurrentIndex());
-	this.selectBetween(range.start,range.end);
-};
-
-BaseSelectableTextField.prototype._setIndexUnderMouse = function(x,y)
-{
-	var pt = this.globalToLocal(x, y);
-	var letters = this.getLettersIn(pt.x,pt.y,1,1);
-	this.unSelect();
-	this.setFocus(true);
-	
-	if( letters.length > 0 )
-	{
-		this.setCurrentIndex( letters[0].index );
-	}
-};
-
-BaseSelectableTextField.prototype._mouseEventHandler = function(event)
-{
-	
-	if( event.type == MouseEvent.DOUBLE_CLICK )
-	{
-		this.setFocus( event.target == this );
-		
-		if( this.getFocus() == true )
-		{
-			this._setIndexUnderMouse(event.stageX,event.stageY);
-			this._selectCurrentWord();
-		}
-	}
-	
-	if( event.type == MouseEvent.MOUSE_DOWN && this._focused == true && event.target != this )
-	{
-		this.setFocus(false);
-	}
-	
-	// if non focused return
-	if( this._focused == false )
-	{
-		this.unSelect();
-		return;
-	}
-		
-	if( event.type == MouseEvent.MOUSE_UP )
-	{
-		this._down = false;
-	}
-	
-	if( event.type == MouseEvent.CLICK )
-	{
-		this._down = false;
-		
-		if( this._ignoreNextClick == true )
-		{
-			this._ignoreNextClick = false;
+			this.addTextAt(text,this.getCurrentIndex() + 1);
 		}
 		else
 		{
-			this._setIndexUnderMouse(event.stageX,event.stageY);
-		}
-	}
-	
-	if( event.type == MouseEvent.MOUSE_DOWN)
-	{
-		this._down = true;
-		this._setIndexUnderMouse(event.stageX,event.stageY);
-		this._startPoint = this.globalToLocal(event.stageX, event.stageY);
-		return;
-	}
-	
-	if( event.type == MouseEvent.MOUSE_MOVE && this._down == true && this._startPoint != null)
-	{
-		var endPoint = this.globalToLocal(event.stageX, event.stageY);
-		var x = ( endPoint.x < this._startPoint.x ) ? endPoint.x : this._startPoint.x;
-		var x2 = ( endPoint.x < this._startPoint.x ) ? this._startPoint.x : endPoint.x;
-		var y = ( endPoint.y < this._startPoint.y ) ? endPoint.y : this._startPoint.y;
-		var y2 = ( endPoint.y < this._startPoint.y ) ? this._startPoint.y : endPoint.y;
-		var width = x2 - x;
-		var height = y2 - y;
-		
-		this.selectInto(x,y,width,height);
-		this._ignoreNextClick = true;
-	}
-};
-
-BaseSelectableTextField.prototype.selectInto = function(x,y,width,height)
-{
-	var result = this.getLettersIn(x,y,width,height);
-	var i = result.length;
-	var letter = null;
-	var start = -1;
-	var end = -1;
-	
-	while( --i > -1 )
-	{
-		letter = result[i];
-		start = ( start == -1 || letter.index < start ) ? letter.index : start;
-		end = ( end == -1 || letter.index > end ) ? letter.index : end;
-	}
-	
-	this.selectBetween(start,end);
-};
-
-BaseSelectableTextField.prototype.getLettersIn = function(x,y,width,height)
-{
-	var i = this.children.length;
-	var letter = null;
-	var result = new Array();
-	
-	while( --i > -1 )
-	{
-		letter = this.children[i];
-		
-		if( 
-			letter.x > x + width ||
-			letter.x + letter.width < x || 
-			letter.y + letter.height < y || 
-			letter.y > y + height 
-		)
-		{
-			continue;
-		}
-		
-		result.push( letter );
-	}
-	
-	return result;
-};
-
-BaseSelectableTextField.prototype.getSelectionRange = function()
-{
-	var start = -1;
-	var end = -1;
-	var i = this.children.length;
-	var letter = null;
-	
-	while( --i > -1 )
-	{
-		letter = this.children[i];
-		if( letter.selected == true )
-		{
-			if( end == -1 )
+			if( event.keyCode == Keyboard.ENTER )
 			{
-				end = i;
+				text = "";
 			}
 			
-			if( end > 0 )
-			{
-				start = i;
-			}
-		}
-	}
-	
-	return {start: start, end: end};
-};
-
-BaseSelectableTextField.prototype.isSelected = function()
-{
-	var range =  this.getSelectionRange();
-	return ( range.start > 0 && range.end > 0 );
-};
-
-BaseSelectableTextField.prototype.selectAll = function()
-{
-	this.selectBetween(0,this.children.length);
-};
-
-BaseSelectableTextField.prototype.unSelect = function()
-{
-	var i = this.children.length;
-	var letter = null;
-	
-	while( --i > -1 )
-	{
-		letter = this.children[i];
-		letter.selected = false;
-	}
-};
-
-BaseSelectableTextField.prototype.selectBetween = function(startIndex, endIndex)
-{
-	var i = this.children.length;
-	var letter = null;
-	
-	while( --i > -1 )
-	{
-		letter = this.children[i];
-		letter.selected = ( i >= startIndex && i <= endIndex );
-	}
-};
-
-
-
-
-
-
-/**
- * ...
- * @author Hatshepsout
- */
-
-function BaseTextField()
-{
-	DisplayObjectContainer.apply(this);
-	this.defaultTextFormat = new TextFormat();
-}
-
-Tomahawk.registerClass(BaseTextField,"BaseTextField");
-Tomahawk.extend("BaseTextField","DisplayObjectContainer");
-
-BaseTextField.prototype.defaultTextFormat = null;
-BaseTextField.prototype._focused = false;
-BaseTextField.prototype._currentIndex = 0;
-BaseTextField.prototype.background = true;
-BaseTextField.prototype.border = true;
-BaseTextField.prototype.backgroundColor = "white";
-BaseTextField.prototype.borderColor = "black";
-
-BaseTextField.prototype.setCurrentIndex = function(index)
-{
-	
-	index = ( index < 0 ) ? 0 : index;
-	index = ( index > this.children.length ) ? this.children.length : index;
-	
-	var current = this.getLetterAt(this._currentIndex);
-	
-	if( current == null )
-		return;
-	
-	current.cursor = false;
-	current = this.getChildAt(index);
-	
-	if( current == null )
-		return;
-		
-	current.cursor = true;
-	this._currentIndex = index;
-};
-
-
-BaseTextField.prototype.getWordRangeAt = function(index)
-{
-	var letter = null;
-	var i = index;
-	var max = this.children.length;
-	var end = -1;
-	var start = -1;
-	
-	while( i < max )
-	{
-		letter = this.getChildAt(i);
-		
-		if( letter == null )
-			continue;
-			
-		if( i == max - 1 )
-		{
-			end = i;
-			break;
+			this.addCharAt(text,this.getCurrentIndex() + 1, true);
 		}
 		
-		if( letter.value == " " || letter.newline == true )
-		{
-			end = i - 1;
-			break;
-		}
 		
-		i++;
-	}
-	
-	i = index;
-	
-	while( i > -1 )
-	{
-		letter = this.getChildAt(i);
-		if( letter == null )
-			continue;
-		
-		if( letter.value == " " || letter.newline == true )
-		{
-			start = i + 1;
-			break;
-		}
-		
-		i--;
-	}
-	
-	return {start: start, end: end};
-
-};
-
-BaseTextField.prototype.getCurrentIndex = function()
-{
-	return this._currentIndex;
-};
-
-BaseTextField.prototype._alignRow = function( row, textAlign )
-{
-	var i = this.children[i];
-	var letter = null;
-	
-	while( --i > -1 )
-	{
-		letter = this.children[i];
-		if( letter.row == row )
-		{
-			letter.format.textAlign == textAlign;
-		}
-	}
-}
-
-BaseTextField.prototype.setFocus = function(value)
-{
-	if( this._focused == value )
-		return;
-		
-	this._focused = value;
-	var type = ( this._focused == true ) ? Event.FOCUSED : Event.UNFOCUSED;
-	var focusEvent = new Event( type, true, true );
-	this.dispatchEvent(focusEvent);
-	this.setCurrentIndex(0);
-};
-
-BaseTextField.prototype.getFocus = function()
-{
-	return this._focused;
-};
-
-BaseTextField.prototype.setTextFormat = function( format, startIndex, endIndex )
-{
-	var end = ( endIndex == undefined ) ? startIndex : endIndex;
-	var i = startIndex;
-	var currentFormat = null;
-	
-	for( ; i <= end; i++ )
-	{
-		var letter = this.getChildAt(i);
-		if( letter != null )
-			letter.format = format;
-	}
-	
-	if( letter != null )
-		this._alignRow(letter.row,format.textAlign);
-};
-
-BaseTextField.prototype.getTextFormat = function(index)
-{
-	var letter = this.getChildAt(index);
-	if( letter == null )
-		return this.defaultTextFormat.clone();
-		
-	return letter.format.clone();
-};
-
-BaseTextField.prototype.getText = function()
-{
-	var text = "";
-	var i = 0;
-	var max = this.children.length;
-	
-	for( i = 0; i < max; i++ )
-	{
-		letter = this.children[i];
-		text += letter.value;
-	}
-	
-	return text;
-};
-
-BaseTextField.prototype.setText = function(value)
-{
-	while( this.children.length > 0 )
-		this.removeChildAt(0);
-		
-	var i = 0;
-	var max = value.length;
-	
-	for( i = 0; i < max; i++ )
-	{
-		this.addCharAt(value[i],i);
 	}
 };
-
-BaseTextField.prototype.getLetters = function()
-{
-	return this.children;
-};
-
-BaseTextField.prototype.getLetterAt = function(index)
-{
-	return this.getChildAt(index);
-};
-
-BaseTextField.prototype.addCharAt = function(value,index,isNewline)
-{
-	var previous = this.children[index-1];
-	var letter = new Letter();
-	letter.value = value;
-	letter.index = index;
-	letter.newline = ( isNewline == true ) ? true : false;
-	letter.format = ( previous == undefined ) ? this.defaultTextFormat.clone() : previous.format.clone();
-	this.addChildAt(letter,index);
-	console.log(this._currentIndex);
-	//this.setCurrentIndex(0);
-	//this.setCurrentIndex(index);
-};
-
-BaseTextField.prototype.removeCharAt = function(index)
-{
-	this.setCurrentIndex(index-1);
-	this.removeChildAt(index);
-};
-
-BaseTextField.prototype.addTextAt = function(value,index)
-{
-	var i = value.length;
-	while( --i > -1 )
-	{
-		this.addCharAt(value[i],index);
-	}
-	
-	this.setCurrentIndex(index);
-};
-
-BaseTextField.prototype.removeTextBetween = function(startIndex,endIndex)
-{
-	var i = this.children.length;
-	var letters = new Array();
-	var letter = null;
-	
-	while( --i > -1 )
-	{
-		if( i >= startIndex && i <= endIndex )
-		{
-			letters.push( this.getChildAt(i) );
-		}
-	}
-	
-	while( letters.length > 0 )
-	{
-		letter = letters.shift();
-		this.removeCharAt(letter.index);
-	}
-};
-
-BaseTextField.prototype.draw = function(context,transformMatrix)
-{
-	var i = 0;
-	var max = this.children.length;
-	var x = 0;
-	var rowsHeight = new Array();
-	var rowsWidth = new Array();
-	var maxLineHeight = 0;
-	var currentRow = 0;
-	var rowY = 0;
-	var offsetX = 0;
-	
-	if( this.background == true )
-	{
-		context.save();
-		context.beginPath();
-		context.fillStyle = this.backgroundColor;
-		context.fillRect(0,0,this.width,this.height);
-		context.fill();
-		context.restore();
-	}
-	if( this.border == true )
-	{
-		context.save();
-		context.beginPath();
-		context.strokeStyle = this.borderColor;
-		context.moveTo(0,0);
-		context.lineTo(this.width,0);
-		context.lineTo(this.width,this.height);
-		context.lineTo(0,this.height);
-		context.lineTo(0,0);
-		context.stroke();
-		context.restore();
-	}
-	
-	for( i = 0; i < max; i++ )
-	{
-		letter = this.children[i];
-		letter.x = x;
-		letter.y = 0;
-		letter.row = currentRow;
-		maxLineHeight = ( maxLineHeight < letter.textHeight ) ? letter.textHeight : maxLineHeight;
-		
-		if( x + letter.textWidth > this.width || letter.newline == true )
-		{			
-			rowsWidth.push(x);
-			rowsHeight.push(maxLineHeight);
-			
-			curLineHeight = 0;
-			maxLineHeight = 0;
-			x = 0;
-			currentRow++;
-		}
-		else
-		{
-			x += letter.textWidth;
-		}
-	}
-	
-	rowsWidth.push(x);
-	rowsHeight.push(maxLineHeight);
-	
-	rowY = 0;
-	currentRow = -1;
-	offsetX = 0;
-	
-	for( i = 0; i < max; i++ )
-	{
-		letter = this.children[i];
-		
-		if( currentRow != letter.row )
-		{
-			offsetX = (letter.format.textAlign == "left" ) ? 0 : 0;
-			offsetX = (letter.format.textAlign == "center" ) ? ( this.width - rowsWidth[letter.row] ) * 0.5 : 0;
-			offsetX = (letter.format.textAlign == "right" ) ? ( this.width - rowsWidth[letter.row] ) : 0;
-			rowY += rowsHeight[letter.row];
-			currentRow = letter.row;
-		}
-		
-		letter.y = rowY - letter.textHeight;
-		letter.x += offsetX;
-	}
-	
-	DisplayObjectContainer.prototype.draw.apply(this, [context,transformMatrix]);
-};
-
-
-
-
-
-/**
- * note
- * @author Thot
- */
-
-function InputText()
-{
-	SelectableText.apply(this);
-	Stage.getInstance().addEventListener( KeyEvent.KEY_DOWN, this, this._keyHandler );
-}
-
-Tomahawk.registerClass( InputText, "InputText" );
-Tomahawk.extend( "InputText","SelectableText" );
-
-
-InputText.prototype._addTextAt = function(value,index)
-{
-	var sub1 = this.text.substr(0,index + 1);
-	var sub2 = this.text.substr(index + 1);
-	var format = this.getTextFormat(index );
-	var max = value.length;
-	
-	this.text = sub1 + value + sub2;
-	
-	while( --max > -1 )
-		this.pushTextFormat(format,index);
-	
-	this.currentIndex = index += value.length;
-};
-
-InputText.prototype._deleteTextBetween = function(start,end)
-{
-	var sub1 = this.text.substr(0,start);
-	var sub2 = this.text.substr(end);
-	this.removeTextFormatBetween(start,end);
-	this.text = sub1 + sub2;
-	this.currentIndex = start - 1;
-};
-
-InputText.prototype._deleteSelectedText = function()
-{
-	if( this._selectStart != -1 )
-	{
-		this._deleteTextBetween(this._selectStart,this._selectEnd + 1);
-		this._selectStart = this._selectEnd = -1;
-		return true;
-	}
-	return false;
-};
-
-InputText.prototype._keyHandler = function(event)
-{
-	if( this.focused == false )
-		return;
-	
-	if( event.keyCode == Keyboard.BACKSPACE || event.keyCode == Keyboard.SUPPR)
-	{
-		var deleted = this._deleteSelectedText();
-		
-		if( deleted == false )
-		{
-			var step = ( event.keyCode == Keyboard.BACKSPACE ) ? 0 : 1;
-			var start = this.currentIndex + step;
-			var end = start + 1;
-			this._deleteTextBetween(start,end);
-		}
-	}
-	else if( event.keyCode == Keyboard.LEFT || event.keyCode == Keyboard.RIGHT)
-	{
-		var step = ( event.keyCode == Keyboard.LEFT ) ? -1 : 1;
-		
-		if( event.shiftKey == true )
-		{
-			if( this._selectEnd == -1 )
-				this._selectEnd = this.currentIndex;
-			
-			this._selectStart = this.currentIndex;
-			if( this._selectEnd < this._selectStart )
-			{
-				this._selectStart = this._selectEnd;
-				this._selectEnd = this.currentIndex;
-			}
-		}
-		
-		this.currentIndex += step;
-	}
-	else if( event.isCharacter == true )
-	{
-		// special select all
-		if( event.keyCode == Keyboard.A && event.ctrlKey )
-		{
-			this.setSelection(0,this.text.length);
-			return;
-		}
-		
-		var text = event.value;
-		this._deleteSelectedText();
-		
-		if( event.keyCode == Keyboard.V && event.ctrlKey )
-		{
-			text = window.prompt ("Copy to clipboard: Ctrl+C, Enter", "");
-		}
-		
-		this._addTextAt(text,this.currentIndex);
-	}
-};
-
 
 
 
@@ -3172,8 +2503,8 @@ Letter.prototype.draw = function(context,transformMatrix)
 		{
 			context.save();
 			context.beginPath();
-			context.moveTo(this.textWidth - 2,0);
-			context.lineTo(this.textWidth - 2,this.textHeight);
+			context.moveTo(this.textWidth,0);
+			context.lineTo(this.textWidth,this.textHeight);
 			context.stroke();
 			context.restore();
 		}
@@ -3182,13 +2513,12 @@ Letter.prototype.draw = function(context,transformMatrix)
 
 
 
-
 /**
  * ...
- * @author HTML5
+ * @author Hatshepsout
  */
 
-function SelectableText()
+function SelectableTextField()
 {
 	TextField.apply(this);
 	this.mouseEnabled = true;
@@ -3200,140 +2530,65 @@ function SelectableText()
 	Stage.getInstance().addEventListener( MouseEvent.MOUSE_MOVE, this, this._mouseEventHandler, true );
 }
 
-Tomahawk.registerClass( SelectableText, "SelectableText" );
-Tomahawk.extend( "SelectableText", "TextField" );
+Tomahawk.registerClass(SelectableTextField,"SelectableTextField");
+Tomahawk.extend("SelectableTextField","TextField");
 
+SelectableTextField.prototype._ignoreNextClick = false;
+SelectableTextField.prototype._startPoint = null;
+SelectableTextField.prototype._down = false;
 
-
-SelectableText.prototype._selectStart = -1;
-SelectableText.prototype._selectEnd = -1;
-SelectableText.prototype._lastTime = 0;
-SelectableText.prototype.focused = false;
-SelectableText.prototype.currentIndex = 0;
-SelectableText.prototype._cursorVisible = false;
-SelectableText.prototype._down = false;
-SelectableText.prototype._ignoreNextClick = false;
-SelectableText.prototype._startPoint = null;
-
-SelectableText.prototype.getLettersIn = function(x,y,width,height)
+SelectableTextField.prototype.getObjectUnder = function(x,y)
 {
-	var i = 0;
-	var letters = new Array();
-	var max = this._letters.length;
-	var letterObj = null;
-	
-	for( i = 0; i < max; i++ )
-	{
-		letterObj = this._letters[i];
+	if( DisplayObject.prototype.hitTest.apply(this,[x,y] ) )
+		return this;
 		
-		if( 
-			letterObj.x > x + width ||
-			letterObj.x + letterObj.width < x || 
-			letterObj.y < y || 
-			letterObj.y - letterObj.height > y + height 
-		)
-		{
-			continue;
-		}
-		
-		letters.push(letterObj);
-	}
-	
-	return letters;
+	return null;
 };
 
-SelectableText.prototype.getSelectionRange = function()
+SelectableTextField.prototype._selectCurrentWord = function()
 {
-	return {start:this._selectStart, end:this._selectEnd};
+	this.unSelect();
+	var range = this.getWordRangeAt(this.getCurrentIndex());
+	this.selectBetween(range.start,range.end);
 };
 
-SelectableText.prototype.setSelection = function( start, end )
-{
-	this._selectStart = start;
-	this._selectEnd = end;
-};
-
-SelectableText.prototype.isSelected = function()
-{
-	return this._selectStart != -1;
-};
-
-SelectableText.prototype._setIndexUnderMouse = function(x,y)
+SelectableTextField.prototype._setIndexUnderMouse = function(x,y)
 {
 	var pt = this.globalToLocal(x, y);
 	var letters = this.getLettersIn(pt.x,pt.y,1,1);
-	this._selectStart = this._selectEnd = -1;
+	this.unSelect();
+	this.setFocus(true);
 	
 	if( letters.length > 0 )
 	{
-		this.currentIndex = letters[0].index;
+		this.setCurrentIndex( letters[0].index );
 	}
 };
 
-SelectableText.prototype._selectCurrentWord = function()
+SelectableTextField.prototype._mouseEventHandler = function(event)
 {
-	var start = -1;
-	var end = -1;
-	var currentIndex = this.currentIndex;
 	
-	while( currentIndex-- > -1 )
-	{
-		if( this.text[currentIndex] == " " || this.text[currentIndex] == TextField.NEW_LINE_CHARACTER)
-		{
-			start = currentIndex;
-			break;
-		}
-	}
-	
-	currentIndex = this.currentIndex;
-	
-	while( currentIndex++ < this.text.length )
-	{
-		if( this.text[currentIndex] == " "  || this.text[currentIndex] == TextField.NEW_LINE_CHARACTER)
-		{
-			end = currentIndex;
-			break;
-		}
-	}
-	
-	if( start == -1 )
-		start = 0;
-		
-	if( end == -1 )
-		end = this.text.length - 1;
-	
-	this.setSelection( start, end );
-	this._selectStart = start;
-	this._selectEnd = end;
-	this.currentIndex = start;
-};
-
-SelectableText.prototype._mouseEventHandler = function(event)
-{
 	if( event.type == MouseEvent.DOUBLE_CLICK )
 	{
-		this.setFocus(event.target == this);
+		this.setFocus( event.target == this );
+		
+		if( this.getFocus() == true )
+		{
+			this._setIndexUnderMouse(event.stageX,event.stageY);
+			this._selectCurrentWord();
+		}
 	}
 	
-	if( event.type == MouseEvent.MOUSE_DOWN && this.focused == true && event.target != this )
+	if( event.type == MouseEvent.MOUSE_DOWN && this._focused == true && event.target != this )
 	{
 		this.setFocus(false);
 	}
 	
 	// if non focused return
-	if( this.focused == false )
+	if( this._focused == false )
 	{
-		this.setSelection(-1,-1);
+		this.unSelect();
 		return;
-	}
-	
-	if( event.type == MouseEvent.DOUBLE_CLICK )
-	{
-		if( this.focused == true )
-		{
-			this._setIndexUnderMouse(event.stageX,event.stageY);
-			this._selectCurrentWord();
-		}
 	}
 		
 	if( event.type == MouseEvent.MOUSE_UP )
@@ -3351,7 +2606,6 @@ SelectableText.prototype._mouseEventHandler = function(event)
 		}
 		else
 		{
-			
 			this._setIndexUnderMouse(event.stageX,event.stageY);
 		}
 	}
@@ -3359,6 +2613,7 @@ SelectableText.prototype._mouseEventHandler = function(event)
 	if( event.type == MouseEvent.MOUSE_DOWN)
 	{
 		this._down = true;
+		this._setIndexUnderMouse(event.stageX,event.stageY);
 		this._startPoint = this.globalToLocal(event.stageX, event.stageY);
 		return;
 	}
@@ -3373,111 +2628,384 @@ SelectableText.prototype._mouseEventHandler = function(event)
 		var width = x2 - x;
 		var height = y2 - y;
 		
-		this._selectInto(x,y,width,height);
+		this.selectInto(x,y,width,height);
 		this._ignoreNextClick = true;
 	}
 };
 
-SelectableText.prototype._selectInto = function(x,y,width,height)
+SelectableTextField.prototype.selectInto = function(x,y,width,height)
 {
-	var letters = this.getLettersIn(x,y,width,height);
+	var result = this.getLettersIn(x,y,width,height);
+	var i = result.length;
+	var letter = null;
 	var start = -1;
 	var end = -1;
-	var i = letters.length;
-	var letterObj = null;
-	
 	
 	while( --i > -1 )
 	{
-		letterObj = letters[i];
-		start = ( letterObj.index < start || start == -1 ) ? letterObj.index : start;
-		end = ( letterObj.index > end || end == -1 ) ? letterObj.index : end;
+		letter = result[i];
+		start = ( start == -1 || letter.index < start ) ? letter.index : start;
+		end = ( end == -1 || letter.index > end ) ? letter.index : end;
 	}
 	
-	this._selectStart = start;
-	this._selectEnd = end;
+	this.selectBetween(start,end);
 };
 
-SelectableText.prototype._drawText = function(context)
+SelectableTextField.prototype.getLettersIn = function(x,y,width,height)
 {
+	var i = this.children.length;
+	var letter = null;
+	var result = new Array();
 	
-	TextField.prototype._drawText.apply( this, [context] );
-	
-	this.currentIndex = ( this.currentIndex > this._letters.length - 1 ) ? this._letters.length - 1 : this.currentIndex;
-	this.currentIndex = ( this.currentIndex < 0 ) ? 0 : this.currentIndex;
-	
-	var letterObj = this._letters[this.currentIndex];
-	var time = new Date().getTime();
-	
-	if( time - this._lastTime > 500 )
+	while( --i > -1 )
 	{
-		this._lastTime = time;
-		this._cursorVisible =!this._cursorVisible;
-	}
-	
-	if( this._cursorVisible == true && letterObj && this.focused)
-	{
-		var selected = ( this.currentIndex >= this._selectStart && this.currentIndex <= this._selectEnd ) ? true : false;
-		context.save();
-		context.beginPath();
-		context.strokeStyle = ( selected ) ? "white":"black";
-		context.moveTo( letterObj.x + letterObj.width, letterObj.y );
-		context.lineTo( letterObj.x + letterObj.width, letterObj.y - letterObj.height );
-		context.stroke();
-		context.restore();
-	}
-	
-};
-
-SelectableText.prototype.setFocus = function( value )
-{
-	if( this.focused == value )
-		return;
+		letter = this.children[i];
 		
-	this.focused = value;
-	var type = ( this.focused == true ) ? Event.FOCUSED : Event.UNFOCUSED;
-	var focusEvent = new Event( type, true, true );
-	this.dispatchEvent(focusEvent);
+		if( 
+			letter.x > x + width ||
+			letter.x + letter.width < x || 
+			letter.y + letter.height < y || 
+			letter.y > y + height 
+		)
+		{
+			continue;
+		}
+		
+		result.push( letter );
+	}
+	
+	return result;
 };
+
+SelectableTextField.prototype.getSelectionRange = function()
+{
+	var start = -1;
+	var end = -1;
+	var i = this.children.length;
+	var letter = null;
+	
+	while( --i > -1 )
+	{
+		letter = this.children[i];
+		if( letter.selected == true )
+		{
+			if( end == -1 )
+			{
+				end = i;
+			}
+			
+			if( end > 0 )
+			{
+				start = i;
+			}
+		}
+	}
+	
+	return {start: start, end: end};
+};
+
+SelectableTextField.prototype.isSelected = function()
+{
+	var range =  this.getSelectionRange();
+	return ( range.start >= 0 && range.end > range.start );
+};
+
+SelectableTextField.prototype.selectAll = function()
+{
+	this.selectBetween(0,this.children.length);
+};
+
+SelectableTextField.prototype.unSelect = function()
+{
+	var i = this.children.length;
+	var letter = null;
+	
+	while( --i > -1 )
+	{
+		letter = this.children[i];
+		letter.selected = false;
+	}
+};
+
+SelectableTextField.prototype.selectBetween = function(startIndex, endIndex)
+{
+	var i = this.children.length;
+	var letter = null;
+	
+	while( --i > -1 )
+	{
+		letter = this.children[i];
+		letter.selected = ( i >= startIndex && i <= endIndex );
+	}
+};
+
+
 
 
 
 
 /**
  * ...
- * @author HTML5
+ * @author Hatshepsout
  */
 
 function TextField()
 {
+	DisplayObjectContainer.apply(this);
 	this.defaultTextFormat = new TextFormat();
-	this._letters = new Array();
 }
 
-Tomahawk.registerClass( TextField, "TextField" );
-Tomahawk.extend( "TextField", "DisplayObject" );
+Tomahawk.registerClass(TextField,"TextField");
+Tomahawk.extend("TextField","DisplayObjectContainer");
 
-TextField.NEW_LINE_CHARACTER = "¤";
-
-TextField.prototype._lineMetrics = null;
-TextField.prototype._letters = null;
-TextField.prototype._formats = null;
-TextField.prototype._textHeight = 0;
-TextField.prototype._selectStart = -1;
-TextField.prototype._selectEnd = -1;
-
-TextField.prototype.text = "";
-TextField.prototype.padding = 5;
-TextField.prototype.background = true;
-TextField.prototype.backgroundColor = "#ffffff";
-TextField.prototype.border = true;
-TextField.prototype.borderColor = "#000000";
 TextField.prototype.defaultTextFormat = null;
+TextField.prototype._focused = false;
+TextField.prototype._selectedLetter = null;
+TextField.prototype.background = true;
+TextField.prototype.border = true;
+TextField.prototype.backgroundColor = "white";
+TextField.prototype.borderColor = "black";
 
-
-TextField.prototype.draw = function(context)
+TextField.prototype.setCurrentIndex = function(index)
 {
-	context.save();
+	var current = null;
+	index = ( index < 0 ) ? 0 : index;
+	index = ( index > this.children.length ) ? this.children.length : index;
+	
+	if( this._selectedLetter != null )
+	{
+		this._selectedLetter.cursor = false;
+	}
+	
+	current = this.getChildAt(index);
+	
+	if( current == null )
+		return;
+		
+	current.cursor = true;	
+	this._selectedLetter = current;
+};
+
+TextField.prototype.getWordRangeAt = function(index)
+{
+	var letter = null;
+	var i = index;
+	var max = this.children.length;
+	var end = -1;
+	var start = -1;
+	
+	while( i < max )
+	{
+		letter = this.getChildAt(i);
+		
+		if( letter == null )
+			continue;
+			
+		if( i == max - 1 )
+		{
+			end = i;
+			break;
+		}
+		
+		if( letter.value == " " || letter.newline == true )
+		{
+			end = i - 1;
+			break;
+		}
+		
+		i++;
+	}
+	
+	i = index;
+	
+	while( i > -1 )
+	{
+		letter = this.getChildAt(i);
+		if( letter == null )
+			continue;
+		
+		if( letter.value == " " || letter.newline == true )
+		{
+			start = i + 1;
+			break;
+		}
+		
+		i--;
+	}
+	
+	return {start: start, end: end};
+
+};
+
+TextField.prototype.getCurrentIndex = function()
+{
+	return this._selectedLetter.index;
+};
+
+TextField.prototype._alignRow = function( row, textAlign )
+{
+	var i = this.children[i];
+	var letter = null;
+	
+	while( --i > -1 )
+	{
+		letter = this.children[i];
+		if( letter.row == row )
+		{
+			letter.format.textAlign == textAlign;
+		}
+	}
+}
+
+TextField.prototype.setFocus = function(value)
+{
+	if( this._focused == value )
+		return;
+		
+	this._focused = value;
+	var type = ( this._focused == true ) ? Event.FOCUSED : Event.UNFOCUSED;
+	var focusEvent = new Event( type, true, true );
+	this.dispatchEvent(focusEvent);
+	this.setCurrentIndex(0);
+};
+
+TextField.prototype.getFocus = function()
+{
+	return this._focused;
+};
+
+TextField.prototype.setTextFormat = function( format, startIndex, endIndex )
+{
+	var end = ( endIndex == undefined ) ? startIndex : endIndex;
+	var i = startIndex;
+	var currentFormat = null;
+	
+	for( ; i <= end; i++ )
+	{
+		var letter = this.getChildAt(i);
+		if( letter != null )
+			letter.format = format;
+	}
+	
+	if( letter != null )
+		this._alignRow(letter.row,format.textAlign);
+};
+
+TextField.prototype.getTextFormat = function(index)
+{
+	var letter = this.getChildAt(index);
+	if( letter == null )
+		return this.defaultTextFormat.clone();
+		
+	return letter.format.clone();
+};
+
+TextField.prototype.getText = function()
+{
+	var text = "";
+	var i = 0;
+	var max = this.children.length;
+	
+	for( i = 0; i < max; i++ )
+	{
+		letter = this.children[i];
+		text += letter.value;
+	}
+	
+	return text;
+};
+
+TextField.prototype.setText = function(value)
+{
+	while( this.children.length > 0 )
+		this.removeChildAt(0);
+		
+	var i = 0;
+	var max = value.length;
+	
+	for( i = 0; i < max; i++ )
+	{
+		this.addCharAt(value[i],i);
+	}
+};
+
+TextField.prototype.getLetters = function()
+{
+	return this.children;
+};
+
+TextField.prototype.getLetterAt = function(index)
+{
+	return this.getChildAt(index);
+};
+
+TextField.prototype.addCharAt = function(value,index,isNewline)
+{
+	var previous = this.children[index-1];
+	var letter = new Letter();
+	letter.value = value;
+	letter.index = index;
+	letter.newline = ( isNewline == true ) ? true : false;
+	letter.format = ( previous == undefined ) ? this.defaultTextFormat.clone() : previous.format.clone();
+	this.addChildAt(letter,index);
+	this.setCurrentIndex(index);
+};
+
+TextField.prototype.removeCharAt = function(index)
+{
+	this.removeChildAt(index);
+	this.setCurrentIndex(index-1);
+};
+
+TextField.prototype.addTextAt = function(value,index)
+{
+	var i = value.length;
+	while( --i > -1 )
+	{
+		this.addCharAt(value[i],index);
+	}
+	
+	this.setCurrentIndex(index);
+};
+
+TextField.prototype.removeTextBetween = function(startIndex,endIndex)
+{
+	var i = this.children.length;
+	var letters = new Array();
+	var letter = null;
+	
+	while( --i > -1 )
+	{
+		if( i >= startIndex && i <= endIndex )
+		{
+			letters.push( this.getChildAt(i) );
+		}
+	}
+	
+	while( letters.length > 0 )
+	{
+		letter = letters.shift();
+		this.removeCharAt(letter.index);
+	}
+};
+
+TextField.prototype.draw = function(context,transformMatrix)
+{
+	var i = 0;
+	var max = this.children.length;
+	var x = 0;
+	var rowsHeight = new Array();
+	var rowsWidth = new Array();
+	var maxLineHeight = 0;
+	var currentRow = 0;
+	var rowY = 0;
+	var offsetX = 0;
+	var rows = new Array();
+	var currentRow = new Array();
+	var rowLetter = null;
+	var j = 0;
+	var y = 0;
+	var textAlign = "left";
 	
 	if( this.background == true )
 	{
@@ -3488,7 +3016,6 @@ TextField.prototype.draw = function(context)
 		context.fill();
 		context.restore();
 	}
-	
 	if( this.border == true )
 	{
 		context.save();
@@ -3503,219 +3030,58 @@ TextField.prototype.draw = function(context)
 		context.restore();
 	}
 	
-	
-	this._drawText(context);
-	context.restore();
-};
-
-TextField.prototype.pushTextFormat = function( format, index )
-{
-	var sub1 = this._formats.slice(0,index);
-	var sub2 = this._formats.slice(index);
-	sub1.push(format);
-	sub1 = sub1.concat(sub2);
-	this._formats = sub1;
-};
-
-TextField.prototype.removeTextFormatBetween = function( start, end )
-{
-	this._formats.splice(start,end-start);
-};
-
-TextField.prototype.setTextFormat = function( format, startIndex, endIndex )
-{
-	startIndex = startIndex || 0;
-	endIndex = ( endIndex == undefined ) ? this.text.length : endIndex;
-	
-	var i = startIndex;
-	var max = endIndex + 1;
-	
-	for( ; i < max; i++ )
-	{
-		this._formats[i] = format;
-	}
-	
-};
-
-TextField.prototype.getTextFormat = function(index)
-{
-	var format = this._formats[index] || this.defaultTextFormat;
-	return format.clone();
-};
-
-TextField.prototype.getTextHeight = function()
-{
-	return this._textHeight;
-};
-
-TextField.prototype._updateMetrics = function(context)
-{		
-	var x = this.padding;
-	var y = 0;
-	var textWidth = 0;
-	var lineHeight = 0 ;
-	var curLineHeight = 0;
-	var lines = new Array();
-	var letters = new Array();
-	var letterObj = null;
-	var lineObj = null;
-	var currentFormat = null;
-	var i = 0;
-	var max = this.text.length;
-	var currentRow = 0;
-	var currentChar = "";
-	var offsetX = 0;
-	var textAlign = "left";
-	
-
 	for( i = 0; i < max; i++ )
-	{
-		context.save();
-		currentFormat = this._formats[i] || this.defaultTextFormat;
-		currentFormat.updateContext(context);
-		currentChar = this.text.charAt(i);
+	{		
+		letter = this.children[i];
+		letter.index = i;
+		maxLineHeight = ( maxLineHeight < letter.textHeight ) ? letter.textHeight : maxLineHeight;
 		
-		textWidth = context.measureText(this.text.charAt(i)).width;
-		curLineHeight = context.measureText('M').width;
-		
-		lineHeight = ( curLineHeight > lineHeight ) ? curLineHeight : lineHeight;
-		
-		if( x + textWidth > this.width || currentChar == TextField.NEW_LINE_CHARACTER)
+		if( x + letter.textWidth > this.width || letter.newline == true )
 		{
-			y += lineHeight;
+			y += maxLineHeight;
 			
-			lineObj = new Object();
-			lineObj.height = lineHeight;
-			lineObj.y = y;
-			lineObj.x = 0;
-			lineObj.width = x;
-			lineObj.maxWidth = this.width;
-			lineObj.align = textAlign;
+			textAlign = ( currentRow[0] != undefined ) ? currentRow[0].format.textAlign : "left";
 			
-			if( textAlign == "right" )
-				lineObj.x = lineObj.maxWidth - lineObj.width;
-				
-			if( textAlign == "center" )
-				lineObj.x = ( lineObj.maxWidth - lineObj.width )  * 0.5;
+			offsetX = (textAlign == "left" ) ? 0 : 0;
+			offsetX = (textAlign == "center" ) ? ( this.width - x ) * 0.5 : 0;
+			offsetX = (textAlign == "right" ) ? ( this.width - x ) : 0;
 			
-			lines.push(lineObj);
-			
-			x = 0;
-			
-			lineHeight = 0;
-			
-			if( currentChar == TextField.NEW_LINE_CHARACTER )
+			for( j = 0; j < currentRow.length; j++ )
 			{
-				currentChar = "";
-				textWidth = 0;
+				rowLetter = currentRow[j];
+				rowLetter.y = y - rowLetter.textHeight;
+				rowLetter.x += offsetX;
 			}
+			
+			currentRow = new Array();
+			x = 0;
+			maxLineHeight = letter.textHeight;
 		}
-	
-		letterObj = new Letter();
-		letterObj.value = currentChar;
-		letterObj.index = i;
-		letterObj.row = lines.length;
-		letterObj.x = x;
-		letterObj.y = 0;
-		letterObj.width = textWidth;
-		letterObj.height = curLineHeight;
-		letters.push(letterObj);
 		
-		x+=textWidth;
-		textAlign = currentFormat.textAlign;
-		
-		context.restore();
+		letter.x = x;
+		letter.y = 0;
+		x += letter.textWidth;
+		currentRow.push(letter);
 	}
 	
-	lineObj = new Object();
-	lineObj.height = (curLineHeight > lineHeight)?curLineHeight:lineHeight;
-	lineObj.y = y + lineObj.height;
-	lineObj.x = 0;
-	lineObj.width = x;
-	lineObj.maxWidth = this.width;
-	lineObj.align = textAlign;
+	y += maxLineHeight;
+	textAlign = ( currentRow[0] != undefined ) ? currentRow[0].format.textAlign : "left";
+			
+	offsetX = (textAlign == "left" ) ? 0 : 0;
+	offsetX = (textAlign == "center" ) ? ( this.width - x ) * 0.5 : 0;
+	offsetX = (textAlign == "right" ) ? ( this.width - x ) : 0;
 	
-	if( textAlign == "right" )
-		lineObj.x = lineObj.maxWidth - lineObj.width;
-		
-	if( textAlign == "center" )
-		lineObj.x = ( lineObj.maxWidth - lineObj.width )  * 0.5;
-	
-	lines.push(lineObj);
-	
-	i = 0;
-	max = letters.length;
-	y = 0;
-	currentRow = 0;
-	
-	for( ; i < max; i++ )
+	for( j = 0; j < currentRow.length; j++ )
 	{
-		letterObj = letters[i];
-		lineObj = lines[letterObj.row];
-		letterObj.y = lineObj.y + letterObj.y;
-		letterObj.x = lineObj.x + letterObj.x;
+		rowLetter = currentRow[j];
+		rowLetter.y = y - rowLetter.textHeight;
+		rowLetter.x += offsetX;
 	}
 	
-	this._letters = letters;
-	this._textHeight = y + this.padding;
+	DisplayObjectContainer.prototype.draw.apply(this, [context,transformMatrix]);
 };
 
-TextField.prototype.getLetters = function(context)
-{
-	return this._letters;
-};
 
-TextField.prototype._drawText = function(context)
-{
-	this._updateMetrics(context);
-	
-	var metrics = this._letters;
-	var letterObj = null;
-	var currentFormat = null;
-	var i = 0;
-	var max = this._letters.length;
-	var selected = false;
-	
-	for(  i = 0; i < max; i++ )
-	{
-		letterObj = metrics[i];
-		context.save();
-		currentFormat = this._formats[i] || this.defaultTextFormat;
-		
-		selected = ( i >= this._selectStart && i <= this._selectEnd );
-		
-		if( selected == true )
-		{
-			context.save();
-			context.beginPath();
-			context.fillStyle = "black";
-			context.fillRect(letterObj.x, letterObj.y - letterObj.height, letterObj.width, letterObj.height);
-			context.fill();
-			context.restore();
-		}
-		
-		currentFormat.updateContext(context);
-		
-		if( currentFormat.underline == true )
-		{
-			context.save();
-			context.beginPath();
-			context.moveTo(letterObj.x,letterObj.y + 2);
-			context.lineTo(letterObj.x + letterObj.width,letterObj.y + 2);
-			context.stroke();
-			context.restore();
-		}
-		
-		if( selected == true )
-		{
-			context.globalCompositeOperation = "xor";
-		}
-		
-		context.fillText(letterObj.value, letterObj.x, letterObj.y );
-		
-		context.restore();
-	}
-};
 
 
 
@@ -3756,110 +3122,6 @@ TextFormat.prototype.clone = function()
 	format.size = new Number( this.size );
 	
 	return format;
-};
-
-
-
-/**
- * ...
- * @author Hatshepsout
- */
-
-function TextRow()
-{
-	DisplayObjectContainer.apply(this);
-}
-
-Tomahawk.registerClass(TextRow,"TextRow");
-Tomahawk.extend("TextRow","DisplayObjectContainer");
-
-TextRow.prototype.align 		= "left";
-TextRow.prototype.index 		= 0;	
-TextRow.prototype.textWidth 	= 0;	
-TextRow.prototype.textHeight 	= 0;	
-TextRow.prototype.maxWidth 		= 0;	
-TextRow.prototype.startIndex	= 0;
-TextRow.prototype.endIndex		= 0;
-
-
-TextRow.prototype.addLetter = function(letter)
-{
-	this.addChild(letter);
-};
-
-TextRow.prototype.removeLetter = function(letter)
-{
-	this.removeChild(letter);
-};
-
-TextRow.prototype.getLetterAt = function(index)
-{
-	return this.getChildAt(index);
-};
-
-TextRow.prototype.getLetters = function()
-{
-	return this.children;
-};
-
-TextRow.prototype.getLettersIn = function(x,y)
-{
-	var i = this.children.length;
-	var currentLetter = null;
-	var lettersIn = new Array();
-	
-	while( --i > -1 )
-	{
-		currentLetter = this.children[i];
-		
-		if( currentLetter.hitTest(x,y) == true)
-			lettersIn.push(currentLetter);
-	}
-	
-	return lettersIn;
-};
-
-TextRow.prototype.addLetterAt = function(letter,index)
-{
-	this.addChildAt(letter,index);
-};
-
-TextRow.prototype.draw = function(context,transformMatrix)
-{
-	var i = 0;
-	var max = this.children.length
-	var currentLetter = null;
-	var lineHeight = 0;
-	var x = 0;
-	var offsetX = 0;
-	
-	if( this.align == "center" )
-		offsetX = ( this.maxWidth - this.textWidth ) * 0.5;
-		
-	if( this.align == "right" )
-		offsetX = ( this.maxWidth - this.textWidth );
-	
-	for( i = 0; i < max; i++ )
-	{
-		currentLetter = this.children[i];		
-		currentLetter.x = x;
-		currentLetter.y = ( this.textHeight - currentLetter.textHeight );
-		lineHeight = ( currentLetter.textHeight > lineHeight ) ? currentLetter.textHeight : lineHeight;
-		
-		if( x + currentLetter.textWidth > this.maxWidth )
-		{
-			currentLetter.alpha = 0.5;
-		}
-		else
-		{
-			x += currentLetter.textWidth;
-		}
-	}
-	
-	this.textWidth 	= x;
-	this.textHeight = lineHeight;
-	
-	DisplayObjectContainer.prototype.draw.apply(this, [context,transformMatrix]);
 };
 
 

@@ -1,39 +1,265 @@
-
 /**
  * ...
- * @author HTML5
+ * @author Hatshepsout
  */
 
 function TextField()
 {
+	DisplayObjectContainer.apply(this);
 	this.defaultTextFormat = new TextFormat();
-	this._letters = new Array();
 }
 
-Tomahawk.registerClass( TextField, "TextField" );
-Tomahawk.extend( "TextField", "DisplayObject" );
+Tomahawk.registerClass(TextField,"TextField");
+Tomahawk.extend("TextField","DisplayObjectContainer");
 
-TextField.NEW_LINE_CHARACTER = "¤";
-
-TextField.prototype._lineMetrics = null;
-TextField.prototype._letters = null;
-TextField.prototype._formats = null;
-TextField.prototype._textHeight = 0;
-TextField.prototype._selectStart = -1;
-TextField.prototype._selectEnd = -1;
-
-TextField.prototype.text = "";
-TextField.prototype.padding = 5;
-TextField.prototype.background = true;
-TextField.prototype.backgroundColor = "#ffffff";
-TextField.prototype.border = true;
-TextField.prototype.borderColor = "#000000";
 TextField.prototype.defaultTextFormat = null;
+TextField.prototype._focused = false;
+TextField.prototype._selectedLetter = null;
+TextField.prototype.background = true;
+TextField.prototype.border = true;
+TextField.prototype.backgroundColor = "white";
+TextField.prototype.borderColor = "black";
 
-
-TextField.prototype.draw = function(context)
+TextField.prototype.setCurrentIndex = function(index)
 {
-	context.save();
+	var current = null;
+	index = ( index < 0 ) ? 0 : index;
+	index = ( index > this.children.length ) ? this.children.length : index;
+	
+	if( this._selectedLetter != null )
+	{
+		this._selectedLetter.cursor = false;
+	}
+	
+	current = this.getChildAt(index);
+	
+	if( current == null )
+		return;
+		
+	current.cursor = true;	
+	this._selectedLetter = current;
+};
+
+TextField.prototype.getWordRangeAt = function(index)
+{
+	var letter = null;
+	var i = index;
+	var max = this.children.length;
+	var end = -1;
+	var start = -1;
+	
+	while( i < max )
+	{
+		letter = this.getChildAt(i);
+		
+		if( letter == null )
+			continue;
+			
+		if( i == max - 1 )
+		{
+			end = i;
+			break;
+		}
+		
+		if( letter.value == " " || letter.newline == true )
+		{
+			end = i - 1;
+			break;
+		}
+		
+		i++;
+	}
+	
+	i = index;
+	
+	while( i > -1 )
+	{
+		letter = this.getChildAt(i);
+		if( letter == null )
+			continue;
+		
+		if( letter.value == " " || letter.newline == true )
+		{
+			start = i + 1;
+			break;
+		}
+		
+		i--;
+	}
+	
+	return {start: start, end: end};
+
+};
+
+TextField.prototype.getCurrentIndex = function()
+{
+	return this._selectedLetter.index;
+};
+
+TextField.prototype._alignRow = function( row, textAlign )
+{
+	var i = this.children[i];
+	var letter = null;
+	
+	while( --i > -1 )
+	{
+		letter = this.children[i];
+		if( letter.row == row )
+		{
+			letter.format.textAlign == textAlign;
+		}
+	}
+}
+
+TextField.prototype.setFocus = function(value)
+{
+	if( this._focused == value )
+		return;
+		
+	this._focused = value;
+	var type = ( this._focused == true ) ? Event.FOCUSED : Event.UNFOCUSED;
+	var focusEvent = new Event( type, true, true );
+	this.dispatchEvent(focusEvent);
+	this.setCurrentIndex(0);
+};
+
+TextField.prototype.getFocus = function()
+{
+	return this._focused;
+};
+
+TextField.prototype.setTextFormat = function( format, startIndex, endIndex )
+{
+	var end = ( endIndex == undefined ) ? startIndex : endIndex;
+	var i = startIndex;
+	var currentFormat = null;
+	
+	for( ; i <= end; i++ )
+	{
+		var letter = this.getChildAt(i);
+		if( letter != null )
+			letter.format = format;
+	}
+	
+	if( letter != null )
+		this._alignRow(letter.row,format.textAlign);
+};
+
+TextField.prototype.getTextFormat = function(index)
+{
+	var letter = this.getChildAt(index);
+	if( letter == null )
+		return this.defaultTextFormat.clone();
+		
+	return letter.format.clone();
+};
+
+TextField.prototype.getText = function()
+{
+	var text = "";
+	var i = 0;
+	var max = this.children.length;
+	
+	for( i = 0; i < max; i++ )
+	{
+		letter = this.children[i];
+		text += letter.value;
+	}
+	
+	return text;
+};
+
+TextField.prototype.setText = function(value)
+{
+	while( this.children.length > 0 )
+		this.removeChildAt(0);
+		
+	var i = 0;
+	var max = value.length;
+	
+	for( i = 0; i < max; i++ )
+	{
+		this.addCharAt(value[i],i);
+	}
+};
+
+TextField.prototype.getLetters = function()
+{
+	return this.children;
+};
+
+TextField.prototype.getLetterAt = function(index)
+{
+	return this.getChildAt(index);
+};
+
+TextField.prototype.addCharAt = function(value,index,isNewline)
+{
+	var previous = this.children[index-1];
+	var letter = new Letter();
+	letter.value = value;
+	letter.index = index;
+	letter.newline = ( isNewline == true ) ? true : false;
+	letter.format = ( previous == undefined ) ? this.defaultTextFormat.clone() : previous.format.clone();
+	this.addChildAt(letter,index);
+	this.setCurrentIndex(index);
+};
+
+TextField.prototype.removeCharAt = function(index)
+{
+	this.removeChildAt(index);
+	this.setCurrentIndex(index-1);
+};
+
+TextField.prototype.addTextAt = function(value,index)
+{
+	var i = value.length;
+	while( --i > -1 )
+	{
+		this.addCharAt(value[i],index);
+	}
+	
+	this.setCurrentIndex(index);
+};
+
+TextField.prototype.removeTextBetween = function(startIndex,endIndex)
+{
+	var i = this.children.length;
+	var letters = new Array();
+	var letter = null;
+	
+	while( --i > -1 )
+	{
+		if( i >= startIndex && i <= endIndex )
+		{
+			letters.push( this.getChildAt(i) );
+		}
+	}
+	
+	while( letters.length > 0 )
+	{
+		letter = letters.shift();
+		this.removeCharAt(letter.index);
+	}
+};
+
+TextField.prototype.draw = function(context,transformMatrix)
+{
+	var i = 0;
+	var max = this.children.length;
+	var x = 0;
+	var rowsHeight = new Array();
+	var rowsWidth = new Array();
+	var maxLineHeight = 0;
+	var currentRow = 0;
+	var rowY = 0;
+	var offsetX = 0;
+	var rows = new Array();
+	var currentRow = new Array();
+	var rowLetter = null;
+	var j = 0;
+	var y = 0;
+	var textAlign = "left";
 	
 	if( this.background == true )
 	{
@@ -44,7 +270,6 @@ TextField.prototype.draw = function(context)
 		context.fill();
 		context.restore();
 	}
-	
 	if( this.border == true )
 	{
 		context.save();
@@ -59,216 +284,54 @@ TextField.prototype.draw = function(context)
 		context.restore();
 	}
 	
-	
-	this._drawText(context);
-	context.restore();
-};
-
-TextField.prototype.pushTextFormat = function( format, index )
-{
-	var sub1 = this._formats.slice(0,index);
-	var sub2 = this._formats.slice(index);
-	sub1.push(format);
-	sub1 = sub1.concat(sub2);
-	this._formats = sub1;
-};
-
-TextField.prototype.removeTextFormatBetween = function( start, end )
-{
-	this._formats.splice(start,end-start);
-};
-
-TextField.prototype.setTextFormat = function( format, startIndex, endIndex )
-{
-	startIndex = startIndex || 0;
-	endIndex = ( endIndex == undefined ) ? this.text.length : endIndex;
-	
-	var i = startIndex;
-	var max = endIndex + 1;
-	
-	for( ; i < max; i++ )
-	{
-		this._formats[i] = format;
-	}
-	
-};
-
-TextField.prototype.getTextFormat = function(index)
-{
-	var format = this._formats[index] || this.defaultTextFormat;
-	return format.clone();
-};
-
-TextField.prototype.getTextHeight = function()
-{
-	return this._textHeight;
-};
-
-TextField.prototype._updateMetrics = function(context)
-{		
-	var x = this.padding;
-	var y = 0;
-	var textWidth = 0;
-	var lineHeight = 0 ;
-	var curLineHeight = 0;
-	var lines = new Array();
-	var letters = new Array();
-	var letterObj = null;
-	var lineObj = null;
-	var currentFormat = null;
-	var i = 0;
-	var max = this.text.length;
-	var currentRow = 0;
-	var currentChar = "";
-	var offsetX = 0;
-	var textAlign = "left";
-	
-
 	for( i = 0; i < max; i++ )
-	{
-		context.save();
-		currentFormat = this._formats[i] || this.defaultTextFormat;
-		currentFormat.updateContext(context);
-		currentChar = this.text.charAt(i);
+	{		
+		letter = this.children[i];
+		letter.index = i;
+		maxLineHeight = ( maxLineHeight < letter.textHeight ) ? letter.textHeight : maxLineHeight;
 		
-		textWidth = context.measureText(this.text.charAt(i)).width;
-		curLineHeight = context.measureText('M').width;
-		
-		lineHeight = ( curLineHeight > lineHeight ) ? curLineHeight : lineHeight;
-		
-		if( x + textWidth > this.width || currentChar == TextField.NEW_LINE_CHARACTER)
+		if( x + letter.textWidth > this.width || letter.newline == true )
 		{
-			y += lineHeight;
+			y += maxLineHeight;
 			
-			lineObj = new Object();
-			lineObj.height = lineHeight;
-			lineObj.y = y;
-			lineObj.x = 0;
-			lineObj.width = x;
-			lineObj.maxWidth = this.width;
-			lineObj.align = textAlign;
+			textAlign = ( currentRow[0] != undefined ) ? currentRow[0].format.textAlign : "left";
 			
-			if( textAlign == "right" )
-				lineObj.x = lineObj.maxWidth - lineObj.width;
-				
-			if( textAlign == "center" )
-				lineObj.x = ( lineObj.maxWidth - lineObj.width )  * 0.5;
+			offsetX = (textAlign == "left" ) ? 0 : 0;
+			offsetX = (textAlign == "center" ) ? ( this.width - x ) * 0.5 : 0;
+			offsetX = (textAlign == "right" ) ? ( this.width - x ) : 0;
 			
-			lines.push(lineObj);
-			
-			x = 0;
-			
-			lineHeight = 0;
-			
-			if( currentChar == TextField.NEW_LINE_CHARACTER )
+			for( j = 0; j < currentRow.length; j++ )
 			{
-				currentChar = "";
-				textWidth = 0;
+				rowLetter = currentRow[j];
+				rowLetter.y = y - rowLetter.textHeight;
+				rowLetter.x += offsetX;
 			}
+			
+			currentRow = new Array();
+			x = 0;
+			maxLineHeight = letter.textHeight;
 		}
-	
-		letterObj = new Letter();
-		letterObj.value = currentChar;
-		letterObj.index = i;
-		letterObj.row = lines.length;
-		letterObj.x = x;
-		letterObj.y = 0;
-		letterObj.width = textWidth;
-		letterObj.height = curLineHeight;
-		letters.push(letterObj);
 		
-		x+=textWidth;
-		textAlign = currentFormat.textAlign;
-		
-		context.restore();
+		letter.x = x;
+		letter.y = 0;
+		x += letter.textWidth;
+		currentRow.push(letter);
 	}
 	
-	lineObj = new Object();
-	lineObj.height = (curLineHeight > lineHeight)?curLineHeight:lineHeight;
-	lineObj.y = y + lineObj.height;
-	lineObj.x = 0;
-	lineObj.width = x;
-	lineObj.maxWidth = this.width;
-	lineObj.align = textAlign;
+	y += maxLineHeight;
+	textAlign = ( currentRow[0] != undefined ) ? currentRow[0].format.textAlign : "left";
+			
+	offsetX = (textAlign == "left" ) ? 0 : 0;
+	offsetX = (textAlign == "center" ) ? ( this.width - x ) * 0.5 : 0;
+	offsetX = (textAlign == "right" ) ? ( this.width - x ) : 0;
 	
-	if( textAlign == "right" )
-		lineObj.x = lineObj.maxWidth - lineObj.width;
-		
-	if( textAlign == "center" )
-		lineObj.x = ( lineObj.maxWidth - lineObj.width )  * 0.5;
-	
-	lines.push(lineObj);
-	
-	i = 0;
-	max = letters.length;
-	y = 0;
-	currentRow = 0;
-	
-	for( ; i < max; i++ )
+	for( j = 0; j < currentRow.length; j++ )
 	{
-		letterObj = letters[i];
-		lineObj = lines[letterObj.row];
-		letterObj.y = lineObj.y + letterObj.y;
-		letterObj.x = lineObj.x + letterObj.x;
+		rowLetter = currentRow[j];
+		rowLetter.y = y - rowLetter.textHeight;
+		rowLetter.x += offsetX;
 	}
 	
-	this._letters = letters;
-	this._textHeight = y + this.padding;
+	DisplayObjectContainer.prototype.draw.apply(this, [context,transformMatrix]);
 };
 
-TextField.prototype.getLetters = function(context)
-{
-	return this._letters;
-};
-
-TextField.prototype._drawText = function(context)
-{
-	this._updateMetrics(context);
-	
-	var metrics = this._letters;
-	var letterObj = null;
-	var currentFormat = null;
-	var i = 0;
-	var max = this._letters.length;
-	var selected = false;
-	
-	for(  i = 0; i < max; i++ )
-	{
-		letterObj = metrics[i];
-		context.save();
-		currentFormat = this._formats[i] || this.defaultTextFormat;
-		
-		selected = ( i >= this._selectStart && i <= this._selectEnd );
-		
-		if( selected == true )
-		{
-			context.save();
-			context.beginPath();
-			context.fillStyle = "black";
-			context.fillRect(letterObj.x, letterObj.y - letterObj.height, letterObj.width, letterObj.height);
-			context.fill();
-			context.restore();
-		}
-		
-		currentFormat.updateContext(context);
-		
-		if( currentFormat.underline == true )
-		{
-			context.save();
-			context.beginPath();
-			context.moveTo(letterObj.x,letterObj.y + 2);
-			context.lineTo(letterObj.x + letterObj.width,letterObj.y + 2);
-			context.stroke();
-			context.restore();
-		}
-		
-		if( selected == true )
-		{
-			context.globalCompositeOperation = "xor";
-		}
-		
-		context.fillText(letterObj.value, letterObj.x, letterObj.y );
-		
-		context.restore();
-	}
-};
