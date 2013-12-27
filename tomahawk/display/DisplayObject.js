@@ -87,7 +87,7 @@ DisplayObject.prototype._update = function()
 	}
 	else
 	{
-		this._outOfScreen = true;
+		this._outOfScreen = false;
 	}
 };
 

@@ -399,7 +399,7 @@ DisplayObject.prototype._update = function()
 	}
 	else
 	{
-		this._outOfScreen = true;
+		this._outOfScreen = false;
 	}
 };
 
@@ -420,7 +420,6 @@ DisplayObject.prototype.setMask = function( mask )
 
 DisplayObject.prototype.render = function( context )
 {	
-	
 	if( this.updateNextFrame == true )
 	{
 		this._update();
