@@ -28,7 +28,6 @@ MovieClip.prototype._enterFrameHandler = function(event)
 	}
 };
 
-
 MovieClip.prototype.setFrame = function( frameIndex, texture )
 {
 	this._frames[frameIndex] = texture;
@@ -36,6 +35,7 @@ MovieClip.prototype.setFrame = function( frameIndex, texture )
 
 MovieClip.prototype.play = function()
 {
+	this.stop();
 	Stage.getInstance().addEventListener(Event.ENTER_FRAME, this,this._enterFrameHandler); 
 };
 

@@ -243,7 +243,7 @@ TextField.prototype.removeTextBetween = function(startIndex,endIndex)
 	}
 };
 
-TextField.prototype.draw = function(context,transformMatrix)
+TextField.prototype.draw = function(context,contextMatrix)
 {
 	var i = 0;
 	var max = this.children.length;
@@ -332,6 +332,6 @@ TextField.prototype.draw = function(context,transformMatrix)
 		rowLetter.x += offsetX;
 	}
 	
-	DisplayObjectContainer.prototype.draw.apply(this, [context,transformMatrix]);
+	DisplayObjectContainer.prototype.draw.apply(this, [context,contextMatrix]);
 };
 

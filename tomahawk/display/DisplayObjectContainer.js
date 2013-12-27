@@ -13,6 +13,7 @@ Tomahawk.registerClass( DisplayObjectContainer, "DisplayObjectContainer" );
 Tomahawk.extend( "DisplayObjectContainer", "DisplayObject" );
 
 DisplayObjectContainer.prototype.children = null;
+DisplayObjectContainer.prototype.isContainer = true;
 
 DisplayObjectContainer.prototype.addChild = function(child)
 {
@@ -50,14 +51,6 @@ DisplayObjectContainer.prototype.hitTest = function(x,y)
 	var children = this.children;
 	var i = children.length;
 	var child = null;
-	var left = null;
-	var top = null;
-	var right = null;
-	var bottom = null;
-	var lRect = null;
-	var rRect = null;
-	var tRect = null;
-	var bRect = null;
 	
 	while( --i > -1 )
 	{
@@ -68,42 +61,6 @@ DisplayObjectContainer.prototype.hitTest = function(x,y)
 	}
 	
 	return false;
-};
-
-DisplayObjectContainer.prototype.getBoundingRect = function()
-{
-	var children = this.children;
-	var i = children.length;
-	var child = null;
-	var rect = new Object();
-	var childRect = null;
-	
-	rect.x = 0;
-	rect.y = 0;
-	rect.top = 0;
-	rect.left = 0;
-	rect.right = 0;
-	rect.bottom = 0;
-	rect.width = 0;
-	rect.height = 0;
-	
-	i = children.length;
-	
-	while( --i > -1 )
-	{
-		child = children[i];
-		rect.left = ( child.x < rect.left ) ? child.x : rect.left;
-		rect.top = ( child.y < rect.top ) ? child.y : rect.top;
-		rect.right = ( child.x + child.width > rect.right ) ? child.x + child.width : rect.right;
-		rect.bottom = ( child.y + child.height > rect.bottom ) ? child.y + child.height : rect.bottom;
-	}
-	
-	rect.x 			= rect.left;
-	rect.y 			= rect.top;
-	rect.width 		= rect.right - rect.left;
-	rect.height 	= rect.bottom - rect.top;
-	
-	return rect;
 };
 
 DisplayObjectContainer.prototype.addChildAt = function(child, index)
@@ -139,35 +96,27 @@ DisplayObjectContainer.prototype.removeChild = function(child)
 	child.dispatchEvent( new Event(Event.REMOVED, true, true) );
 };
 
-
-DisplayObjectContainer.prototype.getObjectUnder = function(x,y)
+DisplayObjectContainer.prototype.render = function( context )
 {
-	var under = null;
 	var children = this.children;
-	var i = children.length;
+	var i = 0;
+	var max = children.length;
 	var child = null;
 	
-	while( --i > -1 )
+	for( ; i < max; i++ )
 	{
 		child = children[i];
 		
-		if( child.children )
+		if( this.updateNextFrame == true )
 		{
-			under = child.getObjectUnder(x,y);
-			
-			if( under != null )
-				return under;
-		}
-		else if( child.mouseEnabled == true && child.hitTest(x,y) == true )
-		{
-			return child;
+			child.updateNextFrame = true;
 		}
 	}
 	
-	return under;
+	DisplayObject.prototype.render.apply( this, [context] );
 };
 
-DisplayObjectContainer.prototype.draw = function( context, transformMatrix  )
+DisplayObjectContainer.prototype.draw = function( context  )
 {	
 	var children = this.children;
 	var i = 0;
@@ -177,8 +126,41 @@ DisplayObjectContainer.prototype.draw = function( context, transformMatrix  )
 	for( ; i < max; i++ )
 	{
 		child = children[i];
-		child.render(context, transformMatrix);
+		child.render(context);
 	}
+	
+	this.updateNextFrame = false;
+	
+};
+
+
+
+DisplayObjectContainer.prototype.getBoundingRect = function()
+{
+	var children = this.children;
+	var i = children.length;
+	var child = null;
+	var rect = new Rectangle();
+	var childRect = null;
+	
+	i = children.length;
+	
+	while( --i > -1 )
+	{
+		child = children[i];
+		childRect = child.getBoundingRect();
+		rect.left = ( childRect.left < rect.left ) ? childRect.left : rect.left;
+		rect.right = ( childRect.right > rect.right ) ? childRect.right : rect.right;
+		rect.top = ( childRect.top < rect.top ) ? childRect.top : rect.top;
+		rect.bottom = ( childRect.bottom > rect.bottom ) ? childRect.bottom : rect.bottom;
+	}
+	
+	rect.x = rect.left;
+	rect.y = rect.top;
+	rect.width = rect.right - rect.left;
+	rect.height = rect.bottom - rect.top;
+	
+	return rect;
 };
 
 DisplayObjectContainer.prototype.getObjectsUnder = function(x,y,limit)
@@ -192,7 +174,7 @@ DisplayObjectContainer.prototype.getObjectsUnder = function(x,y,limit)
 	{
 		child = children[i];
 		
-		if( child.getObjectsUnder )
+		if( child.isContainer )
 		{
 			under = under.concat(child.getObjectsUnder(x,y,limit));
 		}
@@ -203,6 +185,33 @@ DisplayObjectContainer.prototype.getObjectsUnder = function(x,y,limit)
 		
 		if( limit != undefined && under.length == limit)
 			return under;
+	}
+	
+	return under;
+};
+
+DisplayObjectContainer.prototype.getObjectUnder = function(x,y)
+{
+	var under = null;
+	var children = this.children;
+	var i = children.length;
+	var child = null;
+	
+	while( --i > -1 )
+	{
+		child = children[i];
+		
+		if( child.isContainer )
+		{
+			under = child.getObjectUnder(x,y);
+			
+			if( under != null )
+				return under;
+		}
+		else if( child.mouseEnabled == true && child.hitTest(x,y) == true )
+		{
+			return child;
+		}
 	}
 	
 	return under;

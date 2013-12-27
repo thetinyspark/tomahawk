@@ -15,9 +15,9 @@ Tomahawk.extend( "Bitmap", "DisplayObject" );
 
 Bitmap.prototype.texture = null;
 
-Bitmap.prototype.draw = function( context, transformMatrix )
+Bitmap.prototype.draw = function( context )
 {
-	if( this.texture )
+	if( this.texture != null )
 	{
 		var rect = this.texture.rect;
 		var data = this.texture.data;

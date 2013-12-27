@@ -47,6 +47,7 @@ Stage.prototype.mouseX = 0;
 Stage.prototype.mouseY = 0;
 Stage.prototype._input = null;
 Stage.prototype._focused = false;
+Stage.prototype._cache = null;
 
 
 Stage.prototype.init = function(canvas)
@@ -107,7 +108,6 @@ Stage.prototype._mouseHandler = function(event)
 	var bounds = this._canvas.getBoundingClientRect();
 	var x = event.clientX - bounds.left;
 	var y = event.clientY - bounds.top;
-	//var activeChild = this._getMouseObjectUnder(x,y,this);
 	var activeChild = this.getObjectUnder(x,y);
 	var mouseEvent = null;
 	var i = 0;
@@ -170,31 +170,6 @@ Stage.prototype.getMovement = function()
 	return pt;
 };
 
-Stage.prototype._getMouseObjectUnder = function(x,y,container)
-{
-	var under = null;
-	var children = container.children;
-	var i = children.length;
-	var child = null;
-	
-	while( --i > -1 )
-	{
-		child = children[i];
-		
-		if( child.children )
-		{
-			under = this._getMouseObjectUnder(x,y,child);
-			if( under != null )
-				return under;
-		}
-		else if( child.mouseEnabled == true && child.hitTest(x,y) == true )
-		{
-			return child;
-		}
-	}
-	
-	return null;
-};
 
 Stage.prototype._eventHandler = function(event)
 {
@@ -221,8 +196,6 @@ Stage.prototype._eventHandler = function(event)
 Stage.prototype._enterFrame = function()
 {
 	this.dispatchEvent(new Event(Event.ENTER_FRAME,true,true));
-	
-	var transformMatrix = new Matrix2D();
 	var curTime = new Date().getTime();
 	var scope = this;
 	
@@ -237,7 +210,7 @@ Stage.prototype._enterFrame = function()
 	
 	this._context.clearRect(0,0,this._canvas.width,this._canvas.height);
 	this._context.save();
-	this.render(this._context, transformMatrix);
+	this.render(this._context);
 	this._context.restore();
 	
 	if( this._debug == true )

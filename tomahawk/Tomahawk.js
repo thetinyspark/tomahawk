@@ -24,9 +24,6 @@ Tomahawk._extends = new Array();
 		var obj = null;
 		var i = 0;
 		var max = Tomahawk._extends.length;
-			
-		
-		
 		for (i = 0; i < max; i++ )
 		{
 			Tomahawk._inherits( Tomahawk._extends[i] );
@@ -61,12 +58,12 @@ Tomahawk._extends = new Array();
 		
 		if( child != null && ancestor != null )
 		{
-			ancestor = new ancestor();
-			for( var prop in ancestor )
+			for( var prop in ancestor.prototype )
 			{
+				var descriptor = Object.getOwnPropertyDescriptor( ancestor.prototype, prop );
 				if( !child.prototype[prop] )
 				{
-					child.prototype[prop] = ancestor[prop];
+					Object.defineProperty( child.prototype, prop, descriptor );
 				}
 			}
 		}

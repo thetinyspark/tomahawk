@@ -22,3 +22,8 @@ Screen.getWindowWidth = function()
 {
 	return window.innerWidth;
 };
+
+Screen.getWindowHeight = function()
+{
+	return window.innerHeight;
+};
