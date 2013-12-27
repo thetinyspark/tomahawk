@@ -1194,6 +1194,23 @@ Shape.prototype.draw = function(context)
  * @author Thot
 */
 
+function Sprite()
+{
+	DisplayObjectContainer.apply(this);
+}
+
+Tomahawk.registerClass( Sprite, "Sprite" );
+Tomahawk.extend( "Sprite", "DisplayObjectContainer" );
+
+
+
+
+
+/**
+ * ...
+ * @author Thot
+*/
+
 function Stage()
 {
 	DisplayObjectContainer.apply(this);
