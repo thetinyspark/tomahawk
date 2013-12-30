@@ -284,9 +284,10 @@ Screen.getWindowHeight = function()
 
 
 
-function Bitmap()
+function Bitmap(texture)
 {
 	DisplayObject.apply(this);
+	this.texture = texture;
 }
 
 Tomahawk.registerClass( Bitmap, "Bitmap" );
@@ -295,14 +296,11 @@ Tomahawk.extend( "Bitmap", "DisplayObject" );
 Bitmap.prototype.texture = null;
 
 Bitmap.prototype.draw = function( context )
-{
-	if( this.texture != null )
-	{
-		var rect = this.texture.rect;
-		var data = this.texture.data;
+{	
+	var rect = this.texture.rect;
+	var data = this.texture.data;
 		
-		context.drawImage(	data, rect[0], rect[1], rect[2], rect[3], 0, 0, this.width, this.height );
-	}
+	context.drawImage(	data, rect[0], rect[1], rect[2], rect[3], 0, 0, this.width, this.height );
 };
 
 
@@ -318,7 +316,7 @@ Bitmap.prototype.draw = function( context )
 function DisplayObject()
 {
 	EventDispatcher.apply(this);
-	this._matrix = new Matrix2D();
+	this.matrix = new Matrix2D();
 	this._concatenedMatrix = new Matrix2D();
 	this._bounds = new Rectangle();
 }
@@ -328,17 +326,17 @@ Tomahawk.extend( "DisplayObject", "EventDispatcher" );
 
 DisplayObject.prototype.name 			= null;
 DisplayObject.prototype.parent 			= null;
-DisplayObject.prototype._x 				= 0;
-DisplayObject.prototype._y 				= 0;
-DisplayObject.prototype._pivotX 		= 0;
-DisplayObject.prototype._pivotY 		= 0;
-DisplayObject.prototype._skewX 			= 0;
-DisplayObject.prototype._skewY 			= 0;
-DisplayObject.prototype._scaleX 		= 1;
-DisplayObject.prototype._scaleY 		= 1;
-DisplayObject.prototype._width 			= 0;
-DisplayObject.prototype._height 		= 0;
-DisplayObject.prototype._rotation 		= 0;
+DisplayObject.prototype.x 				= 0;
+DisplayObject.prototype.y 				= 0;
+DisplayObject.prototype.pivotX 			= 0;
+DisplayObject.prototype.pivotY 			= 0;
+DisplayObject.prototype.skewX 			= 0;
+DisplayObject.prototype.skewY 			= 0;
+DisplayObject.prototype.scaleX 			= 1;
+DisplayObject.prototype.scaleY 			= 1;
+DisplayObject.prototype.width 			= 0;
+DisplayObject.prototype.height 			= 0;
+DisplayObject.prototype.rotation 		= 0;
 
 DisplayObject.prototype.alpha 			= 1;
 DisplayObject.prototype.mouseEnabled 	= false;
@@ -347,131 +345,123 @@ DisplayObject.prototype.handCursor 		= false;
 DisplayObject.prototype.isMask			= false;
 DisplayObject.prototype.filters 		= null;
 DisplayObject.prototype.mask 			= null;
-DisplayObject.prototype.updateNextFrame = true;
-DisplayObject.prototype._matrix 		= null;
-DisplayObject.prototype._bounds 		= null;
-DisplayObject.prototype._outOfScreen 	= false;
-DisplayObject.prototype._concatenedMatrix = null;
+DisplayObject.prototype.matrix 				= null;
+DisplayObject.prototype._bounds 			= null;
+DisplayObject.prototype._cache 				= null;
+DisplayObject.prototype._concatenedMatrix 	= null;
+DisplayObject.prototype.cacheAsBitmap		= false;
+DisplayObject.prototype.autoUpdate			= true;
+DisplayObject.prototype.updateNextFrame		= true;
 
 DisplayObject._toRadians = Math.PI / 180;
 
-
-DisplayObject.prototype._update = function()
-{
-	var current = this;
-	
-	this._matrix.identity();
-	this._matrix.appendTransform(	this._x, 
-									this._y, 
-									this._scaleX, 
-									this._scaleY, 
-									this._rotation, 
-									this._skewX, 
-									this._skewY, 
-									this._pivotX, 
-									this._pivotY);
-									
-									
-	this._concatenedMatrix.identity();
-	
-	if( this.parent == null )
-	{
-		this._concatenedMatrix = this._matrix.clone();
-	}
-	else
-	{
-		this._concatenedMatrix = this.parent.getMatrix().clone().appendTransform(	this._x, 
-																					this._y, 
-																					this._scaleX, 
-																					this._scaleY, 
-																					this._rotation, 
-																					this._skewX, 
-																					this._skewY, 
-																					this._pivotX, 
-																					this._pivotY );
-	}
-	
-	this._bounds = this.getBoundingRect();
-	
-	if( this._bounds.right < 0|| this._bounds.left > 800 || this._bounds.top > 600 || this._bounds.bottom < 0 )
-	{
-		this._outOfScreen = true;
-	}
-	else
-	{
-		this._outOfScreen = false;
-	}
-};
-
 DisplayObject.prototype.setMask = function( mask )
 {
-	if( this._mask != null )
+	if( this.mask != null )
 	{
-		this._mask.isMask = false;
+		this.mask.isMask = false;
 	}
 	
-	this._mask = mask;
+	this.mask = mask;
 	
-	if( this._mask != null )
+	if( this.mask != null )
 	{
-		this._mask.isMask = true;
+		this.mask.isMask = true;
 	}
 };
 
-DisplayObject.prototype.render = function( context )
-{	
-	if( this.updateNextFrame == true )
-	{
-		this._update();
-		this.updateNextFrame = false;
-	}
-	
-	if( this.visible == false || this._outOfScreen == true )
+DisplayObject.prototype.updateMatrix = function()
+{
+	if( this.autoUpdate == false && this.updateNextFrame == false )
 		return;
-		
-	var mat = this._concatenedMatrix;
-	var cache = null;
-	var redraw = false;
+	
+	this.matrix.d = this.matrix.a = 1;
+	this.matrix.b = this.matrix.c = this.matrix.tx = this.matrix.ty = 0;
+	this.matrix.appendTransform(	this.x, 
+									this.y, 
+									this.scaleX, 
+									this.scaleY, 
+									this.rotation, 
+									this.skewX, 
+									this.skewY, 
+									this.pivotX, 
+									this.pivotY);
+									
+	this.updateNextFrame = false;
+};
+
+
+DisplayObject.prototype.updateCache = function()
+{	
+	var buffer = null;
+	var context = null;
+	var filters = this.filters;
+	var bounds = this.getBoundingRect();
+	var i = 0;
+	
+	buffer = document.createElement("canvas");
+	buffer.width = bounds.width;
+	buffer.height = bounds.height;
+	
+	context = buffer.getContext("2d");
 	
 	context.save();
+	context.globalAlpha = this.alpha;
+	this.draw(context);
+	context.restore();
 	
-	if( this.isMask == true )
-	{
-		return;
-	}
-	
-	if( this._mask != null || this.filters != null )
-	{
-		cache = DrawUtils.getCanvas();
+	if( filters != null )
+	{		
+		i = filters.length;
 		
-		if( this._mask != null )
+		while( --i > -1 )
 		{
-			DrawUtils.drawMask(cache,this,this._mask);
-		}
-		
-		if( this.filters != null )
-		{
-			DrawUtils.drawFilters(cache,this)
+			filters[i].apply(buffer,context,this);
 		}
 	}
 	
-	if( cache == null )
+	this._cache = buffer;
+};
+
+DisplayObject.prototype.drawComposite = function(drawContext)
+{
+	if( this._cache == null || this.cacheAsBitmap == false)
+		this.updateCache();
+		
+	var buffer = this._cache;
+	var context = null;
+	var mat = null;
+	var i = 0;
+	var mask = this.mask;
+	
+	if( mask != null )
 	{
+		buffer = document.createElement("canvas");
+		buffer.width = this._cache.width;
+		buffer.height = this._cache.height;
+		context = buffer.getContext("2d");
+		
+		mat = mask.getConcatenedMatrix().prependMatrix( this.getConcatenedMatrix().invert() );
+		context.save();
+
+		context.globalAlpha = mask.alpha;
 		context.setTransform(	mat.a,
 								mat.b,
 								mat.c,
 								mat.d,
 								mat.tx,
-								mat.ty);				
-		this.draw(context);
+								mat.ty);
+									
+		mask.draw(context);
+		
+		context.restore();
+		context.save();
+		context.globalCompositeOperation = "source-in";
+		context.drawImage(this._cache, 0, 0, this._cache.width, this._cache.height );
+		context.restore();
 	}
-	else
-	{
-		context.drawImage(cache,0,0,cache.width,cache.height);
-		DrawUtils.recycleCanvas(cache);
-	}
-
-	context.restore();
+	
+	drawContext.drawImage(buffer,0, 0, buffer.width, buffer.height );	
 };
 
 DisplayObject.prototype.draw = function(context)
@@ -479,13 +469,20 @@ DisplayObject.prototype.draw = function(context)
 	return;
 };
 
-DisplayObject.prototype.getMatrix = function()
-{
-	return this._matrix;
-};
-
 DisplayObject.prototype.getConcatenedMatrix = function()
 {
+	this.updateNextFrame = true;
+	this.updateMatrix();
+	var current = this.parent;
+	var mat = this.matrix.clone();
+	
+	while( current != null )
+	{
+		mat.prependMatrix(current.matrix );
+		current = current.parent;
+	}
+	
+	this._concatenedMatrix = mat;
 	return this._concatenedMatrix;
 };
 
@@ -552,177 +549,11 @@ DisplayObject.prototype.getBoundingRect = function()
 	rect.y = rect.top;
 	rect.width = rect.right - rect.left;
 	rect.height = rect.bottom - rect.top;
+	
+	this._bounds = rect;
 	return rect;
 };
 
-
-
-DisplayObject.prototype.getX = function()
-{
-	return this._x;
-};
-
-DisplayObject.prototype.getY = function()
-{
-	return this._y;
-};
-
-DisplayObject.prototype.getWidth = function()
-{
-	return this._width;
-};
-
-DisplayObject.prototype.getHeight = function()
-{
-	return this._height;
-};
-
-DisplayObject.prototype.getPivotX = function()
-{
-	return this._pivotX;
-};
-
-DisplayObject.prototype.getPivotY = function()
-{
-	return this._pivotY;
-};
-
-DisplayObject.prototype.getScaleX = function()
-{
-	return this._scaleX;
-};
-
-DisplayObject.prototype.getScaleY = function()
-{
-	return this._scaleY;
-};
-
-DisplayObject.prototype.getSkewX = function()
-{
-	return this._skewX;
-};
-
-DisplayObject.prototype.getSkewY = function()
-{
-	return this._skewY;
-};
-
-DisplayObject.prototype.getRotation = function()
-{
-	return this._rotation;
-};
-
-
-DisplayObject.prototype.setX = function(value)
-{
-	this._x = value;
-	this.updateNextFrame = true;
-};
-
-DisplayObject.prototype.setY = function(value)
-{
-	this._y = value;
-	this.updateNextFrame = true;
-};
-
-DisplayObject.prototype.setWidth = function(value)
-{
-	this._width = value;
-	this.updateNextFrame = true;
-};
-
-DisplayObject.prototype.setHeight = function(value)
-{
-	this._height = value;
-	this.updateNextFrame = true;
-};
-
-DisplayObject.prototype.setPivotX = function(value)
-{
-	this._pivotX = value;
-	this.updateNextFrame = true;
-};
-
-DisplayObject.prototype.setPivotY = function(value)
-{
-	this._pivotY = value;
-	this.updateNextFrame = true;
-};
-
-DisplayObject.prototype.setScaleX = function(value)
-{
-	this._scaleX = value;
-	this.updateNextFrame = true;
-};
-
-DisplayObject.prototype.setScaleY = function(value)
-{
-	this._scaleY = value;
-	this.updateNextFrame = true;
-};
-
-DisplayObject.prototype.setSkewX = function(value)
-{
-	this._skewX = value;
-	this.updateNextFrame = true;
-};
-
-DisplayObject.prototype.setSkewY = function(value)
-{
-	this._skewY = value;
-	this.updateNextFrame = true;
-};
-
-DisplayObject.prototype.setRotation = function(value)
-{
-	this._rotation = value;
-	this.updateNextFrame = true;
-};
-
-
-Object.defineProperty(DisplayObject.prototype, "x", {	get: DisplayObject.prototype.getX,
-														set: DisplayObject.prototype.setX, 
-														enumerable: true });
-														
-Object.defineProperty(DisplayObject.prototype, "y", {	get: DisplayObject.prototype.getY,
-														set: DisplayObject.prototype.setY, 
-														enumerable: true });
-														
-Object.defineProperty(DisplayObject.prototype, "width", {	get: DisplayObject.prototype.getWidth,
-															set: DisplayObject.prototype.setWidth, 
-															enumerable: true });
-															
-Object.defineProperty(DisplayObject.prototype, "height", {	get: DisplayObject.prototype.getHeight,
-															set: DisplayObject.prototype.setHeight, 
-															enumerable: true });
-															
-Object.defineProperty(DisplayObject.prototype, "skewX", {	get: DisplayObject.prototype.getSkewX,
-															set: DisplayObject.prototype.setSkewX, 
-															enumerable: true });
-															
-Object.defineProperty(DisplayObject.prototype, "skewY", {	get: DisplayObject.prototype.getSkewY,
-															set: DisplayObject.prototype.setSkewY, 
-															enumerable: true });
-
-Object.defineProperty(DisplayObject.prototype, "scaleX", {	get: DisplayObject.prototype.getScaleX,
-															set: DisplayObject.prototype.setScaleX, 
-															enumerable: true });
-															
-Object.defineProperty(DisplayObject.prototype, "scaleY", {	get: DisplayObject.prototype.getScaleY,
-															set: DisplayObject.prototype.setScaleY, 
-															enumerable: true });
-															
-Object.defineProperty(DisplayObject.prototype, "pivotX", {	get: DisplayObject.prototype.getPivotX,
-															set: DisplayObject.prototype.setPivotX, 
-															enumerable: true });
-															
-Object.defineProperty(DisplayObject.prototype, "pivotY", {	get: DisplayObject.prototype.getPivotY,
-															set: DisplayObject.prototype.setPivotY, 
-															enumerable: true });
-															
-Object.defineProperty(DisplayObject.prototype, "rotation", {get: DisplayObject.prototype.getRotation,
-															set: DisplayObject.prototype.setRotation, 
-															enumerable: true });
 
 
 
@@ -748,6 +579,7 @@ Tomahawk.extend( "DisplayObjectContainer", "DisplayObject" );
 
 DisplayObjectContainer.prototype.children = null;
 DisplayObjectContainer.prototype.isContainer = true;
+DisplayObjectContainer.prototype.cacheChildrenMatrix = true;
 
 DisplayObjectContainer.prototype.addChild = function(child)
 {
@@ -830,41 +662,39 @@ DisplayObjectContainer.prototype.removeChild = function(child)
 	child.dispatchEvent( new Event(Event.REMOVED, true, true) );
 };
 
-DisplayObjectContainer.prototype.render = function( context )
-{
-	var children = this.children;
-	var i = 0;
-	var max = children.length;
-	var child = null;
-	
-	for( ; i < max; i++ )
-	{
-		child = children[i];
-		
-		if( this.updateNextFrame == true )
-		{
-			child.updateNextFrame = true;
-		}
-	}
-	
-	DisplayObject.prototype.render.apply( this, [context] );
-};
-
-DisplayObjectContainer.prototype.draw = function( context  )
+DisplayObjectContainer.prototype.draw = function( context )
 {	
 	var children = this.children;
 	var i = 0;
 	var max = children.length;
 	var child = null;
+	var mat = null;
+	
 	
 	for( ; i < max; i++ )
 	{
 		child = children[i];
-		child.render(context);
+		child.updateMatrix();
+		mat = child.matrix;
+		
+		if( child.visible == false || child.isMask == true )
+			continue;
+		
+		context.save();
+		context.globalAlpha *= child.alpha;
+		context.transform(mat.a,mat.b,mat.c,mat.d,mat.tx,mat.ty);
+		
+		if( child.mask != null || child.filters != null || child.cacheAsBitmap == true )
+		{
+			child.drawComposite(context);
+		}
+		else
+		{
+			child.draw(context);
+		}
+		
+		context.restore();
 	}
-	
-	this.updateNextFrame = false;
-	
 };
 
 
@@ -961,9 +791,9 @@ DisplayObjectContainer.prototype.getObjectUnder = function(x,y)
  * @author Thot
 */
 
-function MovieClip()
+function MovieClip(texture)
 {
-	Bitmap.apply(this);
+	Bitmap.apply(this, [texture]);
 	this._frames = new Array();
 }
 
@@ -1248,12 +1078,9 @@ Stage.prototype._frameCount = 0;
 Stage.prototype._fps = 0;
 Stage.prototype._canvas = null;
 Stage.prototype._context = null;
-Stage.prototype._debug = false;
 Stage.prototype._lastActiveChild = null;
-Stage.prototype.displayMouseCoordinates = false;
 Stage.prototype.mouseX = 0;
 Stage.prototype.mouseY = 0;
-Stage.prototype._input = null;
 Stage.prototype._focused = false;
 Stage.prototype._cache = null;
 
@@ -1271,8 +1098,6 @@ Stage.prototype.init = function(canvas)
 		scope._keyboardHandler(event);
 	};
 	
-	this._input = document.createElement("input");
-	this._input.type = "text";
 	this._canvas = canvas;
 	this._context = canvas.getContext("2d");
 	this.addEventListener(Event.ADDED, this, this._eventHandler,true);
@@ -1288,7 +1113,7 @@ Stage.prototype.init = function(canvas)
 	window.addEventListener("keyup",callbackKey);
 	window.addEventListener("keydown",callbackKey);
 	window.addEventListener("keypress",callbackKey);
-	this._enterFrame();		
+	this.enterFrame();		
 };
 
 Stage.prototype._keyboardHandler = function(event)
@@ -1401,55 +1226,47 @@ Stage.prototype._eventHandler = function(event)
 	}
 };
 
-Stage.prototype._enterFrame = function()
+Stage.prototype.enterFrame = function()
 {
-	this.dispatchEvent(new Event(Event.ENTER_FRAME,true,true));
 	var curTime = new Date().getTime();
-	var scope = this;
+	var scope = Stage.getInstance();
+	var context = scope._context;
+	var canvas = scope._canvas;
 	
-	this._frameCount++;
+	scope._frameCount++;
 	
-	if( curTime - this._lastTime >= 1000 )
+	if( curTime - scope._lastTime > 1000 )
 	{
-		this._fps = this._frameCount;
-		this._frameCount = 0;
-		this._lastTime = curTime;
+		scope._fps = scope._frameCount;
+		scope._frameCount = 0;
+		scope._lastTime = curTime;
 	}
 	
-	this._context.clearRect(0,0,this._canvas.width,this._canvas.height);
+	context.clearRect(0,0,canvas.width,canvas.height);
+	context.save();
+	scope.draw(context);
+	context.restore();
+	
+	scope.dispatchEvent(new Event(Event.ENTER_FRAME,true,true));
+	window.requestAnimationFrame(scope.enterFrame);
+};
+
+Stage.prototype.setFPS = function(value)
+{
+	this._fps = value;
+};
+
+Stage.prototype.drawFPS = function()
+{
 	this._context.save();
-	this.render(this._context);
+	this._context.beginPath();
+	this._context.fillStyle = "black";
+	this._context.fillRect(0,0,50,15);
+	this._context.fill();
+	this._context.fillStyle = "red";
+	this._context.font = '10pt Arial';
+	this._context.fillText("fps: "+this._fps, 0,15);
 	this._context.restore();
-	
-	if( this._debug == true )
-	{
-		this._context.save();
-		this._context.beginPath();
-		this._context.fillStyle = "black";
-		this._context.fillRect(0,0,100,30);
-		this._context.fill();
-		this._context.fillStyle = "red";
-		this._context.font = 'italic 20pt Calibri';
-		this._context.fillText("fps: "+this._fps, 0,30);
-		this._context.restore();
-	}
-	
-	if( this.displayMouseCoordinates == true )
-	{
-		this._context.save();
-		this._context.beginPath();
-		this._context.fillStyle = "green";
-		this._context.fillRect(this.mouseX - 2,this.mouseY - 2,4,4);
-		this._context.fill();
-		this._context.restore();
-	}
-	
-	window.requestAnimationFrame(
-		function()
-		{
-			scope._enterFrame();
-		}
-	);
 };
 
 Stage.prototype.getCanvas = function()
@@ -1467,117 +1284,12 @@ Stage.prototype.getFPS = function()
 	return this._fps;
 };
 
-Stage.prototype.setDebug = function( debug )
-{
-	this._debug = debug;
-};
 
 
 
 
 
 
-
-
-
-
-/**
- * ...
- * @author Thot
- */
-
-function DrawUtils(){}
-
-DrawUtils._pool = new Array();
-
-
-DrawUtils.drawMask = function( canvas, drawableObject, mask )
-{
-	var context = canvas.getContext("2d");
-	var curMatrix = mask.getConcatenedMatrix();
-	
-	context.save();
-	
-	context.globalAlpha = mask.alpha;
-	context.setTransform(	curMatrix.a,
-							curMatrix.b,
-							curMatrix.c,
-							curMatrix.d,
-							curMatrix.tx,
-							curMatrix.ty);
-								
-	mask.draw(context);
-	
-	context.restore();
-
-	context.save();
-	
-	context.globalCompositeOperation = "source-in";
-	curMatrix = drawableObject.getConcatenedMatrix();
-	
-	context.globalAlpha = drawableObject.alpha;
-	context.setTransform(	curMatrix.a,
-							curMatrix.b,
-							curMatrix.c,
-							curMatrix.d,
-							curMatrix.tx,
-							curMatrix.ty);
-	
-	drawableObject.draw(context);
-	
-	context.restore();
-	return canvas;
-};
-
-DrawUtils.drawFilters = function( canvas, drawableObject )
-{
-	var i = 0;
-	var max = drawableObject.filters.length;
-	var filter = null;
-	var curMatrix = drawableObject.getConcatenedMatrix();
-	var context = canvas.getContext("2d");
-	context.save();
-	
-	context.globalAlpha = drawableObject.alpha;
-	context.setTransform(	curMatrix.a,
-							curMatrix.b,
-							curMatrix.c,
-							curMatrix.d,
-							curMatrix.tx,
-							curMatrix.ty);
-								
-	drawableObject.draw(context);
-	
-	for( ; i < max; i++ )
-	{
-		filter = drawableObject.filters[i];
-		filter.apply(canvas,context,drawableObject);
-	}
-	
-	context.restore();
-};
-
-DrawUtils.getCanvas = function()
-{
-	var canvas = null;
-	if( DrawUtils._pool.length > 0 )
-	{
-		canvas = DrawUtils._pool.shift();
-	}
-	else
-	{
-		canvas = document.createElement("canvas");
-		canvas.width = Stage.getInstance().getCanvas().width;
-		canvas.height = Stage.getInstance().getCanvas().height;
-	}
-	
-	return canvas;
-};
-
-DrawUtils.recycleCanvas = function(canvas)
-{
-	DrawUtils._pool.push(canvas);
-};
 
 
 
@@ -2086,8 +1798,7 @@ Tomahawk.extend( "GrayScaleFilter", "PixelFilter" );
 
 GrayScaleFilter.prototype.process = function()
 {
-	var rect = this._object.getBoundingRect();
-	var pixels = this.getPixels(rect.x,rect.y,rect.width,rect.height);
+	var pixels = this.getPixels(0,0,this._canvas.width,this._canvas.height);
 	var data = pixels.data;
 	
 	for (var i=0; i<data.length; i+=4) 
@@ -2099,7 +1810,7 @@ GrayScaleFilter.prototype.process = function()
 		data[i] = data[i+1] = data[i+2] = v;
 	}
 	
-	this.setPixels(pixels,rect.x,rect.y);
+	this.setPixels(pixels,0,0);
 };
 
 
@@ -2118,18 +1829,12 @@ PixelFilter.prototype._object = null;
 
 PixelFilter.prototype.getPixels = function(x,y,width,height)
 {
-	var x1 = ( x < 0 ) ? 0 : x;
-	var y1 = ( y < 0 ) ? 0 : y;
-	var width1 = ( width > this._canvas.width ) ? this._canvas.width : width;
-	var height1 = ( height > this._canvas.height ) ? this._canvas.height : height;
-	return this._context.getImageData(x1,y1,width1,height1);
+	return this._context.getImageData(x,y,width,height);
 };
 
 PixelFilter.prototype.setPixels = function(pixels,x,y)
 {
-	var x1 = ( x < 0 ) ? 0 : x;
-	var y1 = ( y < 0 ) ? 0 : y;
-	this._context.putImageData(pixels,x1,y1);
+	this._context.putImageData(pixels,x,y);
 };
 
 PixelFilter.prototype.process = function()

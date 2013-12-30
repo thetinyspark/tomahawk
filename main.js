@@ -22,7 +22,6 @@ Main.prototype.init = function()
 	
 	Tomahawk.run();
 	Stage.getInstance().init(document.getElementById("tomahawk"));
-	Stage.getInstance().setDebug(true);
 	
 	AssetsLoader.getInstance().addFile("./assets/ground.png","ground");
 	AssetsLoader.getInstance().addFile("./assets/perso1.png","perso1");
@@ -43,7 +42,7 @@ Main.prototype.complete = function()
 	var texture = null;
 	var coords = null;
 	var container = new DisplayObjectContainer();
-	var i = 15;
+	var i = 50;
 	var j = 0;
 	
 	while( --i > -1 )
@@ -58,13 +57,13 @@ Main.prototype.complete = function()
 			texture.data = data["ground"]
 			texture.rect = [0,0,64,43];
 			
-			bmp = new Bitmap();
-			bmp.texture = texture;
+			bmp = new Bitmap(texture);
 			bmp.width = 64;
 			bmp.height = 43;
 			bmp.x = coords.x + 400;
 			bmp.y = coords.y;
 			bmp.name = "bmp_"+i+'_'+j;
+			bmp.autoUpdate = false;
 			
 			container.addChildAt(bmp,0);
 		}
@@ -72,31 +71,38 @@ Main.prototype.complete = function()
 	
 	
 	coords = this.isoToScreen(5,5,64,32);
-	
+	coords.x += 400;
 	texture = new Texture();
-	texture.data = data["perso1"]
-	texture.rect = [0,0,110,224];
+	texture.data = data["ground"]
+	texture.rect = [0,0,64,43];
 	
 	var mymask = new Bitmap();
 	mymask.texture = texture;
 	mymask.width = 64;
-	mymask.height = 113;
-	mymask.x = coords.x + 410;
-	mymask.y = coords.y - ( mymask.height - 32 );
+	mymask.height = 43;
+	mymask.x = coords.x;
+	mymask.y = coords.y;
+	mymask.pivotX = mymask.width >> 1;
+	mymask.pivotY = mymask.height >> 1;
+	
+	texture = new Texture();
+	texture.data = data["perso1"];
+	texture.rect = [0,0,110,224];
 	
 	bmp = new Bitmap();
 	bmp.texture = texture;
 	bmp.width = 64;
 	bmp.height = 113;
-	bmp.x = coords.x + 400;
-	bmp.y = coords.y - ( bmp.height - 32 );
+	bmp.x = coords.x;
+	bmp.y = coords.y;
 	
-	//container.addChild(mymask);
+	Stage.getInstance().addChild(mymask);
 	container.addChild(bmp);
 	
+	container.setMask( mymask );
+	container.cacheAsBitmap = true;
+	container.filters = [new GrayScaleFilter()];
 	
-	//bmp.setMask( mymask );
-	//container.filters = [new GrayScaleFilter()];
 	
 	if( Screen.getWindowWidth() < 800 )
 	{	
@@ -106,13 +112,23 @@ Main.prototype.complete = function()
 	Stage.getInstance().addChild(container);
 	Stage.getInstance().addEventListener(Event.ENTER_FRAME, this, this.onFrame);
 	
+	container.cacheAsBitmap = true;
+	container.name = "narnia";
+	
 };
 
 Main.prototype.onFrame = function()
 {
-	Stage.getInstance().getChildAt(0).getChildAt(0).x++;
-	//Stage.getInstance().getChildAt(0).x++;
-	//Stage.getInstance().getChildAt(0).updateNextFrame = true;
+	Stage.getInstance().drawFPS();
+	var container = Stage.getInstance().getChildByName("narnia");
+	
+	container.y--;
+	
+	if( container.mask != null )
+	{
+		container.mask.scaleX =  2;
+		container.mask.scaleY = 2;
+	}
 };
 
 window.onload = function()
