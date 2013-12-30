@@ -112,7 +112,7 @@ Main.prototype.complete = function()
 	input.border = false;
 	
 	
-	container.setMask(input);
+	//container.setMask(input);
 	
 	tomahawk_ns.Stage.getInstance().addChild(container);
 	tomahawk_ns.Stage.getInstance().addChild(input);

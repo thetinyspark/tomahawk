@@ -2911,8 +2911,6 @@ MovieClip.prototype.stop = function()
 	TextField.prototype.setCurrentIndex = function(index)
 	{
 		var current = null;
-		index = ( index < 0 ) ? 0 : index;
-		index = ( index > this.children.length ) ? this.children.length : index;
 		
 		if( this._selectedLetter != null )
 		{
@@ -3010,7 +3008,15 @@ MovieClip.prototype.stop = function()
 		var type = ( this._focused == true ) ? tomahawk_ns.Event.FOCUSED : tomahawk_ns.Event.UNFOCUSED;
 		var focusEvent = new tomahawk_ns.Event( type, true, true );
 		this.dispatchEvent(focusEvent);
-		this.setCurrentIndex(0);
+		
+		if( this._focused == false )
+		{
+			this.setCurrentIndex(-1);
+		}
+		else
+		{
+			this.setCurrentIndex(0);
+		}
 	};
 
 	TextField.prototype.getFocus = function()
