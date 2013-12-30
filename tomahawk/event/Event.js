@@ -3,34 +3,40 @@
  * @author Thot
 */
 
-function Event(type, bubbles, cancelable)
-{
-	this.type = type;
-	this.cancelable = cancelable;
-	this.bubbles = bubbles;
-}
+(function() {	
+	
+	function Event(type, bubbles, cancelable)
+	{
+		this.type = type;
+		this.cancelable = cancelable;
+		this.bubbles = bubbles;
+	}
 
-Tomahawk.registerClass( Event, "Event" );
+	Tomahawk.registerClass( Event, "Event" );
 
-Event.prototype.type = null;
-Event.prototype.bubbles = false;
-Event.prototype.cancelable = true;
-Event.prototype.data = null;
-Event.prototype.target = null;
-Event.prototype.currentTarget = null;
+	Event.prototype.type = null;
+	Event.prototype.bubbles = false;
+	Event.prototype.cancelable = true;
+	Event.prototype.data = null;
+	Event.prototype.target = null;
+	Event.prototype.currentTarget = null;
 
-Event.prototype.stopPropagation = function()
-{
-	if( this.cancelable == true )
-		this.bubbles = false;
-};
+	Event.prototype.stopPropagation = function()
+	{
+		if( this.cancelable == true )
+			this.bubbles = false;
+	};
 
 
-Event.FOCUSED			= "focused"
-Event.UNFOCUSED			= "unfocused"
-Event.ADDED 			= "added";
-Event.ADDED_TO_STAGE 	= "addedToStage";
-Event.ENTER_FRAME 		= "enterFrame";
-Event.REMOVED 			= "removed";
-Event.REMOVED_FROM_STAGE= "removedFromStage";
+	Event.FOCUSED			= "focused"
+	Event.UNFOCUSED			= "unfocused"
+	Event.ADDED 			= "added";
+	Event.ADDED_TO_STAGE 	= "addedToStage";
+	Event.ENTER_FRAME 		= "enterFrame";
+	Event.REMOVED 			= "removed";
+	Event.REMOVED_FROM_STAGE= "removedFromStage";
+	
+	
+	tomahawk_ns.Event = Event;
 
+})();

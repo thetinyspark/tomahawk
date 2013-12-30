@@ -1,48 +1,52 @@
 
+(function() {
+	
 
-function Matrix2D(a, b, c, d, tx, ty)
-{
-	this.initialize(a, b, c, d, tx, ty);
-	this._stack = new Array();
-}
+	function Matrix2D(a, b, c, d, tx, ty)
+	{
+		this.initialize(a, b, c, d, tx, ty);
+		this._stack = new Array();
+	}
 
-Matrix2D.prototype._stack = null;
+	Tomahawk.registerClass( Matrix2D, "Matrix2D" );
+	
+	Matrix2D.prototype._stack = null;
 
-Matrix2D.prototype.save = function()
-{
-	this._stack.push(this.a,this.b,this.c,this.d,this.tx,this.ty);
-};
+	Matrix2D.prototype.save = function()
+	{
+		this._stack.push(this.a,this.b,this.c,this.d,this.tx,this.ty);
+	};
 
-Matrix2D.prototype.restore = function()
-{
-	this.ty = this._stack.pop();
-	this.tx = this._stack.pop();
-	this.d = this._stack.pop();
-	this.c = this._stack.pop();
-	this.b = this._stack.pop();
-	this.a = this._stack.pop();
-};
+	Matrix2D.prototype.restore = function()
+	{
+		this.ty = this._stack.pop();
+		this.tx = this._stack.pop();
+		this.d = this._stack.pop();
+		this.c = this._stack.pop();
+		this.b = this._stack.pop();
+		this.a = this._stack.pop();
+	};
 
-// static public properties:
+	// static public properties:
 
-/**
- * An identity matrix, representing a null transformation.
- * @property identity
- * @static
- * @type Matrix2D
- * @readonly
- **/
-Matrix2D.prototype.identity = null;// set at bottom of class definition.
+	/**
+	 * An identity matrix, representing a null transformation.
+	 * @property identity
+	 * @static
+	 * @type Matrix2D
+	 * @readonly
+	 **/
+	Matrix2D.prototype.identity = null;// set at bottom of class definition.
 
-/**
- * Multiplier for converting degrees to radians. Used internally by Matrix2D.
- * @property DEG_TO_RAD
- * @static
- * @final
- * @type Number
- * @readonly
- **/
-Matrix2D.DEG_TO_RAD = Math.PI/180;
+	/**
+	 * Multiplier for converting degrees to radians. Used internally by Matrix2D.
+	 * @property DEG_TO_RAD
+	 * @static
+	 * @final
+	 * @type Number
+	 * @readonly
+	 **/
+	Matrix2D.DEG_TO_RAD = Math.PI/180;
 
 
 // public properties:
@@ -477,3 +481,8 @@ Matrix2D.DEG_TO_RAD = Math.PI/180;
 
 	// this has to be populated after the class is defined:
 	Matrix2D.identity = new Matrix2D();
+	
+	
+	tomahawk_ns.Matrix2D = Matrix2D;
+	
+})();

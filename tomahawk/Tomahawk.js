@@ -2,7 +2,9 @@
  * ...
  * @author Thot
  */
-
+ 
+var tomahawk_ns = new Object();
+ 
 function Tomahawk(){}
 
 Tomahawk._classes = new Object();

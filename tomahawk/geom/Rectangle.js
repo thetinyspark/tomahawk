@@ -2,14 +2,23 @@
  * ...
  * @author Thot
  */
+ 
+ (function() {
+	
+	
+	Tomahawk.registerClass(Rectangle,"Rectangle");
 
-function Rectangle(){}
+	function Rectangle(){}
 
-Rectangle.prototype.x 		= 0;
-Rectangle.prototype.y 		= 0;
-Rectangle.prototype.width 	= 0;
-Rectangle.prototype.height 	= 0;
-Rectangle.prototype.left 	= 0;
-Rectangle.prototype.right 	= 0;
-Rectangle.prototype.top 	= 0;
-Rectangle.prototype.bottom 	= 0;
+	Rectangle.prototype.x 		= 0;
+	Rectangle.prototype.y 		= 0;
+	Rectangle.prototype.width 	= 0;
+	Rectangle.prototype.height 	= 0;
+	Rectangle.prototype.left 	= 0;
+	Rectangle.prototype.right 	= 0;
+	Rectangle.prototype.top 	= 0;
+	Rectangle.prototype.bottom 	= 0;
+
+	tomahawk_ns.Rectangle = Rectangle;
+
+})();

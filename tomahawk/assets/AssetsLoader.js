@@ -2,8 +2,10 @@
  * ...
  * @author Thot
  */
-
  
+ (function() {
+	
+
 function AssetsLoader()
 {
 	this._loadingList = new Array();
@@ -71,3 +73,5 @@ AssetsLoader.prototype._onLoadComplete = function(image,alias)
 	this.load();
 };
 
+tomahawk_ns.AssetsLoader = AssetsLoader;
+})();

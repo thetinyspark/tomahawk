@@ -21,29 +21,36 @@ Main.prototype.init = function()
 	var scope = this;
 	
 	Tomahawk.run();
-	Stage.getInstance().init(document.getElementById("tomahawk"));
+	tomahawk_ns.Stage.getInstance().init(document.getElementById("tomahawk"));
 	
-	AssetsLoader.getInstance().addFile("./assets/ground.png","ground");
-	AssetsLoader.getInstance().addFile("./assets/perso1.png","perso1");
-	AssetsLoader.getInstance().addFile("./assets/perso2.png","perso2");
-	AssetsLoader.getInstance().addFile("./assets/perso3.png","perso3");
-	AssetsLoader.getInstance().onComplete = function()
+	tomahawk_ns.AssetsLoader.getInstance().addFile("./assets/ground.png","ground");
+	tomahawk_ns.AssetsLoader.getInstance().addFile("./assets/perso1.png","perso1");
+	tomahawk_ns.AssetsLoader.getInstance().addFile("./assets/perso2.png","perso2");
+	tomahawk_ns.AssetsLoader.getInstance().addFile("./assets/perso3.png","perso3");
+	tomahawk_ns.AssetsLoader.getInstance().onComplete = function()
 	{
 		scope.complete();
 	};
 	
-	AssetsLoader.getInstance().load();
+	tomahawk_ns.AssetsLoader.getInstance().load();
 };
 
 Main.prototype.complete = function()
 {
-	var data = AssetsLoader.getInstance().getData();
+	var data = tomahawk_ns.AssetsLoader.getInstance().getData();
 	var bmp = null;
 	var texture = null;
 	var coords = null;
-	var container = new DisplayObjectContainer();
+	var container = new tomahawk_ns.DisplayObjectContainer();
+	
 	var i = 50;
 	var j = 0;
+	
+	if( tomahawk_ns.Screen.getWindowWidth() < 800 )
+	{	
+		tomahawk_ns.Stage.getInstance().getCanvas().width = tomahawk_ns.Screen.getWindowWidth();
+		tomahawk_ns.Stage.getInstance().getCanvas().height = tomahawk_ns.Screen.getWindowHeight();
+	}
 	
 	while( --i > -1 )
 	{
@@ -53,11 +60,11 @@ Main.prototype.complete = function()
 		{
 			coords = this.isoToScreen(i,j,64,32);
 			
-			texture = new Texture();
+			texture = new tomahawk_ns.Texture();
 			texture.data = data["ground"]
 			texture.rect = [0,0,64,43];
 			
-			bmp = new Bitmap(texture);
+			bmp = new tomahawk_ns.Bitmap(texture);
 			bmp.width = 64;
 			bmp.height = 43;
 			bmp.x = coords.x + 400;
@@ -72,55 +79,50 @@ Main.prototype.complete = function()
 	
 	coords = this.isoToScreen(5,5,64,32);
 	coords.x += 400;
-	texture = new Texture();
-	texture.data = data["ground"]
-	texture.rect = [0,0,64,43];
 	
-	var mymask = new Bitmap();
-	mymask.texture = texture;
-	mymask.width = 64;
-	mymask.height = 43;
-	mymask.x = coords.x;
-	mymask.y = coords.y;
-	mymask.pivotX = mymask.width >> 1;
-	mymask.pivotY = mymask.height >> 1;
-	
-	texture = new Texture();
+	texture = new tomahawk_ns.Texture();
 	texture.data = data["perso1"];
 	texture.rect = [0,0,110,224];
 	
-	bmp = new Bitmap();
+	bmp = new tomahawk_ns.Bitmap();
 	bmp.texture = texture;
 	bmp.width = 64;
 	bmp.height = 113;
 	bmp.x = coords.x;
 	bmp.y = coords.y;
 	
-	Stage.getInstance().addChild(mymask);
 	container.addChild(bmp);
-	
-	container.setMask( mymask );
 	container.cacheAsBitmap = true;
-	container.filters = [new GrayScaleFilter()];
-	
-	
-	if( Screen.getWindowWidth() < 800 )
-	{	
-		Stage.getInstance().getCanvas().width = Screen.getWindowWidth();
-		Stage.getInstance().getCanvas().height = Screen.getWindowHeight();
-	}
-	Stage.getInstance().addChild(container);
-	Stage.getInstance().addEventListener(Event.ENTER_FRAME, this, this.onFrame);
-	
-	container.cacheAsBitmap = true;
+	//container.filters = [new tomahawk_ns.GrayScaleFilter()];
 	container.name = "narnia";
 	
+	
+	var input = new tomahawk_ns.InputTextField();
+	
+	input.defaultTextFormat = new tomahawk_ns.TextFormat();
+	input.defaultTextFormat.size = 48;
+	input.defaultTextFormat.bold = true;
+	input.defaultTextFormat.textAlign = "center";
+	input.width = 250;
+	input.height = 100;
+	input.x = coords.x - 250;
+	input.y = 250;
+	input.setText("Text Mask");
+	input.background = false;
+	input.border = false;
+	
+	
+	container.setMask(input);
+	
+	tomahawk_ns.Stage.getInstance().addChild(container);
+	tomahawk_ns.Stage.getInstance().addChild(input);
+	tomahawk_ns.Stage.getInstance().addEventListener(tomahawk_ns.Event.ENTER_FRAME, this, this.onFrame);
 };
 
 Main.prototype.onFrame = function()
 {
-	Stage.getInstance().drawFPS();
-	var container = Stage.getInstance().getChildByName("narnia");
+	tomahawk_ns.Stage.getInstance().drawFPS();
+	var container = tomahawk_ns.Stage.getInstance().getChildByName("narnia");
 	
 	container.y--;
 	

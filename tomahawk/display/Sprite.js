@@ -3,11 +3,20 @@
  * @author Thot
 */
 
-function Sprite()
-{
-	DisplayObjectContainer.apply(this);
-}
+(function() {
 
-Tomahawk.registerClass( Sprite, "Sprite" );
-Tomahawk.extend( "Sprite", "DisplayObjectContainer" );
+	function Sprite()
+	{
+		tomahawk_ns.DisplayObjectContainer.apply(this);
+	}
+
+	Tomahawk.registerClass( Sprite, "Sprite" );
+	Tomahawk.extend( "Sprite", "DisplayObjectContainer" );
+	
+	
+	Sprite.prototype.handCursor = false;
+
+
+	tomahawk_ns.Sprite = Sprite;
+})();
 
