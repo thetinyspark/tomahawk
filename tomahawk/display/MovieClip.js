@@ -3,9 +3,9 @@
  * @author Thot
 */
 
-function MovieClip()
+function MovieClip(texture)
 {
-	Bitmap.apply(this);
+	Bitmap.apply(this, [texture]);
 	this._frames = new Array();
 }
 

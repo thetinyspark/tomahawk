@@ -14,6 +14,7 @@ Tomahawk.extend( "DisplayObjectContainer", "DisplayObject" );
 
 DisplayObjectContainer.prototype.children = null;
 DisplayObjectContainer.prototype.isContainer = true;
+DisplayObjectContainer.prototype.cacheChildrenMatrix = true;
 
 DisplayObjectContainer.prototype.addChild = function(child)
 {
@@ -96,41 +97,39 @@ DisplayObjectContainer.prototype.removeChild = function(child)
 	child.dispatchEvent( new Event(Event.REMOVED, true, true) );
 };
 
-DisplayObjectContainer.prototype.render = function( context )
-{
-	var children = this.children;
-	var i = 0;
-	var max = children.length;
-	var child = null;
-	
-	for( ; i < max; i++ )
-	{
-		child = children[i];
-		
-		if( this.updateNextFrame == true )
-		{
-			child.updateNextFrame = true;
-		}
-	}
-	
-	DisplayObject.prototype.render.apply( this, [context] );
-};
-
-DisplayObjectContainer.prototype.draw = function( context  )
+DisplayObjectContainer.prototype.draw = function( context )
 {	
 	var children = this.children;
 	var i = 0;
 	var max = children.length;
 	var child = null;
+	var mat = null;
+	
 	
 	for( ; i < max; i++ )
 	{
 		child = children[i];
-		child.render(context);
+		child.updateMatrix();
+		mat = child.matrix;
+		
+		if( child.visible == false || child.isMask == true )
+			continue;
+		
+		context.save();
+		context.globalAlpha *= child.alpha;
+		context.transform(mat.a,mat.b,mat.c,mat.d,mat.tx,mat.ty);
+		
+		if( child.mask != null || child.filters != null || child.cacheAsBitmap == true )
+		{
+			child.drawComposite(context);
+		}
+		else
+		{
+			child.draw(context);
+		}
+		
+		context.restore();
 	}
-	
-	this.updateNextFrame = false;
-	
 };
 
 

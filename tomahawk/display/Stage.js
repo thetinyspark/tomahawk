@@ -40,12 +40,9 @@ Stage.prototype._frameCount = 0;
 Stage.prototype._fps = 0;
 Stage.prototype._canvas = null;
 Stage.prototype._context = null;
-Stage.prototype._debug = false;
 Stage.prototype._lastActiveChild = null;
-Stage.prototype.displayMouseCoordinates = false;
 Stage.prototype.mouseX = 0;
 Stage.prototype.mouseY = 0;
-Stage.prototype._input = null;
 Stage.prototype._focused = false;
 Stage.prototype._cache = null;
 
@@ -63,8 +60,6 @@ Stage.prototype.init = function(canvas)
 		scope._keyboardHandler(event);
 	};
 	
-	this._input = document.createElement("input");
-	this._input.type = "text";
 	this._canvas = canvas;
 	this._context = canvas.getContext("2d");
 	this.addEventListener(Event.ADDED, this, this._eventHandler,true);
@@ -80,7 +75,7 @@ Stage.prototype.init = function(canvas)
 	window.addEventListener("keyup",callbackKey);
 	window.addEventListener("keydown",callbackKey);
 	window.addEventListener("keypress",callbackKey);
-	this._enterFrame();		
+	this.enterFrame();		
 };
 
 Stage.prototype._keyboardHandler = function(event)
@@ -193,55 +188,47 @@ Stage.prototype._eventHandler = function(event)
 	}
 };
 
-Stage.prototype._enterFrame = function()
+Stage.prototype.enterFrame = function()
 {
-	this.dispatchEvent(new Event(Event.ENTER_FRAME,true,true));
 	var curTime = new Date().getTime();
-	var scope = this;
+	var scope = Stage.getInstance();
+	var context = scope._context;
+	var canvas = scope._canvas;
 	
-	this._frameCount++;
+	scope._frameCount++;
 	
-	if( curTime - this._lastTime >= 1000 )
+	if( curTime - scope._lastTime > 1000 )
 	{
-		this._fps = this._frameCount;
-		this._frameCount = 0;
-		this._lastTime = curTime;
+		scope._fps = scope._frameCount;
+		scope._frameCount = 0;
+		scope._lastTime = curTime;
 	}
 	
-	this._context.clearRect(0,0,this._canvas.width,this._canvas.height);
+	context.clearRect(0,0,canvas.width,canvas.height);
+	context.save();
+	scope.draw(context);
+	context.restore();
+	
+	scope.dispatchEvent(new Event(Event.ENTER_FRAME,true,true));
+	window.requestAnimationFrame(scope.enterFrame);
+};
+
+Stage.prototype.setFPS = function(value)
+{
+	this._fps = value;
+};
+
+Stage.prototype.drawFPS = function()
+{
 	this._context.save();
-	this.render(this._context);
+	this._context.beginPath();
+	this._context.fillStyle = "black";
+	this._context.fillRect(0,0,50,15);
+	this._context.fill();
+	this._context.fillStyle = "red";
+	this._context.font = '10pt Arial';
+	this._context.fillText("fps: "+this._fps, 0,15);
 	this._context.restore();
-	
-	if( this._debug == true )
-	{
-		this._context.save();
-		this._context.beginPath();
-		this._context.fillStyle = "black";
-		this._context.fillRect(0,0,100,30);
-		this._context.fill();
-		this._context.fillStyle = "red";
-		this._context.font = 'italic 20pt Calibri';
-		this._context.fillText("fps: "+this._fps, 0,30);
-		this._context.restore();
-	}
-	
-	if( this.displayMouseCoordinates == true )
-	{
-		this._context.save();
-		this._context.beginPath();
-		this._context.fillStyle = "green";
-		this._context.fillRect(this.mouseX - 2,this.mouseY - 2,4,4);
-		this._context.fill();
-		this._context.restore();
-	}
-	
-	window.requestAnimationFrame(
-		function()
-		{
-			scope._enterFrame();
-		}
-	);
 };
 
 Stage.prototype.getCanvas = function()
@@ -257,11 +244,6 @@ Stage.prototype.getContext = function()
 Stage.prototype.getFPS = function()
 {
 	return this._fps;
-};
-
-Stage.prototype.setDebug = function( debug )
-{
-	this._debug = debug;
 };
 
 
