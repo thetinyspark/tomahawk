@@ -2903,10 +2903,11 @@ MovieClip.prototype.stop = function()
 	TextField.prototype.defaultTextFormat = null;
 	TextField.prototype._focused = false;
 	TextField.prototype._selectedLetter = null;
-	TextField.prototype.background = true;
-	TextField.prototype.border = true;
+	TextField.prototype.background = false;
+	TextField.prototype.border = false;
 	TextField.prototype.backgroundColor = "white";
 	TextField.prototype.borderColor = "black";
+	TextField.prototype.autoSize = false;
 
 	TextField.prototype.setCurrentIndex = function(index)
 	{
@@ -3230,6 +3231,11 @@ MovieClip.prototype.stop = function()
 		}
 		
 		tomahawk_ns.DisplayObjectContainer.prototype.draw.apply(this, [context]);
+		
+		if( this.autoSize == true )
+		{
+			this.height = rowLetter.y + rowLetter.textHeight;
+		}
 	};
 
 	tomahawk_ns.TextField = TextField;

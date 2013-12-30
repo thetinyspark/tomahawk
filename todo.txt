@@ -1,4 +1,3 @@
 TODO
 
-- add mask features on displayobjects
-- add a namespace on whole library
+- make some examples
