@@ -39,11 +39,15 @@
 	DisplayObject.prototype.mask 				= null;
 	DisplayObject.prototype.matrix 				= null;
 	DisplayObject.prototype._bounds 			= null;
-	DisplayObject.prototype._cache 				= null;
 	DisplayObject.prototype._concatenedMatrix 	= null;
 	DisplayObject.prototype.cacheAsBitmap		= false;
 	DisplayObject.prototype.autoUpdate			= true;
 	DisplayObject.prototype.updateNextFrame		= true;
+	
+	DisplayObject.prototype._cache 				= null;
+	DisplayObject.prototype._cacheOffsetX 		= 0;
+	DisplayObject.prototype._cacheOffsetY 		= 0;
+	
 
 	DisplayObject._toRadians = Math.PI / 180;
 
@@ -87,18 +91,24 @@
 		var buffer = null;
 		var context = null;
 		var filters = this.filters;
-		var bounds = this.getBoundingRect();
 		var i = 0;
+		var offX = 0;
+		var offY = 0;
 		
+		bounds = this.getBoundingRectIn(this);
 		buffer = document.createElement("canvas");
 		buffer.width = bounds.width;
 		buffer.height = bounds.height;
 		
+		offX = bounds.left;
+		offY = bounds.top;
+		
 		context = buffer.getContext("2d");
 		
 		context.save();
-		context.globalAlpha = this.alpha;
-		this.draw(context);
+			context.globalAlpha = this.alpha;
+			context.translate( -offX, -offY );
+			this.draw(context);
 		context.restore();
 		
 		if( filters != null )
@@ -112,6 +122,8 @@
 		}
 		
 		this._cache = buffer;
+		this._cacheOffsetX = offX;
+		this._cacheOffsetY = offY;
 	};
 
 	DisplayObject.prototype.drawComposite = function(drawContext)
@@ -133,26 +145,30 @@
 			context = buffer.getContext("2d");
 			
 			mat = mask.getConcatenedMatrix().prependMatrix( this.getConcatenedMatrix().invert() );
-			context.save();
-
-			context.globalAlpha = mask.alpha;
-			context.setTransform(	mat.a,
-									mat.b,
-									mat.c,
-									mat.d,
-									mat.tx,
-									mat.ty);
-										
-			mask.draw(context);
 			
-			context.restore();
 			context.save();
-			context.globalCompositeOperation = "source-in";
-			context.drawImage(this._cache, 0, 0, this._cache.width, this._cache.height );
+				context.globalAlpha = mask.alpha;
+				context.setTransform(	mat.a,
+										mat.b,
+										mat.c,
+										mat.d,
+										mat.tx,
+										mat.ty);
+											
+				mask.draw(context);
 			context.restore();
+			
+			context.save();
+				context.globalCompositeOperation = "source-in";
+				context.drawImage(	this._cache, this._cacheOffsetX , this._cacheOffsetY , this._cache.width , this._cache.height );
+			context.restore();
+			
+			drawContext.drawImage(buffer,0, 0, buffer.width, buffer.height );
 		}
-		
-		drawContext.drawImage(buffer,0, 0, buffer.width, buffer.height );	
+		else
+		{
+			drawContext.drawImage(	buffer, this._cacheOffsetX, this._cacheOffsetY, buffer.width, buffer.height);	
+		}
 	};
 
 	DisplayObject.prototype.draw = function(context)
@@ -215,10 +231,54 @@
 		return false;
 	};
 
+	DisplayObject.prototype.getBoundingRectIn = function(spaceCoordinates)
+	{
+		this.updateNextFrame = true;
+		this.updateMatrix();
+		
+		var rect = new tomahawk_ns.Rectangle();
+		var points = new Array();
+		var pt1 = this.localToGlobal(0,0);
+		var pt2 = this.localToGlobal(this.width,0);
+		var pt3 = this.localToGlobal(0,this.height);
+		var pt4 = this.localToGlobal(this.width,this.height);
+		
+		pt1 = spaceCoordinates.globalToLocal(pt1.x,pt1.y);
+		pt2 = spaceCoordinates.globalToLocal(pt2.x,pt2.y);
+		pt3 = spaceCoordinates.globalToLocal(pt3.x,pt3.y);
+		pt4 = spaceCoordinates.globalToLocal(pt4.x,pt4.y);
+		
+		points.push(pt1,pt2,pt3,pt4);
+		
+		rect.left = 0xFFFFFFFF;
+		rect.top = 0xFFFFFFFF;
+		
+		var i = points.length;
+		while( --i > -1 )
+		{
+			rect.left = ( points[i].x < rect.left ) ? points[i].x : rect.left;
+			rect.right = ( points[i].x > rect.right ) ? points[i].x : rect.right;
+			rect.top = ( points[i].y < rect.top ) ? points[i].y : rect.top;
+			rect.bottom = ( points[i].y > rect.bottom ) ? points[i].y : rect.bottom;
+		}
+		
+		rect.x = rect.left;
+		rect.y = rect.top;
+		rect.width = rect.right - rect.left;
+		rect.height = rect.bottom - rect.top;
+		
+		this._bounds = rect;
+		return rect;
+	};
+	
 	DisplayObject.prototype.getBoundingRect = function()
 	{
 		var rect = new tomahawk_ns.Rectangle();
 		var points = new Array();
+		
+		this.updateNextFrame = true;
+		this.updateMatrix();
+		
 		points.push(this.localToGlobal(0,0));
 		points.push(this.localToGlobal(this.width,0));
 		points.push(this.localToGlobal(0,this.height));

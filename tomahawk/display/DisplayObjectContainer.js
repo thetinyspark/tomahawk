@@ -159,6 +159,34 @@
 		rect.height = rect.bottom - rect.top;
 		
 		return rect;
+	};	
+	
+	DisplayObjectContainer.prototype.getBoundingRectIn = function(spaceCoordinates)
+	{
+		var children = this.children;
+		var i = children.length;
+		var child = null;
+		var rect = new tomahawk_ns.Rectangle();
+		var childRect = null;
+		
+		i = children.length;
+		
+		while( --i > -1 )
+		{
+			child = children[i];
+			childRect = child.getBoundingRectIn(spaceCoordinates);
+			rect.left = ( childRect.left < rect.left ) ? childRect.left : rect.left;
+			rect.right = ( childRect.right > rect.right ) ? childRect.right : rect.right;
+			rect.top = ( childRect.top < rect.top ) ? childRect.top : rect.top;
+			rect.bottom = ( childRect.bottom > rect.bottom ) ? childRect.bottom : rect.bottom;
+		}
+		
+		rect.x = rect.left;
+		rect.y = rect.top;
+		rect.width = rect.right - rect.left;
+		rect.height = rect.bottom - rect.top;
+		
+		return rect;
 	};
 
 	DisplayObjectContainer.prototype.getObjectsUnder = function(x,y,limit)
