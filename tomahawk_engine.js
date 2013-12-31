@@ -633,6 +633,11 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		return rect;
 	};
 
+	DisplayObject.prototype.getNestedChildren = function()
+	{
+		return new Array(this);
+	}
+	
 	tomahawk_ns.DisplayObject = DisplayObject;
 
 })();
@@ -1404,7 +1409,10 @@ MovieClip.prototype.stop = function()
 	{
 		var list = null;
 		var i = 0;
+		var max = 0;
 		var child = null;
+		var type = null;
+		
 		switch( event.type )
 		{
 			case tomahawk_ns.Event.FOCUSED: 
@@ -1417,23 +1425,23 @@ MovieClip.prototype.stop = function()
 				break;
 				
 			case tomahawk_ns.Event.ADDED: 
+			case tomahawk_ns.Event.REMOVED: 
+				
 				list = event.target.getNestedChildren();
-				i = list.length;
-				while( --i > -1 )
+				max = list.length;
+				
+				for( i= 0; i < max; i++ )
 				{
 					list[i].stage = this;
-					list[i].dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.ADDED_TO_STAGE, true, true) ); 
 				}
-				break;
 				
-			case tomahawk_ns.Event.REMOVED: 
-				list = event.target.getNestedChildren();
-				i = list.length;
-				while( --i > -1 )
+				type = ( event.type == tomahawk_ns.Event.ADDED ) ? tomahawk_ns.Event.ADDED_TO_STAGE : tomahawk_ns.Event.REMOVED_FROM_STAGE;
+				
+				for( i= 0; i < max; i++ )
 				{
-					list[i].dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.REMOVED_FROM_STAGE, true, true) ); 
-					list[i].stage = null;
+					list[i].dispatchEvent( new tomahawk_ns.Event(type, true, true) ); 
 				}
+				
 				break;
 		}
 	};
@@ -2656,8 +2664,6 @@ MovieClip.prototype.stop = function()
 		tomahawk_ns.SelectableTextField.apply(this);
 		this.addEventListener( tomahawk_ns.Event.ADDED_TO_STAGE, this, this._inputTextFieldAddedHandler );
 	}
-	
-	
 
 	Tomahawk.registerClass(InputTextField,"InputTextField");
 	Tomahawk.extend("InputTextField","SelectableTextField");
@@ -2854,7 +2860,6 @@ MovieClip.prototype.stop = function()
 	
 	SelectableTextField.prototype._selectableTextFieldAddedHandler = function(event)
 	{
-		console.log(this.stage);
 		this.removeEventListener( tomahawk_ns.Event.ADDED_TO_STAGE, this, this._selectableTextFieldAddedHandler );
 		this.stage.addEventListener( tomahawk_ns.MouseEvent.MOUSE_DOWN, this, this._mouseEventHandler,true );
 		this.stage.addEventListener( tomahawk_ns.MouseEvent.DOUBLE_CLICK, this, this._mouseEventHandler,true );

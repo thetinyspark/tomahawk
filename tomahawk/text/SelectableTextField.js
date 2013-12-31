@@ -25,7 +25,6 @@
 	
 	SelectableTextField.prototype._selectableTextFieldAddedHandler = function(event)
 	{
-		console.log(this.stage);
 		this.removeEventListener( tomahawk_ns.Event.ADDED_TO_STAGE, this, this._selectableTextFieldAddedHandler );
 		this.stage.addEventListener( tomahawk_ns.MouseEvent.MOUSE_DOWN, this, this._mouseEventHandler,true );
 		this.stage.addEventListener( tomahawk_ns.MouseEvent.DOUBLE_CLICK, this, this._mouseEventHandler,true );

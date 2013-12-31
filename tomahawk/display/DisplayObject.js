@@ -305,6 +305,11 @@
 		return rect;
 	};
 
+	DisplayObject.prototype.getNestedChildren = function()
+	{
+		return new Array(this);
+	}
+	
 	tomahawk_ns.DisplayObject = DisplayObject;
 
 })();

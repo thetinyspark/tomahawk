@@ -9,8 +9,6 @@
 		tomahawk_ns.SelectableTextField.apply(this);
 		this.addEventListener( tomahawk_ns.Event.ADDED_TO_STAGE, this, this._inputTextFieldAddedHandler );
 	}
-	
-	
 
 	Tomahawk.registerClass(InputTextField,"InputTextField");
 	Tomahawk.extend("InputTextField","SelectableTextField");
