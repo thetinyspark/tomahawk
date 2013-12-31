@@ -29,6 +29,7 @@
 
 	Letter.prototype.updateMetrics = function(context)
 	{
+		context = context || document.createElement("canvas").getContext("2d");
 		context.save();
 		
 		this.format.updateContext(context);

@@ -94,8 +94,7 @@
 		var i = 0;
 		var offX = 0;
 		var offY = 0;
-		
-		bounds = this.getBoundingRectIn(this);
+		var bounds = this.getBoundingRectIn(this);
 		buffer = document.createElement("canvas");
 		buffer.width = bounds.width;
 		buffer.height = bounds.height;
@@ -128,7 +127,7 @@
 
 	DisplayObject.prototype.drawComposite = function(drawContext)
 	{
-		if( this._cache == null || this.cacheAsBitmap == false)
+		if( this._cache == null || this.cacheAsBitmap == false )
 			this.updateCache();
 			
 		var buffer = this._cache;

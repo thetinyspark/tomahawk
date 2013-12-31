@@ -422,8 +422,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		var i = 0;
 		var offX = 0;
 		var offY = 0;
-		
-		bounds = this.getBoundingRectIn(this);
+		var bounds = this.getBoundingRectIn(this);
 		buffer = document.createElement("canvas");
 		buffer.width = bounds.width;
 		buffer.height = bounds.height;
@@ -456,7 +455,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 	DisplayObject.prototype.drawComposite = function(drawContext)
 	{
-		if( this._cache == null || this.cacheAsBitmap == false)
+		if( this._cache == null || this.cacheAsBitmap == false )
 			this.updateCache();
 			
 		var buffer = this._cache;
@@ -2708,6 +2707,7 @@ MovieClip.prototype.stop = function()
 
 	Letter.prototype.updateMetrics = function(context)
 	{
+		context = context || document.createElement("canvas").getContext("2d");
 		context.save();
 		
 		this.format.updateContext(context);
@@ -3226,12 +3226,14 @@ MovieClip.prototype.stop = function()
 		letter.format = ( previous == undefined ) ? this.defaultTextFormat.clone() : previous.format.clone();
 		this.addChildAt(letter,index);
 		this.setCurrentIndex(index);
+		this._repos();
 	};
 
 	TextField.prototype.removeCharAt = function(index)
 	{
 		this.removeChildAt(index);
 		this.setCurrentIndex(index-1);
+		this._repos();
 	};
 
 	TextField.prototype.addTextAt = function(value,index)
@@ -3265,8 +3267,8 @@ MovieClip.prototype.stop = function()
 			this.removeCharAt(letter.index);
 		}
 	};
-
-	TextField.prototype.draw = function(context)
+	
+	TextField.prototype._repos = function()
 	{
 		var i = 0;
 		var max = this.children.length;
@@ -3284,33 +3286,11 @@ MovieClip.prototype.stop = function()
 		var y = 0;
 		var textAlign = "left";
 		
-		if( this.background == true )
-		{
-			context.save();
-			context.beginPath();
-			context.fillStyle = this.backgroundColor;
-			context.fillRect(0,0,this.width,this.height);
-			context.fill();
-			context.restore();
-		}
-		
-		if( this.border == true )
-		{
-			context.save();
-			context.beginPath();
-			context.strokeStyle = this.borderColor;
-			context.moveTo(0,0);
-			context.lineTo(this.width,0);
-			context.lineTo(this.width,this.height);
-			context.lineTo(0,this.height);
-			context.lineTo(0,0);
-			context.stroke();
-			context.restore();
-		}
-		
 		for( i = 0; i < max; i++ )
 		{		
 			letter = this.children[i];
+			letter.updateMetrics();
+				
 			letter.index = i;
 			maxLineHeight = ( maxLineHeight < letter.textHeight ) ? letter.textHeight : maxLineHeight;
 			
@@ -3356,12 +3336,39 @@ MovieClip.prototype.stop = function()
 			rowLetter.x += offsetX;
 		}
 		
-		tomahawk_ns.DisplayObjectContainer.prototype.draw.apply(this, [context]);
-		
 		if( this.autoSize == true && rowLetter != null )
 		{
 			this.height = rowLetter.y + rowLetter.textHeight;
 		}
+	};
+
+	TextField.prototype.draw = function(context)
+	{
+		if( this.background == true )
+		{
+			context.save();
+			context.beginPath();
+			context.fillStyle = this.backgroundColor;
+			context.fillRect(0,0,this.width,this.height);
+			context.fill();
+			context.restore();
+		}
+		
+		if( this.border == true )
+		{
+			context.save();
+			context.beginPath();
+			context.strokeStyle = this.borderColor;
+			context.moveTo(0,0);
+			context.lineTo(this.width,0);
+			context.lineTo(this.width,this.height);
+			context.lineTo(0,this.height);
+			context.lineTo(0,0);
+			context.stroke();
+			context.restore();
+		}
+		
+		tomahawk_ns.DisplayObjectContainer.prototype.draw.apply(this, [context]);
 	};
 
 	tomahawk_ns.TextField = TextField;

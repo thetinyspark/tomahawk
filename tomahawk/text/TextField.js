@@ -213,12 +213,14 @@
 		letter.format = ( previous == undefined ) ? this.defaultTextFormat.clone() : previous.format.clone();
 		this.addChildAt(letter,index);
 		this.setCurrentIndex(index);
+		this._repos();
 	};
 
 	TextField.prototype.removeCharAt = function(index)
 	{
 		this.removeChildAt(index);
 		this.setCurrentIndex(index-1);
+		this._repos();
 	};
 
 	TextField.prototype.addTextAt = function(value,index)
@@ -252,8 +254,8 @@
 			this.removeCharAt(letter.index);
 		}
 	};
-
-	TextField.prototype.draw = function(context)
+	
+	TextField.prototype._repos = function()
 	{
 		var i = 0;
 		var max = this.children.length;
@@ -271,33 +273,11 @@
 		var y = 0;
 		var textAlign = "left";
 		
-		if( this.background == true )
-		{
-			context.save();
-			context.beginPath();
-			context.fillStyle = this.backgroundColor;
-			context.fillRect(0,0,this.width,this.height);
-			context.fill();
-			context.restore();
-		}
-		
-		if( this.border == true )
-		{
-			context.save();
-			context.beginPath();
-			context.strokeStyle = this.borderColor;
-			context.moveTo(0,0);
-			context.lineTo(this.width,0);
-			context.lineTo(this.width,this.height);
-			context.lineTo(0,this.height);
-			context.lineTo(0,0);
-			context.stroke();
-			context.restore();
-		}
-		
 		for( i = 0; i < max; i++ )
 		{		
 			letter = this.children[i];
+			letter.updateMetrics();
+				
 			letter.index = i;
 			maxLineHeight = ( maxLineHeight < letter.textHeight ) ? letter.textHeight : maxLineHeight;
 			
@@ -343,12 +323,39 @@
 			rowLetter.x += offsetX;
 		}
 		
-		tomahawk_ns.DisplayObjectContainer.prototype.draw.apply(this, [context]);
-		
 		if( this.autoSize == true && rowLetter != null )
 		{
 			this.height = rowLetter.y + rowLetter.textHeight;
 		}
+	};
+
+	TextField.prototype.draw = function(context)
+	{
+		if( this.background == true )
+		{
+			context.save();
+			context.beginPath();
+			context.fillStyle = this.backgroundColor;
+			context.fillRect(0,0,this.width,this.height);
+			context.fill();
+			context.restore();
+		}
+		
+		if( this.border == true )
+		{
+			context.save();
+			context.beginPath();
+			context.strokeStyle = this.borderColor;
+			context.moveTo(0,0);
+			context.lineTo(this.width,0);
+			context.lineTo(this.width,this.height);
+			context.lineTo(0,this.height);
+			context.lineTo(0,0);
+			context.stroke();
+			context.restore();
+		}
+		
+		tomahawk_ns.DisplayObjectContainer.prototype.draw.apply(this, [context]);
 	};
 
 	tomahawk_ns.TextField = TextField;
