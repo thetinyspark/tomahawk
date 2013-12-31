@@ -116,6 +116,11 @@ Main.prototype.onFrame = function()
 	this._counter++;
 	//return;
 	
+	if( container == null )
+	{
+		return;
+	}
+	
 	if( this._counter > 120 )
 	{
 		this._direction++;

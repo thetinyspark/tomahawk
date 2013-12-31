@@ -7,12 +7,20 @@
 	function InputTextField()
 	{
 		tomahawk_ns.SelectableTextField.apply(this);
-		tomahawk_ns.Stage.getInstance().addEventListener( tomahawk_ns.KeyEvent.KEY_DOWN, this, this._keyHandler );
+		this.addEventListener( tomahawk_ns.Event.ADDED_TO_STAGE, this, this._inputTextFieldAddedHandler );
 	}
+	
+	
 
 	Tomahawk.registerClass(InputTextField,"InputTextField");
 	Tomahawk.extend("InputTextField","SelectableTextField");
 
+	InputTextField.prototype._inputTextFieldAddedHandler = function(event)
+	{
+		this.removeEventListener( tomahawk_ns.Event.ADDED_TO_STAGE, this, this._inputTextFieldAddedHandler );
+		this.stage.addEventListener( tomahawk_ns.KeyEvent.KEY_DOWN, this, this._keyHandler );
+	};
+	
 	InputTextField.prototype._keyHandler = function(event)
 	{
 		var range = this.getSelectionRange();

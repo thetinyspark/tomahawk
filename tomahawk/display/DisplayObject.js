@@ -30,6 +30,7 @@
 	DisplayObject.prototype.width 				= 0;
 	DisplayObject.prototype.height 				= 0;
 	DisplayObject.prototype.rotation 			= 0;
+	DisplayObject.prototype.stage 				= null;
 
 	DisplayObject.prototype.alpha 				= 1;
 	DisplayObject.prototype.mouseEnabled 		= false;

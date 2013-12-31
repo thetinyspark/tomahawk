@@ -17,10 +17,10 @@ Tomahawk.registerClass( AssetsLoader, "AssetsLoader" );
 AssetsLoader._instance = null;
 AssetsLoader.getInstance = function()
 {
-	if( AssetsLoader._instance == null )
-		AssetsLoader._instance = new AssetsLoader();
+	if( tomahawk_ns.AssetsLoader._instance == null )
+		tomahawk_ns.AssetsLoader._instance = new tomahawk_ns.AssetsLoader();
 		
-	return AssetsLoader._instance;
+	return tomahawk_ns.AssetsLoader._instance;
 };
 
 

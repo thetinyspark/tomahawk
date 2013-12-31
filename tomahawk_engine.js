@@ -96,10 +96,10 @@ Tomahawk.registerClass( AssetsLoader, "AssetsLoader" );
 AssetsLoader._instance = null;
 AssetsLoader.getInstance = function()
 {
-	if( AssetsLoader._instance == null )
-		AssetsLoader._instance = new AssetsLoader();
+	if( tomahawk_ns.AssetsLoader._instance == null )
+		tomahawk_ns.AssetsLoader._instance = new tomahawk_ns.AssetsLoader();
 		
-	return AssetsLoader._instance;
+	return tomahawk_ns.AssetsLoader._instance;
 };
 
 
@@ -179,10 +179,10 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	AssetsManager._instance = null;
 	AssetsManager.getInstance = function()
 	{
-		if( AssetsManager._instance == null )
-			AssetsManager._instance = new AssetsManager();
+		if( tomahawk_ns.AssetsManager._instance == null )
+			tomahawk_ns.AssetsManager._instance = new tomahawk_ns.AssetsManager();
 			
-		return AssetsManager._instance;
+		return tomahawk_ns.AssetsManager._instance;
 	};
 
 	AssetsManager.prototype._images = null;
@@ -266,14 +266,14 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 	Tomahawk.registerClass(Screen,"Screen");
 	
-	Screen.getInnerWidth = function()
+	Screen.getInnerWidth = function(stage)
 	{
-		return Stage.getInstance().getCanvas().parent.offsetWidth;
+		return stage.getCanvas().parent.offsetWidth;
 	};
 
-	Screen.getInnerHeight = function()
+	Screen.getInnerHeight = function(stage)
 	{
-		return Stage.getInstance().getCanvas().parent.offsetHeight;
+		return stage.getCanvas().parent.offsetHeight;
 	};
 
 	Screen.getWindowWidth = function()
@@ -358,6 +358,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	DisplayObject.prototype.width 				= 0;
 	DisplayObject.prototype.height 				= 0;
 	DisplayObject.prototype.rotation 			= 0;
+	DisplayObject.prototype.stage 				= null;
 
 	DisplayObject.prototype.alpha 				= 1;
 	DisplayObject.prototype.mouseEnabled 		= false;
@@ -887,6 +888,25 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		return under;
 	};
 
+	DisplayObjectContainer.prototype.getNestedChildren = function()
+	{
+		var list = new Array();
+		var subChild = null;
+		var i = this.children.length;
+		
+		while( --i > -1 )
+		{
+			subChild = this.children[i];
+			if( subChild.isContainer == true )
+			{
+				list = list.concat(subChild.getNestedChildren());
+			}
+			
+			list.push(subChild);
+		}
+		
+		return list;
+	}
 
 	tomahawk_ns.DisplayObjectContainer = DisplayObjectContainer;
 })();
@@ -931,12 +951,18 @@ MovieClip.prototype.setFrame = function( frameIndex, texture )
 MovieClip.prototype.play = function()
 {
 	this.stop();
-	Stage.getInstance().addEventListener(Event.ENTER_FRAME, this,this._enterFrameHandler); 
+	
+	if( this.stage == null )
+		return;
+		
+	this.stage.addEventListener(Event.ENTER_FRAME, this,this._enterFrameHandler); 
 };
 
 MovieClip.prototype.stop = function()
 {
-	Stage.getInstance().removeEventListener(Event.ENTER_FRAME, this,this._enterFrameHandler); 
+	if( this.stage == null )
+		return;
+	this.stage.removeEventListener(Event.ENTER_FRAME, this,this._enterFrameHandler); 
 };
 
 
@@ -1223,13 +1249,16 @@ MovieClip.prototype.stop = function()
 	Tomahawk.registerClass( Stage, "Stage" );
 	Tomahawk.extend( "Stage", "DisplayObjectContainer" );
 
-	Stage._instance = null;
-	Stage.getInstance = function()
+	Stage._instances = new Object();
+	
+	Stage.getInstance = function(stageName)
 	{
-		if( Stage._instance == null )
-			Stage._instance = new Stage();
+		stageName = stageName || "defaultStage";
+		
+		if( !tomahawk_ns.Stage._instances[stageName] )
+			tomahawk_ns.Stage._instances[stageName] = new tomahawk_ns.Stage();
 			
-		return Stage._instance;
+		return tomahawk_ns.Stage._instances[stageName];
 	};
 
 
@@ -1373,6 +1402,9 @@ MovieClip.prototype.stop = function()
 
 	Stage.prototype._eventHandler = function(event)
 	{
+		var list = null;
+		var i = 0;
+		var child = null;
 		switch( event.type )
 		{
 			case tomahawk_ns.Event.FOCUSED: 
@@ -1385,11 +1417,23 @@ MovieClip.prototype.stop = function()
 				break;
 				
 			case tomahawk_ns.Event.ADDED: 
-				event.target.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.ADDED_TO_STAGE, true, true) ); 
+				list = event.target.getNestedChildren();
+				i = list.length;
+				while( --i > -1 )
+				{
+					list[i].stage = this;
+					list[i].dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.ADDED_TO_STAGE, true, true) ); 
+				}
 				break;
 				
 			case tomahawk_ns.Event.REMOVED: 
-				event.target.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.REMOVED_FROM_STAGE, true, true) ); 
+				list = event.target.getNestedChildren();
+				i = list.length;
+				while( --i > -1 )
+				{
+					list[i].dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.REMOVED_FROM_STAGE, true, true) ); 
+					list[i].stage = null;
+				}
 				break;
 		}
 	};
@@ -2610,12 +2654,20 @@ MovieClip.prototype.stop = function()
 	function InputTextField()
 	{
 		tomahawk_ns.SelectableTextField.apply(this);
-		tomahawk_ns.Stage.getInstance().addEventListener( tomahawk_ns.KeyEvent.KEY_DOWN, this, this._keyHandler );
+		this.addEventListener( tomahawk_ns.Event.ADDED_TO_STAGE, this, this._inputTextFieldAddedHandler );
 	}
+	
+	
 
 	Tomahawk.registerClass(InputTextField,"InputTextField");
 	Tomahawk.extend("InputTextField","SelectableTextField");
 
+	InputTextField.prototype._inputTextFieldAddedHandler = function(event)
+	{
+		this.removeEventListener( tomahawk_ns.Event.ADDED_TO_STAGE, this, this._inputTextFieldAddedHandler );
+		this.stage.addEventListener( tomahawk_ns.KeyEvent.KEY_DOWN, this, this._keyHandler );
+	};
+	
 	InputTextField.prototype._keyHandler = function(event)
 	{
 		var range = this.getSelectionRange();
@@ -2787,12 +2839,10 @@ MovieClip.prototype.stop = function()
 	{
 		tomahawk_ns.TextField.apply(this);
 		this.mouseEnabled = true;
-		tomahawk_ns.Stage.getInstance().addEventListener( tomahawk_ns.MouseEvent.MOUSE_DOWN, this, this._mouseEventHandler,true );
-		tomahawk_ns.Stage.getInstance().addEventListener( tomahawk_ns.MouseEvent.DOUBLE_CLICK, this, this._mouseEventHandler,true );
+		
+		this.addEventListener( tomahawk_ns.Event.ADDED_TO_STAGE, this, this._selectableTextFieldAddedHandler );
 		this.addEventListener( tomahawk_ns.MouseEvent.CLICK, this, this._mouseEventHandler );
 		this.addEventListener( tomahawk_ns.MouseEvent.MOUSE_DOWN, this, this._mouseEventHandler );
-		tomahawk_ns.Stage.getInstance().addEventListener( tomahawk_ns.MouseEvent.MOUSE_UP, this, this._mouseEventHandler, true );
-		tomahawk_ns.Stage.getInstance().addEventListener( tomahawk_ns.MouseEvent.MOUSE_MOVE, this, this._mouseEventHandler, true );
 	}
 
 	Tomahawk.registerClass(SelectableTextField,"SelectableTextField");
@@ -2801,6 +2851,16 @@ MovieClip.prototype.stop = function()
 	SelectableTextField.prototype._ignoreNextClick = false;
 	SelectableTextField.prototype._startPoint = null;
 	SelectableTextField.prototype._down = false;
+	
+	SelectableTextField.prototype._selectableTextFieldAddedHandler = function(event)
+	{
+		console.log(this.stage);
+		this.removeEventListener( tomahawk_ns.Event.ADDED_TO_STAGE, this, this._selectableTextFieldAddedHandler );
+		this.stage.addEventListener( tomahawk_ns.MouseEvent.MOUSE_DOWN, this, this._mouseEventHandler,true );
+		this.stage.addEventListener( tomahawk_ns.MouseEvent.DOUBLE_CLICK, this, this._mouseEventHandler,true );
+		this.stage.addEventListener( tomahawk_ns.MouseEvent.MOUSE_UP, this, this._mouseEventHandler, true );
+		this.stage.addEventListener( tomahawk_ns.MouseEvent.MOUSE_MOVE, this, this._mouseEventHandler, true );
+	};
 
 	SelectableTextField.prototype.getObjectUnder = function(x,y)
 	{

@@ -243,6 +243,25 @@
 		return under;
 	};
 
+	DisplayObjectContainer.prototype.getNestedChildren = function()
+	{
+		var list = new Array();
+		var subChild = null;
+		var i = this.children.length;
+		
+		while( --i > -1 )
+		{
+			subChild = this.children[i];
+			if( subChild.isContainer == true )
+			{
+				list = list.concat(subChild.getNestedChildren());
+			}
+			
+			list.push(subChild);
+		}
+		
+		return list;
+	}
 
 	tomahawk_ns.DisplayObjectContainer = DisplayObjectContainer;
 })();

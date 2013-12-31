@@ -10,12 +10,10 @@
 	{
 		tomahawk_ns.TextField.apply(this);
 		this.mouseEnabled = true;
-		tomahawk_ns.Stage.getInstance().addEventListener( tomahawk_ns.MouseEvent.MOUSE_DOWN, this, this._mouseEventHandler,true );
-		tomahawk_ns.Stage.getInstance().addEventListener( tomahawk_ns.MouseEvent.DOUBLE_CLICK, this, this._mouseEventHandler,true );
+		
+		this.addEventListener( tomahawk_ns.Event.ADDED_TO_STAGE, this, this._selectableTextFieldAddedHandler );
 		this.addEventListener( tomahawk_ns.MouseEvent.CLICK, this, this._mouseEventHandler );
 		this.addEventListener( tomahawk_ns.MouseEvent.MOUSE_DOWN, this, this._mouseEventHandler );
-		tomahawk_ns.Stage.getInstance().addEventListener( tomahawk_ns.MouseEvent.MOUSE_UP, this, this._mouseEventHandler, true );
-		tomahawk_ns.Stage.getInstance().addEventListener( tomahawk_ns.MouseEvent.MOUSE_MOVE, this, this._mouseEventHandler, true );
 	}
 
 	Tomahawk.registerClass(SelectableTextField,"SelectableTextField");
@@ -24,6 +22,16 @@
 	SelectableTextField.prototype._ignoreNextClick = false;
 	SelectableTextField.prototype._startPoint = null;
 	SelectableTextField.prototype._down = false;
+	
+	SelectableTextField.prototype._selectableTextFieldAddedHandler = function(event)
+	{
+		console.log(this.stage);
+		this.removeEventListener( tomahawk_ns.Event.ADDED_TO_STAGE, this, this._selectableTextFieldAddedHandler );
+		this.stage.addEventListener( tomahawk_ns.MouseEvent.MOUSE_DOWN, this, this._mouseEventHandler,true );
+		this.stage.addEventListener( tomahawk_ns.MouseEvent.DOUBLE_CLICK, this, this._mouseEventHandler,true );
+		this.stage.addEventListener( tomahawk_ns.MouseEvent.MOUSE_UP, this, this._mouseEventHandler, true );
+		this.stage.addEventListener( tomahawk_ns.MouseEvent.MOUSE_MOVE, this, this._mouseEventHandler, true );
+	};
 
 	SelectableTextField.prototype.getObjectUnder = function(x,y)
 	{

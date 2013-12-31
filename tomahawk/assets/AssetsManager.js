@@ -19,10 +19,10 @@
 	AssetsManager._instance = null;
 	AssetsManager.getInstance = function()
 	{
-		if( AssetsManager._instance == null )
-			AssetsManager._instance = new AssetsManager();
+		if( tomahawk_ns.AssetsManager._instance == null )
+			tomahawk_ns.AssetsManager._instance = new tomahawk_ns.AssetsManager();
 			
-		return AssetsManager._instance;
+		return tomahawk_ns.AssetsManager._instance;
 	};
 
 	AssetsManager.prototype._images = null;

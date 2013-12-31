@@ -9,14 +9,14 @@
 
 	Tomahawk.registerClass(Screen,"Screen");
 	
-	Screen.getInnerWidth = function()
+	Screen.getInnerWidth = function(stage)
 	{
-		return Stage.getInstance().getCanvas().parent.offsetWidth;
+		return stage.getCanvas().parent.offsetWidth;
 	};
 
-	Screen.getInnerHeight = function()
+	Screen.getInnerHeight = function(stage)
 	{
-		return Stage.getInstance().getCanvas().parent.offsetHeight;
+		return stage.getCanvas().parent.offsetHeight;
 	};
 
 	Screen.getWindowWidth = function()

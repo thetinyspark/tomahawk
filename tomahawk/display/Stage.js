@@ -28,13 +28,16 @@
 	Tomahawk.registerClass( Stage, "Stage" );
 	Tomahawk.extend( "Stage", "DisplayObjectContainer" );
 
-	Stage._instance = null;
-	Stage.getInstance = function()
+	Stage._instances = new Object();
+	
+	Stage.getInstance = function(stageName)
 	{
-		if( Stage._instance == null )
-			Stage._instance = new Stage();
+		stageName = stageName || "defaultStage";
+		
+		if( !tomahawk_ns.Stage._instances[stageName] )
+			tomahawk_ns.Stage._instances[stageName] = new tomahawk_ns.Stage();
 			
-		return Stage._instance;
+		return tomahawk_ns.Stage._instances[stageName];
 	};
 
 
@@ -178,6 +181,9 @@
 
 	Stage.prototype._eventHandler = function(event)
 	{
+		var list = null;
+		var i = 0;
+		var child = null;
 		switch( event.type )
 		{
 			case tomahawk_ns.Event.FOCUSED: 
@@ -190,11 +196,23 @@
 				break;
 				
 			case tomahawk_ns.Event.ADDED: 
-				event.target.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.ADDED_TO_STAGE, true, true) ); 
+				list = event.target.getNestedChildren();
+				i = list.length;
+				while( --i > -1 )
+				{
+					list[i].stage = this;
+					list[i].dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.ADDED_TO_STAGE, true, true) ); 
+				}
 				break;
 				
 			case tomahawk_ns.Event.REMOVED: 
-				event.target.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.REMOVED_FROM_STAGE, true, true) ); 
+				list = event.target.getNestedChildren();
+				i = list.length;
+				while( --i > -1 )
+				{
+					list[i].dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.REMOVED_FROM_STAGE, true, true) ); 
+					list[i].stage = null;
+				}
 				break;
 		}
 	};
