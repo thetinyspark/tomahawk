@@ -345,7 +345,7 @@
 		
 		tomahawk_ns.DisplayObjectContainer.prototype.draw.apply(this, [context]);
 		
-		if( this.autoSize == true )
+		if( this.autoSize == true && rowLetter != null )
 		{
 			this.height = rowLetter.y + rowLetter.textHeight;
 		}

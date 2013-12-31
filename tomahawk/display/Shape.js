@@ -100,6 +100,12 @@
 		this._getCommands().push( [1,"bezierCurveTo",[controlX1, controlY1, controlX2, controlY2, endX, endY]] );
 	};
 
+	
+	Shape.prototype.fillWithCurrentGradient = function()
+	{
+		this._getCommands().push( [1,"fillWithCurrentGradient",null] );
+	};
+	
 	Shape.prototype.addColorStop = function(offset, color)
 	{
 		this._getCommands().push( [1,"addColorStop",[offset, color]] );
@@ -114,7 +120,9 @@
 	{
 		this._getCommands().push( [1,"createRadialGradient",[startX, startY, startRadius, endX, endY, endRadius]] );
 	};
-
+	
+	
+	
 	Shape.prototype.lineWidth = function(value)
 	{
 		this._getCommands().push( [0,"lineWidth",value] );
@@ -154,6 +162,7 @@
 		var type = null;
 		var prop = null;
 		var args = null;
+		var gradient = null;
 		
 		//type = 0 : set; type = 1 : method
 		
@@ -166,12 +175,41 @@
 			
 			if( type == 0 )
 			{
-				context[prop] = args;
+				if( context[prop] )
+				{
+					context[prop] = args;				
+				}
+				else if( gradient != null )
+				{
+					if( gradient[prop] )
+						gradient[prop] = args;
+				}
 			}
 			else
 			{
-				context[prop].apply(context,args);
+				if( prop == "createLinearGradient" || prop == "createRadialGradient" )
+				{
+					gradient = context[prop].apply(context,args);
+				}
+				else if( prop == "fillWithCurrentGradient" )
+				{
+					context.fillStyle = gradient;
+				}
+				else
+				{
+					if( context[prop] )
+					{
+						context[prop].apply(context,args);
+					}
+					else if( gradient != null )
+					{
+						if( gradient[prop] )
+							gradient[prop].apply(gradient,args);
+					}
+				}
 			}
+			
+			
 		}
 		
 	};
