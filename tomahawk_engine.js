@@ -670,7 +670,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		
 		child.parent = this;
 		this.children.push(child);
-		child.dispatchEvent( new Event(Event.ADDED, true, true) );
+		child.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.ADDED, true, true) );
 	};
 
 	DisplayObjectContainer.prototype.getChildAt = function (index)
@@ -717,7 +717,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		this.children = tab1.concat([child]).concat(tab2);
 		
 		child.parent = this;
-		child.dispatchEvent( new Event(Event.ADDED, true, true) );
+		child.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.ADDED, true, true) );
 	};
 
 	DisplayObjectContainer.prototype.removeChildAt = function(index)
@@ -728,7 +728,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 			
 		child.parent = null;
 		this.children.splice(index,1);
-		child.dispatchEvent( new Event(Event.REMOVED, true, true) );
+		child.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.REMOVED, true, true) );
 	};
 
 	DisplayObjectContainer.prototype.removeChild = function(child)
@@ -739,7 +739,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 			this.children.splice(index,1);
 			
 		child.parent = null;
-		child.dispatchEvent( new Event(Event.REMOVED, true, true) );
+		child.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.REMOVED, true, true) );
 	};
 
 	DisplayObjectContainer.prototype.draw = function( context )
@@ -3021,6 +3021,7 @@ MovieClip.prototype.stop = function()
 	{
 		tomahawk_ns.DisplayObjectContainer.apply(this);
 		this.defaultTextFormat = new tomahawk_ns.TextFormat();
+		this.width = this.height = 100;
 	}
 
 	Tomahawk.registerClass(TextField,"TextField");
@@ -3223,7 +3224,7 @@ MovieClip.prototype.stop = function()
 		letter.value = value;
 		letter.index = index;
 		letter.newline = ( isNewline == true ) ? true : false;
-		letter.format = ( previous == undefined ) ? this.defaultTextFormat.clone() : previous.format.clone();
+		letter.format = ( !previous ) ? this.defaultTextFormat.clone() : previous.format.clone();
 		this.addChildAt(letter,index);
 		this.setCurrentIndex(index);
 		this._repos();
@@ -3279,7 +3280,7 @@ MovieClip.prototype.stop = function()
 		var currentRow = 0;
 		var rowY = 0;
 		var offsetX = 0;
-		var rows = new Array();
+		var rowIndex = 0;
 		var currentRow = new Array();
 		var rowLetter = null;
 		var j = 0;
@@ -3296,13 +3297,24 @@ MovieClip.prototype.stop = function()
 			
 			if( x + letter.textWidth > this.width || letter.newline == true )
 			{
+				rowIndex++;
 				y += maxLineHeight;
 				
 				textAlign = ( currentRow[0] != undefined ) ? currentRow[0].format.textAlign : "left";
 				
-				offsetX = (textAlign == "left" ) ? 0 : 0;
-				offsetX = (textAlign == "center" ) ? ( this.width - x ) * 0.5 : 0;
-				offsetX = (textAlign == "right" ) ? ( this.width - x ) : 0;
+				if( textAlign == "left" )
+				{
+					offsetX = 0;
+				}
+				if( textAlign == "center" )
+				{
+					offsetX = ( this.width - x ) * 0.5;
+				}
+				
+				if( textAlign == "right" )
+				{
+					offsetX = this.width - x;
+				}
 				
 				for( j = 0; j < currentRow.length; j++ )
 				{
@@ -3316,6 +3328,7 @@ MovieClip.prototype.stop = function()
 				maxLineHeight = letter.textHeight;
 			}
 			
+			letter.row = rowIndex;
 			letter.x = x;
 			letter.y = 0;
 			x += letter.textWidth;
@@ -3324,10 +3337,22 @@ MovieClip.prototype.stop = function()
 		
 		y += maxLineHeight;
 		textAlign = ( currentRow[0] != undefined ) ? currentRow[0].format.textAlign : "left";
-				
-		offsetX = (textAlign == "left" ) ? 0 : 0;
-		offsetX = (textAlign == "center" ) ? ( this.width - x ) * 0.5 : 0;
-		offsetX = (textAlign == "right" ) ? ( this.width - x ) : 0;
+		
+		if( textAlign == "left" )
+		{
+			offsetX = 0;
+		}
+		if( textAlign == "center" )
+		{
+			offsetX = ( this.width - x ) * 0.5;
+		}
+		
+		if( textAlign == "right" )
+		{
+			offsetX = this.width - x;
+		}
+			
+		
 		
 		for( j = 0; j < currentRow.length; j++ )
 		{
@@ -3344,6 +3369,8 @@ MovieClip.prototype.stop = function()
 
 	TextField.prototype.draw = function(context)
 	{
+		this._repos();
+		
 		if( this.background == true )
 		{
 			context.save();

@@ -26,7 +26,7 @@
 		
 		child.parent = this;
 		this.children.push(child);
-		child.dispatchEvent( new Event(Event.ADDED, true, true) );
+		child.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.ADDED, true, true) );
 	};
 
 	DisplayObjectContainer.prototype.getChildAt = function (index)
@@ -73,7 +73,7 @@
 		this.children = tab1.concat([child]).concat(tab2);
 		
 		child.parent = this;
-		child.dispatchEvent( new Event(Event.ADDED, true, true) );
+		child.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.ADDED, true, true) );
 	};
 
 	DisplayObjectContainer.prototype.removeChildAt = function(index)
@@ -84,7 +84,7 @@
 			
 		child.parent = null;
 		this.children.splice(index,1);
-		child.dispatchEvent( new Event(Event.REMOVED, true, true) );
+		child.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.REMOVED, true, true) );
 	};
 
 	DisplayObjectContainer.prototype.removeChild = function(child)
@@ -95,7 +95,7 @@
 			this.children.splice(index,1);
 			
 		child.parent = null;
-		child.dispatchEvent( new Event(Event.REMOVED, true, true) );
+		child.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.REMOVED, true, true) );
 	};
 
 	DisplayObjectContainer.prototype.draw = function( context )

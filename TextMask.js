@@ -23,7 +23,10 @@ Main.prototype.init = function()
 	field.width = field.height = 800;
 	field.autoSize = true;
 	field.defaultTextFormat.size = 90;
-	field.setText("Editable multiline Text Mask Example by The Tiny Spark - Tomahawk Engine");
+	field.setText("Tomahawk");
+	field.defaultTextFormat.textAlign = "center";
+	field.setTextFormat(field.defaultTextFormat,0,1);
+	console.log(field.getChildAt(0).format.textAlign);
 	field.y = 0;
 	
 	shape.beginPath();
