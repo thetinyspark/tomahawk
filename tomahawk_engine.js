@@ -302,6 +302,8 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	{
 		tomahawk_ns.DisplayObject.apply(this);
 		this.texture = texture;
+		this.width = this.texture.rect[2];
+		this.height = this.texture.rect[3];
 	}
 
 	Tomahawk.registerClass( Bitmap, "Bitmap" );
@@ -1278,6 +1280,8 @@ MovieClip.prototype.stop = function()
 	Stage.prototype._focused = false;
 	Stage.prototype._focusedElement = null;
 	Stage.prototype._cache = null;
+	Stage.prototype.background = false;
+	Stage.prototype.backgroundColor = "#0080C0";
 
 
 	Stage.prototype.init = function(canvas)
@@ -1449,7 +1453,7 @@ MovieClip.prototype.stop = function()
 	Stage.prototype.enterFrame = function()
 	{
 		var curTime = new Date().getTime();
-		var scope = Stage.getInstance();
+		var scope = this;
 		var context = scope._context;
 		var canvas = scope._canvas;
 		
@@ -1462,13 +1466,30 @@ MovieClip.prototype.stop = function()
 			scope._lastTime = curTime;
 		}
 		
-		context.clearRect(0,0,canvas.width,canvas.height);
+
+		if( scope.background == true )
+		{
+			context.save();
+			context.beginPath();
+			context.fillStyle = scope.backgroundColor;
+			context.fillRect( 0, 0, canvas.width, canvas.height );
+			context.fill();
+			context.restore();
+		}
+		else
+		{
+			context.clearRect(0,0,canvas.width,canvas.height);
+		}
 		context.save();
 		scope.draw(context);
 		context.restore();
 		
 		scope.dispatchEvent(new tomahawk_ns.Event(tomahawk_ns.Event.ENTER_FRAME,true,true));
-		window.requestAnimationFrame(scope.enterFrame);
+		window.requestAnimationFrame(	function()
+										{
+											scope.enterFrame();
+										}
+		);
 	};
 
 	Stage.prototype.setFPS = function(value)
@@ -2744,8 +2765,9 @@ MovieClip.prototype.stop = function()
  
 	function Letter()
 	{
-		tomahawk_ns.DisplayObject.apply(this);
-		this.format = new tomahawk_ns.TextFormat();
+		tomahawk_ns.DisplayObject.apply(this);		
+		Letter._metricsContext = Letter._metricsContext || document.createElement("canvas").getContext("2d");
+		this.setTextFormat( new tomahawk_ns.TextFormat() );
 	}
 
 	Tomahawk.registerClass(Letter,"Letter");
@@ -2762,10 +2784,18 @@ MovieClip.prototype.stop = function()
 	Letter.prototype.cursor				= false;		
 	Letter.prototype._drawCursor	 	= false;
 	Letter.prototype._drawCursorTime 	= 0;
-
-	Letter.prototype.updateMetrics = function(context)
+	Letter._metricsContext				= null;
+	
+	
+	Letter.prototype.setTextFormat = function(value)
 	{
-		context = context || document.createElement("canvas").getContext("2d");
+		this.format = value;
+		this.updateMetrics();
+	};
+
+	Letter.prototype.updateMetrics = function()
+	{
+		context = Letter._metricsContext;
 		context.save();
 		
 		this.format.updateContext(context);
@@ -2779,8 +2809,6 @@ MovieClip.prototype.stop = function()
 
 	Letter.prototype.draw = function(context)
 	{
-		this.updateMetrics(context);
-		
 		if( this.newline == true )
 			return;
 			
@@ -3100,6 +3128,7 @@ MovieClip.prototype.stop = function()
 	TextField.prototype.backgroundColor = "white";
 	TextField.prototype.borderColor = "black";
 	TextField.prototype.autoSize = false;
+	TextField.prototype._lastWidth = 0;
 
 	TextField.prototype.setCurrentIndex = function(index)
 	{
@@ -3227,7 +3256,7 @@ MovieClip.prototype.stop = function()
 		{
 			var letter = this.getChildAt(i);
 			if( letter != null )
-				letter.format = format;
+				letter.setTextFormat(format);
 		}
 		
 		if( letter != null )
@@ -3339,8 +3368,6 @@ MovieClip.prototype.stop = function()
 		var i = 0;
 		var max = this.children.length;
 		var x = 0;
-		var rowsHeight = new Array();
-		var rowsWidth = new Array();
 		var maxLineHeight = 0;
 		var currentRow = 0;
 		var rowY = 0;
@@ -3375,7 +3402,6 @@ MovieClip.prototype.stop = function()
 				{
 					offsetX = ( this.width - x ) * 0.5;
 				}
-				
 				if( textAlign == "right" )
 				{
 					offsetX = this.width - x;
@@ -3388,8 +3414,8 @@ MovieClip.prototype.stop = function()
 					rowLetter.x += offsetX;
 				}
 				
-				currentRow = new Array();
 				x = 0;
+				currentRow = new Array();
 				maxLineHeight = letter.textHeight;
 			}
 			
@@ -3411,13 +3437,10 @@ MovieClip.prototype.stop = function()
 		{
 			offsetX = ( this.width - x ) * 0.5;
 		}
-		
 		if( textAlign == "right" )
 		{
 			offsetX = this.width - x;
 		}
-			
-		
 		
 		for( j = 0; j < currentRow.length; j++ )
 		{
@@ -3434,7 +3457,11 @@ MovieClip.prototype.stop = function()
 
 	TextField.prototype.draw = function(context)
 	{
-		this._repos();
+		if( this._lastWidth != this.width )
+		{
+			this._repos();
+			this._lastWidth = this.width;
+		}
 		
 		if( this.background == true )
 		{

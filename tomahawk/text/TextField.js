@@ -22,6 +22,7 @@
 	TextField.prototype.backgroundColor = "white";
 	TextField.prototype.borderColor = "black";
 	TextField.prototype.autoSize = false;
+	TextField.prototype._lastWidth = 0;
 
 	TextField.prototype.setCurrentIndex = function(index)
 	{
@@ -149,7 +150,7 @@
 		{
 			var letter = this.getChildAt(i);
 			if( letter != null )
-				letter.format = format;
+				letter.setTextFormat(format);
 		}
 		
 		if( letter != null )
@@ -261,8 +262,6 @@
 		var i = 0;
 		var max = this.children.length;
 		var x = 0;
-		var rowsHeight = new Array();
-		var rowsWidth = new Array();
 		var maxLineHeight = 0;
 		var currentRow = 0;
 		var rowY = 0;
@@ -297,7 +296,6 @@
 				{
 					offsetX = ( this.width - x ) * 0.5;
 				}
-				
 				if( textAlign == "right" )
 				{
 					offsetX = this.width - x;
@@ -310,8 +308,8 @@
 					rowLetter.x += offsetX;
 				}
 				
-				currentRow = new Array();
 				x = 0;
+				currentRow = new Array();
 				maxLineHeight = letter.textHeight;
 			}
 			
@@ -333,13 +331,10 @@
 		{
 			offsetX = ( this.width - x ) * 0.5;
 		}
-		
 		if( textAlign == "right" )
 		{
 			offsetX = this.width - x;
 		}
-			
-		
 		
 		for( j = 0; j < currentRow.length; j++ )
 		{
@@ -356,7 +351,11 @@
 
 	TextField.prototype.draw = function(context)
 	{
-		this._repos();
+		if( this._lastWidth != this.width )
+		{
+			this._repos();
+			this._lastWidth = this.width;
+		}
 		
 		if( this.background == true )
 		{

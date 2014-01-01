@@ -25,7 +25,10 @@ Main.prototype.init = function()
 	
 	Tomahawk.run();
 	tomahawk_ns.Stage.getInstance().init(document.getElementById("tomahawk"));
+	tomahawk_ns.Stage.getInstance().background = true;
+	tomahawk_ns.Stage.getInstance().backgroundColor = "#73D3F9";
 	
+	tomahawk_ns.AssetsLoader.getInstance().addFile("./assets/clouds.png","clouds");
 	tomahawk_ns.AssetsLoader.getInstance().addFile("./assets/ground.png","ground");
 	tomahawk_ns.AssetsLoader.getInstance().addFile("./assets/perso1.png","perso1");
 	tomahawk_ns.AssetsLoader.getInstance().addFile("./assets/perso2.png","perso2");
@@ -44,9 +47,20 @@ Main.prototype.complete = function()
 	var bmp = null;
 	var texture = null;
 	var coords = null;
-	var container = new tomahawk_ns.DisplayObjectContainer();
-	var numRows = 30;
-	var numCols = 30;
+	var container = new tomahawk_ns.Sprite();
+	var cloundsContainer = new tomahawk_ns.Sprite();
+	var numRows = 50;
+	var numCols = 50;
+	var sky = new tomahawk_ns.Shape();
+	
+	
+	sky.beginPath();
+	sky.createLinearGradient(0,0,0,100);
+	sky.addColorStop(0,"white");
+	sky.addColorStop(1,"#73D3F9");
+	sky.fillWithCurrentGradient();
+	sky.fillRect(0,0,800,800);
+	
 	
 	if( tomahawk_ns.Screen.getWindowWidth() < 800 )
 	{	
@@ -82,14 +96,34 @@ Main.prototype.complete = function()
 		}
 	}
 	
+	
+	i = 5;
+	
+	texture = new tomahawk_ns.Texture();
+	texture.data = data["clouds"];
+	texture.rect = [0,0,150,91];
+	
+	while( --i > -1 )
+	{
+		bmp = new tomahawk_ns.Bitmap(texture);
+		bmp.x = Math.random() * 800;
+		bmp.y = Math.random() * 400;
+		bmp.mouseEnabled = false;
+		bmp.alpha = 0.8;
+		
+		cloundsContainer.addChild(bmp);
+	}
+	
+	cloundsContainer.mouseEnabled = false;
+	
+	
 	coords = this.isoToScreen(5,5,64,32);
 	
 	texture = new tomahawk_ns.Texture();
 	texture.data = data["perso1"];
 	texture.rect = [0,0,110,224];
 	
-	bmp = new tomahawk_ns.Bitmap();
-	bmp.texture = texture;
+	bmp = new tomahawk_ns.Bitmap(texture);
 	bmp.width = 64;
 	bmp.height = 113;
 	bmp.x = coords.x;
@@ -104,8 +138,12 @@ Main.prototype.complete = function()
 	//container.x = tomahawk_ns.Stage.getInstance().getCanvas().width * 0.5;
 	container.name = "narnia";
 	container.cacheAsBitmap = true;
+	cloundsContainer.name = "clouds";
 	
+	
+	tomahawk_ns.Stage.getInstance().addChild(sky);
 	tomahawk_ns.Stage.getInstance().addChild(container);
+	tomahawk_ns.Stage.getInstance().addChild(cloundsContainer);
 	tomahawk_ns.Stage.getInstance().addEventListener(tomahawk_ns.Event.ENTER_FRAME, this, this.onFrame);
 };
 
@@ -113,15 +151,22 @@ Main.prototype.onFrame = function()
 {
 	tomahawk_ns.Stage.getInstance().drawFPS();
 	var container = tomahawk_ns.Stage.getInstance().getChildByName("narnia");
+	var cloundsContainer = tomahawk_ns.Stage.getInstance().getChildByName("clouds");
 	this._counter++;
 	//return;
+	
+	var i = cloundsContainer.children.length;
+	while( --i > -1 )
+	{
+		cloundsContainer.getChildAt(i).x -= 0.1;
+	}
 	
 	if( container == null )
 	{
 		return;
 	}
 	
-	if( this._counter > 120 )
+	if( this._counter > 240 )
 	{
 		this._direction++;
 		if( this._direction == 4 )
@@ -134,21 +179,29 @@ Main.prototype.onFrame = function()
 	{
 		container.x--;
 		container.y--;
+		cloundsContainer.x -= 0.5;
+		cloundsContainer.y -= 0.5;
 	}
 	else if( this._direction == 1 )
 	{
 		container.x++;
 		container.y--;
+		cloundsContainer.x += 0.5;
+		cloundsContainer.y -= 0.5;
 	}
 	else if( this._direction == 2 )
 	{
 		container.x++;
 		container.y++;
+		cloundsContainer.x += 0.5;
+		cloundsContainer.y += 0.5;
 	}
 	else if( this._direction == 3 )
 	{
 		container.x--;
 		container.y++;
+		cloundsContainer.x -= 0.5;
+		cloundsContainer.y += 0.5;
 	}
 };
 

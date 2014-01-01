@@ -8,8 +8,9 @@
  
 	function Letter()
 	{
-		tomahawk_ns.DisplayObject.apply(this);
-		this.format = new tomahawk_ns.TextFormat();
+		tomahawk_ns.DisplayObject.apply(this);		
+		Letter._metricsContext = Letter._metricsContext || document.createElement("canvas").getContext("2d");
+		this.setTextFormat( new tomahawk_ns.TextFormat() );
 	}
 
 	Tomahawk.registerClass(Letter,"Letter");
@@ -26,10 +27,18 @@
 	Letter.prototype.cursor				= false;		
 	Letter.prototype._drawCursor	 	= false;
 	Letter.prototype._drawCursorTime 	= 0;
-
-	Letter.prototype.updateMetrics = function(context)
+	Letter._metricsContext				= null;
+	
+	
+	Letter.prototype.setTextFormat = function(value)
 	{
-		context = context || document.createElement("canvas").getContext("2d");
+		this.format = value;
+		this.updateMetrics();
+	};
+
+	Letter.prototype.updateMetrics = function()
+	{
+		context = Letter._metricsContext;
 		context.save();
 		
 		this.format.updateContext(context);
@@ -43,8 +52,6 @@
 
 	Letter.prototype.draw = function(context)
 	{
-		this.updateMetrics(context);
-		
 		if( this.newline == true )
 			return;
 			

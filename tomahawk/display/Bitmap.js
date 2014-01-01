@@ -9,6 +9,8 @@
 	{
 		tomahawk_ns.DisplayObject.apply(this);
 		this.texture = texture;
+		this.width = this.texture.rect[2];
+		this.height = this.texture.rect[3];
 	}
 
 	Tomahawk.registerClass( Bitmap, "Bitmap" );

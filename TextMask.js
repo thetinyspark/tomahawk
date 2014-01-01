@@ -13,6 +13,7 @@ Main.prototype.init = function()
 	var field = new tomahawk_ns.InputTextField();
 	var shape = new tomahawk_ns.Shape();
 	var container = new tomahawk_ns.Sprite();
+	var text ="Tomahawk engine";
 	
 	stage.init(document.getElementById("tomahawk"));
 	
@@ -23,7 +24,7 @@ Main.prototype.init = function()
 	field.width = field.height = 800;
 	field.autoSize = true;
 	field.defaultTextFormat.size = 90;
-	field.setText("Tomahawk");
+	field.setText(text);
 	field.defaultTextFormat.textAlign = "center";
 	field.setTextFormat(field.defaultTextFormat,0,1);
 	field.y = 0;
@@ -47,6 +48,14 @@ Main.prototype.init = function()
 		var mask = ( event.target.checked == true ) ? field : null;
 		shape.setMask(mask);
 	};
+	
+	stage.addEventListener(tomahawk_ns.Event.ENTER_FRAME, this, this._enterFrame );
+};
+
+Main.prototype._enterFrame = function(event)
+{
+	var stage = event.target;
+	stage.drawFPS();
 };
 
 window.onload = function()

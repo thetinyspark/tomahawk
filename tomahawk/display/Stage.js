@@ -52,6 +52,8 @@
 	Stage.prototype._focused = false;
 	Stage.prototype._focusedElement = null;
 	Stage.prototype._cache = null;
+	Stage.prototype.background = false;
+	Stage.prototype.backgroundColor = "#0080C0";
 
 
 	Stage.prototype.init = function(canvas)
@@ -223,7 +225,7 @@
 	Stage.prototype.enterFrame = function()
 	{
 		var curTime = new Date().getTime();
-		var scope = Stage.getInstance();
+		var scope = this;
 		var context = scope._context;
 		var canvas = scope._canvas;
 		
@@ -236,13 +238,30 @@
 			scope._lastTime = curTime;
 		}
 		
-		context.clearRect(0,0,canvas.width,canvas.height);
+
+		if( scope.background == true )
+		{
+			context.save();
+			context.beginPath();
+			context.fillStyle = scope.backgroundColor;
+			context.fillRect( 0, 0, canvas.width, canvas.height );
+			context.fill();
+			context.restore();
+		}
+		else
+		{
+			context.clearRect(0,0,canvas.width,canvas.height);
+		}
 		context.save();
 		scope.draw(context);
 		context.restore();
 		
 		scope.dispatchEvent(new tomahawk_ns.Event(tomahawk_ns.Event.ENTER_FRAME,true,true));
-		window.requestAnimationFrame(scope.enterFrame);
+		window.requestAnimationFrame(	function()
+										{
+											scope.enterFrame();
+										}
+		);
 	};
 
 	Stage.prototype.setFPS = function(value)
