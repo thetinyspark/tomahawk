@@ -38,7 +38,7 @@
 
 	Letter.prototype.updateMetrics = function()
 	{
-		context = Letter._metricsContext;
+		var context = Letter._metricsContext;
 		context.save();
 		
 		this.format.updateContext(context);

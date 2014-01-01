@@ -2795,7 +2795,7 @@ MovieClip.prototype.stop = function()
 
 	Letter.prototype.updateMetrics = function()
 	{
-		context = Letter._metricsContext;
+		var context = Letter._metricsContext;
 		context.save();
 		
 		this.format.updateContext(context);
@@ -3129,6 +3129,7 @@ MovieClip.prototype.stop = function()
 	TextField.prototype.borderColor = "black";
 	TextField.prototype.autoSize = false;
 	TextField.prototype._lastWidth = 0;
+	TextField.prototype._reposNextFrame = true;
 
 	TextField.prototype.setCurrentIndex = function(index)
 	{
@@ -3321,14 +3322,14 @@ MovieClip.prototype.stop = function()
 		letter.format = ( !previous ) ? this.defaultTextFormat.clone() : previous.format.clone();
 		this.addChildAt(letter,index);
 		this.setCurrentIndex(index);
-		this._repos();
+		this._reposNextFrame = true;
 	};
 
 	TextField.prototype.removeCharAt = function(index)
 	{
 		this.removeChildAt(index);
 		this.setCurrentIndex(index-1);
-		this._repos();
+		this._reposNextFrame = true;
 	};
 
 	TextField.prototype.addTextAt = function(value,index)
@@ -3457,10 +3458,11 @@ MovieClip.prototype.stop = function()
 
 	TextField.prototype.draw = function(context)
 	{
-		if( this._lastWidth != this.width )
+		if( this._lastWidth != this.width || this._reposNextFrame == true )
 		{
 			this._repos();
 			this._lastWidth = this.width;
+			this._reposNextFrame = false;
 		}
 		
 		if( this.background == true )
@@ -3504,19 +3506,26 @@ MovieClip.prototype.stop = function()
 
 	TextFormat.prototype.textColor = "black";
 	TextFormat.prototype.textAlign = "center";
-	TextFormat.prototype.font = "Arial";
-	TextFormat.prototype.bold = false;
-	TextFormat.prototype.italic = false;
-	TextFormat.prototype.size = 12;
 	TextFormat.prototype.underline = false;
 	TextFormat.prototype.backgroundSelectedColor = "blue";
+	TextFormat.prototype._updateFont = true;
+	TextFormat.prototype._fontString = "";
+	TextFormat.prototype._font = "Arial";
+	TextFormat.prototype._bold = false;
+	TextFormat.prototype._italic = false;
+	TextFormat.prototype._size = 12;
 
 	TextFormat.prototype.updateContext = function(context)
 	{
-		var bold = ( this.bold ) ? "bold" : "";
-		var italic = ( this.italic ) ? "italic" : "";
+		if( this._updateFont == true )
+		{
+			this._updateFont == false;	
+			var bold = ( this._bold ) ? "bold" : "";
+			var italic = ( this._italic ) ? "italic" : "";
+			this._fontString = italic+' '+bold+' '+this._size+'px '+this._font;
+		}
 		
-		context.font = italic+' '+bold+' '+this.size+'px '+this.font;
+		context.font = this._fontString;
 		context.fillStyle = this.textColor;
 		//context.textAlign = this.textAlign;
 		
@@ -3528,8 +3537,8 @@ MovieClip.prototype.stop = function()
 
 	TextFormat.prototype.clone = function()
 	{
-		var format = new TextFormat();
-		format.textColor = this.textColor.substr(0,this.textColor.length);
+		var format = new tomahawk_ns.TextFormat();
+		format.textColor = new String(this.textColor);
 		format.textAlign = new String( this.textAlign );
 		format.font = new String( this.font );
 		format.bold = ( this.bold == true );
@@ -3539,7 +3548,38 @@ MovieClip.prototype.stop = function()
 		
 		return format;
 	};
+	
+	TextFormat.prototype.setBold = function(value){ this._bold = value; this._updateFont = true; };
+	TextFormat.prototype.setItalic = function(value){ this._italic = value; this._updateFont = true; };
+	TextFormat.prototype.setSize = function(value){ this._size = value; this._updateFont = true; };
+	TextFormat.prototype.setFont = function(value){ this._font = value; this._updateFont = true; };
+	
+	TextFormat.prototype.getBold = function(){ return this._bold };
+	TextFormat.prototype.getItalic = function(){ return this._italic };
+	TextFormat.prototype.getFont = function(){ return this._font };
+	TextFormat.prototype.getSize = function(){ return this._size };
 
+	
+	Object.defineProperty( TextFormat.prototype, "bold", {
+		set: TextFormat.prototype.setBold,
+		get: TextFormat.prototype.getBold,
+		enumerable: true
+	} );
+	Object.defineProperty( TextFormat.prototype, "italic", {
+		set: TextFormat.prototype.setItalic,
+		get: TextFormat.prototype.getItalic,
+		enumerable: true
+	} );
+	Object.defineProperty( TextFormat.prototype, "size", {
+		set: TextFormat.prototype.setSize,
+		get: TextFormat.prototype.getSize,
+		enumerable: true
+	} );
+	Object.defineProperty( TextFormat.prototype, "font", {
+		set: TextFormat.prototype.setFont,
+		get: TextFormat.prototype.getFont,
+		enumerable: true
+	} );
 	
 	tomahawk_ns.TextFormat = TextFormat;
 })();

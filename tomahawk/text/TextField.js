@@ -23,6 +23,7 @@
 	TextField.prototype.borderColor = "black";
 	TextField.prototype.autoSize = false;
 	TextField.prototype._lastWidth = 0;
+	TextField.prototype._reposNextFrame = true;
 
 	TextField.prototype.setCurrentIndex = function(index)
 	{
@@ -215,14 +216,14 @@
 		letter.format = ( !previous ) ? this.defaultTextFormat.clone() : previous.format.clone();
 		this.addChildAt(letter,index);
 		this.setCurrentIndex(index);
-		this._repos();
+		this._reposNextFrame = true;
 	};
 
 	TextField.prototype.removeCharAt = function(index)
 	{
 		this.removeChildAt(index);
 		this.setCurrentIndex(index-1);
-		this._repos();
+		this._reposNextFrame = true;
 	};
 
 	TextField.prototype.addTextAt = function(value,index)
@@ -351,10 +352,11 @@
 
 	TextField.prototype.draw = function(context)
 	{
-		if( this._lastWidth != this.width )
+		if( this._lastWidth != this.width || this._reposNextFrame == true )
 		{
 			this._repos();
 			this._lastWidth = this.width;
+			this._reposNextFrame = false;
 		}
 		
 		if( this.background == true )
