@@ -16,6 +16,13 @@ Main.prototype.init = function()
 	var text ="Tomahawk engine";
 	var report = new tomahawk_ns.TextField();
 	
+	var i = 1000;
+	while( --i > -1 )
+	{
+		text += "aa";
+	}
+	
+	
 	report.name = "report";
 	report.autoSize = true;
 	report.defaultTextFormat.size = 20;
@@ -30,7 +37,7 @@ Main.prototype.init = function()
 	shape.width = shape.height = 800;
 	field.width = field.height = 800;
 	field.autoSize = true;
-	field.defaultTextFormat.size = 90;
+	field.defaultTextFormat.size = 20;
 	field.setText(text);
 	field.defaultTextFormat.textAlign = "center";
 	field.setTextFormat(field.defaultTextFormat,0,1);
@@ -48,6 +55,7 @@ Main.prototype.init = function()
 	container.scaleX = container.scaleY = 0.5;
 	container.name = "container";
 	field.setFocus(false);
+	//field.cacheAsBitmap = true;
 	
 	document.getElementById("toggleMask").onchange = function(event)
 	{
@@ -66,15 +74,12 @@ Main.prototype.init = function()
 
 Main.prototype._enterFrame = function(event)
 {
-	
 	var stage = event.target;
 	var field = stage.getChildByName("container").getChildByName("text");
 	var report = stage.getChildByName("container").getChildByName("report");
 	var text = field.getText();
 	stage.drawFPS();
 	report.setText( ""+text.length+" chars" );
-	
-	console.log(field.getText().length);
 };
 
 window.onload = function()

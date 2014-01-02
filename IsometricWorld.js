@@ -1,12 +1,12 @@
 /**
- * ...
- * @author Thot
+ * @author The Tiny Spark
  */
 
 function Main(){}
 
 Main.prototype._direction = 0;
 Main.prototype._counter = 0;
+Main.prototype._down = false;
 
 Main.prototype.isoToScreen = function(  p_row, p_col, p_cellW, p_cellH )
 {
@@ -48,7 +48,7 @@ Main.prototype.complete = function()
 	var texture = null;
 	var coords = null;
 	var container = new tomahawk_ns.Sprite();
-	var cloundsContainer = new tomahawk_ns.Sprite();
+	var cloudsContainer = new tomahawk_ns.Sprite();
 	var numRows = 50;
 	var numCols = 50;
 	var sky = new tomahawk_ns.Shape();
@@ -108,13 +108,12 @@ Main.prototype.complete = function()
 		bmp = new tomahawk_ns.Bitmap(texture);
 		bmp.x = Math.random() * 800;
 		bmp.y = Math.random() * 400;
-		bmp.mouseEnabled = false;
 		bmp.alpha = 0.8;
 		
-		cloundsContainer.addChild(bmp);
+		cloudsContainer.addChild(bmp);
 	}
 	
-	cloundsContainer.mouseEnabled = false;
+	cloudsContainer.mouseEnabled = false;
 	
 	
 	coords = this.isoToScreen(5,5,64,32);
@@ -135,74 +134,100 @@ Main.prototype.complete = function()
 	container.addChild(bmp);
 	
 	bounds = container.getBoundingRect();
-	//container.x = tomahawk_ns.Stage.getInstance().getCanvas().width * 0.5;
 	container.name = "narnia";
 	container.cacheAsBitmap = true;
-	cloundsContainer.name = "clouds";
-	
+	cloudsContainer.name = "clouds";
+	container.mouseEnabled = true;
+	container.handCursor = true;
 	
 	tomahawk_ns.Stage.getInstance().addChild(sky);
 	tomahawk_ns.Stage.getInstance().addChild(container);
-	tomahawk_ns.Stage.getInstance().addChild(cloundsContainer);
+	tomahawk_ns.Stage.getInstance().addChild(cloudsContainer);
 	tomahawk_ns.Stage.getInstance().addEventListener(tomahawk_ns.Event.ENTER_FRAME, this, this.onFrame);
+	
+	container.addEventListener(tomahawk_ns.MouseEvent.MOUSE_MOVE, this, this._mouseHandler );
+	container.addEventListener(tomahawk_ns.MouseEvent.MOUSE_DOWN, this, this._mouseHandler );
+	container.addEventListener(tomahawk_ns.MouseEvent.MOUSE_UP, this, this._mouseHandler );
+};
+
+Main.prototype._mouseHandler = function(event)
+{
+	var container = event.target;
+	var stage = container.stage;
+	var cloudsContainer = stage.getChildByName("clouds");
+	
+	if( event.type == tomahawk_ns.MouseEvent.MOUSE_UP )
+		this._down = false;
+		
+	if( event.type == tomahawk_ns.MouseEvent.MOUSE_DOWN )
+		this._down = true;
+		
+	if( event.type == tomahawk_ns.MouseEvent.MOUSE_MOVE && this._down == true )
+	{
+		var pt = stage.getMovement();
+		container.x += pt.x;
+		container.y += pt.y;
+		cloudsContainer.x += pt.x * 0.5;
+		cloudsContainer.y += pt.y * 0.5;
+	}
 };
 
 Main.prototype.onFrame = function()
 {
 	tomahawk_ns.Stage.getInstance().drawFPS();
-	var container = tomahawk_ns.Stage.getInstance().getChildByName("narnia");
-	var cloundsContainer = tomahawk_ns.Stage.getInstance().getChildByName("clouds");
-	this._counter++;
+	//var container = tomahawk_ns.Stage.getInstance().getChildByName("narnia");
+	var cloudsContainer = tomahawk_ns.Stage.getInstance().getChildByName("clouds");
+	//this._counter++;
 	//return;
-	
-	var i = cloundsContainer.children.length;
+	//
+	var i = cloudsContainer.children.length;
 	while( --i > -1 )
 	{
-		cloundsContainer.getChildAt(i).x -= 0.1;
+		cloudsContainer.getChildAt(i).x -= 0.1;
 	}
-	
-	if( container == null )
-	{
-		return;
-	}
-	
-	if( this._counter > 240 )
-	{
-		this._direction++;
-		if( this._direction == 4 )
-			this._direction = 0;
-			
-		this._counter = 0;
-	}
-	
-	if( this._direction == 0 )
-	{
-		container.x--;
-		container.y--;
-		cloundsContainer.x -= 0.5;
-		cloundsContainer.y -= 0.5;
-	}
-	else if( this._direction == 1 )
-	{
-		container.x++;
-		container.y--;
-		cloundsContainer.x += 0.5;
-		cloundsContainer.y -= 0.5;
-	}
-	else if( this._direction == 2 )
-	{
-		container.x++;
-		container.y++;
-		cloundsContainer.x += 0.5;
-		cloundsContainer.y += 0.5;
-	}
-	else if( this._direction == 3 )
-	{
-		container.x--;
-		container.y++;
-		cloundsContainer.x -= 0.5;
-		cloundsContainer.y += 0.5;
-	}
+	//
+	//if( container == null )
+	//{
+		//return;
+	//}
+	//
+	//if( this._counter > 240 )
+	//{
+		//this._direction++;
+		//if( this._direction == 4 )
+			//this._direction = 0;
+			//
+		//this._counter = 0;
+	//}
+	//
+	//if( this._direction == 0 )
+	//{
+		//container.x--;
+		//container.y--;
+		//cloudsContainer.x -= 0.5;
+		//cloudsContainer.y -= 0.5;
+	//}
+	//else if( this._direction == 1 )
+	//{
+		//container.x++;
+		//container.y--;
+		//cloudsContainer.x += 0.5;
+		//cloudsContainer.y -= 0.5;
+	//}
+	//else if( this._direction == 2 )
+	//{
+		//container.x++;
+		//container.y++;
+		//cloudsContainer.x += 0.5;
+		//cloudsContainer.y += 0.5;
+	//}
+	//else if( this._direction == 3 )
+	//{
+		//container.x--;
+		//container.y++;
+		//cloudsContainer.x -= 0.5;
+		//cloudsContainer.y += 0.5;
+	//}
 };
 
 window.onload = function()

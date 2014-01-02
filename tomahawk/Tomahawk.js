@@ -1,10 +1,8 @@
 /**
- * ...
- * @author Thot
+ * @author The Tiny Spark
  */
- 
 var tomahawk_ns = new Object();
- 
+
 function Tomahawk(){}
 
 Tomahawk._classes = new Object();

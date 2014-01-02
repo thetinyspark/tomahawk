@@ -1,8 +1,6 @@
 /**
- * ...
- * @author Thot
-*/
-
+ * @author The Tiny Spark
+ */
 (function() {
 	
 	function DisplayObjectContainer()
@@ -226,17 +224,30 @@
 		while( --i > -1 )
 		{
 			child = children[i];
-			
+						
 			if( child.isContainer )
 			{
-				under = child.getObjectUnder(x,y);
-				
-				if( under != null )
-					return under;
+				if( child.mouseEnabled == true )
+				{
+					under = child.getObjectUnder(x,y);
+					
+					if( under != null )
+						return under;
+				}
 			}
-			else if( child.mouseEnabled == true && child.hitTest(x,y) == true )
+			else
 			{
-				return child;
+				if( child.mouseEnabled == true )
+				{
+					if( child.hitTest(x,y) == true )
+						return child;
+				}
+				else
+				{
+					if( child.parent.mouseEnabled == true && child.hitTest(x,y) == true )
+						return child.parent;
+				}
+				
 			}
 		}
 		

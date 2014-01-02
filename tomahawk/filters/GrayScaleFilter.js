@@ -1,4 +1,6 @@
-
+/**
+ * @author The Tiny Spark
+ */
 (function() {
 	
 	function GrayScaleFilter()

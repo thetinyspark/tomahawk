@@ -1,6 +1,5 @@
 /**
- * ...
- * @author Hatshepsout
+ * @author The Tiny Spark
  */
 (function() {
 	

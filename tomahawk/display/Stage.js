@@ -1,7 +1,6 @@
 /**
- * ...
- * @author Thot
-*/
+ * @author The Tiny Spark
+ */
 
 (function() {
 	
@@ -164,6 +163,12 @@
 		
 		this._lastActiveChild = activeChild;
 		
+		if( activeChild != null && activeChild.handCursor == true )
+			tomahawk_ns.Mouse.setCursor(tomahawk_ns.Mouse.POINTER, this.getCanvas());
+		else
+			tomahawk_ns.Mouse.setCursor(tomahawk_ns.Mouse.DEFAULT, this.getCanvas());
+		
+		
 		if( event.type != "mousemove" && this._focusedElement != null && activeChild != this._focusedElement )
 		{
 			this._focusedElement.setFocus(false);
@@ -204,6 +209,7 @@
 			case tomahawk_ns.Event.REMOVED: 
 				
 				list = event.target.getNestedChildren();
+				list.push(event.target);
 				max = list.length;
 				
 				for( i= 0; i < max; i++ )
@@ -238,7 +244,6 @@
 			scope._lastTime = curTime;
 		}
 		
-
 		if( scope.background == true )
 		{
 			context.save();

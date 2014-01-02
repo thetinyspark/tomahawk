@@ -1,12 +1,10 @@
 
 
 /**
- * ...
- * @author Thot
+ * @author The Tiny Spark
  */
- 
 var tomahawk_ns = new Object();
- 
+
 function Tomahawk(){}
 
 Tomahawk._classes = new Object();
@@ -78,8 +76,7 @@ Tomahawk._extends = new Array();
 
 
 /**
- * ...
- * @author Thot
+ * @author The Tiny Spark
  */
  
  (function() {
@@ -159,8 +156,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 
 /**
- * ...
- * @author Thot
+ * @author The Tiny Spark
  */
 
 (function() {
@@ -256,8 +252,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 
 /**
- * ...
- * @author Hatshepsout
+ * @author The Tiny Spark
  */
  
  (function() {
@@ -292,9 +287,8 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 
 /**
- * ...
- * @author Thot
-*/
+ * @author The Tiny Spark
+ */
 
 (function() {
 	
@@ -329,9 +323,8 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 
 /**
- * ...
- * @author Thot
-*/
+ * @author The Tiny Spark
+ */
 
 (function() {
 
@@ -364,6 +357,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 	DisplayObject.prototype.alpha 				= 1;
 	DisplayObject.prototype.mouseEnabled 		= false;
+	DisplayObject.prototype.handCursor 			= false;
 	DisplayObject.prototype.visible 			= true;
 	DisplayObject.prototype.isMask				= false;
 	DisplayObject.prototype.filters 			= null;
@@ -435,19 +429,35 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		
 		context = buffer.getContext("2d");
 		
-		context.save();
-			context.globalAlpha = this.alpha;
-			context.translate( -offX, -offY );
-			this.draw(context);
-		context.restore();
 		
+		// before drawing filters
 		if( filters != null )
 		{		
 			i = filters.length;
 			
 			while( --i > -1 )
 			{
-				filters[i].apply(buffer,context,this);
+				if( filters[i].type == tomahawk_ns.PixelFilter.BEFORE_DRAWING_FILTER )
+					filters[i].apply(buffer,context,this);
+			}
+		}
+		
+		
+		context.save();
+			context.globalAlpha = this.alpha;
+			context.translate( -offX, -offY );
+			this.draw(context);
+		context.restore();
+		
+		// after drawing filters
+		if( filters != null )
+		{		
+			i = filters.length;
+			
+			while( --i > -1 )
+			{
+				if( filters[i].type == tomahawk_ns.PixelFilter.AFTER_DRAWING_FILTER )
+					filters[i].apply(buffer,context,this);
 			}
 		}
 		
@@ -484,7 +494,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 										mat.d,
 										mat.tx,
 										mat.ty);
-											
+					
 				mask.draw(context);
 			context.restore();
 			
@@ -651,10 +661,8 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 
 /**
- * ...
- * @author Thot
-*/
-
+ * @author The Tiny Spark
+ */
 (function() {
 	
 	function DisplayObjectContainer()
@@ -878,17 +886,30 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		while( --i > -1 )
 		{
 			child = children[i];
-			
+						
 			if( child.isContainer )
 			{
-				under = child.getObjectUnder(x,y);
-				
-				if( under != null )
-					return under;
+				if( child.mouseEnabled == true )
+				{
+					under = child.getObjectUnder(x,y);
+					
+					if( under != null )
+						return under;
+				}
 			}
-			else if( child.mouseEnabled == true && child.hitTest(x,y) == true )
+			else
 			{
-				return child;
+				if( child.mouseEnabled == true )
+				{
+					if( child.hitTest(x,y) == true )
+						return child;
+				}
+				else
+				{
+					if( child.parent.mouseEnabled == true && child.hitTest(x,y) == true )
+						return child.parent;
+				}
+				
 			}
 		}
 		
@@ -921,9 +942,33 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 
 /**
- * ...
- * @author Thot
-*/
+ * @author The Tiny Spark
+ */
+(function() {
+	
+	function Mouse(){}
+
+	Tomahawk.registerClass( Mouse, "Mouse" );
+	
+	Mouse.RESIZE = "se-resize";
+	Mouse.MOVE = "move";
+	Mouse.POINTER = "pointer";
+	Mouse.DEFAULT = "default";
+
+	Mouse.setCursor = function(value,domElement)
+	{
+		domElement.style.cursor = value;
+	};
+	
+	tomahawk_ns.Mouse = Mouse;
+	
+})();
+
+
+
+/**
+ * @author The Tiny Spark
+ */
 
 function MovieClip(texture)
 {
@@ -977,10 +1022,8 @@ MovieClip.prototype.stop = function()
 
 
 
-
 /**
- * ...
- * @author HTML5
+ * @author The Tiny Spark
  */
 (function() {
 		
@@ -1048,7 +1091,6 @@ MovieClip.prototype.stop = function()
 		this._getCommands().push( [1,"strokeRect",[x, y, width, height]] );
 	};
 
-
 	Shape.prototype.moveTo = function(x,y)
 	{
 		this._getCommands().push( [1,"moveTo",[x,y]] );
@@ -1079,7 +1121,6 @@ MovieClip.prototype.stop = function()
 		this._getCommands().push( [1,"bezierCurveTo",[controlX1, controlY1, controlX2, controlY2, endX, endY]] );
 	};
 
-	
 	Shape.prototype.fillWithCurrentGradient = function()
 	{
 		this._getCommands().push( [1,"fillWithCurrentGradient",null] );
@@ -1099,8 +1140,6 @@ MovieClip.prototype.stop = function()
 	{
 		this._getCommands().push( [1,"createRadialGradient",[startX, startY, startRadius, endX, endY, endRadius]] );
 	};
-	
-	
 	
 	Shape.prototype.lineWidth = function(value)
 	{
@@ -1201,9 +1240,8 @@ MovieClip.prototype.stop = function()
 
 
 /**
- * ...
- * @author Thot
-*/
+ * @author The Tiny Spark
+ */
 
 (function() {
 
@@ -1227,9 +1265,8 @@ MovieClip.prototype.stop = function()
 
 
 /**
- * ...
- * @author Thot
-*/
+ * @author The Tiny Spark
+ */
 
 (function() {
 	
@@ -1392,6 +1429,12 @@ MovieClip.prototype.stop = function()
 		
 		this._lastActiveChild = activeChild;
 		
+		if( activeChild != null && activeChild.handCursor == true )
+			tomahawk_ns.Mouse.setCursor(tomahawk_ns.Mouse.POINTER, this.getCanvas());
+		else
+			tomahawk_ns.Mouse.setCursor(tomahawk_ns.Mouse.DEFAULT, this.getCanvas());
+		
+		
 		if( event.type != "mousemove" && this._focusedElement != null && activeChild != this._focusedElement )
 		{
 			this._focusedElement.setFocus(false);
@@ -1432,6 +1475,7 @@ MovieClip.prototype.stop = function()
 			case tomahawk_ns.Event.REMOVED: 
 				
 				list = event.target.getNestedChildren();
+				list.push(event.target);
 				max = list.length;
 				
 				for( i= 0; i < max; i++ )
@@ -1466,7 +1510,6 @@ MovieClip.prototype.stop = function()
 			scope._lastTime = curTime;
 		}
 		
-
 		if( scope.background == true )
 		{
 			context.save();
@@ -1536,9 +1579,8 @@ MovieClip.prototype.stop = function()
 
 
 /**
- * ...
- * @author Thot
-*/
+ * @author The Tiny Spark
+ */
 
 (function() {	
 	
@@ -1581,9 +1623,8 @@ MovieClip.prototype.stop = function()
 
 
 /**
- * ...
- * @author Thot
-*/
+ * @author The Tiny Spark
+ */
 
 (function() {
 	
@@ -1688,10 +1729,8 @@ MovieClip.prototype.stop = function()
 
 
 /**
- * ...
- * @author Thot
-*/
-
+ * @author The Tiny Spark
+ */
 (function() {	
 
 	function KeyEvent(type, bubbles, cancelable)
@@ -1756,8 +1795,7 @@ MovieClip.prototype.stop = function()
 
 
 /**
- * ...
- * @author Hatshepsout
+ * @author The Tiny Spark
  */
  
  (function() {
@@ -2004,9 +2042,8 @@ MovieClip.prototype.stop = function()
 
 
 /**
- * ...
- * @author Thot
-*/
+ * @author The Tiny Spark
+ */
 (function() {
 	
 	function MouseEvent(){}
@@ -2057,7 +2094,9 @@ MovieClip.prototype.stop = function()
 
 
 
-
+/**
+ * @author The Tiny Spark
+ */
 (function() {
 	
 	function GrayScaleFilter()
@@ -2092,8 +2131,7 @@ MovieClip.prototype.stop = function()
 
 
 /**
- * ...
- * @author Hatshepsout
+ * @author The Tiny Spark
  */
  
 (function() {
@@ -2101,10 +2139,14 @@ MovieClip.prototype.stop = function()
 	function PixelFilter(){}
 	Tomahawk.registerClass( PixelFilter, "PixelFilter" );
 
+	PixelFilter.BEFORE_DRAWING_FILTER = 0;
+	PixelFilter.AFTER_DRAWING_FILTER = 1;
+	
 	PixelFilter.prototype._canvas = null;
 	PixelFilter.prototype._context = null;
 	PixelFilter.prototype._object = null;
-
+	PixelFilter.prototype.filterType = 1;
+	
 	PixelFilter.prototype.getPixels = function(x,y,width,height)
 	{
 		return this._context.getImageData(x,y,width,height);
@@ -2134,7 +2176,46 @@ MovieClip.prototype.stop = function()
 
 
 
+/**
+ * @author The Tiny Spark
+ */
+(function() {
+	
+	function ShadowBlurFilter()
+	{
+		tomahawk_ns.PixelFilter.apply(this);
+		this.type = tomahawk_ns.PixelFilter.BEFORE_DRAWING_FILTER;
+	}
+	
+	Tomahawk.registerClass( ShadowBlurFilter, "ShadowBlurFilter" );
+	Tomahawk.extend( "ShadowBlurFilter", "PixelFilter" );
+	
+	ShadowBlurFilter.prototype.shadowOffsetX = 1;
+	ShadowBlurFilter.prototype.shadowOffsetY = 1;
+	ShadowBlurFilter.prototype.shadowBlur 	= 100;
+	ShadowBlurFilter.prototype.shadowColor 	= "white";
 
+	ShadowBlurFilter.prototype.process = function()
+	{
+		var context = this._canvas.getContext("2d");
+		this._canvas.width += this.shadowBlur + this.shadowOffsetX;
+		this._canvas.height += this.shadowBlur + this.shadowOffsetY;
+		context.shadowBlur = this.shadowBlur;
+		context.shadowColor = this.shadowColor;
+		context.shadowOffsetX = this.shadowOffsetX;
+		context.shadowOffsetY = this.shadowOffsetY;
+	};
+
+	tomahawk_ns.ShadowBlurFilter = ShadowBlurFilter;
+
+})();
+
+
+
+/**
+ * @author The Tiny Spark
+ * original file extracted from createJs and modified a bit for Tomahawk
+ */
 (function() {
 	
 
@@ -2627,8 +2708,7 @@ MovieClip.prototype.stop = function()
 
 
 /**
- * ...
- * @author Thot
+ * @author The Tiny Spark
  */
  
 (function() {
@@ -2648,8 +2728,7 @@ MovieClip.prototype.stop = function()
 
 
 /**
- * ...
- * @author Thot
+ * @author The Tiny Spark
  */
  
  (function() {
@@ -2675,8 +2754,7 @@ MovieClip.prototype.stop = function()
 
 
 /**
- * ...
- * @author Hatshepsout
+ * @author The Tiny Spark
  */
 (function() {
 	
@@ -2756,8 +2834,7 @@ MovieClip.prototype.stop = function()
 
 
 /**
- * ...
- * @author Hatshepsout
+ * @author The Tiny Spark
  */
 
 (function() {
@@ -2862,10 +2939,8 @@ MovieClip.prototype.stop = function()
 
 
 /**
- * ...
- * @author Hatshepsout
+ * @author The Tiny Spark
  */
- 
 (function() {
 	
 
@@ -3105,8 +3180,7 @@ MovieClip.prototype.stop = function()
 
 
 /**
- * ...
- * @author Hatshepsout
+ * @author The Tiny Spark
  */
 (function() {
 	
@@ -3178,7 +3252,6 @@ MovieClip.prototype.stop = function()
 			
 			i++;
 		}
-		
 		
 		i = index + 1;
 		
@@ -3454,6 +3527,9 @@ MovieClip.prototype.stop = function()
 		{
 			this.height = rowLetter.y + rowLetter.textHeight;
 		}
+		
+		this._lastWidth = this.width;
+		this._reposNextFrame = false;
 	};
 
 	TextField.prototype.draw = function(context)
@@ -3461,8 +3537,6 @@ MovieClip.prototype.stop = function()
 		if( this._lastWidth != this.width || this._reposNextFrame == true )
 		{
 			this._repos();
-			this._lastWidth = this.width;
-			this._reposNextFrame = false;
 		}
 		
 		if( this.background == true )
@@ -3498,7 +3572,9 @@ MovieClip.prototype.stop = function()
 
 
 
-
+/**
+ * @author The Tiny Spark
+ */
 (function() {
 	
 	function TextFormat(){}
@@ -3587,9 +3663,8 @@ MovieClip.prototype.stop = function()
 
 
 /**
- * ...
- * @author Thot
-*/
+ * @author The Tiny Spark
+ */
 
 (function() {
 	
@@ -3613,11 +3688,8 @@ MovieClip.prototype.stop = function()
 
 
 /**
- * ...
- * @author Thot
-*/
-
-
+ * @author The Tiny Spark
+ */
 (function() {
 	
 	function TextureAtlas()

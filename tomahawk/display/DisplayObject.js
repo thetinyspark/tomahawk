@@ -1,7 +1,6 @@
 /**
- * ...
- * @author Thot
-*/
+ * @author The Tiny Spark
+ */
 
 (function() {
 
@@ -34,6 +33,7 @@
 
 	DisplayObject.prototype.alpha 				= 1;
 	DisplayObject.prototype.mouseEnabled 		= false;
+	DisplayObject.prototype.handCursor 			= false;
 	DisplayObject.prototype.visible 			= true;
 	DisplayObject.prototype.isMask				= false;
 	DisplayObject.prototype.filters 			= null;
@@ -105,19 +105,35 @@
 		
 		context = buffer.getContext("2d");
 		
-		context.save();
-			context.globalAlpha = this.alpha;
-			context.translate( -offX, -offY );
-			this.draw(context);
-		context.restore();
 		
+		// before drawing filters
 		if( filters != null )
 		{		
 			i = filters.length;
 			
 			while( --i > -1 )
 			{
-				filters[i].apply(buffer,context,this);
+				if( filters[i].type == tomahawk_ns.PixelFilter.BEFORE_DRAWING_FILTER )
+					filters[i].apply(buffer,context,this);
+			}
+		}
+		
+		
+		context.save();
+			context.globalAlpha = this.alpha;
+			context.translate( -offX, -offY );
+			this.draw(context);
+		context.restore();
+		
+		// after drawing filters
+		if( filters != null )
+		{		
+			i = filters.length;
+			
+			while( --i > -1 )
+			{
+				if( filters[i].type == tomahawk_ns.PixelFilter.AFTER_DRAWING_FILTER )
+					filters[i].apply(buffer,context,this);
 			}
 		}
 		
@@ -154,7 +170,7 @@
 										mat.d,
 										mat.tx,
 										mat.ty);
-											
+					
 				mask.draw(context);
 			context.restore();
 			

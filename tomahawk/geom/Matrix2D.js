@@ -1,4 +1,7 @@
-
+/**
+ * @author The Tiny Spark
+ * original file extracted from createJs and modified a bit for Tomahawk
+ */
 (function() {
 	
 

@@ -1,7 +1,5 @@
-
 /**
- * ...
- * @author HTML5
+ * @author The Tiny Spark
  */
 (function() {
 		
@@ -69,7 +67,6 @@
 		this._getCommands().push( [1,"strokeRect",[x, y, width, height]] );
 	};
 
-
 	Shape.prototype.moveTo = function(x,y)
 	{
 		this._getCommands().push( [1,"moveTo",[x,y]] );
@@ -100,7 +97,6 @@
 		this._getCommands().push( [1,"bezierCurveTo",[controlX1, controlY1, controlX2, controlY2, endX, endY]] );
 	};
 
-	
 	Shape.prototype.fillWithCurrentGradient = function()
 	{
 		this._getCommands().push( [1,"fillWithCurrentGradient",null] );
@@ -120,8 +116,6 @@
 	{
 		this._getCommands().push( [1,"createRadialGradient",[startX, startY, startRadius, endX, endY, endRadius]] );
 	};
-	
-	
 	
 	Shape.prototype.lineWidth = function(value)
 	{

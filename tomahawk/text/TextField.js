@@ -1,6 +1,5 @@
 /**
- * ...
- * @author Hatshepsout
+ * @author The Tiny Spark
  */
 (function() {
 	
@@ -72,7 +71,6 @@
 			
 			i++;
 		}
-		
 		
 		i = index + 1;
 		
@@ -348,6 +346,9 @@
 		{
 			this.height = rowLetter.y + rowLetter.textHeight;
 		}
+		
+		this._lastWidth = this.width;
+		this._reposNextFrame = false;
 	};
 
 	TextField.prototype.draw = function(context)
@@ -355,8 +356,6 @@
 		if( this._lastWidth != this.width || this._reposNextFrame == true )
 		{
 			this._repos();
-			this._lastWidth = this.width;
-			this._reposNextFrame = false;
 		}
 		
 		if( this.background == true )

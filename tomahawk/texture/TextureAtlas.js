@@ -1,9 +1,6 @@
 /**
- * ...
- * @author Thot
-*/
-
-
+ * @author The Tiny Spark
+ */
 (function() {
 	
 	function TextureAtlas()

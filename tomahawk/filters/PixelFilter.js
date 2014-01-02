@@ -1,6 +1,5 @@
 /**
- * ...
- * @author Hatshepsout
+ * @author The Tiny Spark
  */
  
 (function() {
@@ -8,10 +7,14 @@
 	function PixelFilter(){}
 	Tomahawk.registerClass( PixelFilter, "PixelFilter" );
 
+	PixelFilter.BEFORE_DRAWING_FILTER = 0;
+	PixelFilter.AFTER_DRAWING_FILTER = 1;
+	
 	PixelFilter.prototype._canvas = null;
 	PixelFilter.prototype._context = null;
 	PixelFilter.prototype._object = null;
-
+	PixelFilter.prototype.filterType = 1;
+	
 	PixelFilter.prototype.getPixels = function(x,y,width,height)
 	{
 		return this._context.getImageData(x,y,width,height);
