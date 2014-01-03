@@ -1252,10 +1252,6 @@ MovieClip.prototype.stop = function()
 
 	Tomahawk.registerClass( Sprite, "Sprite" );
 	Tomahawk.extend( "Sprite", "DisplayObjectContainer" );
-	
-	
-	Sprite.prototype.handCursor = false;
-
 
 	tomahawk_ns.Sprite = Sprite;
 })();
@@ -1288,6 +1284,8 @@ MovieClip.prototype.stop = function()
 					}
 			 
 		})();
+		
+		this.stage = this;
 	}
 
 	Tomahawk.registerClass( Stage, "Stage" );
@@ -1500,6 +1498,9 @@ MovieClip.prototype.stop = function()
 		var scope = this;
 		var context = scope._context;
 		var canvas = scope._canvas;
+		
+		this.width = scope._canvas.width;
+		this.height = scope._canvas.height;
 		
 		scope._frameCount++;
 		
@@ -2861,6 +2862,7 @@ MovieClip.prototype.stop = function()
 	Letter.prototype.cursor				= false;		
 	Letter.prototype._drawCursor	 	= false;
 	Letter.prototype._drawCursorTime 	= 0;
+	Letter.prototype._data 				= null;
 	Letter._metricsContext				= null;
 	
 	
@@ -2947,11 +2949,7 @@ MovieClip.prototype.stop = function()
 	function SelectableTextField()
 	{
 		tomahawk_ns.TextField.apply(this);
-		this.mouseEnabled = true;
-		
 		this.addEventListener( tomahawk_ns.Event.ADDED_TO_STAGE, this, this._selectableTextFieldAddedHandler );
-		this.addEventListener( tomahawk_ns.MouseEvent.CLICK, this, this._mouseEventHandler );
-		this.addEventListener( tomahawk_ns.MouseEvent.MOUSE_DOWN, this, this._mouseEventHandler );
 	}
 
 	Tomahawk.registerClass(SelectableTextField,"SelectableTextField");
@@ -2968,6 +2966,10 @@ MovieClip.prototype.stop = function()
 		this.stage.addEventListener( tomahawk_ns.MouseEvent.DOUBLE_CLICK, this, this._mouseEventHandler,true );
 		this.stage.addEventListener( tomahawk_ns.MouseEvent.MOUSE_UP, this, this._mouseEventHandler, true );
 		this.stage.addEventListener( tomahawk_ns.MouseEvent.MOUSE_MOVE, this, this._mouseEventHandler, true );
+		this.addEventListener( tomahawk_ns.MouseEvent.CLICK, this, this._mouseEventHandler );
+		this.addEventListener( tomahawk_ns.MouseEvent.MOUSE_DOWN, this, this._mouseEventHandler );
+		
+		this.mouseEnabled = true;
 	};
 
 	SelectableTextField.prototype.getObjectUnder = function(x,y)

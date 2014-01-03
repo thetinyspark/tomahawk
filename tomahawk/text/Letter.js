@@ -26,6 +26,7 @@
 	Letter.prototype.cursor				= false;		
 	Letter.prototype._drawCursor	 	= false;
 	Letter.prototype._drawCursorTime 	= 0;
+	Letter.prototype._data 				= null;
 	Letter._metricsContext				= null;
 	
 	

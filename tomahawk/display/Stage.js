@@ -22,6 +22,8 @@
 					}
 			 
 		})();
+		
+		this.stage = this;
 	}
 
 	Tomahawk.registerClass( Stage, "Stage" );
@@ -234,6 +236,9 @@
 		var scope = this;
 		var context = scope._context;
 		var canvas = scope._canvas;
+		
+		this.width = scope._canvas.width;
+		this.height = scope._canvas.height;
 		
 		scope._frameCount++;
 		

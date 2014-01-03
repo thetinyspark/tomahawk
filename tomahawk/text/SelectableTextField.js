@@ -7,11 +7,7 @@
 	function SelectableTextField()
 	{
 		tomahawk_ns.TextField.apply(this);
-		this.mouseEnabled = true;
-		
 		this.addEventListener( tomahawk_ns.Event.ADDED_TO_STAGE, this, this._selectableTextFieldAddedHandler );
-		this.addEventListener( tomahawk_ns.MouseEvent.CLICK, this, this._mouseEventHandler );
-		this.addEventListener( tomahawk_ns.MouseEvent.MOUSE_DOWN, this, this._mouseEventHandler );
 	}
 
 	Tomahawk.registerClass(SelectableTextField,"SelectableTextField");
@@ -28,6 +24,10 @@
 		this.stage.addEventListener( tomahawk_ns.MouseEvent.DOUBLE_CLICK, this, this._mouseEventHandler,true );
 		this.stage.addEventListener( tomahawk_ns.MouseEvent.MOUSE_UP, this, this._mouseEventHandler, true );
 		this.stage.addEventListener( tomahawk_ns.MouseEvent.MOUSE_MOVE, this, this._mouseEventHandler, true );
+		this.addEventListener( tomahawk_ns.MouseEvent.CLICK, this, this._mouseEventHandler );
+		this.addEventListener( tomahawk_ns.MouseEvent.MOUSE_DOWN, this, this._mouseEventHandler );
+		
+		this.mouseEnabled = true;
 	};
 
 	SelectableTextField.prototype.getObjectUnder = function(x,y)

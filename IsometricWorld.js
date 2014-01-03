@@ -135,7 +135,7 @@ Main.prototype.complete = function()
 	
 	bounds = container.getBoundingRect();
 	container.name = "narnia";
-	container.cacheAsBitmap = true;
+	//container.cacheAsBitmap = true;
 	cloudsContainer.name = "clouds";
 	container.mouseEnabled = true;
 	container.handCursor = true;

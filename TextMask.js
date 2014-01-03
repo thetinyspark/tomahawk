@@ -69,6 +69,7 @@ Main.prototype.init = function()
 	container.addChild(shape);
 	container.addChild(field);
 	container.addChild(report);
+	container.mouseEnabled = true;
 	stage.addChild(container);
 };
 

@@ -11,10 +11,6 @@
 
 	Tomahawk.registerClass( Sprite, "Sprite" );
 	Tomahawk.extend( "Sprite", "DisplayObjectContainer" );
-	
-	
-	Sprite.prototype.handCursor = false;
-
 
 	tomahawk_ns.Sprite = Sprite;
 })();
