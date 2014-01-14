@@ -421,8 +421,8 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		var offY = 0;
 		var bounds = this.getBoundingRectIn(this);
 		buffer = document.createElement("canvas");
-		buffer.width = bounds.width;
-		buffer.height = bounds.height;
+		buffer.width = ( bounds.width < 1 ) ? 1 : bounds.width ;
+		buffer.height = ( bounds.height < 1 ) ? 1 : bounds.height ;
 		
 		offX = bounds.left;
 		offY = bounds.top;
@@ -537,14 +537,15 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	{
 		var matrix = this.getConcatenedMatrix();
 		var pt = matrix.transformPoint(x,y);
-		return pt;
+		
+		return new tomahawk_ns.Point(x,y);
 	};
 
 	DisplayObject.prototype.globalToLocal = function(x,y)
 	{
 		var matrix = this.getConcatenedMatrix().clone().invert();
 		var pt = matrix.transformPoint(x,y);
-		return pt;
+		return new tomahawk_ns.Point(x,y);
 	};
 
 	DisplayObject.prototype.hitTest = function(x,y)
@@ -677,6 +678,12 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	DisplayObjectContainer.prototype.children = null;
 	DisplayObjectContainer.prototype.isContainer = true;
 
+	
+	DisplayObjectContainer.prototype.setChildIndex = function(child,index)
+	{
+		this.addChildAt(child,index);
+	};
+	
 	DisplayObjectContainer.prototype.addChild = function(child)
 	{
 		if( child.parent )
@@ -735,27 +742,38 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		child.parent = this;
 		child.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.ADDED, true, true) );
 	};
+	
+	DisplayObjectContainer.prototype.getChildIndex = function(child)
+	{
+		return this.children.indexOf(child);
+	};
 
 	DisplayObjectContainer.prototype.removeChildAt = function(index)
 	{
 		var child = this.children[index];
 		if( child == undefined )
-			return;
+			return null;
 			
 		child.parent = null;
 		this.children.splice(index,1);
 		child.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.REMOVED, true, true) );
+		return child;
 	};
 
 	DisplayObjectContainer.prototype.removeChild = function(child)
 	{
 		var index = this.children.indexOf(child);
+		var child = null;
 		
 		if( index > -1 )
+		{
+			child = this.children[index];
 			this.children.splice(index,1);
-			
-		child.parent = null;
-		child.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.REMOVED, true, true) );
+			child.parent = null;
+			child.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.REMOVED, true, true) );
+		}
+		
+		return child;
 	};
 
 	DisplayObjectContainer.prototype.draw = function( context )
@@ -1352,13 +1370,6 @@ MovieClip.prototype.stop = function()
 
 	Stage.prototype._keyboardHandler = function(event)
 	{
-		if( this._focused == true )
-		{
-			event.preventDefault();
-			event.stopImmediatePropagation();
-			event.stopPropagation();
-		}
-
 		if( event.type == "keyup" )
 			tomahawk_ns.Keyboard.toggleShift(event.keyCode);
 		
@@ -1751,6 +1762,7 @@ MovieClip.prototype.stop = function()
 	KeyEvent.prototype.crtlKey = false;
 	KeyEvent.prototype.shiftKey = false;
 	KeyEvent.prototype.altKey = false;
+	KeyEvent.prototype.nativeEvent = null;
 
 	KeyEvent.fromNativeEvent = function(event,bubbles,cancelable)
 	{
@@ -1765,6 +1777,7 @@ MovieClip.prototype.stop = function()
 		}
 		
 		newEvent = new KeyEvent(type,bubbles,cancelable);
+		newEvent.nativeEvent = event;
 		newEvent.keyCode = event.keyCode;
 		newEvent.charCode = event.charCode;
 		newEvent.ctrlKey = event.ctrlKey;
@@ -2715,7 +2728,11 @@ MovieClip.prototype.stop = function()
 (function() {
 	
 
-	function Point(){}
+	function Point(x,y)
+	{
+		this.x = x, this.y = y
+	}
+	
 	Tomahawk.registerClass( Point, "Point" );
 	
 	
@@ -2776,10 +2793,14 @@ MovieClip.prototype.stop = function()
 	
 	InputTextField.prototype._keyHandler = function(event)
 	{
-		var range = this.getSelectionRange();
-		
 		if( this.getFocus() == false )
 			return;
+		
+		event.nativeEvent.preventDefault();
+		event.nativeEvent.stopImmediatePropagation();
+		event.nativeEvent.stopPropagation();
+		
+		var range = this.getSelectionRange();
 			
 		if( this.isSelected() == true && event.keyCode != tomahawk_ns.Keyboard.LEFT && event.keyCode != tomahawk_ns.Keyboard.RIGHT )
 		{
@@ -2841,28 +2862,24 @@ MovieClip.prototype.stop = function()
 (function() {
 	
  
-	function Letter()
+	function Letter(value)
 	{
 		tomahawk_ns.DisplayObject.apply(this);		
 		Letter._metricsContext = Letter._metricsContext || document.createElement("canvas").getContext("2d");
 		this.setTextFormat( new tomahawk_ns.TextFormat() );
+		this.value = ( value == undefined ) ? "" : value;
 	}
 
 	Tomahawk.registerClass(Letter,"Letter");
 	Tomahawk.extend("Letter","DisplayObject");
 
+	Letter.prototype.newline 			= false;
 	Letter.prototype.value 				= "";
 	Letter.prototype.format 			= null;
-	Letter.prototype.newline 			= false;
 	Letter.prototype.index 				= 0;
-	Letter.prototype.row 				= 0;	
 	Letter.prototype.textWidth 			= 0;	
 	Letter.prototype.textHeight 		= 0;	
 	Letter.prototype.selected			= false;
-	Letter.prototype.cursor				= false;		
-	Letter.prototype._drawCursor	 	= false;
-	Letter.prototype._drawCursorTime 	= 0;
-	Letter.prototype._data 				= null;
 	Letter._metricsContext				= null;
 	
 	
@@ -2878,25 +2895,22 @@ MovieClip.prototype.stop = function()
 		context.save();
 		
 		this.format.updateContext(context);
-		this.textHeight = context.measureText('M').width;
+		this.textHeight = ( context.measureText('M').width );
 		this.textWidth = context.measureText(this.value).width;
 		this.width = this.textWidth;
-		this.height = this.textHeight;
+		this.height = this.textHeight * 1.4;
 		
 		context.restore();
 	};
 
 	Letter.prototype.draw = function(context)
 	{
-		if( this.newline == true )
-			return;
-			
 		if( this.selected == true )
 		{
 			context.save();
 			context.beginPath();
 			context.fillStyle = this.format.backgroundSelectedColor;
-			context.fillRect(0, 0, this.textWidth, this.textHeight);
+			context.fillRect(0, 0, this.textWidth, this.textHeight );
 			context.fill();
 			context.restore();
 		}
@@ -2913,28 +2927,21 @@ MovieClip.prototype.stop = function()
 			context.stroke();
 			context.restore();
 		}	
-		
-		if( this.cursor == true )
-		{
-			var time = new Date().getTime();
-			if( time - this._drawCursorTime > 500 )
-			{
-				this._drawCursor = ( this._drawCursor == true ) ? false: true;
-				this._drawCursorTime = time;
-			}
-			
-			if( this._drawCursor == true )
-			{
-				context.save();
-				context.beginPath();
-				context.moveTo(this.textWidth,0);
-				context.lineTo(this.textWidth,this.textHeight);
-				context.stroke();
-				context.restore();
-			}
-		}
 	};
 
+	Letter.prototype.clone = function()
+	{
+		var letter = new tomahawk_ns.Letter(this.value);
+		letter.format = this.format.clone();
+		letter.index = this.index;
+		letter.row = this.row;
+		letter.textWidth = this.textWidth;
+		letter.textHeight = this.textHeight;
+		letter.selected = this.selected;
+		
+		return letter;
+	};
+	
 	tomahawk_ns.Letter = Letter;
 })();
 
@@ -2949,7 +2956,7 @@ MovieClip.prototype.stop = function()
 	function SelectableTextField()
 	{
 		tomahawk_ns.TextField.apply(this);
-		this.addEventListener( tomahawk_ns.Event.ADDED_TO_STAGE, this, this._selectableTextFieldAddedHandler );
+		this.mouseEnabled = true;
 	}
 
 	Tomahawk.registerClass(SelectableTextField,"SelectableTextField");
@@ -2958,19 +2965,6 @@ MovieClip.prototype.stop = function()
 	SelectableTextField.prototype._ignoreNextClick = false;
 	SelectableTextField.prototype._startPoint = null;
 	SelectableTextField.prototype._down = false;
-	
-	SelectableTextField.prototype._selectableTextFieldAddedHandler = function(event)
-	{
-		this.removeEventListener( tomahawk_ns.Event.ADDED_TO_STAGE, this, this._selectableTextFieldAddedHandler );
-		this.stage.addEventListener( tomahawk_ns.MouseEvent.MOUSE_DOWN, this, this._mouseEventHandler,true );
-		this.stage.addEventListener( tomahawk_ns.MouseEvent.DOUBLE_CLICK, this, this._mouseEventHandler,true );
-		this.stage.addEventListener( tomahawk_ns.MouseEvent.MOUSE_UP, this, this._mouseEventHandler, true );
-		this.stage.addEventListener( tomahawk_ns.MouseEvent.MOUSE_MOVE, this, this._mouseEventHandler, true );
-		this.addEventListener( tomahawk_ns.MouseEvent.CLICK, this, this._mouseEventHandler );
-		this.addEventListener( tomahawk_ns.MouseEvent.MOUSE_DOWN, this, this._mouseEventHandler );
-		
-		this.mouseEnabled = true;
-	};
 
 	SelectableTextField.prototype.getObjectUnder = function(x,y)
 	{
@@ -2992,7 +2986,6 @@ MovieClip.prototype.stop = function()
 		var pt = this.globalToLocal(x, y);
 		var letters = this.getLettersIn(pt.x,pt.y,1,1);
 		this.unSelect();
-		this.setFocus(true);
 		
 		if( letters.length > 0 )
 		{
@@ -3000,31 +2993,35 @@ MovieClip.prototype.stop = function()
 		}
 	};
 
+	
+	SelectableTextField.prototype.setFocus = function(value)
+	{
+		tomahawk_ns.TextField.prototype.setFocus.apply(this,[value]);
+		
+		this.removeEventListener( tomahawk_ns.MouseEvent.DOUBLE_CLICK, this, this._mouseEventHandler );
+		this.removeEventListener( tomahawk_ns.MouseEvent.CLICK, this, this._mouseEventHandler );
+		this.removeEventListener( tomahawk_ns.MouseEvent.MOUSE_DOWN, this, this._mouseEventHandler );
+		this.removeEventListener( tomahawk_ns.MouseEvent.MOUSE_MOVE, this, this._mouseEventHandler, true );
+		
+		if( value == true )
+		{
+			this.addEventListener( tomahawk_ns.MouseEvent.DOUBLE_CLICK, this, this._mouseEventHandler );
+			this.addEventListener( tomahawk_ns.MouseEvent.CLICK, this, this._mouseEventHandler );
+			this.addEventListener( tomahawk_ns.MouseEvent.MOUSE_DOWN, this, this._mouseEventHandler );
+			this.addEventListener( tomahawk_ns.MouseEvent.MOUSE_MOVE, this, this._mouseEventHandler, true );
+		}
+		
+		this.unSelect();
+	};
+	
 	SelectableTextField.prototype._mouseEventHandler = function(event)
 	{
 		if( event.type == tomahawk_ns.MouseEvent.DOUBLE_CLICK )
 		{
-			this.setFocus( event.target == this );
-			
-			if( this.getFocus() == true )
-			{
-				this._setIndexUnderMouse(event.stageX,event.stageY);
-				this._selectCurrentWord();
-			}
+			this._setIndexUnderMouse(event.stageX,event.stageY);
+			this._selectCurrentWord();
 		}
 		
-		if( event.type == tomahawk_ns.MouseEvent.MOUSE_DOWN && this._focused == true && event.target != this )
-		{
-			this.setFocus(false);
-		}
-		
-		// if non focused return
-		if( this._focused == false )
-		{
-			this.unSelect();
-			return;
-		}
-			
 		if( event.type == tomahawk_ns.MouseEvent.MOUSE_UP )
 		{
 			this._down = false;
@@ -3044,14 +3041,6 @@ MovieClip.prototype.stop = function()
 			}
 		}
 		
-		if( event.type == tomahawk_ns.MouseEvent.MOUSE_DOWN)
-		{
-			this._down = true;
-			this._setIndexUnderMouse(event.stageX,event.stageY);
-			this._startPoint = this.globalToLocal(event.stageX, event.stageY);
-			return;
-		}
-		
 		if( event.type == tomahawk_ns.MouseEvent.MOUSE_MOVE && this._down == true && this._startPoint != null)
 		{
 			var endPoint = this.globalToLocal(event.stageX, event.stageY);
@@ -3066,7 +3055,14 @@ MovieClip.prototype.stop = function()
 			this._ignoreNextClick = true;
 		}
 		
-		
+		if( event.type == tomahawk_ns.MouseEvent.MOUSE_DOWN)
+		{
+			this._down = true;
+			this._setIndexUnderMouse(event.stageX,event.stageY);
+			this._startPoint = this.globalToLocal(event.stageX, event.stageY);
+			return;
+		}
+
 	};
 
 	SelectableTextField.prototype.selectInto = function(x,y,width,height)
@@ -3089,19 +3085,37 @@ MovieClip.prototype.stop = function()
 
 	SelectableTextField.prototype.getLettersIn = function(x,y,width,height)
 	{
-		var i = this.children.length;
+		var letters = this.getLetters();
+		var i = letters.length;
 		var letter = null;
 		var result = new Array();
+		var word = null;
+		var bounds = null;
 		
 		while( --i > -1 )
 		{
-			letter = this.children[i];
+			letter = letters[i];
+			word = letter.parent;
 			
+			if( word == null )
+				continue;
+				
 			if( 
-				letter.x > x + width ||
-				letter.x + letter.width < x || 
-				letter.y + letter.height < y || 
-				letter.y > y + height 
+				word.x > x + width ||
+				word.x + word.width < x || 
+				word.y + word.height < y || 
+				word.y > y + height 
+			)
+			{
+				continue;
+			}
+			
+			bounds = letter.getBoundingRectIn(this);
+			
+			if( bounds.left > x + width ||
+				bounds.right < x ||
+				bounds.top > y + height ||
+				bounds.bottom < y 
 			)
 			{
 				continue;
@@ -3117,12 +3131,13 @@ MovieClip.prototype.stop = function()
 	{
 		var start = -1;
 		var end = -1;
-		var i = this.children.length;
+		var letters = this.getLetters();
+		var i = letters.length;
 		var letter = null;
 		
 		while( --i > -1 )
 		{
-			letter = this.children[i];
+			letter = letters[i];
 			if( letter.selected == true )
 			{
 				if( end == -1 )
@@ -3148,31 +3163,56 @@ MovieClip.prototype.stop = function()
 
 	SelectableTextField.prototype.selectAll = function()
 	{
-		this.selectBetween(0,this.children.length);
+		this.selectBetween(0,this.getLetters().length);
 	};
 
 	SelectableTextField.prototype.unSelect = function()
 	{
-		var i = this.children.length;
+		var letters = this.getLetters();
+		var i = letters.length;
 		var letter = null;
 		
 		while( --i > -1 )
 		{
-			letter = this.children[i];
+			letter = letters[i];
+			
+			if( letter.selected == true && letter.parent != null )
+			{
+				letter.parent.needRefresh = true;
+			}
+			
 			letter.selected = false;
 		}
+		
+		this._refreshNextFrame = true;
 	};
 
 	SelectableTextField.prototype.selectBetween = function(startIndex, endIndex)
 	{
-		var i = this.children.length;
+		var letters = this.getLetters();
+		var i = letters.length;
 		var letter = null;
 		
 		while( --i > -1 )
 		{
-			letter = this.children[i];
-			letter.selected = ( i >= startIndex && i <= endIndex );
+			letter = letters[i];
+			
+			if( i >= startIndex && i <= endIndex )
+			{
+				letter.selected = true;
+				if( letter.parent != null )
+					letter.parent.needRefresh = true;
+			}
+			else
+			{
+				if( letter.selected == true && letter.parent != null)
+				{
+					letter.parent.needRefresh = true;
+				}
+				letter.selected = false;
+			}
 		}
+		this._refreshNextFrame = true;
 	};
 
 	tomahawk_ns.SelectableTextField = SelectableTextField;
@@ -3191,111 +3231,81 @@ MovieClip.prototype.stop = function()
 		tomahawk_ns.DisplayObjectContainer.apply(this);
 		this.defaultTextFormat = new tomahawk_ns.TextFormat();
 		this.width = this.height = 100;
+		this._letters = new Array();
+		this._text = "";
 	}
 
 	Tomahawk.registerClass(TextField,"TextField");
 	Tomahawk.extend("TextField","DisplayObjectContainer");
 
-	TextField.prototype.defaultTextFormat = null;
-	TextField.prototype._focused = false;
-	TextField.prototype._selectedLetter = null;
-	TextField.prototype.background = false;
-	TextField.prototype.border = false;
-	TextField.prototype.backgroundColor = "white";
-	TextField.prototype.borderColor = "black";
-	TextField.prototype.autoSize = false;
-	TextField.prototype._lastWidth = 0;
-	TextField.prototype._reposNextFrame = true;
+	TextField.prototype.defaultTextFormat 	= null;
+	TextField.prototype.currentIndex 		= null;
+	TextField.prototype.background 			= false;
+	TextField.prototype.border 				= false;
+	TextField.prototype.padding 			= 0;
+	TextField.prototype.backgroundColor 	= "white";
+	TextField.prototype.borderColor 		= "black";
+	TextField.prototype.autoSize 			= false;
+	TextField.prototype.focusable			= true;
+	
+	TextField.prototype._focused 			= false;
+	TextField.prototype._lastWidth 			= 0;
+	TextField.prototype._refreshNextFrame 	= true;
+	TextField.prototype._textAlign 			= "left";
+	TextField.prototype._text 				= null;
+	TextField.prototype._drawCursor	 		= false;
+	TextField.prototype._drawCursorTime 	= 0;
+	TextField.prototype._letters 			= null;
+	
+	TextField.ALIGN_LEFT 					= "left";
+	TextField.ALIGN_CENTER 					= "center";
+	TextField.ALIGN_RIGHT 					= "right";
+	TextField.ALIGN_JUSTIFY 				= "justify";
 
-	TextField.prototype.setCurrentIndex = function(index)
+	
+	TextField.prototype.getTextAlign = function()
 	{
-		var current = null;
-		
-		if( this._selectedLetter != null )
-		{
-			this._selectedLetter.cursor = false;
-		}
-		
-		current = this.getChildAt(index);
-		
-		if( current == null )
+		return this._textAlign;
+	};
+	
+	TextField.prototype.setTextAlign = function(value)
+	{
+		if( this._textAlign == value )
 			return;
 			
-		current.cursor = true;	
-		this._selectedLetter = current;
+		this._textAlign = value;
+		this._refreshNextFrame = true;
+	};
+	
+	TextField.prototype.setCurrentIndex = function(index)
+	{
+		if( this.currentIndex == index )
+			return;
+			
+		this.currentIndex = index;
+		this._refreshNextFrame = true;
 	};
 
 	TextField.prototype.getWordRangeAt = function(index)
 	{
 		var letter = null;
-		var i = index;
-		var max = this.children.length;
-		var end = -1;
+		var word = this.getWordAt(index);
 		var start = -1;
+		var index = -1;
 		
-		while( i < max )
-		{
-			letter = this.getChildAt(i);
-			
-			if( letter == null )
-				continue;
-				
-			if( i == max - 1 )
-			{
-				end = i;
-				break;
-			}
-			
-			if( letter.value == " " || letter.newline == true )
-			{
-				end = i - 1;
-				break;
-			}
-			
-			i++;
-		}
-		
-		i = index + 1;
-		
-		while( --i > -1 )
-		{
-			letter = this.getChildAt(i);
-			if( letter == null )
-				continue;
-			
-			if( letter.value == " " || letter.newline == true )
-			{
-				start = i + 1;
-				break;
-			}
+		if( word != null )
+		{			
+			start = word.getStartIndex();
+			end = word.getEndIndex();
 		}
 		
 		return {start: start, end: end};
-
 	};
 
 	TextField.prototype.getCurrentIndex = function()
 	{
-		if( this._selectedLetter == null )
-			return 0;
-			
-		return this._selectedLetter.index;
+		return this.currentIndex;
 	};
-
-	TextField.prototype._alignRow = function( row, textAlign )
-	{
-		var i = this.children[i];
-		var letter = null;
-		
-		while( --i > -1 )
-		{
-			letter = this.children[i];
-			if( letter.row == row )
-			{
-				letter.format.textAlign == textAlign;
-			}
-		}
-	}
 
 	TextField.prototype.setFocus = function(value)
 	{
@@ -3326,22 +3336,26 @@ MovieClip.prototype.stop = function()
 	{
 		var end = ( endIndex == undefined ) ? startIndex : endIndex;
 		var i = startIndex;
-		var currentFormat = null;
+		var letter = null;
+		var word = null;
+		var currentWord = null;
 		
 		for( ; i <= end; i++ )
 		{
-			var letter = this.getChildAt(i);
+			letter = this.getLetterAt(i);
 			if( letter != null )
+			{
+				this._refreshNextFrame = true;
 				letter.setTextFormat(format);
+				if( letter.parent != null )
+					letter.parent.needRefresh = true;
+			}
 		}
-		
-		if( letter != null )
-			this._alignRow(letter.row,format.textAlign);
 	};
 
 	TextField.prototype.getTextFormat = function(index)
 	{
-		var letter = this.getChildAt(index);
+		var letter = this.getLetterAt(index);
 		if( letter == null )
 			return this.defaultTextFormat.clone();
 			
@@ -3350,61 +3364,112 @@ MovieClip.prototype.stop = function()
 
 	TextField.prototype.getText = function()
 	{
-		var text = "";
-		var i = 0;
-		var max = this.children.length;
-		
-		for( i = 0; i < max; i++ )
-		{
-			letter = this.children[i];
-			text += letter.value;
-		}
-		
-		return text;
+		return this._text;
 	};
 
 	TextField.prototype.setText = function(value)
 	{
+		if( this._text == value )
+			return;
+			
+		this._text = "";
+		
 		while( this.children.length > 0 )
 			this.removeChildAt(0);
+			
+		this._letters = new Array();
 			
 		var i = 0;
 		var max = value.length;
 		
 		for( i = 0; i < max; i++ )
 		{
-			this.addCharAt(value[i],i);
+			this.addCharAt(value[i], i);
 		}
 	};
 
 	TextField.prototype.getLetters = function()
 	{
-		return this.children;
+		return this._letters;
 	};
 
 	TextField.prototype.getLetterAt = function(index)
 	{
-		return this.getChildAt(index);
+		var letters = this.getLetters();
+		return letters[index] || null;
+	};
+	
+	TextField.prototype.getWordAt = function(index)
+	{
+		var letter = this.getLetterAt(index);
+		var word = null;
+		
+		if( letter == null )
+			return null;
+			
+		word = letter.parent;
+		
+		return word;
 	};
 
 	TextField.prototype.addCharAt = function(value,index,isNewline)
 	{
-		var previous = this.children[index-1];
+		var wordIndex =  ( index == 0 ) ? 0 : index - 1 ;
 		var letter = new tomahawk_ns.Letter();
+		var previous = this.getLetterAt(index-1);
+		var currentWord = this.getWordAt(wordIndex);
+		var tab1 = this._letters.slice(0,index);
+		var tab2 = this._letters.slice(index);
+		
+		//create letter
+		isNewline = ( isNewline == true ) ? true : false;
 		letter.value = value;
-		letter.index = index;
-		letter.newline = ( isNewline == true ) ? true : false;
-		letter.format = ( !previous ) ? this.defaultTextFormat.clone() : previous.format.clone();
-		this.addChildAt(letter,index);
-		this.setCurrentIndex(index);
-		this._reposNextFrame = true;
+		letter.newline = isNewline;
+		letter.setTextFormat( ( previous == null ) ? this.defaultTextFormat.clone() : previous.format.clone() );
+		
+		//rebuild letters array
+		tab1.push(letter);
+		this._letters = tab1.concat(tab2);
+		
+		this.setCurrentIndex(index); //set current index
+		this._refreshNextFrame = true; //refresh textfield at next frame
+		this._text = this._text.substr(0,index) + value + this._text.substr(index); // rebuild text value
+		
+		if( currentWord == null )
+		{
+			currentWord = new tomahawk_ns.Word();
+		}
+		
+		this.addChild(currentWord);
+		currentWord.needRefresh = true;
+		currentWord.addLetterAt(letter,index - currentWord.getStartIndex());
+		
+		this._resetLettersIndex(); // reset letters index
+		this._cutWord(currentWord); // cut the word if necessary
 	};
-
+	
 	TextField.prototype.removeCharAt = function(index)
 	{
-		this.removeChildAt(index);
+		var letter = this.getLetterAt(index);
+		var previous = this.getLetterAt(index-1);
+		
+		if( letter == null )
+			return;
+			
+		var currentWord = letter.parent;
+		
+		this._letters.splice(index,1);
 		this.setCurrentIndex(index-1);
-		this._reposNextFrame = true;
+		this._refreshNextFrame = true;
+	
+		this._text = this._text.substr(0,index-1) + this._text.substr(index+1);
+		
+		currentWord.removeLetterAt( index - currentWord.getStartIndex() );
+		
+		if( currentWord.getNumLetters() == 0 )
+			this.removeChild(currentWord);
+			
+		this._resetLettersIndex();
 	};
 
 	TextField.prototype.addTextAt = function(value,index)
@@ -3420,7 +3485,7 @@ MovieClip.prototype.stop = function()
 
 	TextField.prototype.removeTextBetween = function(startIndex,endIndex)
 	{
-		var i = this.children.length;
+		var i = this.getLetters().length;
 		var letters = new Array();
 		var letter = null;
 		
@@ -3428,7 +3493,7 @@ MovieClip.prototype.stop = function()
 		{
 			if( i >= startIndex && i <= endIndex )
 			{
-				letters.push( this.getChildAt(i) );
+				letters.push( this.getLetterAt(i) );
 			}
 		}
 		
@@ -3439,106 +3504,17 @@ MovieClip.prototype.stop = function()
 		}
 	};
 	
-	TextField.prototype._repos = function()
-	{
-		var i = 0;
-		var max = this.children.length;
-		var x = 0;
-		var maxLineHeight = 0;
-		var currentRow = 0;
-		var rowY = 0;
-		var offsetX = 0;
-		var rowIndex = 0;
-		var currentRow = new Array();
-		var rowLetter = null;
-		var j = 0;
-		var y = 0;
-		var textAlign = "left";
-		
-		for( i = 0; i < max; i++ )
-		{		
-			letter = this.children[i];
-			letter.updateMetrics();
-				
-			letter.index = i;
-			maxLineHeight = ( maxLineHeight < letter.textHeight ) ? letter.textHeight : maxLineHeight;
-			
-			if( x + letter.textWidth > this.width || letter.newline == true )
-			{
-				rowIndex++;
-				y += maxLineHeight;
-				
-				textAlign = ( currentRow[0] != undefined ) ? currentRow[0].format.textAlign : "left";
-				
-				if( textAlign == "left" )
-				{
-					offsetX = 0;
-				}
-				if( textAlign == "center" )
-				{
-					offsetX = ( this.width - x ) * 0.5;
-				}
-				if( textAlign == "right" )
-				{
-					offsetX = this.width - x;
-				}
-				
-				for( j = 0; j < currentRow.length; j++ )
-				{
-					rowLetter = currentRow[j];
-					rowLetter.y = y - rowLetter.textHeight;
-					rowLetter.x += offsetX;
-				}
-				
-				x = 0;
-				currentRow = new Array();
-				maxLineHeight = letter.textHeight;
-			}
-			
-			letter.row = rowIndex;
-			letter.x = x;
-			letter.y = 0;
-			x += letter.textWidth;
-			currentRow.push(letter);
-		}
-		
-		y += maxLineHeight;
-		textAlign = ( currentRow[0] != undefined ) ? currentRow[0].format.textAlign : "left";
-		
-		if( textAlign == "left" )
-		{
-			offsetX = 0;
-		}
-		if( textAlign == "center" )
-		{
-			offsetX = ( this.width - x ) * 0.5;
-		}
-		if( textAlign == "right" )
-		{
-			offsetX = this.width - x;
-		}
-		
-		for( j = 0; j < currentRow.length; j++ )
-		{
-			rowLetter = currentRow[j];
-			rowLetter.y = y - rowLetter.textHeight;
-			rowLetter.x += offsetX;
-		}
-		
-		if( this.autoSize == true && rowLetter != null )
-		{
-			this.height = rowLetter.y + rowLetter.textHeight;
-		}
-		
-		this._lastWidth = this.width;
-		this._reposNextFrame = false;
-	};
-
 	TextField.prototype.draw = function(context)
 	{
-		if( this._lastWidth != this.width || this._reposNextFrame == true )
+		var currentIndexLetter = this.getLetterAt(this.currentIndex);
+		var bounds = null;
+		var time = null;
+		
+		if( this._lastWidth != this.width || this._refreshNextFrame == true )
 		{
-			this._repos();
+			this._refresh();	
+			this._lastWidth = this.width;
+			this._refreshNextFrame = false;
 		}
 		
 		if( this.background == true )
@@ -3565,8 +3541,205 @@ MovieClip.prototype.stop = function()
 			context.restore();
 		}
 		
-		tomahawk_ns.DisplayObjectContainer.prototype.draw.apply(this, [context]);
+		
+		tomahawk_ns.DisplayObjectContainer.prototype.draw.apply(this, [context]);		
+		
+		if( this._focused == true)
+		{
+			time = new Date().getTime();
+			
+			if( currentIndexLetter != null )
+			{
+				bounds = currentIndexLetter.getBoundingRectIn(this);
+			}
+			else
+			{
+				bounds = new tomahawk_ns.Rectangle();
+				bounds.left = bounds.x = 0;
+				bounds.width = bounds.right = 5;
+				bounds.top = bounds.y = 0;
+				bounds.bottom = bounds.height = 10;
+			}
+			
+			if( time - this._drawCursorTime > 500 )
+			{
+				this._drawCursor = ( this._drawCursor == true ) ? false: true;
+				this._drawCursorTime = time;
+			}
+			
+			if( this._drawCursor == true )
+			{
+				context.save();
+				context.beginPath();
+				context.strokeStyle = "black";
+				context.moveTo(	bounds.right,bounds.top);
+				context.lineTo(	bounds.right,bounds.bottom );
+				context.stroke();
+				context.restore();
+			}
+		}
 	};
+
+	
+	
+	
+	TextField.prototype._cutWord = function(word)
+	{
+		var letters = 0;
+		var i = 0;
+		var nextWord = null;
+		var cut = true;
+		var currentLetter = null;
+		
+		while( cut == true )
+		{
+			cut = false;
+			letters = word.getLetters();
+			i = letters.length;
+			
+			while( --i > -1 )
+			{
+				currentLetter = letters[i];
+				if( ( currentLetter.value == " " || currentLetter.newline == true ) && i > 0 )
+				{
+					nextWord = word.cut(i);
+					cut = true;
+					this.addChild( nextWord );
+					
+					nextWord.newline = currentLetter.newline;
+					nextWord.needRefresh = word.needRefresh = true;
+					break;
+				}
+			}
+		}
+		
+		if( word.text.length == 0 )
+			this.removeChild(word);
+	};
+
+	TextField.prototype._resetLettersIndex = function(start)
+	{
+		var letters = this.getLetters();
+		var i = 0;
+		var max = letters.length;
+		var currentLetter = null;
+		
+		for( i = 0; i < max; i++ )
+		{
+			currentLetter = letters[i];
+			currentLetter.index = i;
+		}
+	};
+	
+	TextField.prototype._sortWords = function(a,b)
+	{
+		return ( a.getStartIndex() < b.getStartIndex() ) ? -1 : 1;
+	};
+	
+	TextField.prototype._refresh = function()
+	{
+		var rowIndex = 0;
+		var currentRow = new Array();
+		var rowWord = null;
+		var word = null;
+		var i = 0;
+		var max = this.children.length;
+		var lineY = 0;
+		var lineX = this.padding;
+		var lineHeight = 0;
+		var lineWidth = 0;
+		var maxWidth = this.width - ( this.padding * 2 );
+		
+		this.children.sort( this._sortWords );
+		
+		for( i = 0; i < max; i++ )
+		{		
+			word = this.children[i];
+			word.index = i;
+			word.refresh();
+
+			lineHeight = ( lineHeight < word.height ) ? word.height : lineHeight;
+			
+			if( lineWidth + word.width > maxWidth || word.newline == true )
+			{
+				lineY += lineHeight;
+				this._alignRow( currentRow, rowIndex, lineX, lineY, lineWidth, lineHeight );
+				
+				rowIndex++;
+				lineWidth = 0;
+				currentRow = new Array();
+				lineHeight = word.height;
+			}
+			
+			lineWidth += word.width;
+			currentRow.push(word);
+			
+			if( i == max - 1 )
+			{
+				lineY += lineHeight;
+				this._alignRow( currentRow, rowIndex, lineX, lineY, lineWidth, lineHeight );
+			}
+		}
+		
+		if( this.autoSize == true && word != null )
+		{
+			this.height = word.y + word.height;
+		}
+		
+		
+		//this._cache = null;
+		//this.cacheAsBitmap = true;
+		this._lastWidth = this.width;
+	};
+	
+	TextField.prototype._alignRow = function( currentRow, rowIndex, lineX, lineY, lineWidth, lineHeight )
+	{
+		if( currentRow.length == 0 )
+			return;
+			
+		var maxWidth = this.width - ( this.padding * 2 );
+		var word = currentRow[0];
+		var offsetX = lineX;
+		var marginLeft = 0;
+		var textAlign = this._textAlign;
+		var i = 0;
+		var max = currentRow.length;
+		var currentX = 0;
+				
+		if( textAlign == tomahawk_ns.TextField.ALIGN_LEFT )
+		{
+			offsetX = lineX;
+		}
+		
+		if( textAlign == tomahawk_ns.TextField.ALIGN_CENTER )
+		{
+			offsetX = lineX + ( ( maxWidth - lineWidth ) * 0.5 );
+		}
+			
+		if( textAlign == tomahawk_ns.TextField.ALIGN_RIGHT )
+		{
+			offsetX = lineX + ( maxWidth - lineWidth );
+		}
+		
+		// on ne justifie que si la ligne est occupée à minimum 70% sinon c'est aligné à gauche
+		if( textAlign == tomahawk_ns.TextField.ALIGN_JUSTIFY && lineWidth >= ( maxWidth * 0.7 ) )
+		{
+			offsetX = lineX;
+			marginLeft = ( maxWidth - lineWidth ) / ( currentRow.length - 1 );
+		}
+		
+		currentX = offsetX;
+		
+		for( i = 0; i < max; i++ )
+		{
+			word = currentRow[i];
+			word.y = lineY - word.height;
+			word.x = currentX;
+			
+			currentX += word.width + marginLeft;
+		}
+	};
+	
 
 	tomahawk_ns.TextField = TextField;
 })();
@@ -3583,29 +3756,20 @@ MovieClip.prototype.stop = function()
 	Tomahawk.registerClass( TextFormat, "TextFormat" );
 
 	TextFormat.prototype.textColor = "black";
-	TextFormat.prototype.textAlign = "center";
 	TextFormat.prototype.underline = false;
 	TextFormat.prototype.backgroundSelectedColor = "blue";
-	TextFormat.prototype._updateFont = true;
-	TextFormat.prototype._fontString = "";
-	TextFormat.prototype._font = "Arial";
-	TextFormat.prototype._bold = false;
-	TextFormat.prototype._italic = false;
-	TextFormat.prototype._size = 12;
+	TextFormat.prototype.font = "Arial";
+	TextFormat.prototype.bold = false;
+	TextFormat.prototype.italic = false;
+	TextFormat.prototype.size = 12;
 
 	TextFormat.prototype.updateContext = function(context)
 	{
-		if( this._updateFont == true )
-		{
-			this._updateFont == false;	
-			var bold = ( this._bold ) ? "bold" : "";
-			var italic = ( this._italic ) ? "italic" : "";
-			this._fontString = italic+' '+bold+' '+this._size+'px '+this._font;
-		}
+		var bold = ( this.bold ) ? "bold" : "";
+		var italic = ( this.italic ) ? "italic" : "";
 		
-		context.font = this._fontString;
+		context.font = italic+' '+bold+' '+this.size+'px '+this.font;
 		context.fillStyle = this.textColor;
-		//context.textAlign = this.textAlign;
 		
 		if( this.underline == true )
 		{
@@ -3616,50 +3780,163 @@ MovieClip.prototype.stop = function()
 	TextFormat.prototype.clone = function()
 	{
 		var format = new tomahawk_ns.TextFormat();
-		format.textColor = new String(this.textColor);
-		format.textAlign = new String( this.textAlign );
-		format.font = new String( this.font );
+		format.textColor = this.textColor+"";
+		format.font = this.font+"";
 		format.bold = ( this.bold == true );
 		format.underline = ( this.underline == true );
 		format.italic = ( this.italic == true );
-		format.size = new Number( this.size );
+		format.size = parseInt( this.size );
 		
 		return format;
 	};
 	
-	TextFormat.prototype.setBold = function(value){ this._bold = value; this._updateFont = true; };
-	TextFormat.prototype.setItalic = function(value){ this._italic = value; this._updateFont = true; };
-	TextFormat.prototype.setSize = function(value){ this._size = value; this._updateFont = true; };
-	TextFormat.prototype.setFont = function(value){ this._font = value; this._updateFont = true; };
-	
-	TextFormat.prototype.getBold = function(){ return this._bold };
-	TextFormat.prototype.getItalic = function(){ return this._italic };
-	TextFormat.prototype.getFont = function(){ return this._font };
-	TextFormat.prototype.getSize = function(){ return this._size };
-
-	
-	Object.defineProperty( TextFormat.prototype, "bold", {
-		set: TextFormat.prototype.setBold,
-		get: TextFormat.prototype.getBold,
-		enumerable: true
-	} );
-	Object.defineProperty( TextFormat.prototype, "italic", {
-		set: TextFormat.prototype.setItalic,
-		get: TextFormat.prototype.getItalic,
-		enumerable: true
-	} );
-	Object.defineProperty( TextFormat.prototype, "size", {
-		set: TextFormat.prototype.setSize,
-		get: TextFormat.prototype.getSize,
-		enumerable: true
-	} );
-	Object.defineProperty( TextFormat.prototype, "font", {
-		set: TextFormat.prototype.setFont,
-		get: TextFormat.prototype.getFont,
-		enumerable: true
-	} );
-	
 	tomahawk_ns.TextFormat = TextFormat;
+})();
+
+
+
+/**
+ * ...
+ * @author Hatshepsout
+ */
+
+(function() {
+	
+	function Word()
+	{
+		tomahawk_ns.DisplayObjectContainer.apply(this);
+		this.mouseEnabled = true;
+	}
+	
+	Tomahawk.registerClass(Word,"Word");
+	Tomahawk.extend("Word","DisplayObjectContainer");
+	
+	Word.prototype.row = 0;
+	Word.prototype.newline = false;
+	Word.prototype.marginLeft = 0;
+	Word.prototype.index = 0;
+	Word.prototype.text = "";
+	Word.prototype.needRefresh = false;
+	
+	Word.prototype.getNumLetters = function()
+	{
+		return this.children.length;
+	};
+	
+	Word.prototype.getStartIndex = function()
+	{
+		if( this.children.length == 0 )
+			return 0;
+			
+		return this.getLetterAt(0).index;
+	};
+	
+	Word.prototype.getEndIndex = function()
+	{
+		if( this.children.length == 0 )
+			return 0;
+			
+		return this.getLetterAt( this.children.length - 1 ).index;
+	};
+	
+	Word.prototype.addLetter = function(letter)
+	{
+		this.text = this.text + letter.value;
+		this.needRefresh = true;
+		return this.addChild(letter);
+	};
+	
+	Word.prototype.removeLetterAt = function(index)
+	{
+		this.text = this.text.substr(0,index) + this.text.substr(index+1);
+		this.needRefresh = true;
+		return this.removeChildAt(index);
+	};
+	
+	Word.prototype.removeLetter = function(letter)
+	{
+		var index = this.getChildIndex(letter);
+		
+		if( index == -1 )
+			return letter;
+	
+		this.needRefresh = true;
+		this.text = this.text.substr(0,index) + this.text.substr(index+1);
+		return this.removeChild(letter);
+	};
+	
+	Word.prototype.getLetterAt = function(index)
+	{
+		return this.getChildAt(index);
+	};
+		
+	Word.prototype.addLetterAt = function(letter,index)
+	{
+		this.needRefresh = true;
+		this.text = this.text.substr(0,index) + letter.value + this.text.substr(index);
+		this.addChildAt(letter,index);
+	};
+	
+	Word.prototype.getLetters = function()
+	{
+		return this.children;
+	};
+	
+	Word.prototype.refresh = function()
+	{
+		if( this.needRefresh != true )
+			return;
+			
+		var max = this.children.length;
+		var i = 0;
+		var currentX = 0;
+		this.height = 0;
+		this.width = 0;
+		var currentLetter = null;
+		
+		for( i = 0; i < max; i++ )
+		{
+			currentLetter = this.children[i];
+			
+			if( currentLetter.value == " " && i == 0)
+			{
+				this.marginLeft = currentLetter.width;
+			}
+			
+			currentLetter.updateMetrics();
+			currentLetter.x = currentX;
+			currentX += currentLetter.width;
+			this.height = ( this.height < currentLetter.textHeight ) ? currentLetter.textHeight : this.height;
+		}
+		
+		for( i = 0; i < max; i++ )
+		{
+			currentLetter = this.children[i];
+			currentLetter.y = this.height - currentLetter.textHeight;
+		}
+		
+		this.width = currentX;
+		this.needRefresh = false;
+		this.cacheAsBitmap = true;
+		this.updateCache();
+	};
+	
+	Word.prototype.cut = function(index)
+	{
+		var word = new tomahawk_ns.Word();
+		var i = index;
+		var max = this.children.length;
+		
+		for( i = index; i < max; i++ )
+		{
+			word.addLetter(this.removeLetterAt(index));
+		}
+		
+		word.needRefresh = this.needRefresh = true;
+		return word;
+	};
+	
+	tomahawk_ns.Word = Word;
 })();
 
 

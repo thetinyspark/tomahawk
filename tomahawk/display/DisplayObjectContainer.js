@@ -15,6 +15,12 @@
 	DisplayObjectContainer.prototype.children = null;
 	DisplayObjectContainer.prototype.isContainer = true;
 
+	
+	DisplayObjectContainer.prototype.setChildIndex = function(child,index)
+	{
+		this.addChildAt(child,index);
+	};
+	
 	DisplayObjectContainer.prototype.addChild = function(child)
 	{
 		if( child.parent )
@@ -73,27 +79,38 @@
 		child.parent = this;
 		child.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.ADDED, true, true) );
 	};
+	
+	DisplayObjectContainer.prototype.getChildIndex = function(child)
+	{
+		return this.children.indexOf(child);
+	};
 
 	DisplayObjectContainer.prototype.removeChildAt = function(index)
 	{
 		var child = this.children[index];
 		if( child == undefined )
-			return;
+			return null;
 			
 		child.parent = null;
 		this.children.splice(index,1);
 		child.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.REMOVED, true, true) );
+		return child;
 	};
 
 	DisplayObjectContainer.prototype.removeChild = function(child)
 	{
 		var index = this.children.indexOf(child);
+		var child = null;
 		
 		if( index > -1 )
+		{
+			child = this.children[index];
 			this.children.splice(index,1);
-			
-		child.parent = null;
-		child.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.REMOVED, true, true) );
+			child.parent = null;
+			child.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.REMOVED, true, true) );
+		}
+		
+		return child;
 	};
 
 	DisplayObjectContainer.prototype.draw = function( context )

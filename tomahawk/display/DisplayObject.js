@@ -97,8 +97,8 @@
 		var offY = 0;
 		var bounds = this.getBoundingRectIn(this);
 		buffer = document.createElement("canvas");
-		buffer.width = bounds.width;
-		buffer.height = bounds.height;
+		buffer.width = ( bounds.width < 1 ) ? 1 : bounds.width ;
+		buffer.height = ( bounds.height < 1 ) ? 1 : bounds.height ;
 		
 		offX = bounds.left;
 		offY = bounds.top;
@@ -213,14 +213,15 @@
 	{
 		var matrix = this.getConcatenedMatrix();
 		var pt = matrix.transformPoint(x,y);
-		return pt;
+		
+		return new tomahawk_ns.Point(x,y);
 	};
 
 	DisplayObject.prototype.globalToLocal = function(x,y)
 	{
 		var matrix = this.getConcatenedMatrix().clone().invert();
 		var pt = matrix.transformPoint(x,y);
-		return pt;
+		return new tomahawk_ns.Point(x,y);
 	};
 
 	DisplayObject.prototype.hitTest = function(x,y)

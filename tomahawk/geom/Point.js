@@ -5,7 +5,11 @@
 (function() {
 	
 
-	function Point(){}
+	function Point(x,y)
+	{
+		this.x = x, this.y = y
+	}
+	
 	Tomahawk.registerClass( Point, "Point" );
 	
 	

@@ -135,7 +135,6 @@ Main.prototype.complete = function()
 	
 	bounds = container.getBoundingRect();
 	container.name = "narnia";
-	//container.cacheAsBitmap = true;
 	cloudsContainer.name = "clouds";
 	container.mouseEnabled = true;
 	container.handCursor = true;
@@ -175,59 +174,13 @@ Main.prototype._mouseHandler = function(event)
 Main.prototype.onFrame = function()
 {
 	tomahawk_ns.Stage.getInstance().drawFPS();
-	//var container = tomahawk_ns.Stage.getInstance().getChildByName("narnia");
 	var cloudsContainer = tomahawk_ns.Stage.getInstance().getChildByName("clouds");
-	//this._counter++;
-	//return;
-	//
 	var i = cloudsContainer.children.length;
 	while( --i > -1 )
 	{
 		cloudsContainer.getChildAt(i).x -= 0.1;
 	}
-	//
-	//if( container == null )
-	//{
-		//return;
-	//}
-	//
-	//if( this._counter > 240 )
-	//{
-		//this._direction++;
-		//if( this._direction == 4 )
-			//this._direction = 0;
-			//
-		//this._counter = 0;
-	//}
-	//
-	//if( this._direction == 0 )
-	//{
-		//container.x--;
-		//container.y--;
-		//cloudsContainer.x -= 0.5;
-		//cloudsContainer.y -= 0.5;
-	//}
-	//else if( this._direction == 1 )
-	//{
-		//container.x++;
-		//container.y--;
-		//cloudsContainer.x += 0.5;
-		//cloudsContainer.y -= 0.5;
-	//}
-	//else if( this._direction == 2 )
-	//{
-		//container.x++;
-		//container.y++;
-		//cloudsContainer.x += 0.5;
-		//cloudsContainer.y += 0.5;
-	//}
-	//else if( this._direction == 3 )
-	//{
-		//container.x--;
-		//container.y++;
-		//cloudsContainer.x -= 0.5;
-		//cloudsContainer.y += 0.5;
-	//}
+	
 };
 
 window.onload = function()

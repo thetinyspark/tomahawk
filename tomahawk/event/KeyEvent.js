@@ -20,6 +20,7 @@
 	KeyEvent.prototype.crtlKey = false;
 	KeyEvent.prototype.shiftKey = false;
 	KeyEvent.prototype.altKey = false;
+	KeyEvent.prototype.nativeEvent = null;
 
 	KeyEvent.fromNativeEvent = function(event,bubbles,cancelable)
 	{
@@ -34,6 +35,7 @@
 		}
 		
 		newEvent = new KeyEvent(type,bubbles,cancelable);
+		newEvent.nativeEvent = event;
 		newEvent.keyCode = event.keyCode;
 		newEvent.charCode = event.charCode;
 		newEvent.ctrlKey = event.ctrlKey;

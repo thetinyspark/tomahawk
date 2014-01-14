@@ -7,7 +7,7 @@
 	function SelectableTextField()
 	{
 		tomahawk_ns.TextField.apply(this);
-		this.addEventListener( tomahawk_ns.Event.ADDED_TO_STAGE, this, this._selectableTextFieldAddedHandler );
+		this.mouseEnabled = true;
 	}
 
 	Tomahawk.registerClass(SelectableTextField,"SelectableTextField");
@@ -16,19 +16,6 @@
 	SelectableTextField.prototype._ignoreNextClick = false;
 	SelectableTextField.prototype._startPoint = null;
 	SelectableTextField.prototype._down = false;
-	
-	SelectableTextField.prototype._selectableTextFieldAddedHandler = function(event)
-	{
-		this.removeEventListener( tomahawk_ns.Event.ADDED_TO_STAGE, this, this._selectableTextFieldAddedHandler );
-		this.stage.addEventListener( tomahawk_ns.MouseEvent.MOUSE_DOWN, this, this._mouseEventHandler,true );
-		this.stage.addEventListener( tomahawk_ns.MouseEvent.DOUBLE_CLICK, this, this._mouseEventHandler,true );
-		this.stage.addEventListener( tomahawk_ns.MouseEvent.MOUSE_UP, this, this._mouseEventHandler, true );
-		this.stage.addEventListener( tomahawk_ns.MouseEvent.MOUSE_MOVE, this, this._mouseEventHandler, true );
-		this.addEventListener( tomahawk_ns.MouseEvent.CLICK, this, this._mouseEventHandler );
-		this.addEventListener( tomahawk_ns.MouseEvent.MOUSE_DOWN, this, this._mouseEventHandler );
-		
-		this.mouseEnabled = true;
-	};
 
 	SelectableTextField.prototype.getObjectUnder = function(x,y)
 	{
@@ -50,7 +37,6 @@
 		var pt = this.globalToLocal(x, y);
 		var letters = this.getLettersIn(pt.x,pt.y,1,1);
 		this.unSelect();
-		this.setFocus(true);
 		
 		if( letters.length > 0 )
 		{
@@ -58,31 +44,35 @@
 		}
 	};
 
+	
+	SelectableTextField.prototype.setFocus = function(value)
+	{
+		tomahawk_ns.TextField.prototype.setFocus.apply(this,[value]);
+		
+		this.removeEventListener( tomahawk_ns.MouseEvent.DOUBLE_CLICK, this, this._mouseEventHandler );
+		this.removeEventListener( tomahawk_ns.MouseEvent.CLICK, this, this._mouseEventHandler );
+		this.removeEventListener( tomahawk_ns.MouseEvent.MOUSE_DOWN, this, this._mouseEventHandler );
+		this.removeEventListener( tomahawk_ns.MouseEvent.MOUSE_MOVE, this, this._mouseEventHandler, true );
+		
+		if( value == true )
+		{
+			this.addEventListener( tomahawk_ns.MouseEvent.DOUBLE_CLICK, this, this._mouseEventHandler );
+			this.addEventListener( tomahawk_ns.MouseEvent.CLICK, this, this._mouseEventHandler );
+			this.addEventListener( tomahawk_ns.MouseEvent.MOUSE_DOWN, this, this._mouseEventHandler );
+			this.addEventListener( tomahawk_ns.MouseEvent.MOUSE_MOVE, this, this._mouseEventHandler, true );
+		}
+		
+		this.unSelect();
+	};
+	
 	SelectableTextField.prototype._mouseEventHandler = function(event)
 	{
 		if( event.type == tomahawk_ns.MouseEvent.DOUBLE_CLICK )
 		{
-			this.setFocus( event.target == this );
-			
-			if( this.getFocus() == true )
-			{
-				this._setIndexUnderMouse(event.stageX,event.stageY);
-				this._selectCurrentWord();
-			}
+			this._setIndexUnderMouse(event.stageX,event.stageY);
+			this._selectCurrentWord();
 		}
 		
-		if( event.type == tomahawk_ns.MouseEvent.MOUSE_DOWN && this._focused == true && event.target != this )
-		{
-			this.setFocus(false);
-		}
-		
-		// if non focused return
-		if( this._focused == false )
-		{
-			this.unSelect();
-			return;
-		}
-			
 		if( event.type == tomahawk_ns.MouseEvent.MOUSE_UP )
 		{
 			this._down = false;
@@ -102,14 +92,6 @@
 			}
 		}
 		
-		if( event.type == tomahawk_ns.MouseEvent.MOUSE_DOWN)
-		{
-			this._down = true;
-			this._setIndexUnderMouse(event.stageX,event.stageY);
-			this._startPoint = this.globalToLocal(event.stageX, event.stageY);
-			return;
-		}
-		
 		if( event.type == tomahawk_ns.MouseEvent.MOUSE_MOVE && this._down == true && this._startPoint != null)
 		{
 			var endPoint = this.globalToLocal(event.stageX, event.stageY);
@@ -124,7 +106,14 @@
 			this._ignoreNextClick = true;
 		}
 		
-		
+		if( event.type == tomahawk_ns.MouseEvent.MOUSE_DOWN)
+		{
+			this._down = true;
+			this._setIndexUnderMouse(event.stageX,event.stageY);
+			this._startPoint = this.globalToLocal(event.stageX, event.stageY);
+			return;
+		}
+
 	};
 
 	SelectableTextField.prototype.selectInto = function(x,y,width,height)
@@ -147,19 +136,37 @@
 
 	SelectableTextField.prototype.getLettersIn = function(x,y,width,height)
 	{
-		var i = this.children.length;
+		var letters = this.getLetters();
+		var i = letters.length;
 		var letter = null;
 		var result = new Array();
+		var word = null;
+		var bounds = null;
 		
 		while( --i > -1 )
 		{
-			letter = this.children[i];
+			letter = letters[i];
+			word = letter.parent;
 			
+			if( word == null )
+				continue;
+				
 			if( 
-				letter.x > x + width ||
-				letter.x + letter.width < x || 
-				letter.y + letter.height < y || 
-				letter.y > y + height 
+				word.x > x + width ||
+				word.x + word.width < x || 
+				word.y + word.height < y || 
+				word.y > y + height 
+			)
+			{
+				continue;
+			}
+			
+			bounds = letter.getBoundingRectIn(this);
+			
+			if( bounds.left > x + width ||
+				bounds.right < x ||
+				bounds.top > y + height ||
+				bounds.bottom < y 
 			)
 			{
 				continue;
@@ -175,12 +182,13 @@
 	{
 		var start = -1;
 		var end = -1;
-		var i = this.children.length;
+		var letters = this.getLetters();
+		var i = letters.length;
 		var letter = null;
 		
 		while( --i > -1 )
 		{
-			letter = this.children[i];
+			letter = letters[i];
 			if( letter.selected == true )
 			{
 				if( end == -1 )
@@ -206,31 +214,56 @@
 
 	SelectableTextField.prototype.selectAll = function()
 	{
-		this.selectBetween(0,this.children.length);
+		this.selectBetween(0,this.getLetters().length);
 	};
 
 	SelectableTextField.prototype.unSelect = function()
 	{
-		var i = this.children.length;
+		var letters = this.getLetters();
+		var i = letters.length;
 		var letter = null;
 		
 		while( --i > -1 )
 		{
-			letter = this.children[i];
+			letter = letters[i];
+			
+			if( letter.selected == true && letter.parent != null )
+			{
+				letter.parent.needRefresh = true;
+			}
+			
 			letter.selected = false;
 		}
+		
+		this._refreshNextFrame = true;
 	};
 
 	SelectableTextField.prototype.selectBetween = function(startIndex, endIndex)
 	{
-		var i = this.children.length;
+		var letters = this.getLetters();
+		var i = letters.length;
 		var letter = null;
 		
 		while( --i > -1 )
 		{
-			letter = this.children[i];
-			letter.selected = ( i >= startIndex && i <= endIndex );
+			letter = letters[i];
+			
+			if( i >= startIndex && i <= endIndex )
+			{
+				letter.selected = true;
+				if( letter.parent != null )
+					letter.parent.needRefresh = true;
+			}
+			else
+			{
+				if( letter.selected == true && letter.parent != null)
+				{
+					letter.parent.needRefresh = true;
+				}
+				letter.selected = false;
+			}
 		}
+		this._refreshNextFrame = true;
 	};
 
 	tomahawk_ns.SelectableTextField = SelectableTextField;

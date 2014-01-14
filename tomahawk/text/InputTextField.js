@@ -20,10 +20,14 @@
 	
 	InputTextField.prototype._keyHandler = function(event)
 	{
-		var range = this.getSelectionRange();
-		
 		if( this.getFocus() == false )
 			return;
+		
+		event.nativeEvent.preventDefault();
+		event.nativeEvent.stopImmediatePropagation();
+		event.nativeEvent.stopPropagation();
+		
+		var range = this.getSelectionRange();
 			
 		if( this.isSelected() == true && event.keyCode != tomahawk_ns.Keyboard.LEFT && event.keyCode != tomahawk_ns.Keyboard.RIGHT )
 		{

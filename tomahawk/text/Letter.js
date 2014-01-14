@@ -5,28 +5,24 @@
 (function() {
 	
  
-	function Letter()
+	function Letter(value)
 	{
 		tomahawk_ns.DisplayObject.apply(this);		
 		Letter._metricsContext = Letter._metricsContext || document.createElement("canvas").getContext("2d");
 		this.setTextFormat( new tomahawk_ns.TextFormat() );
+		this.value = ( value == undefined ) ? "" : value;
 	}
 
 	Tomahawk.registerClass(Letter,"Letter");
 	Tomahawk.extend("Letter","DisplayObject");
 
+	Letter.prototype.newline 			= false;
 	Letter.prototype.value 				= "";
 	Letter.prototype.format 			= null;
-	Letter.prototype.newline 			= false;
 	Letter.prototype.index 				= 0;
-	Letter.prototype.row 				= 0;	
 	Letter.prototype.textWidth 			= 0;	
 	Letter.prototype.textHeight 		= 0;	
 	Letter.prototype.selected			= false;
-	Letter.prototype.cursor				= false;		
-	Letter.prototype._drawCursor	 	= false;
-	Letter.prototype._drawCursorTime 	= 0;
-	Letter.prototype._data 				= null;
 	Letter._metricsContext				= null;
 	
 	
@@ -42,25 +38,22 @@
 		context.save();
 		
 		this.format.updateContext(context);
-		this.textHeight = context.measureText('M').width;
+		this.textHeight = ( context.measureText('M').width );
 		this.textWidth = context.measureText(this.value).width;
 		this.width = this.textWidth;
-		this.height = this.textHeight;
+		this.height = this.textHeight * 1.4;
 		
 		context.restore();
 	};
 
 	Letter.prototype.draw = function(context)
 	{
-		if( this.newline == true )
-			return;
-			
 		if( this.selected == true )
 		{
 			context.save();
 			context.beginPath();
 			context.fillStyle = this.format.backgroundSelectedColor;
-			context.fillRect(0, 0, this.textWidth, this.textHeight);
+			context.fillRect(0, 0, this.textWidth, this.textHeight );
 			context.fill();
 			context.restore();
 		}
@@ -77,27 +70,20 @@
 			context.stroke();
 			context.restore();
 		}	
-		
-		if( this.cursor == true )
-		{
-			var time = new Date().getTime();
-			if( time - this._drawCursorTime > 500 )
-			{
-				this._drawCursor = ( this._drawCursor == true ) ? false: true;
-				this._drawCursorTime = time;
-			}
-			
-			if( this._drawCursor == true )
-			{
-				context.save();
-				context.beginPath();
-				context.moveTo(this.textWidth,0);
-				context.lineTo(this.textWidth,this.textHeight);
-				context.stroke();
-				context.restore();
-			}
-		}
 	};
 
+	Letter.prototype.clone = function()
+	{
+		var letter = new tomahawk_ns.Letter(this.value);
+		letter.format = this.format.clone();
+		letter.index = this.index;
+		letter.row = this.row;
+		letter.textWidth = this.textWidth;
+		letter.textHeight = this.textHeight;
+		letter.selected = this.selected;
+		
+		return letter;
+	};
+	
 	tomahawk_ns.Letter = Letter;
 })();

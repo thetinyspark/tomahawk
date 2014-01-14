@@ -90,13 +90,6 @@
 
 	Stage.prototype._keyboardHandler = function(event)
 	{
-		if( this._focused == true )
-		{
-			event.preventDefault();
-			event.stopImmediatePropagation();
-			event.stopPropagation();
-		}
-
 		if( event.type == "keyup" )
 			tomahawk_ns.Keyboard.toggleShift(event.keyCode);
 		
