@@ -81,7 +81,7 @@ Main.prototype.init = function()
 Main.prototype._enterFrame = function(event)
 {
 	var field = event.target.getChildByName("textfield");
-	field.setTextAlign(tomahawk_ns.TextField.ALIGN_JUSTIFY);
+	//field.setTextAlign(tomahawk_ns.TextField.ALIGN_JUSTIFY);
 	event.target.drawFPS();
 };
 
