@@ -74,6 +74,7 @@
 		
 		this.matrix.d = this.matrix.a = 1;
 		this.matrix.b = this.matrix.c = this.matrix.tx = this.matrix.ty = 0;
+		
 		this.matrix.appendTransform(	this.x, 
 										this.y, 
 										this.scaleX, 
@@ -201,6 +202,8 @@
 		
 		while( current != null )
 		{
+			current.updateNextFrame = true;
+			current.updateMatrix();
 			mat.prependMatrix(current.matrix );
 			current = current.parent;
 		}
@@ -213,15 +216,14 @@
 	{
 		var matrix = this.getConcatenedMatrix();
 		var pt = matrix.transformPoint(x,y);
-		
-		return new tomahawk_ns.Point(x,y);
+		return new tomahawk_ns.Point(pt.x,pt.y);
 	};
 
 	DisplayObject.prototype.globalToLocal = function(x,y)
 	{
 		var matrix = this.getConcatenedMatrix().clone().invert();
 		var pt = matrix.transformPoint(x,y);
-		return new tomahawk_ns.Point(x,y);
+		return new tomahawk_ns.Point(pt.x,pt.y);
 	};
 
 	DisplayObject.prototype.hitTest = function(x,y)
