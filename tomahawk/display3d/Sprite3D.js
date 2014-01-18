@@ -33,19 +33,18 @@
 		this.rotationY %= 360;
 		this.rotationZ %= 360;
 			
-		this.matrix3D.identity().appendTransform(	this.x + this.pivotX, 
-													this.y + this.pivotY, 
-													this.z + this.pivotZ,
+		this.matrix3D.identity().appendTransform(	this.x, 
+													this.y, 
+													this.z,
 													this.scaleX, 
 													this.scaleY, 
 													this.scaleZ,
 													this.rotationX, 
 													this.rotationY, 
-													this.rotationZ
-												).translate(
-													- this.pivotX,
-													- this.pivotY,
-													- this.pivotZ
+													this.rotationZ,
+													this.pivotX,
+													this.pivotY,
+													this.pivotZ
 												);
 												
 		this.matrix = tomahawk_ns.Matrix4x4.toMatrix2D(this.matrix3D);
@@ -95,7 +94,7 @@
 	Sprite3D.prototype.localToGlobal3D = function(x,y,z)
 	{
 		var mat = this.getConcatenedMatrix3D();
-		var pt = new tomahawk_ns.Point3D();
+		var pt = new tomahawk_ns.Point3D(x,y,z);
 		mat.transformPoint3D(pt);
 		return pt;
 	};

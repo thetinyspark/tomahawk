@@ -1714,19 +1714,18 @@ MovieClip.prototype.stop = function()
 		this.rotationY %= 360;
 		this.rotationZ %= 360;
 			
-		this.matrix3D.identity().appendTransform(	this.x + this.pivotX, 
-													this.y + this.pivotY, 
-													this.z + this.pivotZ,
+		this.matrix3D.identity().appendTransform(	this.x, 
+													this.y, 
+													this.z,
 													this.scaleX, 
 													this.scaleY, 
 													this.scaleZ,
 													this.rotationX, 
 													this.rotationY, 
-													this.rotationZ
-												).translate(
-													- this.pivotX,
-													- this.pivotY,
-													- this.pivotZ
+													this.rotationZ,
+													this.pivotX,
+													this.pivotY,
+													this.pivotZ
 												);
 												
 		this.matrix = tomahawk_ns.Matrix4x4.toMatrix2D(this.matrix3D);
@@ -1776,7 +1775,7 @@ MovieClip.prototype.stop = function()
 	Sprite3D.prototype.localToGlobal3D = function(x,y,z)
 	{
 		var mat = this.getConcatenedMatrix3D();
-		var pt = new tomahawk_ns.Point3D();
+		var pt = new tomahawk_ns.Point3D(x,y,z);
 		mat.transformPoint3D(pt);
 		return pt;
 	};
@@ -3132,9 +3131,16 @@ Matrix4x4.prototype.appendTransform = function(	x,
 												scaleZ,
 												rotationX, 
 												rotationY, 
-												rotationZ)
+												rotationZ,
+												pivotX,
+												pivotY,
+												pivotZ)
 {
-	return this.translate(x,y,z).scale(scaleX,scaleY,scaleZ).rotate(rotationX,rotationY,rotationZ);
+	
+	return this	.translate(x + pivotX,y + pivotY,z + pivotZ)
+				.scale(scaleX,scaleY,scaleZ)
+				.rotate(rotationX,rotationY,rotationZ)
+				.translate(-pivotX,-pivotY,-pivotZ);
 };
 
 Matrix4x4.prototype.prependMatrix = function( p_mat )
@@ -3387,15 +3393,19 @@ Matrix4x4.prototype.str = function()
 
 
 Matrix4x4.prototype.transformPoint3D = function(point3D)
-{
-	var x = point3D.x, y = point3D.y, z = point3D.z, w = 0;
-	var m = this.data;
+{	
+	//var x = point3D.x, y = point3D.y, z = point3D.z;
+	//var m = this.data;
+    //point3D.x = m[0] * x + m[4] * y + m[8] * z + m[12];
+    //point3D.y = m[1] * x + m[5] * y + m[9] * z + m[13];
+    //point3D.z = m[2] * x + m[6] * y + m[10] * z + m[14];
 	
-    point3D.x = m[0] * x + m[4] * y + m[8] * z + m[12] * w;
-    point3D.y = m[1] * x + m[5] * y + m[9] * z + m[13] * w;
-    point3D.z = m[2] * x + m[6] * y + m[10] * z + m[14] * w;
-    //out[3] = m[3] * x + m[7] * y + m[11] * z + m[15] * w;
+	var mat1 = new tomahawk_ns.Matrix4x4();
+	mat1.translate(point3D.x,point3D.y,point3D.z).prependMatrix(this);
 	
+	point3D.x = mat1.data[3];
+	point3D.y = mat1.data[7];
+	point3D.z = mat1.data[11];
 	return point3D;
 };
 
