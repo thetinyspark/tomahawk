@@ -56,8 +56,6 @@ Main.prototype.init = function()
 	field.x = field.y = 25;
 	field.setTextAlign( tomahawk_ns.TextField.ALIGN_CENTER );
 	
-	
-	
 	// set a new textformat 
 	format = new tomahawk_ns.TextFormat();
 	format.textColor = "red";
@@ -70,7 +68,6 @@ Main.prototype.init = function()
 	format.textColor = "green";
 	
 	field.setTextFormat(format,160,280);	
-	
 	
 	// add and listen
 	stage.addChild( shape );

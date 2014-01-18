@@ -11,9 +11,11 @@ function AssetsLoader()
 };
 
 Tomahawk.registerClass( AssetsLoader, "AssetsLoader" );
+Tomahawk.extend("AssetsLoader", "EventDispatcher" );
 
 // singleton
 AssetsLoader._instance = null;
+
 AssetsLoader.getInstance = function()
 {
 	if( tomahawk_ns.AssetsLoader._instance == null )
@@ -33,10 +35,15 @@ AssetsLoader.prototype.getData = function()
 	return this._data;
 };
 
+AssetsLoader.prototype.clean = function()
+{
+	this._data = new Object();
+};
+
 AssetsLoader.prototype.addFile = function(fileURL, fileAlias)
 {
 	// on réinitialise les data
-	this._data = new Object();
+	this.clean();
 	
 	// on stocke un objet contenant l"url et l'alias du fichier que l'on
 	// utilisera pour le retrouver
@@ -47,10 +54,12 @@ AssetsLoader.prototype.load = function()
 {
 	if( this._loadingList.length == 0 )
 	{
-		if( this.onComplete )
+		if( this.onComplete != null )
 		{
 			this.onComplete();
 		}
+		
+		this.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.COMPLETE, true, true) );
 	}
 	else
 	{
@@ -59,17 +68,18 @@ AssetsLoader.prototype.load = function()
 		var image = new Image();
 		image.onload = function()
 		{
-			scope._onLoadComplete(image, obj.alias);
+			scope._progressHandler(image, obj.alias);
 		};
 		
 		image.src = obj.url;
 	}
 };
 
-AssetsLoader.prototype._onLoadComplete = function(image,alias)
+AssetsLoader.prototype._progressHandler = function(image,alias)
 {
 	this._data[alias] = image;
 	this.load();
+	this.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.PROGRESS, true, true) );
 };
 
 tomahawk_ns.AssetsLoader = AssetsLoader;

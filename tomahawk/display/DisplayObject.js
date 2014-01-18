@@ -50,8 +50,6 @@
 	DisplayObject.prototype._cacheOffsetY 		= 0;
 	
 
-	DisplayObject._toRadians = Math.PI / 180;
-
 	DisplayObject.prototype.setMask = function( mask )
 	{
 		if( this.mask != null )

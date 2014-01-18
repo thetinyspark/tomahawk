@@ -34,6 +34,9 @@
 	Event.ENTER_FRAME 		= "enterFrame";
 	Event.REMOVED 			= "removed";
 	Event.REMOVED_FROM_STAGE= "removedFromStage";
+	Event.IO_ERROR			= "ioError";
+	Event.PROGRESS			= "progress";
+	Event.COMPLETE			= "complete";
 	
 	
 	tomahawk_ns.Event = Event;

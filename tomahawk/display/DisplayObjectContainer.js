@@ -113,6 +113,7 @@
 		return child;
 	};
 
+	
 	DisplayObjectContainer.prototype.draw = function( context )
 	{	
 		var children = this.children;
@@ -120,7 +121,6 @@
 		var max = children.length;
 		var child = null;
 		var mat = null;
-		
 		
 		for( ; i < max; i++ )
 		{
