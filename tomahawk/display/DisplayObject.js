@@ -50,6 +50,42 @@
 	DisplayObject.prototype._cacheOffsetY 		= 0;
 	
 
+	DisplayObject.prototype.getBounds = function()
+	{
+		if( this.updateNextFrame == true || this.autoUpdate == true )
+		{
+			this.updateMatrix();
+			var rect = new tomahawk_ns.Rectangle();
+			var points = new Array();
+			var mat = this.matrix;
+		
+			points.push(mat.transformPoint(0,0));
+			points.push(mat.transformPoint(this.width,0));
+			points.push(mat.transformPoint(0,this.height));
+			points.push(mat.transformPoint(this.width, this.height));
+		
+			rect.left = 0xFFFFFFFF;
+			rect.top = 0xFFFFFFFF;
+		
+			var i = points.length;
+			while( --i > -1 )
+			{
+				rect.left = ( points[i].x < rect.left ) ? points[i].x : rect.left;
+				rect.right = ( points[i].x > rect.right ) ? points[i].x : rect.right;
+				rect.top = ( points[i].y < rect.top ) ? points[i].y : rect.top;
+				rect.bottom = ( points[i].y > rect.bottom ) ? points[i].y : rect.bottom;
+			}
+		
+			rect.x = rect.left;
+			rect.y = rect.top;
+			rect.width = rect.right - rect.left;
+			rect.height = rect.bottom - rect.top;
+			
+			this._bounds = rect;
+		}
+		return this._bounds;
+	};
+	
 	DisplayObject.prototype.setMask = function( mask )
 	{
 		if( this.mask != null )
@@ -283,8 +319,6 @@
 		rect.y = rect.top;
 		rect.width = rect.right - rect.left;
 		rect.height = rect.bottom - rect.top;
-		
-		this._bounds = rect;
 		return rect;
 	};
 	
@@ -317,8 +351,6 @@
 		rect.y = rect.top;
 		rect.width = rect.right - rect.left;
 		rect.height = rect.bottom - rect.top;
-		
-		this._bounds = rect;
 		return rect;
 	};
 

@@ -384,6 +384,42 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	DisplayObject.prototype._cacheOffsetY 		= 0;
 	
 
+	DisplayObject.prototype.getBounds = function()
+	{
+		if( this.updateNextFrame == true || this.autoUpdate == true )
+		{
+			this.updateMatrix();
+			var rect = new tomahawk_ns.Rectangle();
+			var points = new Array();
+			var mat = this.matrix;
+		
+			points.push(mat.transformPoint(0,0));
+			points.push(mat.transformPoint(this.width,0));
+			points.push(mat.transformPoint(0,this.height));
+			points.push(mat.transformPoint(this.width, this.height));
+		
+			rect.left = 0xFFFFFFFF;
+			rect.top = 0xFFFFFFFF;
+		
+			var i = points.length;
+			while( --i > -1 )
+			{
+				rect.left = ( points[i].x < rect.left ) ? points[i].x : rect.left;
+				rect.right = ( points[i].x > rect.right ) ? points[i].x : rect.right;
+				rect.top = ( points[i].y < rect.top ) ? points[i].y : rect.top;
+				rect.bottom = ( points[i].y > rect.bottom ) ? points[i].y : rect.bottom;
+			}
+		
+			rect.x = rect.left;
+			rect.y = rect.top;
+			rect.width = rect.right - rect.left;
+			rect.height = rect.bottom - rect.top;
+			
+			this._bounds = rect;
+		}
+		return this._bounds;
+	};
+	
 	DisplayObject.prototype.setMask = function( mask )
 	{
 		if( this.mask != null )
@@ -617,8 +653,6 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		rect.y = rect.top;
 		rect.width = rect.right - rect.left;
 		rect.height = rect.bottom - rect.top;
-		
-		this._bounds = rect;
 		return rect;
 	};
 	
@@ -651,8 +685,6 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		rect.y = rect.top;
 		rect.width = rect.right - rect.left;
 		rect.height = rect.bottom - rect.top;
-		
-		this._bounds = rect;
 		return rect;
 	};
 
@@ -1676,6 +1708,309 @@ MovieClip.prototype.stop = function()
 
 
 
+
+
+
+/**
+ * @author The Tiny Spark
+ */
+(function() {
+	
+	
+	function QuadTreeContainer()
+	{
+		tomahawk_ns.Sprite.apply(this);
+		
+		var min = -2147483648;
+		var max = 2147483648;
+		var rootDepth = 0;
+		var maxDepth = 24;
+		var maxChildrenPerNode = 24;
+		
+		//var min = -65535;
+		//var max = 65535;
+		this._root = new tomahawk_ns.QuadTreeNode(min,max,min,max,rootDepth,maxDepth,maxChildrenPerNode);
+	}
+
+	Tomahawk.registerClass( QuadTreeContainer, "QuadTreeContainer" );
+	Tomahawk.extend( "QuadTreeContainer", "Sprite" );
+	
+	QuadTreeContainer.prototype._root = null;
+
+	QuadTreeContainer.prototype.addChild = function(child)
+	{
+		child.updateNextFrame = true;
+		this._root.add(child);
+		return tomahawk_ns.Sprite.prototype.addChild.apply(this,[child]);
+	};
+
+	QuadTreeContainer.prototype.addChildAt = function(child, index)
+	{
+		child.updateNextFrame = true;
+		this._root.add(child);
+		return tomahawk_ns.Sprite.prototype.addChildAt.apply(this,[child,index]);
+	};
+
+	QuadTreeContainer.prototype.removeChildAt = function(child, index)
+	{
+		child.updateNextFrame = true;
+		this._root.remove(child);
+		return tomahawk_ns.Sprite.prototype.removeChildAt.apply(this,[child,index]);
+	};
+	
+	QuadTreeContainer.prototype.removeChild = function(child)
+	{
+		child.updateNextFrame = true;
+		this._root.remove(child);
+		return tomahawk_ns.Sprite.prototype.removeChild.apply(this,[child]);
+	};
+	
+
+	QuadTreeContainer.prototype._sort = function(a,b)
+	{
+		return ( a.__index__ < b.__index__ ) ? -1 : 1;
+	};
+	
+	QuadTreeContainer.prototype.draw = function(context)
+	{
+		var i = this.children.length;
+		var child = null;
+		
+		if( this.stage == null )
+			return;
+			
+		var pt1 = this.globalToLocal(0,0);
+		var pt2 = this.globalToLocal(this.stage.getCanvas().width,this.stage.getCanvas().height);
+		var left = pt1.x;
+		var right = pt2.x;
+		var top = pt1.y;
+		var bottom = pt2.y;
+		
+		while( --i > -1 )
+		{
+			child = this.children[i];
+			child.__index__ = i;
+			if( child.updateNextFrame == true || child.autoUpdate == true )
+			{
+				this._root.remove(child);
+				this._root.add(child);
+			}
+		}
+		
+		var all = this.children;
+	
+		this.children = this._root.get(left, right, top, bottom);
+		this.children.sort(this._sort);
+		tomahawk_ns.Sprite.prototype.draw.apply(this,[context]);
+		
+		this.children = all;
+	};
+
+	QuadTreeContainer.prototype.hitTest = function(x,y)
+	{
+		var pt1 = this.globalToLocal(x,y);
+		var left = pt1.x;
+		var right = pt1.x + 1;
+		var top = pt1.y;
+		var bottom = pt1.y + 1;
+		var all = this.children;
+		var answer = false;
+		this.children = this._root.get(left,right,top,bottom);
+		this.children.sort(this._sort);
+		
+		answer = tomahawk_ns.Sprite.prototype.hitTest.apply(this,[x,y]);
+		
+		this.children = all;
+		return answer;
+	};
+	
+	QuadTreeContainer.prototype.getObjectUnder = function(x,y)
+	{
+		var pt1 = this.globalToLocal(x,y);
+		var left = pt1.x;
+		var right = pt1.x + 1;
+		var top = pt1.y;
+		var bottom = pt1.y + 1;
+		
+		var all = this.children;
+		var answer = null;
+		this.children = this._root.get(left, right, top, bottom);
+		this.children.sort(this._sort);
+		
+		answer = tomahawk_ns.Sprite.prototype.getObjectUnder.apply(this,[x,y]);
+		this.children = all;
+		return answer;
+	};
+	
+	tomahawk_ns.QuadTreeContainer = QuadTreeContainer;
+})();
+
+
+
+/**
+ * ...
+ * @author Hatshepsout
+ */
+
+(function() {
+	
+	function QuadTreeNode(left,right,top,bottom, depth, maxChildren, maxDepth)
+	{
+		this.left = left;
+		this.top = top;
+		this.right = right;
+		this.bottom = bottom;
+		this.maxChildren = maxChildren;
+		this.maxDepth = maxDepth;
+		this.depth = depth;
+
+		this.limitX = this.left + ( this.right - this.left ) * 0.5;
+		this.limitY = this.top + ( this.bottom - this.top ) * 0.5;
+		
+		this.children = new Array();
+	}
+	
+	Tomahawk.registerClass( QuadTreeNode, "QuadTreeNode" );
+	
+	QuadTreeNode._tick = 0;
+	
+	QuadTreeNode.prototype.add = function( element )
+	{
+		var child = null;
+		var bounds = element.getBounds();
+		var out = ( bounds.left > this.right || 
+					bounds.right < this.left || 
+					bounds.top > this.bottom || 
+					bounds.bottom < this.top );
+					
+		
+		if( out == true )
+			return;
+		
+		if( this.children.length > this.maxChildren && this.depth < this.maxDepth)
+		{
+			var e = this.depth + 1;
+			var f = this.maxChildren;
+			var g = this.maxDepth;
+			
+			this.full = true;
+			
+			this.node1 = new tomahawk_ns.QuadTreeNode(this.left,	this.limitX	, this.top	 , this.limitY	,e,f,g);
+			this.node2 = new tomahawk_ns.QuadTreeNode(this.left,	this.limitX	, this.limitY, this.bottom	,e,f,g);
+			this.node3 = new tomahawk_ns.QuadTreeNode(this.limitX,	this.right	, this.top	 , this.limitY	,e,f,g);
+			this.node4 = new tomahawk_ns.QuadTreeNode(this.limitX,	this.right	, this.limitY, this.bottom	,e,f,g);
+			
+			while( this.children.length > 0)
+			{
+				child = this.children.shift();
+				this.node1.add(child);
+				this.node2.add(child);
+				this.node3.add(child);
+				this.node4.add(child);
+			}
+		}
+		
+		if( this.full == false )
+		{
+			this.children.push(element);
+		}
+		else
+		{
+			this.node1.add(element);
+			this.node2.add(element);
+			this.node3.add(element);
+			this.node4.add(element);
+		}
+		
+	};
+	
+	QuadTreeNode.prototype.remove = function( element )
+	{
+		var index = -1;
+				
+		if( this.full == true )
+		{
+			this.node1.remove(element);
+			this.node2.remove(element);
+			this.node3.remove(element);
+			this.node4.remove(element);
+		}
+		else
+		{
+			index = this.children.indexOf(element);
+			
+			if( index != -1 )
+				this.children.splice(index,1);
+		}
+	};
+	
+	QuadTreeNode.prototype.get = function(left,right,top,bottom)
+	{
+		tomahawk_ns.QuadTreeNode._tick++;
+		return this._get(left,right,top,bottom);
+	};
+	
+	QuadTreeNode.prototype._get = function( left, right, top, bottom )
+	{
+		var out = ( left > this.right || right < this.left || top > this.bottom || bottom < this.top );
+		var tab = new Array();
+		var child = null;
+		var i = 0;
+		var bounds = null;
+		
+		if( out == true )
+			return tab;
+			
+		if( this.full == true )
+		{
+			tab = tab.concat(this.node1._get(left,right,top,bottom));
+			tab = tab.concat(this.node2._get(left,right,top,bottom));
+			tab = tab.concat(this.node3._get(left,right,top,bottom));
+			tab = tab.concat(this.node4._get(left,right,top,bottom));
+		}
+		else
+		{
+			i = this.children.length;
+			while( --i > -1 )
+			{
+				child = this.children[i];
+				bounds = child.getBounds();
+				
+				out = ( bounds.left > right || 
+						bounds.right < left ||
+						bounds.top > bottom ||
+						bounds.bottom < top || 
+						child.__tick__ == tomahawk_ns.QuadTreeNode._tick);
+						
+				if( out == true )
+					continue;
+				
+				tab.push(child);
+				child.__tick__ = tomahawk_ns.QuadTreeNode._tick;
+			}
+		}
+		
+		return tab;
+	};
+	
+	QuadTreeNode.prototype.full = false;
+	QuadTreeNode.prototype.left = 0;
+	QuadTreeNode.prototype.right = 0;
+	QuadTreeNode.prototype.top = 0;
+	QuadTreeNode.prototype.bottom = 0;
+	QuadTreeNode.prototype.maxChildren = 20;
+	QuadTreeNode.prototype.depth = 0;
+	QuadTreeNode.prototype.node1 = null;
+	QuadTreeNode.prototype.node2 = null;
+	QuadTreeNode.prototype.node3 = null;
+	QuadTreeNode.prototype.node4 = null;
+	QuadTreeNode.prototype.limitX = 0;
+	QuadTreeNode.prototype.limitY = 0;
+	
+	
+	tomahawk_ns.QuadTreeNode = QuadTreeNode;
+	
+})();
 
 
 
