@@ -56,11 +56,12 @@ Main.prototype.completeHandler = function(event)
 	var bmp = null;
 	var texture = null;
 	var coords = null;
-	var container = new tomahawk_ns.QuadTreeContainer();
+	var container = new tomahawk_ns.QuadTreeContainer(-10000,10000,-10000,10000,100,10);
 	var cloudsContainer = new tomahawk_ns.Sprite();
 	var numRows = 100;
 	var numCols = 100;
 	var sky = new tomahawk_ns.Shape();
+	
 	
 	container.enableDragAndDrop(true);
 	
@@ -74,6 +75,8 @@ Main.prototype.completeHandler = function(event)
 	
 	if( tomahawk_ns.Screen.getWindowWidth() < 800 )
 	{	
+		alert(tomahawk_ns.Screen.getWindowWidth());
+		alert(tomahawk_ns.Screen.getWindowHeight());
 		tomahawk_ns.Stage.getInstance().getCanvas().width = tomahawk_ns.Screen.getWindowWidth();
 		tomahawk_ns.Stage.getInstance().getCanvas().height = tomahawk_ns.Screen.getWindowHeight();
 	}
@@ -140,6 +143,7 @@ Main.prototype.completeHandler = function(event)
 	bmp.pivotY = bmp.height >> 1;
 	
 	container.addChild(bmp);
+	container.scaleX = container.scaleY = 2;
 	
 	bounds = container.getBoundingRect();
 	container.name = "world";
