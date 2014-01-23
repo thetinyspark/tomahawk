@@ -49,8 +49,8 @@ Main.prototype.complete = function()
 	var coords = null;
 	var container = new tomahawk_ns.Sprite();
 	var cloudsContainer = new tomahawk_ns.Sprite();
-	var numRows = 50;
-	var numCols = 50;
+	var numRows = 25;
+	var numCols = 20;
 	var sky = new tomahawk_ns.Shape();
 	
 	

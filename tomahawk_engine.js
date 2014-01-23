@@ -11,6 +11,8 @@ Tomahawk._classes = new Object();
 Tomahawk._extends = new Array();
 	
 
+	Tomahawk._funcTab = null;
+
 	Tomahawk.registerClass = function( classDef, className )
 	{
 		Tomahawk._classes[className] = classDef;
@@ -18,7 +20,7 @@ Tomahawk._extends = new Array();
 
 	Tomahawk.extend = function( p_child, p_ancestor )
 	{
-		Tomahawk._extends.push({"child":p_child,"ancestor":p_ancestor});
+		Tomahawk._extends.push({"child":p_child,"ancestor":p_ancestor,"done":false});
 	};
 
 	Tomahawk.run = function()
@@ -26,9 +28,13 @@ Tomahawk._extends = new Array();
 		var obj = null;
 		var i = 0;
 		var max = Tomahawk._extends.length;
+		
+		Tomahawk._funcTab = new Object();
+		
 		for (i = 0; i < max; i++ )
 		{
-			Tomahawk._inherits( Tomahawk._extends[i] );
+			obj = Tomahawk._extends[i];
+			Tomahawk._inherits( obj );
 		}
 	}
 	
@@ -52,34 +58,29 @@ Tomahawk._extends = new Array();
 		var ancestor = null;
 		var superParent = Tomahawk._getParentClass(obj["ancestor"]);
 		
-		if( superParent != null )
+		if( superParent != null && superParent.done == false)
 			Tomahawk._inherits(superParent);
 
 		child = Tomahawk._classes[obj["child"]];
 		ancestor = Tomahawk._classes[obj["ancestor"]];
+		obj.done = true;
+		
+		var func = new Object();
 		
 		if( child != null && ancestor != null )
-		{
+		{	
 			for( var prop in ancestor.prototype )
 			{
-				var descriptor = Object.getOwnPropertyDescriptor( ancestor.prototype, prop );
-				if( !child.prototype[prop] )
-				{
-					Object.defineProperty( child.prototype, prop, descriptor );
-				}
+				func[prop] = ancestor.prototype[prop];
 			}
 			
-			//hack to boost the inheritance
-			var obj1 = new ancestor();
-			var obj2 = new child();
-			
-			for( var prop in obj2 )
+			for( var prop in child.prototype )
 			{
-				obj1[prop] = obj2[prop];
+				func[prop] = child.prototype[prop];
 			}
-			
-			child.prototype = obj1;
 		}
+		
+		child.prototype = func;
 	};
 
 

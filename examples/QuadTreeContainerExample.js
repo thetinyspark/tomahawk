@@ -58,8 +58,8 @@ Main.prototype.completeHandler = function(event)
 	var coords = null;
 	var container = new tomahawk_ns.QuadTreeContainer(-10000,10000,-10000,10000,100,10);
 	var cloudsContainer = new tomahawk_ns.Sprite();
-	var numRows = 100;
-	var numCols = 100;
+	var numRows = 25;
+	var numCols = 20;
 	var sky = new tomahawk_ns.Shape();
 	
 	container.enableDragAndDrop(true);
@@ -140,7 +140,7 @@ Main.prototype.completeHandler = function(event)
 	bmp.pivotY = bmp.height >> 1;
 	
 	container.addChild(bmp);
-	container.scaleX = container.scaleY = 2;
+	//container.scaleX = container.scaleY = 2;
 	
 	bounds = container.getBoundingRect();
 	container.name = "world";
@@ -164,8 +164,8 @@ Main.prototype.onFrame = function()
 	while( --i > -1 )
 	{
 		cloudsContainer.getChildAt(i).x -= 0.1;
-		container.x -= 1;
-		container.y -= 1;
+		container.x -= 0.1;
+		container.y -= 0.1;
 	}
 	
 };
