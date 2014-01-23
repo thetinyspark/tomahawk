@@ -7,6 +7,10 @@
 	function Bitmap(texture)
 	{
 		tomahawk_ns.DisplayObject.apply(this);
+		
+		if( texture == undefined )
+			return;
+			
 		this.texture = texture;
 		this.width = this.texture.rect[2];
 		this.height = this.texture.rect[3];

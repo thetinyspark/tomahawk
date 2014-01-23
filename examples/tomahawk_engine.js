@@ -68,6 +68,17 @@ Tomahawk._extends = new Array();
 					Object.defineProperty( child.prototype, prop, descriptor );
 				}
 			}
+			
+			//hack to boost the inheritance
+			var obj1 = new ancestor();
+			var obj2 = new child();
+			
+			for( var prop in obj2 )
+			{
+				obj1[prop] = obj2[prop];
+			}
+			
+			child.prototype = obj1;
 		}
 	};
 
@@ -305,6 +316,10 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	function Bitmap(texture)
 	{
 		tomahawk_ns.DisplayObject.apply(this);
+		
+		if( texture == undefined )
+			return;
+			
 		this.texture = texture;
 		this.width = this.texture.rect[2];
 		this.height = this.texture.rect[3];
@@ -435,23 +450,27 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		}
 	};
 
+	
+	
 	DisplayObject.prototype.updateMatrix = function()
 	{
 		if( this.autoUpdate == false && this.updateNextFrame == false )
 			return;
+			
+		var mat = this.matrix;
 		
-		this.matrix.d = this.matrix.a = 1;
-		this.matrix.b = this.matrix.c = this.matrix.tx = this.matrix.ty = 0;
+		mat.d = mat.a = 1;
+		mat.b = mat.c = mat.tx = mat.ty = 0;
 		
-		this.matrix.appendTransform(	this.x, 
-										this.y, 
-										this.scaleX, 
-										this.scaleY, 
-										this.rotation, 
-										this.skewX, 
-										this.skewY, 
-										this.pivotX, 
-										this.pivotY);
+		mat.appendTransform(	this.x, 
+								this.y, 
+								this.scaleX, 
+								this.scaleY, 
+								this.rotation, 
+								this.skewX, 
+								this.skewY, 
+								this.pivotX, 
+								this.pivotY);
 										
 		this.updateNextFrame = false;
 	};
@@ -465,6 +484,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		var offX = 0;
 		var offY = 0;
 		var bounds = this.getBoundingRectIn(this);
+		var cacheAsBitmap = this.cacheAsBitmap;
 		buffer = document.createElement("canvas");
 		buffer.width = ( bounds.width < 1 ) ? 1 : bounds.width ;
 		buffer.height = ( bounds.height < 1 ) ? 1 : bounds.height ;
@@ -491,7 +511,9 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		context.save();
 			context.globalAlpha = this.alpha;
 			context.translate( -offX, -offY );
+			this.cacheAsBitmap = false;
 			this.draw(context);
+			this.cacheAsBitmap = cacheAsBitmap;
 		context.restore();
 		
 		// after drawing filters
@@ -558,7 +580,6 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 	DisplayObject.prototype.draw = function(context)
 	{
-		return;
 	};
 
 	DisplayObject.prototype.getConcatenedMatrix = function()
@@ -830,17 +851,18 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		for( ; i < max; i++ )
 		{
 			child = children[i];
+			
+			if( !child.visible || child.isMask == true )
+				continue;
+			
 			child.updateMatrix();
 			mat = child.matrix;
-			
-			if( child.visible == false || child.isMask == true )
-				continue;
 			
 			context.save();
 			context.globalAlpha *= child.alpha;
 			context.transform(mat.a,mat.b,mat.c,mat.d,mat.tx,mat.ty);
 			
-			if( child.mask != null || child.filters != null || child.cacheAsBitmap == true )
+			if( child.cacheAsBitmap == true || child.mask != null || child.filters != null )
 			{
 				child.drawComposite(context);
 			}
@@ -1029,55 +1051,60 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 /**
  * @author The Tiny Spark
  */
-
-function MovieClip(texture)
-{
-	Bitmap.apply(this, [texture]);
-	this._frames = new Array();
-}
-
-Tomahawk.registerClass( MovieClip, "MovieClip" );
-Tomahawk.extend( "MovieClip", "Bitmap" );
-
-MovieClip.prototype._frames = null;
-MovieClip.prototype.currentFrame = 0;
-MovieClip.prototype._enterFrameHandler = null;
-
-MovieClip.prototype._enterFrameHandler = function(event)
-{
-	this.currentFrame++;
-	if( this.currentFrame >= this._frames.length )
-		this.currentFrame = 0;
-		
-	if( this._frames[this.currentFrame] )
-	{
-		this.texture = this._frames[this.currentFrame];
-	}
-};
-
-MovieClip.prototype.setFrame = function( frameIndex, texture )
-{
-	this._frames[frameIndex] = texture;
-};
-
-MovieClip.prototype.play = function()
-{
-	this.stop();
+ 
+(function() {
 	
-	if( this.stage == null )
-		return;
+
+	function MovieClip(texture)
+	{
+		tomahawk_ns.Bitmap.apply(this, [texture]);
+		this._frames = new Array();
+	}
+
+	Tomahawk.registerClass( MovieClip, "MovieClip" );
+	Tomahawk.extend( "MovieClip", "Bitmap" );
+
+	MovieClip.prototype._frames = null;
+	MovieClip.prototype.currentFrame = 0;
+	MovieClip.prototype._enterFrameHandler = null;
+
+	MovieClip.prototype._enterFrameHandler = function(event)
+	{
+		this.currentFrame++;
+		if( this.currentFrame >= this._frames.length )
+			this.currentFrame = 0;
+			
+		if( this._frames[this.currentFrame] )
+		{
+			this.texture = this._frames[this.currentFrame];
+		}
+	};
+
+	MovieClip.prototype.setFrame = function( frameIndex, texture )
+	{
+		this._frames[frameIndex] = texture;
+	};
+
+	MovieClip.prototype.play = function()
+	{
+		this.stop();
 		
-	this.stage.addEventListener(Event.ENTER_FRAME, this,this._enterFrameHandler); 
-};
+		if( this.stage == null )
+			return;
+			
+		this.stage.addEventListener(Event.ENTER_FRAME, this,this._enterFrameHandler); 
+	};
 
-MovieClip.prototype.stop = function()
-{
-	if( this.stage == null )
-		return;
-	this.stage.removeEventListener(Event.ENTER_FRAME, this,this._enterFrameHandler); 
-};
+	MovieClip.prototype.stop = function()
+	{
+		if( this.stage == null )
+			return;
+		this.stage.removeEventListener(Event.ENTER_FRAME, this,this._enterFrameHandler); 
+	};
 
+	tomahawk_ns.MovieClip = MovieClip;
 
+})();
 
 
 

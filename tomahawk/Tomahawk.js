@@ -66,6 +66,17 @@ Tomahawk._extends = new Array();
 					Object.defineProperty( child.prototype, prop, descriptor );
 				}
 			}
+			
+			//hack to boost the inheritance
+			var obj1 = new ancestor();
+			var obj2 = new child();
+			
+			for( var prop in obj2 )
+			{
+				obj1[prop] = obj2[prop];
+			}
+			
+			child.prototype = obj1;
 		}
 	};
 

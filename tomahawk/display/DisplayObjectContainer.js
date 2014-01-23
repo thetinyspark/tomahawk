@@ -125,17 +125,18 @@
 		for( ; i < max; i++ )
 		{
 			child = children[i];
+			
+			if( !child.visible || child.isMask == true )
+				continue;
+			
 			child.updateMatrix();
 			mat = child.matrix;
-			
-			if( child.visible == false || child.isMask == true )
-				continue;
 			
 			context.save();
 			context.globalAlpha *= child.alpha;
 			context.transform(mat.a,mat.b,mat.c,mat.d,mat.tx,mat.ty);
 			
-			if( child.mask != null || child.filters != null || child.cacheAsBitmap == true )
+			if( child.cacheAsBitmap == true || child.mask != null || child.filters != null )
 			{
 				child.drawComposite(context);
 			}

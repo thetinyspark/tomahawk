@@ -101,23 +101,27 @@
 		}
 	};
 
+	
+	
 	DisplayObject.prototype.updateMatrix = function()
 	{
 		if( this.autoUpdate == false && this.updateNextFrame == false )
 			return;
+			
+		var mat = this.matrix;
 		
-		this.matrix.d = this.matrix.a = 1;
-		this.matrix.b = this.matrix.c = this.matrix.tx = this.matrix.ty = 0;
+		mat.d = mat.a = 1;
+		mat.b = mat.c = mat.tx = mat.ty = 0;
 		
-		this.matrix.appendTransform(	this.x, 
-										this.y, 
-										this.scaleX, 
-										this.scaleY, 
-										this.rotation, 
-										this.skewX, 
-										this.skewY, 
-										this.pivotX, 
-										this.pivotY);
+		mat.appendTransform(	this.x, 
+								this.y, 
+								this.scaleX, 
+								this.scaleY, 
+								this.rotation, 
+								this.skewX, 
+								this.skewY, 
+								this.pivotX, 
+								this.pivotY);
 										
 		this.updateNextFrame = false;
 	};
@@ -131,6 +135,7 @@
 		var offX = 0;
 		var offY = 0;
 		var bounds = this.getBoundingRectIn(this);
+		var cacheAsBitmap = this.cacheAsBitmap;
 		buffer = document.createElement("canvas");
 		buffer.width = ( bounds.width < 1 ) ? 1 : bounds.width ;
 		buffer.height = ( bounds.height < 1 ) ? 1 : bounds.height ;
@@ -157,7 +162,9 @@
 		context.save();
 			context.globalAlpha = this.alpha;
 			context.translate( -offX, -offY );
+			this.cacheAsBitmap = false;
 			this.draw(context);
+			this.cacheAsBitmap = cacheAsBitmap;
 		context.restore();
 		
 		// after drawing filters
@@ -224,7 +231,6 @@
 
 	DisplayObject.prototype.draw = function(context)
 	{
-		return;
 	};
 
 	DisplayObject.prototype.getConcatenedMatrix = function()

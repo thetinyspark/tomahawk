@@ -62,7 +62,6 @@ Main.prototype.completeHandler = function(event)
 	var numCols = 100;
 	var sky = new tomahawk_ns.Shape();
 	
-	
 	container.enableDragAndDrop(true);
 	
 	sky.beginPath();
@@ -75,8 +74,6 @@ Main.prototype.completeHandler = function(event)
 	
 	if( tomahawk_ns.Screen.getWindowWidth() < 800 )
 	{	
-		alert(tomahawk_ns.Screen.getWindowWidth());
-		alert(tomahawk_ns.Screen.getWindowHeight());
 		tomahawk_ns.Stage.getInstance().getCanvas().width = tomahawk_ns.Screen.getWindowWidth();
 		tomahawk_ns.Stage.getInstance().getCanvas().height = tomahawk_ns.Screen.getWindowHeight();
 	}
@@ -161,10 +158,14 @@ Main.prototype.onFrame = function()
 {
 	tomahawk_ns.Stage.getInstance().drawFPS();
 	var cloudsContainer = tomahawk_ns.Stage.getInstance().getChildByName("clouds");
+	var container = tomahawk_ns.Stage.getInstance().getChildByName("world");
 	var i = cloudsContainer.children.length;
+	
 	while( --i > -1 )
 	{
 		cloudsContainer.getChildAt(i).x -= 0.1;
+		container.x -= 1;
+		container.y -= 1;
 	}
 	
 };
