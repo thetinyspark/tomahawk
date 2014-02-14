@@ -64,7 +64,7 @@ Tomahawk._extends = new Array();
 		obj.done = true;
 		
 		var func = new Object();
-		
+	
 		if( child != null && ancestor != null )
 		{	
 			for( var prop in ancestor.prototype )

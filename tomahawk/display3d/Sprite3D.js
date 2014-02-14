@@ -12,7 +12,7 @@
 	
 	Sprite3D.prototype.getNormalVector = function()
 	{
-		var mat = tomahawk_ns.Matrix4x4.toMatrix2D(this.getConcatenedMatrix3D());
+		var mat = tomahawk_ns.Matrix4x4.toMatrix2D(this.getConcatenedMatrix3D(true));
 		var pt1 = mat.transformPoint(0,0);
 		var pt3 = mat.transformPoint(0,100);
 		var pt2 = mat.transformPoint(100,0);

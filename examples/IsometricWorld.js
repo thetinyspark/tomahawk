@@ -49,8 +49,8 @@ Main.prototype.complete = function()
 	var coords = null;
 	var container = new tomahawk_ns.Sprite();
 	var cloudsContainer = new tomahawk_ns.Sprite();
-	var numRows = 25;
-	var numCols = 20;
+	var numRows = 40;
+	var numCols = 40;
 	var sky = new tomahawk_ns.Shape();
 	
 	
@@ -68,7 +68,6 @@ Main.prototype.complete = function()
 		tomahawk_ns.Stage.getInstance().getCanvas().height = tomahawk_ns.Screen.getWindowHeight();
 	}
 	
-	var bounds = null;
 	var i = numRows;
 	var j = 0;
 	
@@ -133,7 +132,6 @@ Main.prototype.complete = function()
 	
 	container.addChild(bmp);
 	
-	bounds = container.getBoundingRect();
 	container.name = "narnia";
 	cloudsContainer.name = "clouds";
 	container.mouseEnabled = true;
@@ -151,7 +149,7 @@ Main.prototype.complete = function()
 
 Main.prototype._mouseHandler = function(event)
 {
-	var container = event.target;
+	var container = event.currentTarget;
 	var stage = container.stage;
 	var cloudsContainer = stage.getChildByName("clouds");
 	
@@ -174,6 +172,7 @@ Main.prototype._mouseHandler = function(event)
 Main.prototype.onFrame = function()
 {
 	tomahawk_ns.Stage.getInstance().drawFPS();
+	
 	var cloudsContainer = tomahawk_ns.Stage.getInstance().getChildByName("clouds");
 	var i = cloudsContainer.children.length;
 	while( --i > -1 )

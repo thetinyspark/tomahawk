@@ -97,6 +97,14 @@
 		return child;
 	};
 
+	DisplayObjectContainer.prototype.removeChildren = function()
+	{
+		while( this.children.length > 0 )
+		{
+			this.removeChildAt(0);
+		}
+	};
+	
 	DisplayObjectContainer.prototype.removeChild = function(child)
 	{
 		var index = this.children.indexOf(child);
@@ -113,7 +121,6 @@
 		return child;
 	};
 
-	
 	DisplayObjectContainer.prototype.draw = function( context )
 	{	
 		var children = this.children;
@@ -149,20 +156,29 @@
 		}
 	};
 
-	DisplayObjectContainer.prototype.getBoundingRect = function()
+	DisplayObjectContainer.prototype.updateBounds = function()
 	{
 		var children = this.children;
 		var i = children.length;
 		var child = null;
 		var rect = new tomahawk_ns.Rectangle();
 		var childRect = null;
+		var mat = this.matrix;
+		var points = new Array();
 		
 		i = children.length;
 		
 		while( --i > -1 )
 		{
 			child = children[i];
-			childRect = child.getBoundingRect();
+			
+			if( child.updateNextFrame == true || child.autoUpdate == true )
+			{
+				child.updateMatrix();
+				child.updateBounds();
+			}
+			
+			childRect = child.bounds;
 			rect.left = ( childRect.left < rect.left ) ? childRect.left : rect.left;
 			rect.right = ( childRect.right > rect.right ) ? childRect.right : rect.right;
 			rect.top = ( childRect.top < rect.top ) ? childRect.top : rect.top;
@@ -174,7 +190,10 @@
 		rect.width = rect.right - rect.left;
 		rect.height = rect.bottom - rect.top;
 		
-		return rect;
+		this.width = rect.width;
+		this.height = rect.height;
+		
+		tomahawk_ns.DisplayObject.prototype.updateBounds.apply(this);
 	};	
 	
 	DisplayObjectContainer.prototype.getBoundingRectIn = function(spaceCoordinates)
@@ -205,33 +224,6 @@
 		return rect;
 	};
 
-	DisplayObjectContainer.prototype.getObjectsUnder = function(x,y,limit)
-	{
-		var under = new Array();
-		var children = this.children;
-		var i = children.length;
-		var child = null;
-		
-		while( --i > -1 )
-		{
-			child = children[i];
-			
-			if( child.isContainer )
-			{
-				under = under.concat(child.getObjectsUnder(x,y,limit));
-			}
-			else if( child.hitTest(x,y) == true )
-			{
-				under.push(child);
-			}
-			
-			if( limit != undefined && under.length == limit)
-				return under;
-		}
-		
-		return under;
-	};
-
 	DisplayObjectContainer.prototype.getObjectUnder = function(x,y)
 	{
 		var under = null;
@@ -242,34 +234,29 @@
 		while( --i > -1 )
 		{
 			child = children[i];
-						
-			if( child.isContainer )
-			{
-				if( child.mouseEnabled == true )
-				{
-					under = child.getObjectUnder(x,y);
+			
+			if( child.mouseEnabled == false )
+				continue;
 					
-					if( under != null )
-						return under;
+			if( child.isContainer )
+			{				
+				under = child.getObjectUnder(x,y);
+				
+				if( under != null )
+				{
+					return under;
 				}
 			}
 			else
-			{
-				if( child.mouseEnabled == true )
+			{	
+				if( child.hitTest(x,y) == true )
 				{
-					if( child.hitTest(x,y) == true )
-						return child;
+					return child;
 				}
-				else
-				{
-					if( child.parent.mouseEnabled == true && child.hitTest(x,y) == true )
-						return child.parent;
-				}
-				
 			}
 		}
 		
-		return under;
+		return null;
 	};
 
 	DisplayObjectContainer.prototype.getNestedChildren = function()
@@ -292,5 +279,18 @@
 		return list;
 	}
 
+	DisplayObjectContainer.prototype.destroy = function()
+	{
+		var child = null;
+		
+		while( this.children.length > 0 )
+		{
+			child = this.getChildAt(0);
+			child.destroy();
+		}
+		
+		tomahawk_ns.DisplayObject.prototype.destroy.apply(this);
+	};
+	
 	tomahawk_ns.DisplayObjectContainer = DisplayObjectContainer;
 })();

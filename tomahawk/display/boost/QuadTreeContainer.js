@@ -55,9 +55,10 @@
 	{
 		var i = this.children.length;
 		var child = null;
+		var visibles = null;
 		
 		if( this.stage == null )
-			return;
+			return new Array();
 			
 		while( --i > -1 )
 		{
@@ -66,7 +67,6 @@
 			
 			if( child.updateNextFrame == true || child.autoUpdate == true )
 			{
-				this._root.remove(child);
 				this._root.add(child);
 			}
 		}
@@ -79,10 +79,16 @@
 		var right = pt2.x;
 		var top = pt1.y;
 		var bottom = pt2.y;
-		var visibles = this._root.get(left, right, top, bottom);
+		
+		visibles = this._root.get(left, right, top, bottom);
 		visibles.sort(this._sortVisiblesChildren);
 		
 		return visibles;
+	};
+	
+	QuadTreeContainer.prototype.getRoot = function()
+	{
+		return this._root;
 	};
 
 	QuadTreeContainer.prototype._sortVisiblesChildren = function(a,b)
@@ -101,19 +107,25 @@
 	QuadTreeContainer.prototype.hitTest = function(x,y)
 	{
 		var pt1 = this.globalToLocal(x,y);
+		var pt2 = this.globalToLocal(x + 5,y  + 5);
 		var left = pt1.x;
 		var right = pt1.x + 1;
 		var top = pt1.y;
 		var bottom = pt1.y + 1;
-		var all = this.children;
-		var answer = false;
-		this.children = this._root.get(left,right,top,bottom);
-		this.children.sort(this._sort);
+		var child = null;
+		var children = this._root.get(left,right,top,bottom);
+		var i = children.length;
+		children.sort(this._sortVisiblesChildren);
 		
-		answer = tomahawk_ns.Sprite.prototype.hitTest.apply(this,[x,y]);
+		while( --i > -1 )
+		{
+			child = children[i];
+			
+			if( child.hitTest(x,y) )
+				return true;
+		}
 		
-		this.children = all;
-		return answer;
+		return false;
 	};
 	
 	QuadTreeContainer.prototype.getObjectUnder = function(x,y)
@@ -123,16 +135,39 @@
 		var right = pt1.x + 1;
 		var top = pt1.y;
 		var bottom = pt1.y + 1;
+		var under = null;
+		var child = null;
+		var children = this._root.get(left, right, top, bottom);
+		var i = children.length;
 		
-		var all = this.children;
-		var answer = null;
-		this.children = this._root.get(left, right, top, bottom);
-		this.children.sort(this._sort);
+		children.sort(this._sortVisiblesChildren);
 		
-		answer = tomahawk_ns.Sprite.prototype.getObjectUnder.apply(this,[x,y]);
-		this.children = all;
-		return answer;
+		while( --i > -1 )
+		{
+			child = children[i];
+			
+			if( child.mouseEnabled == false )
+				continue;
+					
+			if( child.isContainer )
+			{				
+				under = child.getObjectUnder(x,y);
+				
+				if( under != null )
+				{
+					return under;
+				}
+			}
+			else
+			{	
+				if( child.hitTest(x,y) == true )
+				{
+					return child;
+				}
+			}
+		}
+		
+		return null;
 	};
-	
 	tomahawk_ns.QuadTreeContainer = QuadTreeContainer;
 })();

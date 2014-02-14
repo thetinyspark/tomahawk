@@ -10,7 +10,7 @@
 		tomahawk_ns.EventDispatcher.apply(this);
 		this.matrix = new tomahawk_ns.Matrix2D();
 		this._concatenedMatrix = new tomahawk_ns.Matrix2D();
-		this._bounds = new tomahawk_ns.Rectangle();
+		this.bounds = new tomahawk_ns.Rectangle();
 	}
 
 	Tomahawk.registerClass( DisplayObject, "DisplayObject" );
@@ -32,14 +32,14 @@
 	DisplayObject.prototype.stage 				= null;
 
 	DisplayObject.prototype.alpha 				= 1;
-	DisplayObject.prototype.mouseEnabled 		= false;
+	DisplayObject.prototype.mouseEnabled 		= true;
 	DisplayObject.prototype.handCursor 			= false;
 	DisplayObject.prototype.visible 			= true;
 	DisplayObject.prototype.isMask				= false;
 	DisplayObject.prototype.filters 			= null;
 	DisplayObject.prototype.mask 				= null;
 	DisplayObject.prototype.matrix 				= null;
-	DisplayObject.prototype._bounds 			= null;
+	DisplayObject.prototype.bounds 				= null;
 	DisplayObject.prototype._concatenedMatrix 	= null;
 	DisplayObject.prototype.cacheAsBitmap		= false;
 	DisplayObject.prototype.autoUpdate			= true;
@@ -50,40 +50,35 @@
 	DisplayObject.prototype._cacheOffsetY 		= 0;
 	
 
-	DisplayObject.prototype.getBounds = function()
-	{
-		if( this.updateNextFrame == true || this.autoUpdate == true )
+	DisplayObject.prototype.updateBounds = function()
+	{		
+		var rect = new tomahawk_ns.Rectangle();
+		var points = new Array();
+		var mat = this.matrix;
+	
+		points.push(mat.transformPoint(0,0));
+		points.push(mat.transformPoint(this.width,0));
+		points.push(mat.transformPoint(0,this.height));
+		points.push(mat.transformPoint(this.width, this.height));
+	
+		rect.left = 0xFFFFFFFF;
+		rect.top = 0xFFFFFFFF;
+	
+		var i = points.length;
+		while( --i > -1 )
 		{
-			this.updateMatrix();
-			var rect = new tomahawk_ns.Rectangle();
-			var points = new Array();
-			var mat = this.matrix;
-		
-			points.push(mat.transformPoint(0,0));
-			points.push(mat.transformPoint(this.width,0));
-			points.push(mat.transformPoint(0,this.height));
-			points.push(mat.transformPoint(this.width, this.height));
-		
-			rect.left = 0xFFFFFFFF;
-			rect.top = 0xFFFFFFFF;
-		
-			var i = points.length;
-			while( --i > -1 )
-			{
-				rect.left = ( points[i].x < rect.left ) ? points[i].x : rect.left;
-				rect.right = ( points[i].x > rect.right ) ? points[i].x : rect.right;
-				rect.top = ( points[i].y < rect.top ) ? points[i].y : rect.top;
-				rect.bottom = ( points[i].y > rect.bottom ) ? points[i].y : rect.bottom;
-			}
-		
-			rect.x = rect.left;
-			rect.y = rect.top;
-			rect.width = rect.right - rect.left;
-			rect.height = rect.bottom - rect.top;
-			
-			this._bounds = rect;
+			rect.left = ( points[i].x < rect.left ) ? points[i].x : rect.left;
+			rect.right = ( points[i].x > rect.right ) ? points[i].x : rect.right;
+			rect.top = ( points[i].y < rect.top ) ? points[i].y : rect.top;
+			rect.bottom = ( points[i].y > rect.bottom ) ? points[i].y : rect.bottom;
 		}
-		return this._bounds;
+	
+		rect.x = rect.left;
+		rect.y = rect.top;
+		rect.width = rect.right - rect.left;
+		rect.height = rect.bottom - rect.top;
+		
+		this.bounds = rect;
 	};
 	
 	DisplayObject.prototype.setMask = function( mask )
@@ -101,8 +96,6 @@
 		}
 	};
 
-	
-	
 	DisplayObject.prototype.updateMatrix = function()
 	{
 		if( this.autoUpdate == false && this.updateNextFrame == false )
@@ -112,6 +105,7 @@
 		
 		mat.d = mat.a = 1;
 		mat.b = mat.c = mat.tx = mat.ty = 0;
+		
 		
 		mat.appendTransform(	this.x, 
 								this.y, 
@@ -232,18 +226,19 @@
 	DisplayObject.prototype.draw = function(context)
 	{
 	};
-
-	DisplayObject.prototype.getConcatenedMatrix = function()
+	
+	DisplayObject.prototype.getConcatenedMatrix = function(forceUpdate)
 	{
-		this.updateNextFrame = true;
-		this.updateMatrix();
-		var current = this.parent;
-		var mat = this.matrix.clone();
+		var current = this;
+		var mat = new tomahawk_ns.Matrix2D();
 		
 		while( current != null )
 		{
-			current.updateNextFrame = true;
-			current.updateMatrix();
+			if( forceUpdate == true )
+			{
+				current.updateNextFrame = true;
+				current.updateMatrix();
+			}
 			mat.prependMatrix(current.matrix );
 			current = current.parent;
 		}
@@ -268,6 +263,20 @@
 
 	DisplayObject.prototype.hitTest = function(x,y)
 	{		
+		//var pt1 = null;
+		//var current = this;
+		//var mat = this.matrix.clone();
+		//
+		//while( current != null )
+		//{
+			//mat.prependMatrix(current.matrix );
+			//current = current.parent;
+		//}
+		//
+		//mat = mat.clone().invert();
+		//
+		//pt1 = mat.transformPoint(x,y);
+		
 		var pt1 = this.globalToLocal(x,y);
 		
 		if( pt1.x < 0 || pt1.x > this.width || pt1.y < 0 || pt1.y > this.height )
@@ -328,42 +337,23 @@
 		return rect;
 	};
 	
-	DisplayObject.prototype.getBoundingRect = function()
-	{
-		var rect = new tomahawk_ns.Rectangle();
-		var points = new Array();
-		
-		this.updateNextFrame = true;
-		this.updateMatrix();
-		
-		points.push(this.localToGlobal(0,0));
-		points.push(this.localToGlobal(this.width,0));
-		points.push(this.localToGlobal(0,this.height));
-		points.push(this.localToGlobal(this.width, this.height));
-		
-		rect.left = 0xFFFFFFFF;
-		rect.top = 0xFFFFFFFF;
-		
-		var i = points.length;
-		while( --i > -1 )
-		{
-			rect.left = ( points[i].x < rect.left ) ? points[i].x : rect.left;
-			rect.right = ( points[i].x > rect.right ) ? points[i].x : rect.right;
-			rect.top = ( points[i].y < rect.top ) ? points[i].y : rect.top;
-			rect.bottom = ( points[i].y > rect.bottom ) ? points[i].y : rect.bottom;
-		}
-		
-		rect.x = rect.left;
-		rect.y = rect.top;
-		rect.width = rect.right - rect.left;
-		rect.height = rect.bottom - rect.top;
-		return rect;
-	};
-
 	DisplayObject.prototype.getNestedChildren = function()
 	{
 		return new Array(this);
 	}
+	
+	DisplayObject.prototype.destroy = function()
+	{
+		this._cache = null;
+		this.setMask(null);
+		
+		if( this.parent != null )
+		{
+			this.parent.removeChild(this);
+		}
+		
+		tomahawk_ns.EventDispatcher.prototype.destroy.apply(this);
+	};
 	
 	tomahawk_ns.DisplayObject = DisplayObject;
 

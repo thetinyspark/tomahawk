@@ -66,7 +66,7 @@ Tomahawk._extends = new Array();
 		obj.done = true;
 		
 		var func = new Object();
-		
+	
 		if( child != null && ancestor != null )
 		{	
 			for( var prop in ancestor.prototype )
@@ -112,8 +112,6 @@ AssetsLoader.getInstance = function()
 		
 	return tomahawk_ns.AssetsLoader._instance;
 };
-
-
 
 AssetsLoader.prototype.onComplete = null;
 AssetsLoader.prototype._loadingList = null;
@@ -338,6 +336,61 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 			
 		context.drawImage(	data, rect[0], rect[1], rect[2], rect[3], 0, 0, this.width, this.height );
 	};
+	
+	// a vertex is an array with: x, y, u, v
+	Bitmap.prototype.drawTriangles = function( context, vertices )
+	{
+		var max = vertices.length;
+		var i = 0;
+		var rect = this.texture.rect;
+		var data = this.texture.data;
+		
+		for( ; i < max; i++ )
+		{
+			this._drawTriangle( vertices[i], context, data, rect.width, rect.height );
+		}
+	};
+	
+	Bitmap.prototype._drawTriangle = function(vertices, ctx, texture, texW, texH ) 
+	{
+        var x0 = vertices[0][0], x1 = vertices[1][0], x2 = vertices[2][0];
+        var y0 = vertices[0][1], y1 = vertices[1][1], y2 = vertices[2][1];
+        var u0 = vertices[0][2], u1 = vertices[1][2], u2 = vertices[2][2];
+        var v0 = vertices[0][3], v1 = vertices[1][3], v2 = vertices[2][3];
+		
+		u0 *= texW;
+		u1 *= texW;
+		u2 *= texW;
+		v0 *= texH;
+		v1 *= texH;
+		v2 *= texH;
+
+        // Set clipping area so that only pixels inside the triangle will
+        // be affected by the image drawing operation
+        ctx.save(); 
+		ctx.beginPath(); 
+		ctx.moveTo(x0, y0); 
+		ctx.lineTo(x1, y1);
+        ctx.lineTo(x2, y2); 
+		ctx.closePath(); 
+		ctx.clip();
+
+        // Compute matrix transform
+        var delta 	= u0*v1 + v0*u2 + u1*v2 - v1*u2 - v0*u1 - u0*v2;
+        var delta_a = x0*v1 + v0*x2 + x1*v2 - v1*x2 - v0*x1 - x0*v2;
+        var delta_b = u0*x1 + x0*u2 + u1*x2 - x1*u2 - x0*u1 - u0*x2;
+        var delta_c = u0*v1*x2 + v0*x1*u2 + x0*u1*v2 - x0*v1*u2 - v0*u1*x2 - u0*x1*v2;
+        var delta_d = y0*v1 + v0*y2 + y1*v2 - v1*y2 - v0*y1 - y0*v2;
+        var delta_e = u0*y1 + y0*u2 + u1*y2 - y1*u2 - y0*u1 - u0*y2;
+        var delta_f = u0*v1*y2 + v0*y1*u2 + y0*u1*v2 - y0*v1*u2 - v0*u1*y2 - u0*y1*v2;
+
+        // Draw the transformed image
+        ctx.transform(delta_a/delta, delta_d/delta,
+                      delta_b/delta, delta_e/delta,
+                      delta_c/delta, delta_f/delta);
+        ctx.drawImage(texture, 0, 0,texW,texH);
+        ctx.restore();
+	};
 
 	tomahawk_ns.Bitmap = Bitmap;
 
@@ -360,7 +413,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		tomahawk_ns.EventDispatcher.apply(this);
 		this.matrix = new tomahawk_ns.Matrix2D();
 		this._concatenedMatrix = new tomahawk_ns.Matrix2D();
-		this._bounds = new tomahawk_ns.Rectangle();
+		this.bounds = new tomahawk_ns.Rectangle();
 	}
 
 	Tomahawk.registerClass( DisplayObject, "DisplayObject" );
@@ -382,14 +435,14 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	DisplayObject.prototype.stage 				= null;
 
 	DisplayObject.prototype.alpha 				= 1;
-	DisplayObject.prototype.mouseEnabled 		= false;
+	DisplayObject.prototype.mouseEnabled 		= true;
 	DisplayObject.prototype.handCursor 			= false;
 	DisplayObject.prototype.visible 			= true;
 	DisplayObject.prototype.isMask				= false;
 	DisplayObject.prototype.filters 			= null;
 	DisplayObject.prototype.mask 				= null;
 	DisplayObject.prototype.matrix 				= null;
-	DisplayObject.prototype._bounds 			= null;
+	DisplayObject.prototype.bounds 				= null;
 	DisplayObject.prototype._concatenedMatrix 	= null;
 	DisplayObject.prototype.cacheAsBitmap		= false;
 	DisplayObject.prototype.autoUpdate			= true;
@@ -400,40 +453,35 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	DisplayObject.prototype._cacheOffsetY 		= 0;
 	
 
-	DisplayObject.prototype.getBounds = function()
-	{
-		if( this.updateNextFrame == true || this.autoUpdate == true )
+	DisplayObject.prototype.updateBounds = function()
+	{		
+		var rect = new tomahawk_ns.Rectangle();
+		var points = new Array();
+		var mat = this.matrix;
+	
+		points.push(mat.transformPoint(0,0));
+		points.push(mat.transformPoint(this.width,0));
+		points.push(mat.transformPoint(0,this.height));
+		points.push(mat.transformPoint(this.width, this.height));
+	
+		rect.left = 0xFFFFFFFF;
+		rect.top = 0xFFFFFFFF;
+	
+		var i = points.length;
+		while( --i > -1 )
 		{
-			this.updateMatrix();
-			var rect = new tomahawk_ns.Rectangle();
-			var points = new Array();
-			var mat = this.matrix;
-		
-			points.push(mat.transformPoint(0,0));
-			points.push(mat.transformPoint(this.width,0));
-			points.push(mat.transformPoint(0,this.height));
-			points.push(mat.transformPoint(this.width, this.height));
-		
-			rect.left = 0xFFFFFFFF;
-			rect.top = 0xFFFFFFFF;
-		
-			var i = points.length;
-			while( --i > -1 )
-			{
-				rect.left = ( points[i].x < rect.left ) ? points[i].x : rect.left;
-				rect.right = ( points[i].x > rect.right ) ? points[i].x : rect.right;
-				rect.top = ( points[i].y < rect.top ) ? points[i].y : rect.top;
-				rect.bottom = ( points[i].y > rect.bottom ) ? points[i].y : rect.bottom;
-			}
-		
-			rect.x = rect.left;
-			rect.y = rect.top;
-			rect.width = rect.right - rect.left;
-			rect.height = rect.bottom - rect.top;
-			
-			this._bounds = rect;
+			rect.left = ( points[i].x < rect.left ) ? points[i].x : rect.left;
+			rect.right = ( points[i].x > rect.right ) ? points[i].x : rect.right;
+			rect.top = ( points[i].y < rect.top ) ? points[i].y : rect.top;
+			rect.bottom = ( points[i].y > rect.bottom ) ? points[i].y : rect.bottom;
 		}
-		return this._bounds;
+	
+		rect.x = rect.left;
+		rect.y = rect.top;
+		rect.width = rect.right - rect.left;
+		rect.height = rect.bottom - rect.top;
+		
+		this.bounds = rect;
 	};
 	
 	DisplayObject.prototype.setMask = function( mask )
@@ -451,8 +499,6 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		}
 	};
 
-	
-	
 	DisplayObject.prototype.updateMatrix = function()
 	{
 		if( this.autoUpdate == false && this.updateNextFrame == false )
@@ -462,6 +508,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		
 		mat.d = mat.a = 1;
 		mat.b = mat.c = mat.tx = mat.ty = 0;
+		
 		
 		mat.appendTransform(	this.x, 
 								this.y, 
@@ -582,18 +629,19 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	DisplayObject.prototype.draw = function(context)
 	{
 	};
-
-	DisplayObject.prototype.getConcatenedMatrix = function()
+	
+	DisplayObject.prototype.getConcatenedMatrix = function(forceUpdate)
 	{
-		this.updateNextFrame = true;
-		this.updateMatrix();
-		var current = this.parent;
-		var mat = this.matrix.clone();
+		var current = this;
+		var mat = new tomahawk_ns.Matrix2D();
 		
 		while( current != null )
 		{
-			current.updateNextFrame = true;
-			current.updateMatrix();
+			if( forceUpdate == true )
+			{
+				current.updateNextFrame = true;
+				current.updateMatrix();
+			}
 			mat.prependMatrix(current.matrix );
 			current = current.parent;
 		}
@@ -618,6 +666,20 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 	DisplayObject.prototype.hitTest = function(x,y)
 	{		
+		//var pt1 = null;
+		//var current = this;
+		//var mat = this.matrix.clone();
+		//
+		//while( current != null )
+		//{
+			//mat.prependMatrix(current.matrix );
+			//current = current.parent;
+		//}
+		//
+		//mat = mat.clone().invert();
+		//
+		//pt1 = mat.transformPoint(x,y);
+		
 		var pt1 = this.globalToLocal(x,y);
 		
 		if( pt1.x < 0 || pt1.x > this.width || pt1.y < 0 || pt1.y > this.height )
@@ -678,42 +740,23 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		return rect;
 	};
 	
-	DisplayObject.prototype.getBoundingRect = function()
-	{
-		var rect = new tomahawk_ns.Rectangle();
-		var points = new Array();
-		
-		this.updateNextFrame = true;
-		this.updateMatrix();
-		
-		points.push(this.localToGlobal(0,0));
-		points.push(this.localToGlobal(this.width,0));
-		points.push(this.localToGlobal(0,this.height));
-		points.push(this.localToGlobal(this.width, this.height));
-		
-		rect.left = 0xFFFFFFFF;
-		rect.top = 0xFFFFFFFF;
-		
-		var i = points.length;
-		while( --i > -1 )
-		{
-			rect.left = ( points[i].x < rect.left ) ? points[i].x : rect.left;
-			rect.right = ( points[i].x > rect.right ) ? points[i].x : rect.right;
-			rect.top = ( points[i].y < rect.top ) ? points[i].y : rect.top;
-			rect.bottom = ( points[i].y > rect.bottom ) ? points[i].y : rect.bottom;
-		}
-		
-		rect.x = rect.left;
-		rect.y = rect.top;
-		rect.width = rect.right - rect.left;
-		rect.height = rect.bottom - rect.top;
-		return rect;
-	};
-
 	DisplayObject.prototype.getNestedChildren = function()
 	{
 		return new Array(this);
 	}
+	
+	DisplayObject.prototype.destroy = function()
+	{
+		this._cache = null;
+		this.setMask(null);
+		
+		if( this.parent != null )
+		{
+			this.parent.removeChild(this);
+		}
+		
+		tomahawk_ns.EventDispatcher.prototype.destroy.apply(this);
+	};
 	
 	tomahawk_ns.DisplayObject = DisplayObject;
 
@@ -824,6 +867,14 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		return child;
 	};
 
+	DisplayObjectContainer.prototype.removeChildren = function()
+	{
+		while( this.children.length > 0 )
+		{
+			this.removeChildAt(0);
+		}
+	};
+	
 	DisplayObjectContainer.prototype.removeChild = function(child)
 	{
 		var index = this.children.indexOf(child);
@@ -840,7 +891,6 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		return child;
 	};
 
-	
 	DisplayObjectContainer.prototype.draw = function( context )
 	{	
 		var children = this.children;
@@ -876,20 +926,29 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		}
 	};
 
-	DisplayObjectContainer.prototype.getBoundingRect = function()
+	DisplayObjectContainer.prototype.updateBounds = function()
 	{
 		var children = this.children;
 		var i = children.length;
 		var child = null;
 		var rect = new tomahawk_ns.Rectangle();
 		var childRect = null;
+		var mat = this.matrix;
+		var points = new Array();
 		
 		i = children.length;
 		
 		while( --i > -1 )
 		{
 			child = children[i];
-			childRect = child.getBoundingRect();
+			
+			if( child.updateNextFrame == true || child.autoUpdate == true )
+			{
+				child.updateMatrix();
+				child.updateBounds();
+			}
+			
+			childRect = child.bounds;
 			rect.left = ( childRect.left < rect.left ) ? childRect.left : rect.left;
 			rect.right = ( childRect.right > rect.right ) ? childRect.right : rect.right;
 			rect.top = ( childRect.top < rect.top ) ? childRect.top : rect.top;
@@ -901,7 +960,10 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		rect.width = rect.right - rect.left;
 		rect.height = rect.bottom - rect.top;
 		
-		return rect;
+		this.width = rect.width;
+		this.height = rect.height;
+		
+		tomahawk_ns.DisplayObject.prototype.updateBounds.apply(this);
 	};	
 	
 	DisplayObjectContainer.prototype.getBoundingRectIn = function(spaceCoordinates)
@@ -932,33 +994,6 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		return rect;
 	};
 
-	DisplayObjectContainer.prototype.getObjectsUnder = function(x,y,limit)
-	{
-		var under = new Array();
-		var children = this.children;
-		var i = children.length;
-		var child = null;
-		
-		while( --i > -1 )
-		{
-			child = children[i];
-			
-			if( child.isContainer )
-			{
-				under = under.concat(child.getObjectsUnder(x,y,limit));
-			}
-			else if( child.hitTest(x,y) == true )
-			{
-				under.push(child);
-			}
-			
-			if( limit != undefined && under.length == limit)
-				return under;
-		}
-		
-		return under;
-	};
-
 	DisplayObjectContainer.prototype.getObjectUnder = function(x,y)
 	{
 		var under = null;
@@ -969,34 +1004,29 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		while( --i > -1 )
 		{
 			child = children[i];
-						
-			if( child.isContainer )
-			{
-				if( child.mouseEnabled == true )
-				{
-					under = child.getObjectUnder(x,y);
+			
+			if( child.mouseEnabled == false )
+				continue;
 					
-					if( under != null )
-						return under;
+			if( child.isContainer )
+			{				
+				under = child.getObjectUnder(x,y);
+				
+				if( under != null )
+				{
+					return under;
 				}
 			}
 			else
-			{
-				if( child.mouseEnabled == true )
+			{	
+				if( child.hitTest(x,y) == true )
 				{
-					if( child.hitTest(x,y) == true )
-						return child;
+					return child;
 				}
-				else
-				{
-					if( child.parent.mouseEnabled == true && child.hitTest(x,y) == true )
-						return child.parent;
-				}
-				
 			}
 		}
 		
-		return under;
+		return null;
 	};
 
 	DisplayObjectContainer.prototype.getNestedChildren = function()
@@ -1019,6 +1049,19 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		return list;
 	}
 
+	DisplayObjectContainer.prototype.destroy = function()
+	{
+		var child = null;
+		
+		while( this.children.length > 0 )
+		{
+			child = this.getChildAt(0);
+			child.destroy();
+		}
+		
+		tomahawk_ns.DisplayObject.prototype.destroy.apply(this);
+	};
+	
 	tomahawk_ns.DisplayObjectContainer = DisplayObjectContainer;
 })();
 
@@ -1396,13 +1439,13 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	{
 		this.stopDrag();
 		
-		this.removeEventListener(tomahawk_ns.MouseEvent.MOUSE_DOWN, this, this.___toggleDragDropHandler___);
-		this.removeEventListener(tomahawk_ns.MouseEvent.MOUSE_UP, this, this.___toggleDragDropHandler___);
+		this.removeEventListener(tomahawk_ns.MouseEvent.MOUSE_DOWN, this, this.___toggleDragDropHandler___,true);
+		this.removeEventListener(tomahawk_ns.MouseEvent.MOUSE_UP, this, this.___toggleDragDropHandler___,true);
 		
 		if( value == true )
 		{
-			this.addEventListener(tomahawk_ns.MouseEvent.MOUSE_DOWN, this, this.___toggleDragDropHandler___);
-			this.addEventListener(tomahawk_ns.MouseEvent.MOUSE_UP, this, this.___toggleDragDropHandler___);
+			this.addEventListener(tomahawk_ns.MouseEvent.MOUSE_DOWN, this, this.___toggleDragDropHandler___,true);
+			this.addEventListener(tomahawk_ns.MouseEvent.MOUSE_UP, this, this.___toggleDragDropHandler___,true);
 		}
 		
 		this.mouseEnabled = true;
@@ -1436,6 +1479,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 	function Stage()
 	{
+		tomahawk_ns.DisplayObject._collide = 0;
 		tomahawk_ns.DisplayObjectContainer.apply(this);
 			// useful
 		window.requestAnimationFrame = (function()
@@ -1587,7 +1631,16 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		
 		this._lastActiveChild = activeChild;
 		
-		if( activeChild != null && activeChild.handCursor == true )
+		var handCursor = false;
+		var current = activeChild;
+		
+		while( current != null )
+		{
+			handCursor = handCursor || current.handCursor;
+			current = current.parent;
+		}
+		
+		if( activeChild != null && handCursor == true )
 			tomahawk_ns.Mouse.setCursor(tomahawk_ns.Mouse.POINTER, this.getCanvas());
 		else
 			tomahawk_ns.Mouse.setCursor(tomahawk_ns.Mouse.DEFAULT, this.getCanvas());
@@ -1685,7 +1738,9 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 			context.clearRect(0,0,canvas.width,canvas.height);
 		}
 		context.save();
+		
 		scope.draw(context);
+		
 		context.restore();
 		
 		scope.dispatchEvent(new tomahawk_ns.Event(tomahawk_ns.Event.ENTER_FRAME,true,true));
@@ -1796,9 +1851,10 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	{
 		var i = this.children.length;
 		var child = null;
+		var visibles = null;
 		
 		if( this.stage == null )
-			return;
+			return new Array();
 			
 		while( --i > -1 )
 		{
@@ -1807,7 +1863,6 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 			
 			if( child.updateNextFrame == true || child.autoUpdate == true )
 			{
-				this._root.remove(child);
 				this._root.add(child);
 			}
 		}
@@ -1820,10 +1875,16 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		var right = pt2.x;
 		var top = pt1.y;
 		var bottom = pt2.y;
-		var visibles = this._root.get(left, right, top, bottom);
+		
+		visibles = this._root.get(left, right, top, bottom);
 		visibles.sort(this._sortVisiblesChildren);
 		
 		return visibles;
+	};
+	
+	QuadTreeContainer.prototype.getRoot = function()
+	{
+		return this._root;
 	};
 
 	QuadTreeContainer.prototype._sortVisiblesChildren = function(a,b)
@@ -1842,19 +1903,25 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	QuadTreeContainer.prototype.hitTest = function(x,y)
 	{
 		var pt1 = this.globalToLocal(x,y);
+		var pt2 = this.globalToLocal(x + 5,y  + 5);
 		var left = pt1.x;
 		var right = pt1.x + 1;
 		var top = pt1.y;
 		var bottom = pt1.y + 1;
-		var all = this.children;
-		var answer = false;
-		this.children = this._root.get(left,right,top,bottom);
-		this.children.sort(this._sort);
+		var child = null;
+		var children = this._root.get(left,right,top,bottom);
+		var i = children.length;
+		children.sort(this._sortVisiblesChildren);
 		
-		answer = tomahawk_ns.Sprite.prototype.hitTest.apply(this,[x,y]);
+		while( --i > -1 )
+		{
+			child = children[i];
+			
+			if( child.hitTest(x,y) )
+				return true;
+		}
 		
-		this.children = all;
-		return answer;
+		return false;
 	};
 	
 	QuadTreeContainer.prototype.getObjectUnder = function(x,y)
@@ -1864,17 +1931,40 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		var right = pt1.x + 1;
 		var top = pt1.y;
 		var bottom = pt1.y + 1;
+		var under = null;
+		var child = null;
+		var children = this._root.get(left, right, top, bottom);
+		var i = children.length;
 		
-		var all = this.children;
-		var answer = null;
-		this.children = this._root.get(left, right, top, bottom);
-		this.children.sort(this._sort);
+		children.sort(this._sortVisiblesChildren);
 		
-		answer = tomahawk_ns.Sprite.prototype.getObjectUnder.apply(this,[x,y]);
-		this.children = all;
-		return answer;
+		while( --i > -1 )
+		{
+			child = children[i];
+			
+			if( child.mouseEnabled == false )
+				continue;
+					
+			if( child.isContainer )
+			{				
+				under = child.getObjectUnder(x,y);
+				
+				if( under != null )
+				{
+					return under;
+				}
+			}
+			else
+			{	
+				if( child.hitTest(x,y) == true )
+				{
+					return child;
+				}
+			}
+		}
+		
+		return null;
 	};
-	
 	tomahawk_ns.QuadTreeContainer = QuadTreeContainer;
 })();
 
@@ -1906,125 +1996,171 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	Tomahawk.registerClass( QuadTreeNode, "QuadTreeNode" );
 	
 	QuadTreeNode._tick = 0;
+	QuadTreeNode.prototype._cache = null;
 	
-	QuadTreeNode.prototype.add = function( element )
+	
+	// iterative  methods
+	
+	QuadTreeNode.prototype.add = function(element)
 	{
-		var child = null;
-		var bounds = element.getBounds();
-		var out = ( bounds.left > this.right || 
-					bounds.right < this.left || 
-					bounds.top > this.bottom || 
-					bounds.bottom < this.top );
-					
+		this.remove(element);
 		
-		if( out == true )
-			return;
-		
-		if( this.children.length > this.maxChildren && this.depth < this.maxDepth)
+		if( element.updateNextFrame == true || element.autoUpdate == true )
 		{
-			var e = this.depth + 1;
-			var f = this.maxChildren;
-			var g = this.maxDepth;
+			element.updateMatrix();
+			element.updateBounds();
+		}
+		
+		var nodes = new Array();
+		var currentNode = this;
+		var bounds = element.bounds;
+		var out = false;
+		var left = bounds.left;
+		var right = bounds.right;
+		var top = bounds.top;
+		var bottom = bounds.bottom;
+		nodes.push(this);
+		
+		while( nodes.length > 0 )
+		{
+			currentNode = nodes.shift();
 			
-			this.full = true;
+			out =	( 	left > currentNode.right || 
+						right < currentNode.left || 
+						top > currentNode.bottom || 
+						bottom < currentNode.top );
+						
+			if( out == true )
+				continue;
 			
-			this.node1 = new tomahawk_ns.QuadTreeNode(this.left,	this.limitX	, this.top	 , this.limitY	,e,f,g);
-			this.node2 = new tomahawk_ns.QuadTreeNode(this.left,	this.limitX	, this.limitY, this.bottom	,e,f,g);
-			this.node3 = new tomahawk_ns.QuadTreeNode(this.limitX,	this.right	, this.top	 , this.limitY	,e,f,g);
-			this.node4 = new tomahawk_ns.QuadTreeNode(this.limitX,	this.right	, this.limitY, this.bottom	,e,f,g);
-			
-			while( this.children.length > 0)
+			if( currentNode.children.length > currentNode.maxChildren && currentNode.depth < currentNode.maxDepth)
 			{
-				child = this.children.shift();
-				this.node1.add(child);
-				this.node2.add(child);
-				this.node3.add(child);
-				this.node4.add(child);
+				currentNode.split();
+			}
+		
+			if( currentNode.full == false )
+			{
+				currentNode.children.push(element);
+			}
+			else
+			{
+				nodes.push(currentNode.node1);
+				nodes.push(currentNode.node2);
+				nodes.push(currentNode.node3);
+				nodes.push(currentNode.node4);
 			}
 		}
-		
-		if( this.full == false )
-		{
-			this.children.push(element);
-		}
-		else
-		{
-			this.node1.add(element);
-			this.node2.add(element);
-			this.node3.add(element);
-			this.node4.add(element);
-		}
-		
 	};
 	
 	QuadTreeNode.prototype.remove = function( element )
 	{
 		var index = -1;
-				
-		if( this.full == true )
+		var nodes = new Array();
+		var currentNode = this;
+		var bounds = element.bounds;
+		nodes.push(this);
+		
+		while( nodes.length > 0 )
 		{
-			this.node1.remove(element);
-			this.node2.remove(element);
-			this.node3.remove(element);
-			this.node4.remove(element);
-		}
-		else
-		{
-			index = this.children.indexOf(element);
+			currentNode = nodes.shift();
 			
-			if( index != -1 )
-				this.children.splice(index,1);
+			if( currentNode.full == true )
+			{
+				nodes.push(currentNode.node1);
+				nodes.push(currentNode.node2);
+				nodes.push(currentNode.node3);
+				nodes.push(currentNode.node4);
+				continue;
+			}
+			
+			index = currentNode.children.indexOf(element);
+			if( index > -1 )
+				currentNode.children.splice(index,1);
 		}
 	};
 	
-	QuadTreeNode.prototype.get = function(left,right,top,bottom)
+	QuadTreeNode.prototype.get = function( left, right, top, bottom )
 	{
-		tomahawk_ns.QuadTreeNode._tick++;
-		return this._get(left,right,top,bottom);
-	};
-	
-	QuadTreeNode.prototype._get = function( left, right, top, bottom )
-	{
-		var out = ( left > this.right || right < this.left || top > this.bottom || bottom < this.top );
-		var tab = new Array();
+		var tick = tomahawk_ns.QuadTreeNode._tick + 1;
+		var result = new Array();
+		var nodes = new Array();
+		var currentNode = this;
+		var out = false;
 		var child = null;
 		var i = 0;
-		var bounds = null;
 		
-		if( out == true )
-			return tab;
+		nodes.push(this);
+		
+		while( nodes.length > 0 )
+		{
+			currentNode = nodes.shift();
 			
-		if( this.full == true )
-		{
-			tab = tab.concat(this.node1._get(left,right,top,bottom));
-			tab = tab.concat(this.node2._get(left,right,top,bottom));
-			tab = tab.concat(this.node3._get(left,right,top,bottom));
-			tab = tab.concat(this.node4._get(left,right,top,bottom));
-		}
-		else
-		{
-			i = this.children.length;
+			out = ( left > currentNode.right || 
+					right < currentNode.left || 
+					top > currentNode.bottom || 
+					bottom < currentNode.top );
+					
+			if( out == true )
+				continue;
+				
+			if( currentNode.full == true )
+			{
+				nodes.push(currentNode.node1);
+				nodes.push(currentNode.node2);
+				nodes.push(currentNode.node3);
+				nodes.push(currentNode.node4);
+				continue;
+			}
+				
+			i = currentNode.children.length;
+			
 			while( --i > -1 )
 			{
-				child = this.children[i];
-				bounds = child.getBounds();
+				child = currentNode.children[i];
+				bounds = child.bounds;
 				
 				out = ( bounds.left > right || 
 						bounds.right < left ||
 						bounds.top > bottom ||
 						bounds.bottom < top || 
-						child.__tick__ == tomahawk_ns.QuadTreeNode._tick);
+						child.__tick__ == tick);
 						
 				if( out == true )
 					continue;
 				
-				tab.push(child);
-				child.__tick__ = tomahawk_ns.QuadTreeNode._tick;
+				result.push(child);
+				child.__tick__ = tick;
 			}
 		}
 		
-		return tab;
+		tomahawk_ns.QuadTreeNode._tick = tick;
+		return result;
 	};
+	
+	QuadTreeNode.prototype.split = function()
+	{
+		var child = null;
+		var e = this.depth + 1;
+		var f = this.maxChildren;
+		var g = this.maxDepth;
+		
+		this.node1 = new tomahawk_ns.QuadTreeNode(this.left,	this.limitX	, this.top	 , this.limitY	,e,f,g);
+		this.node2 = new tomahawk_ns.QuadTreeNode(this.left,	this.limitX	, this.limitY, this.bottom	,e,f,g);
+		this.node3 = new tomahawk_ns.QuadTreeNode(this.limitX,	this.right	, this.top	 , this.limitY	,e,f,g);
+		this.node4 = new tomahawk_ns.QuadTreeNode(this.limitX,	this.right	, this.limitY, this.bottom	,e,f,g);
+		
+		while( this.children.length > 0)
+		{
+			child = this.children.shift();
+			this.node1.add(child);
+			this.node2.add(child);
+			this.node3.add(child);
+			this.node4.add(child);
+		}
+		
+		this.full = true;
+	};
+	
 	
 	QuadTreeNode.prototype.full = false;
 	QuadTreeNode.prototype.left = 0;
@@ -2061,7 +2197,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	
 	Sprite3D.prototype.getNormalVector = function()
 	{
-		var mat = tomahawk_ns.Matrix4x4.toMatrix2D(this.getConcatenedMatrix3D());
+		var mat = tomahawk_ns.Matrix4x4.toMatrix2D(this.getConcatenedMatrix3D(true));
 		var pt1 = mat.transformPoint(0,0);
 		var pt3 = mat.transformPoint(0,100);
 		var pt2 = mat.transformPoint(100,0);
@@ -2317,6 +2453,17 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		this._listeners = arr;
 	};
 
+	EventDispatcher.prototype.removeEventListeners = function()
+	{
+		this._listeners = new Array();
+	};
+	
+	EventDispatcher.prototype.destroy = function()
+	{
+		this.removeEventListeners();
+		this.parent = null;
+	};
+	
 	tomahawk_ns.EventDispatcher = EventDispatcher;
 
 })();
@@ -3066,6 +3213,8 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	 **/
 	Matrix2D.prototype.appendTransform = function(x, y, scaleX, scaleY, rotation, skewX, skewY, regX, regY) {
 		
+		tomahawk_ns.Matrix2D.TOTAL_COUNT++;
+		
 		if (rotation%360) {
 			var r = rotation*Matrix2D.DEG_TO_RAD;
 			var cos = Math.cos(r);
@@ -3297,7 +3446,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	// this has to be populated after the class is defined:
 	Matrix2D.identity = new Matrix2D();
 	
-	
+	Matrix2D.TOTAL_COUNT = 0;
 	tomahawk_ns.Matrix2D = Matrix2D;
 	
 })();

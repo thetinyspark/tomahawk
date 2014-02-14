@@ -254,6 +254,8 @@
 	 **/
 	Matrix2D.prototype.appendTransform = function(x, y, scaleX, scaleY, rotation, skewX, skewY, regX, regY) {
 		
+		tomahawk_ns.Matrix2D.TOTAL_COUNT++;
+		
 		if (rotation%360) {
 			var r = rotation*Matrix2D.DEG_TO_RAD;
 			var cos = Math.cos(r);
@@ -485,7 +487,7 @@
 	// this has to be populated after the class is defined:
 	Matrix2D.identity = new Matrix2D();
 	
-	
+	Matrix2D.TOTAL_COUNT = 0;
 	tomahawk_ns.Matrix2D = Matrix2D;
 	
 })();

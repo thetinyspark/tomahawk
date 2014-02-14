@@ -97,6 +97,17 @@
 		this._listeners = arr;
 	};
 
+	EventDispatcher.prototype.removeEventListeners = function()
+	{
+		this._listeners = new Array();
+	};
+	
+	EventDispatcher.prototype.destroy = function()
+	{
+		this.removeEventListeners();
+		this.parent = null;
+	};
+	
 	tomahawk_ns.EventDispatcher = EventDispatcher;
 
 })();

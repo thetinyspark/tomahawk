@@ -56,10 +56,10 @@ Main.prototype.completeHandler = function(event)
 	var bmp = null;
 	var texture = null;
 	var coords = null;
-	var container = new tomahawk_ns.QuadTreeContainer(-10000,10000,-10000,10000,100,10);
+	var container = new tomahawk_ns.QuadTreeContainer(-10000,10000,-10000,10000,100,4);
 	var cloudsContainer = new tomahawk_ns.Sprite();
-	var numRows = 25;
-	var numCols = 20;
+	var numRows = 100;
+	var numCols = 100;
 	var sky = new tomahawk_ns.Shape();
 	
 	container.enableDragAndDrop(true);
@@ -78,9 +78,9 @@ Main.prototype.completeHandler = function(event)
 		tomahawk_ns.Stage.getInstance().getCanvas().height = tomahawk_ns.Screen.getWindowHeight();
 	}
 	
-	var bounds = null;
 	var i = numRows;
 	var j = 0;
+	var spr = new tomahawk_ns.Sprite();
 	
 	while( --i > -1 )
 	{
@@ -88,6 +88,8 @@ Main.prototype.completeHandler = function(event)
 		
 		while( --j > -1 )
 		{
+			spr = new tomahawk_ns.Sprite();
+			
 			coords = this.isoToScreen(i,j,64,32);
 			
 			texture = new tomahawk_ns.Texture();
@@ -97,14 +99,24 @@ Main.prototype.completeHandler = function(event)
 			bmp = new tomahawk_ns.Bitmap(texture);
 			bmp.width = 64;
 			bmp.height = 43;
-			bmp.x = coords.x;
-			bmp.y = coords.y;
 			bmp.name = "bmp_"+i+'_'+j;
-			bmp.autoUpdate = false;
 			
-			container.addChildAt(bmp,0);
+			bmp.autoUpdate = false;
+			spr.autoUpdate = false;
+			
+			spr.name = "spr_"+i+'_'+j;
+			spr.addChild(bmp);
+			
+			spr.x = coords.x;
+			spr.y = coords.y;
+			container.addChildAt(spr,0);
 		}
 	}
+	
+	
+	spr = container.getChildAt(1);
+	spr.updateBounds();
+	bmp = spr.getChildAt(0);
 	
 	i = 5;
 	
@@ -122,8 +134,7 @@ Main.prototype.completeHandler = function(event)
 		cloudsContainer.addChild(bmp);
 	}
 	
-	cloudsContainer.mouseEnabled = false;
-	
+
 	coords = this.isoToScreen(5,5,64,32);
 	
 	texture = new tomahawk_ns.Texture();
@@ -138,35 +149,22 @@ Main.prototype.completeHandler = function(event)
 	
 	bmp.pivotX =  bmp.width >> 1;
 	bmp.pivotY = bmp.height >> 1;
+	bmp.autoUpdate = false;
 	
 	container.addChild(bmp);
-	//container.scaleX = container.scaleY = 2;
+	container.scaleX = container.scaleY = 1;
 	
-	bounds = container.getBoundingRect();
 	container.name = "world";
 	cloudsContainer.name = "clouds";
-	container.mouseEnabled = true;
 	container.handCursor = true;
 	
-	tomahawk_ns.Stage.getInstance().addChild(sky);
 	tomahawk_ns.Stage.getInstance().addChild(container);
-	tomahawk_ns.Stage.getInstance().addChild(cloudsContainer);
 	tomahawk_ns.Stage.getInstance().addEventListener(tomahawk_ns.Event.ENTER_FRAME, this, this.onFrame);
 };
 
 Main.prototype.onFrame = function()
 {
 	tomahawk_ns.Stage.getInstance().drawFPS();
-	var cloudsContainer = tomahawk_ns.Stage.getInstance().getChildByName("clouds");
-	var container = tomahawk_ns.Stage.getInstance().getChildByName("world");
-	var i = cloudsContainer.children.length;
-	
-	while( --i > -1 )
-	{
-		cloudsContainer.getChildAt(i).x -= 0.1;
-		container.x -= 0.1;
-		container.y -= 0.1;
-	}
 	
 };
 

@@ -7,6 +7,7 @@
 
 	function Stage()
 	{
+		tomahawk_ns.DisplayObject._collide = 0;
 		tomahawk_ns.DisplayObjectContainer.apply(this);
 			// useful
 		window.requestAnimationFrame = (function()
@@ -158,7 +159,16 @@
 		
 		this._lastActiveChild = activeChild;
 		
-		if( activeChild != null && activeChild.handCursor == true )
+		var handCursor = false;
+		var current = activeChild;
+		
+		while( current != null )
+		{
+			handCursor = handCursor || current.handCursor;
+			current = current.parent;
+		}
+		
+		if( activeChild != null && handCursor == true )
 			tomahawk_ns.Mouse.setCursor(tomahawk_ns.Mouse.POINTER, this.getCanvas());
 		else
 			tomahawk_ns.Mouse.setCursor(tomahawk_ns.Mouse.DEFAULT, this.getCanvas());
@@ -256,7 +266,9 @@
 			context.clearRect(0,0,canvas.width,canvas.height);
 		}
 		context.save();
+		
 		scope.draw(context);
+		
 		context.restore();
 		
 		scope.dispatchEvent(new tomahawk_ns.Event(tomahawk_ns.Event.ENTER_FRAME,true,true));

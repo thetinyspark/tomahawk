@@ -24,125 +24,171 @@
 	Tomahawk.registerClass( QuadTreeNode, "QuadTreeNode" );
 	
 	QuadTreeNode._tick = 0;
+	QuadTreeNode.prototype._cache = null;
 	
-	QuadTreeNode.prototype.add = function( element )
+	
+	// iterative  methods
+	
+	QuadTreeNode.prototype.add = function(element)
 	{
-		var child = null;
-		var bounds = element.getBounds();
-		var out = ( bounds.left > this.right || 
-					bounds.right < this.left || 
-					bounds.top > this.bottom || 
-					bounds.bottom < this.top );
-					
+		this.remove(element);
 		
-		if( out == true )
-			return;
-		
-		if( this.children.length > this.maxChildren && this.depth < this.maxDepth)
+		if( element.updateNextFrame == true || element.autoUpdate == true )
 		{
-			var e = this.depth + 1;
-			var f = this.maxChildren;
-			var g = this.maxDepth;
+			element.updateMatrix();
+			element.updateBounds();
+		}
+		
+		var nodes = new Array();
+		var currentNode = this;
+		var bounds = element.bounds;
+		var out = false;
+		var left = bounds.left;
+		var right = bounds.right;
+		var top = bounds.top;
+		var bottom = bounds.bottom;
+		nodes.push(this);
+		
+		while( nodes.length > 0 )
+		{
+			currentNode = nodes.shift();
 			
-			this.full = true;
+			out =	( 	left > currentNode.right || 
+						right < currentNode.left || 
+						top > currentNode.bottom || 
+						bottom < currentNode.top );
+						
+			if( out == true )
+				continue;
 			
-			this.node1 = new tomahawk_ns.QuadTreeNode(this.left,	this.limitX	, this.top	 , this.limitY	,e,f,g);
-			this.node2 = new tomahawk_ns.QuadTreeNode(this.left,	this.limitX	, this.limitY, this.bottom	,e,f,g);
-			this.node3 = new tomahawk_ns.QuadTreeNode(this.limitX,	this.right	, this.top	 , this.limitY	,e,f,g);
-			this.node4 = new tomahawk_ns.QuadTreeNode(this.limitX,	this.right	, this.limitY, this.bottom	,e,f,g);
-			
-			while( this.children.length > 0)
+			if( currentNode.children.length > currentNode.maxChildren && currentNode.depth < currentNode.maxDepth)
 			{
-				child = this.children.shift();
-				this.node1.add(child);
-				this.node2.add(child);
-				this.node3.add(child);
-				this.node4.add(child);
+				currentNode.split();
+			}
+		
+			if( currentNode.full == false )
+			{
+				currentNode.children.push(element);
+			}
+			else
+			{
+				nodes.push(currentNode.node1);
+				nodes.push(currentNode.node2);
+				nodes.push(currentNode.node3);
+				nodes.push(currentNode.node4);
 			}
 		}
-		
-		if( this.full == false )
-		{
-			this.children.push(element);
-		}
-		else
-		{
-			this.node1.add(element);
-			this.node2.add(element);
-			this.node3.add(element);
-			this.node4.add(element);
-		}
-		
 	};
 	
 	QuadTreeNode.prototype.remove = function( element )
 	{
 		var index = -1;
-				
-		if( this.full == true )
+		var nodes = new Array();
+		var currentNode = this;
+		var bounds = element.bounds;
+		nodes.push(this);
+		
+		while( nodes.length > 0 )
 		{
-			this.node1.remove(element);
-			this.node2.remove(element);
-			this.node3.remove(element);
-			this.node4.remove(element);
-		}
-		else
-		{
-			index = this.children.indexOf(element);
+			currentNode = nodes.shift();
 			
-			if( index != -1 )
-				this.children.splice(index,1);
+			if( currentNode.full == true )
+			{
+				nodes.push(currentNode.node1);
+				nodes.push(currentNode.node2);
+				nodes.push(currentNode.node3);
+				nodes.push(currentNode.node4);
+				continue;
+			}
+			
+			index = currentNode.children.indexOf(element);
+			if( index > -1 )
+				currentNode.children.splice(index,1);
 		}
 	};
 	
-	QuadTreeNode.prototype.get = function(left,right,top,bottom)
+	QuadTreeNode.prototype.get = function( left, right, top, bottom )
 	{
-		tomahawk_ns.QuadTreeNode._tick++;
-		return this._get(left,right,top,bottom);
-	};
-	
-	QuadTreeNode.prototype._get = function( left, right, top, bottom )
-	{
-		var out = ( left > this.right || right < this.left || top > this.bottom || bottom < this.top );
-		var tab = new Array();
+		var tick = tomahawk_ns.QuadTreeNode._tick + 1;
+		var result = new Array();
+		var nodes = new Array();
+		var currentNode = this;
+		var out = false;
 		var child = null;
 		var i = 0;
-		var bounds = null;
 		
-		if( out == true )
-			return tab;
+		nodes.push(this);
+		
+		while( nodes.length > 0 )
+		{
+			currentNode = nodes.shift();
 			
-		if( this.full == true )
-		{
-			tab = tab.concat(this.node1._get(left,right,top,bottom));
-			tab = tab.concat(this.node2._get(left,right,top,bottom));
-			tab = tab.concat(this.node3._get(left,right,top,bottom));
-			tab = tab.concat(this.node4._get(left,right,top,bottom));
-		}
-		else
-		{
-			i = this.children.length;
+			out = ( left > currentNode.right || 
+					right < currentNode.left || 
+					top > currentNode.bottom || 
+					bottom < currentNode.top );
+					
+			if( out == true )
+				continue;
+				
+			if( currentNode.full == true )
+			{
+				nodes.push(currentNode.node1);
+				nodes.push(currentNode.node2);
+				nodes.push(currentNode.node3);
+				nodes.push(currentNode.node4);
+				continue;
+			}
+				
+			i = currentNode.children.length;
+			
 			while( --i > -1 )
 			{
-				child = this.children[i];
-				bounds = child.getBounds();
+				child = currentNode.children[i];
+				bounds = child.bounds;
 				
 				out = ( bounds.left > right || 
 						bounds.right < left ||
 						bounds.top > bottom ||
 						bounds.bottom < top || 
-						child.__tick__ == tomahawk_ns.QuadTreeNode._tick);
+						child.__tick__ == tick);
 						
 				if( out == true )
 					continue;
 				
-				tab.push(child);
-				child.__tick__ = tomahawk_ns.QuadTreeNode._tick;
+				result.push(child);
+				child.__tick__ = tick;
 			}
 		}
 		
-		return tab;
+		tomahawk_ns.QuadTreeNode._tick = tick;
+		return result;
 	};
+	
+	QuadTreeNode.prototype.split = function()
+	{
+		var child = null;
+		var e = this.depth + 1;
+		var f = this.maxChildren;
+		var g = this.maxDepth;
+		
+		this.node1 = new tomahawk_ns.QuadTreeNode(this.left,	this.limitX	, this.top	 , this.limitY	,e,f,g);
+		this.node2 = new tomahawk_ns.QuadTreeNode(this.left,	this.limitX	, this.limitY, this.bottom	,e,f,g);
+		this.node3 = new tomahawk_ns.QuadTreeNode(this.limitX,	this.right	, this.top	 , this.limitY	,e,f,g);
+		this.node4 = new tomahawk_ns.QuadTreeNode(this.limitX,	this.right	, this.limitY, this.bottom	,e,f,g);
+		
+		while( this.children.length > 0)
+		{
+			child = this.children.shift();
+			this.node1.add(child);
+			this.node2.add(child);
+			this.node3.add(child);
+			this.node4.add(child);
+		}
+		
+		this.full = true;
+	};
+	
 	
 	QuadTreeNode.prototype.full = false;
 	QuadTreeNode.prototype.left = 0;

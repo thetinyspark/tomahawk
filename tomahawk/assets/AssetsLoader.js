@@ -24,8 +24,6 @@ AssetsLoader.getInstance = function()
 	return tomahawk_ns.AssetsLoader._instance;
 };
 
-
-
 AssetsLoader.prototype.onComplete = null;
 AssetsLoader.prototype._loadingList = null;
 AssetsLoader.prototype._data = null;
