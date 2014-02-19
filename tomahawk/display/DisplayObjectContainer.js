@@ -71,6 +71,10 @@
 
 	DisplayObjectContainer.prototype.addChildAt = function(child, index)
 	{
+		if( child.parent != null )
+		{
+			child.parent.removeChild(child);
+		}
 		var children = this.children;
 		var tab1 = this.children.slice(0,index);
 		var tab2 = this.children.slice(index);

@@ -11,15 +11,20 @@
 		if( texture == undefined )
 			return;
 			
-		this.texture = texture;
-		this.width = this.texture.rect[2];
-		this.height = this.texture.rect[3];
+		this.setTexture(texture);
 	}
 
 	Tomahawk.registerClass( Bitmap, "Bitmap" );
 	Tomahawk.extend( "Bitmap", "DisplayObject" );
 
 	Bitmap.prototype.texture = null;
+	
+	Bitmap.prototype.setTexture = function(texture)
+	{
+		this.texture = texture;
+		this.width = this.texture.rect[2];
+		this.height = this.texture.rect[3];
+	};
 
 	Bitmap.prototype.draw = function( context )
 	{	
@@ -30,25 +35,38 @@
 	};
 	
 	// a vertex is an array with: x, y, u, v
-	Bitmap.prototype.drawTriangles = function( context, vertices )
+	Bitmap.prototype.drawTriangles = function( context, vertices, indices, uvtData )
 	{
-		var max = vertices.length;
+		var max = indices.length;
 		var i = 0;
 		var rect = this.texture.rect;
 		var data = this.texture.data;
+		var vertex1 = null;
+		var vertex2 = null;
+		var vertex3 = null;
+		var uv1 = null;
+		var uv2 = null;
+		var uv3 = null;
 		
-		for( ; i < max; i++ )
+		for( i = 0; i < max; i+=3 )
 		{
-			this._drawTriangle( vertices[i], context, data, rect.width, rect.height );
+			vertex1 = vertices[i*3];
+			vertex2 = vertices[i*3 + 1];
+			vertex3 = vertices[i*3 + 2];
+			uv1 = uvtData[i*3];
+			uv2 = uvtData[i*3 + 1];
+			uv3 = uvtData[i*3 + 2];
+			this._drawTriangle( vertex1,vertex2,vertex2,uv1,uv2,uv3, context, data, rect.width, rect.height );
 		}
 	};
 	
-	Bitmap.prototype._drawTriangle = function(vertices, ctx, texture, texW, texH ) 
+	Bitmap.prototype._drawTriangle = function(v1,v2,v3,uv1,uv2,uv3, ctx, texture, texW, texH ) 
 	{
-        var x0 = vertices[0][0], x1 = vertices[1][0], x2 = vertices[2][0];
-        var y0 = vertices[0][1], y1 = vertices[1][1], y2 = vertices[2][1];
-        var u0 = vertices[0][2], u1 = vertices[1][2], u2 = vertices[2][2];
-        var v0 = vertices[0][3], v1 = vertices[1][3], v2 = vertices[2][3];
+        var x0 = v1[0], x1 = v2[0], x2 = v3[0];
+        var y0 = v1[1], y1 = v2[1], y2 = v3[1];
+		
+        var u0 = uv1[0], u1 = uv2[0], u2 = uv3[0];
+        var v0 = uv1[1], v1 = uv2[1], v2 = uv3[1];
 		
 		u0 *= texW;
 		u1 *= texW;

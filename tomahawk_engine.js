@@ -116,6 +116,8 @@ AssetsLoader.getInstance = function()
 AssetsLoader.prototype.onComplete = null;
 AssetsLoader.prototype._loadingList = null;
 AssetsLoader.prototype._data = null;
+AssetsLoader.prototype._numFiles = 0;
+
 
 AssetsLoader.prototype.getData = function()
 {
@@ -135,6 +137,7 @@ AssetsLoader.prototype.addFile = function(fileURL, fileAlias)
 	// on stocke un objet contenant l"url et l'alias du fichier que l'on
 	// utilisera pour le retrouver
 	this._loadingList.push({url:fileURL,alias:fileAlias});
+	this._numFiles++;
 };
 
 AssetsLoader.prototype.load = function()
@@ -147,12 +150,19 @@ AssetsLoader.prototype.load = function()
 		}
 		
 		this.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.COMPLETE, true, true) );
+		this._numFiles = 0;
 	}
 	else
 	{
 		var obj = this._loadingList.shift();
 		var scope = this;
 		var image = new Image();
+		
+		image.onerror = function()
+		{
+			scope._errorHandler();
+		};
+		
 		image.onload = function()
 		{
 			scope._progressHandler(image, obj.alias);
@@ -167,6 +177,18 @@ AssetsLoader.prototype._progressHandler = function(image,alias)
 	this._data[alias] = image;
 	this.load();
 	this.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.PROGRESS, true, true) );
+};
+
+AssetsLoader.prototype._errorHandler = function()
+{
+	this.load();
+	this.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.IO_ERROR, true, true) );
+};
+
+AssetsLoader.prototype.getProgression = function()
+{
+	var progression = ( this._numFiles - this._loadingList.length ) / this._numFiles;
+	return progression;
 };
 
 tomahawk_ns.AssetsLoader = AssetsLoader;
@@ -319,15 +341,20 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		if( texture == undefined )
 			return;
 			
-		this.texture = texture;
-		this.width = this.texture.rect[2];
-		this.height = this.texture.rect[3];
+		this.setTexture(texture);
 	}
 
 	Tomahawk.registerClass( Bitmap, "Bitmap" );
 	Tomahawk.extend( "Bitmap", "DisplayObject" );
 
 	Bitmap.prototype.texture = null;
+	
+	Bitmap.prototype.setTexture = function(texture)
+	{
+		this.texture = texture;
+		this.width = this.texture.rect[2];
+		this.height = this.texture.rect[3];
+	};
 
 	Bitmap.prototype.draw = function( context )
 	{	
@@ -338,25 +365,38 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	};
 	
 	// a vertex is an array with: x, y, u, v
-	Bitmap.prototype.drawTriangles = function( context, vertices )
+	Bitmap.prototype.drawTriangles = function( context, vertices, indices, uvtData )
 	{
-		var max = vertices.length;
+		var max = indices.length;
 		var i = 0;
 		var rect = this.texture.rect;
 		var data = this.texture.data;
+		var vertex1 = null;
+		var vertex2 = null;
+		var vertex3 = null;
+		var uv1 = null;
+		var uv2 = null;
+		var uv3 = null;
 		
-		for( ; i < max; i++ )
+		for( i = 0; i < max; i+=3 )
 		{
-			this._drawTriangle( vertices[i], context, data, rect.width, rect.height );
+			vertex1 = vertices[i*3];
+			vertex2 = vertices[i*3 + 1];
+			vertex3 = vertices[i*3 + 2];
+			uv1 = uvtData[i*3];
+			uv2 = uvtData[i*3 + 1];
+			uv3 = uvtData[i*3 + 2];
+			this._drawTriangle( vertex1,vertex2,vertex2,uv1,uv2,uv3, context, data, rect.width, rect.height );
 		}
 	};
 	
-	Bitmap.prototype._drawTriangle = function(vertices, ctx, texture, texW, texH ) 
+	Bitmap.prototype._drawTriangle = function(v1,v2,v3,uv1,uv2,uv3, ctx, texture, texW, texH ) 
 	{
-        var x0 = vertices[0][0], x1 = vertices[1][0], x2 = vertices[2][0];
-        var y0 = vertices[0][1], y1 = vertices[1][1], y2 = vertices[2][1];
-        var u0 = vertices[0][2], u1 = vertices[1][2], u2 = vertices[2][2];
-        var v0 = vertices[0][3], v1 = vertices[1][3], v2 = vertices[2][3];
+        var x0 = v1[0], x1 = v2[0], x2 = v3[0];
+        var y0 = v1[1], y1 = v2[1], y2 = v3[1];
+		
+        var u0 = uv1[0], u1 = uv2[0], u2 = uv3[0];
+        var v0 = uv1[1], v1 = uv2[1], v2 = uv3[1];
 		
 		u0 *= texW;
 		u1 *= texW;
@@ -393,6 +433,129 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	};
 
 	tomahawk_ns.Bitmap = Bitmap;
+
+})();
+
+
+
+
+
+
+/**
+ * @author The Tiny Spark
+ */
+
+(function() {
+	
+	function BitmapMesh(texture)
+	{
+		tomahawk_ns.Bitmap.apply(this,[texture]);
+	}
+
+	Tomahawk.registerClass( BitmapMesh, "BitmapMesh" );
+	Tomahawk.extend( "BitmapMesh", "Bitmap" );
+	
+	BitmapMesh.prototype.vertices = null;
+	BitmapMesh.prototype.uvs = null;
+	BitmapMesh.prototype.indices = null;
+	BitmapMesh.prototype.showLines = false;
+	
+	BitmapMesh.prototype.setTexture = function(texture)
+	{
+		tomahawk_ns.Bitmap.prototype.setTexture.apply(this,[texture]);
+		this.vertices = [[0,0],[this.width,0],[0,this.height],[this.width,this.height]];
+		this.uvs = [[0,0],[1,0],[0,1],[1,1]];
+		this.indices = [0,1,2,1,2,3];
+	};
+
+	BitmapMesh.prototype.draw = function( context )
+	{	
+		var vertices = this.vertices;
+		var uvtData = this.uvs;
+		var indices = this.indices;
+		var max = indices.length;
+		var i = 0;
+		var width = this.texture.rect[2];
+		var height = this.texture.rect[3];
+		var data = this.texture.data;
+		var vertex1 = null;
+		var vertex2 = null;
+		var vertex3 = null;
+		var index1 = 0;
+		var index2 = 0;
+		var index3 = 0;
+		var uv1 = null;
+		var uv2 = null;
+		var uv3 = null;
+		
+		//console.clear();
+		
+		for( i = 0; i < max; i+=3 )
+		{
+			index1 = indices[i];
+			index2 = indices[i + 1];
+			index3 = indices[i + 2];
+			vertex1 = vertices[index1];
+			vertex2 = vertices[index2];
+			vertex3 = vertices[index3];
+			
+			uv1 = uvtData[index1];
+			uv2 = uvtData[index2];
+			uv3 = uvtData[index3];
+			this._drawTriangle( vertex1,vertex2,vertex3,uv1,uv2,uv3, context, data, width, height );
+		}
+	};
+	
+	BitmapMesh.prototype._drawTriangle = function(v1,v2,v3,uv1,uv2,uv3, ctx, texture, texW, texH ) 
+	{
+		
+        var x0 = v1[0], x1 = v2[0], x2 = v3[0];
+        var y0 = v1[1], y1 = v2[1], y2 = v3[1];
+		
+        var u0 = uv1[0], u1 = uv2[0], u2 = uv3[0];
+        var v0 = uv1[1], v1 = uv2[1], v2 = uv3[1];
+		
+		u0 *= texW;
+		u1 *= texW;
+		u2 *= texW;
+		v0 *= texH;
+		v1 *= texH;
+		v2 *= texH;
+
+        // Set clipping area so that only pixels inside the triangle will
+        // be affected by the image drawing operation
+        ctx.save(); 
+		ctx.beginPath(); 
+		ctx.fillStyle = "black";
+		ctx.moveTo(x0, y0); 
+		ctx.lineTo(x1, y1);
+        ctx.lineTo(x2, y2); 
+		ctx.lineTo(x0,y0);
+		
+		if( this.showLines == true )
+			ctx.stroke();
+			
+		ctx.closePath(); 
+		ctx.clip();
+
+        // Compute matrix transform
+        var delta 	= u0*v1 + v0*u2 + u1*v2 - v1*u2 - v0*u1 - u0*v2;
+        var delta_a = x0*v1 + v0*x2 + x1*v2 - v1*x2 - v0*x1 - x0*v2;
+        var delta_b = u0*x1 + x0*u2 + u1*x2 - x1*u2 - x0*u1 - u0*x2;
+        var delta_c = u0*v1*x2 + v0*x1*u2 + x0*u1*v2 - x0*v1*u2 - v0*u1*x2 - u0*x1*v2;
+        var delta_d = y0*v1 + v0*y2 + y1*v2 - v1*y2 - v0*y1 - y0*v2;
+        var delta_e = u0*y1 + y0*u2 + u1*y2 - y1*u2 - y0*u1 - u0*y2;
+        var delta_f = u0*v1*y2 + v0*y1*u2 + y0*u1*v2 - y0*v1*u2 - v0*u1*y2 - u0*y1*v2;
+
+        // Draw the transformed image
+        ctx.transform(delta_a/delta, delta_d/delta,
+                      delta_b/delta, delta_e/delta,
+                      delta_c/delta, delta_f/delta);
+        ctx.drawImage(texture, 0, 0,texW,texH);
+        ctx.restore();
+	};
+
+	tomahawk_ns.BitmapMesh = BitmapMesh;
 
 })();
 
@@ -841,6 +1004,10 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 	DisplayObjectContainer.prototype.addChildAt = function(child, index)
 	{
+		if( child.parent != null )
+		{
+			child.parent.removeChild(child);
+		}
 		var children = this.children;
 		var tab1 = this.children.slice(0,index);
 		var tab2 = this.children.slice(index);

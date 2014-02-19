@@ -27,6 +27,8 @@ AssetsLoader.getInstance = function()
 AssetsLoader.prototype.onComplete = null;
 AssetsLoader.prototype._loadingList = null;
 AssetsLoader.prototype._data = null;
+AssetsLoader.prototype._numFiles = 0;
+
 
 AssetsLoader.prototype.getData = function()
 {
@@ -46,6 +48,7 @@ AssetsLoader.prototype.addFile = function(fileURL, fileAlias)
 	// on stocke un objet contenant l"url et l'alias du fichier que l'on
 	// utilisera pour le retrouver
 	this._loadingList.push({url:fileURL,alias:fileAlias});
+	this._numFiles++;
 };
 
 AssetsLoader.prototype.load = function()
@@ -58,12 +61,19 @@ AssetsLoader.prototype.load = function()
 		}
 		
 		this.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.COMPLETE, true, true) );
+		this._numFiles = 0;
 	}
 	else
 	{
 		var obj = this._loadingList.shift();
 		var scope = this;
 		var image = new Image();
+		
+		image.onerror = function()
+		{
+			scope._errorHandler();
+		};
+		
 		image.onload = function()
 		{
 			scope._progressHandler(image, obj.alias);
@@ -78,6 +88,18 @@ AssetsLoader.prototype._progressHandler = function(image,alias)
 	this._data[alias] = image;
 	this.load();
 	this.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.PROGRESS, true, true) );
+};
+
+AssetsLoader.prototype._errorHandler = function()
+{
+	this.load();
+	this.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.IO_ERROR, true, true) );
+};
+
+AssetsLoader.prototype.getProgression = function()
+{
+	var progression = ( this._numFiles - this._loadingList.length ) / this._numFiles;
+	return progression;
 };
 
 tomahawk_ns.AssetsLoader = AssetsLoader;
