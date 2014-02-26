@@ -13,7 +13,7 @@
 	PixelFilter.prototype._canvas = null;
 	PixelFilter.prototype._context = null;
 	PixelFilter.prototype._object = null;
-	PixelFilter.prototype.filterType = 1;
+	PixelFilter.prototype.type = 1;
 	
 	PixelFilter.prototype.getPixels = function(x,y,width,height)
 	{

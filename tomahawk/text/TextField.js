@@ -69,6 +69,7 @@
 		var word = this.getWordAt(index);
 		var start = -1;
 		var index = -1;
+		var end = -1;
 		
 		if( word != null )
 		{			

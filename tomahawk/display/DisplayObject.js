@@ -355,6 +355,31 @@
 		tomahawk_ns.EventDispatcher.prototype.destroy.apply(this);
 	};
 	
+	DisplayObject.prototype.snapshot = function(transformMatrix)
+	{
+		var mat = transformMatrix || new tomahawk_ns.Matrix2D();
+		var oldMat = this.matrix.clone();
+		
+		var canvas = document.createElement("canvas");
+		var context = canvas.getContext("2d");
+		this.matrix = mat;
+		
+		this.updateNextFrame = true;
+		this.updateBounds();
+		
+		canvas.width = this.bounds.width;
+		canvas.height = this.bounds.height;
+		
+		context.transform(mat.a,mat.b,mat.c,mat.d,mat.tx,mat.ty);
+		this.draw(context);
+		
+		this.matrix = oldMat;
+		this.updateNextFrame = true;
+		this.updateBounds();
+		
+		return canvas;
+	};
+	
 	tomahawk_ns.DisplayObject = DisplayObject;
 
 })();

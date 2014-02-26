@@ -921,6 +921,31 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		tomahawk_ns.EventDispatcher.prototype.destroy.apply(this);
 	};
 	
+	DisplayObject.prototype.snapshot = function(transformMatrix)
+	{
+		var mat = transformMatrix || new tomahawk_ns.Matrix2D();
+		var oldMat = this.matrix.clone();
+		
+		var canvas = document.createElement("canvas");
+		var context = canvas.getContext("2d");
+		this.matrix = mat;
+		
+		this.updateNextFrame = true;
+		this.updateBounds();
+		
+		canvas.width = this.bounds.width;
+		canvas.height = this.bounds.height;
+		
+		context.transform(mat.a,mat.b,mat.c,mat.d,mat.tx,mat.ty);
+		this.draw(context);
+		
+		this.matrix = oldMat;
+		this.updateNextFrame = true;
+		this.updateBounds();
+		
+		return canvas;
+	};
+	
 	tomahawk_ns.DisplayObject = DisplayObject;
 
 })();
@@ -3011,6 +3036,95 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
  */
 (function() {
 	
+	function BrightnessFilter()
+	{
+		tomahawk_ns.PixelFilter.apply(this);
+	}
+	
+	Tomahawk.registerClass( BrightnessFilter, "BrightnessFilter" );
+	Tomahawk.extend( "BrightnessFilter", "PixelFilter" );
+	
+	BrightnessFilter.prototype.value = 0;
+
+	BrightnessFilter.prototype.process = function()
+	{
+		if( this.value == 0 )
+			return;
+			
+		var pixels = this.getPixels(0,0,this._canvas.width,this._canvas.height);
+		var data = pixels.data;
+		var value = parseInt(this.value);
+		
+		for (var i=0; i<data.length; i+=4) 
+		{
+			data[i]	  = data[i] + value;
+			data[i+1] = data[i+1] + value;
+			data[i+2] = data[i+2] + value;
+		}
+		
+		this.setPixels(pixels,0,0);
+	};
+	
+	tomahawk_ns.BrightnessFilter = BrightnessFilter;
+
+})();
+
+
+
+	
+
+(function() {
+
+	function ContrastFilter()
+	{
+		tomahawk_ns.PixelFilter.apply(this);
+	}
+	
+	Tomahawk.registerClass( ContrastFilter, "ContrastFilter" );
+	Tomahawk.extend( "ContrastFilter", "PixelFilter" );
+	
+	ContrastFilter.prototype.value = 0;
+
+	ContrastFilter.prototype.process = function()
+	{
+		if( this.value == 0 )
+			return;
+			
+		var pixels = this.getPixels(0,0,this._canvas.width,this._canvas.height);
+		var data = pixels.data;
+		var r = 0, g = 0, b = 0, a = 0;
+		var value = parseFloat(this.value);
+
+		for (var i=0; i<data.length; i+=4) 
+		{
+			r = data[i+0]; r/=255; r -= 0.5; r *= value; r += 0.5; r *= 255;
+			g = data[i+1]; g/=255; g -= 0.5; g *= value; g += 0.5; g *= 255;
+			b = data[i+2]; b/=255; b -= 0.5; b *= value; b += 0.5; b *= 255;
+			
+			r = parseInt(r); r = ( r > 255 ) ? 255 : r; r = ( r < 0 ) ? 0 : r;
+			g = parseInt(g); g = ( g > 255 ) ? 255 : g; g = ( g < 0 ) ? 0 : g;
+			b = parseInt(b); b = ( b > 255 ) ? 255 : b; b = ( b < 0 ) ? 0 : b;
+			
+			data[i] = r;
+			data[i+1] = g;
+			data[i+2] = b;
+		}
+		
+		this.setPixels(pixels,0,0);
+	};
+	
+	
+	tomahawk_ns.ContrastFilter = ContrastFilter;
+
+})();
+
+
+
+/**
+ * @author The Tiny Spark
+ */
+(function() {
+	
 	function GrayScaleFilter()
 	{
 		tomahawk_ns.PixelFilter.apply(this);
@@ -3057,7 +3171,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	PixelFilter.prototype._canvas = null;
 	PixelFilter.prototype._context = null;
 	PixelFilter.prototype._object = null;
-	PixelFilter.prototype.filterType = 1;
+	PixelFilter.prototype.type = 1;
 	
 	PixelFilter.prototype.getPixels = function(x,y,width,height)
 	{
@@ -4863,6 +4977,7 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		var word = this.getWordAt(index);
 		var start = -1;
 		var index = -1;
+		var end = -1;
 		
 		if( word != null )
 		{			
