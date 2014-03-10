@@ -61,8 +61,10 @@
 		points.push(mat.transformPoint(0,this.height));
 		points.push(mat.transformPoint(this.width, this.height));
 	
-		rect.left = 0xFFFFFFFF;
-		rect.top = 0xFFFFFFFF;
+		rect.left = 2147483648;
+		rect.top = 2147483648;
+		rect.bottom = -2147483648;
+		rect.right = -2147483648;
 	
 		var i = points.length;
 		while( --i > -1 )
@@ -194,6 +196,7 @@
 			buffer = document.createElement("canvas");
 			buffer.width = this._cache.width;
 			buffer.height = this._cache.height;
+			
 			context = buffer.getContext("2d");
 			
 			mat = mask.getConcatenedMatrix().prependMatrix( this.getConcatenedMatrix().invert() );
@@ -318,8 +321,10 @@
 		
 		points.push(pt1,pt2,pt3,pt4);
 		
-		rect.left = 0xFFFFFFFF;
-		rect.top = 0xFFFFFFFF;
+		rect.left = 2147483648;
+		rect.top = 2147483648;
+		rect.bottom = -2147483648;
+		rect.right = -2147483648;
 		
 		var i = points.length;
 		while( --i > -1 )

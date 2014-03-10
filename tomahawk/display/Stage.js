@@ -56,7 +56,13 @@
 	Stage.prototype._cache = null;
 	Stage.prototype.background = false;
 	Stage.prototype.backgroundColor = "#0080C0";
+	Stage.prototype._stop = false;
 
+	
+	Stage.prototype._getContext  = function()
+	{
+		return this._canvas.getContext("2d");
+	};
 
 	Stage.prototype.init = function(canvas)
 	{
@@ -72,11 +78,14 @@
 		};
 		
 		this._canvas = canvas;
-		this._context = canvas.getContext("2d");
+		this._context = this._getContext();
 		this.addEventListener(tomahawk_ns.Event.ADDED, this, this._eventHandler,true);
 		this.addEventListener(tomahawk_ns.Event.FOCUSED, this, this._eventHandler,true);
 		this.addEventListener(tomahawk_ns.Event.UNFOCUSED, this, this._eventHandler,true);
 		this._canvas.addEventListener("click",callback);
+		this._canvas.addEventListener("touchstart",callback);
+		this._canvas.addEventListener("touchmove",callback);
+		this._canvas.addEventListener("touchend",callback);
 		this._canvas.addEventListener("mousemove",callback);
 		this._canvas.addEventListener("mousedown",callback);
 		this._canvas.addEventListener("mouseup",callback);
@@ -100,13 +109,38 @@
 
 	Stage.prototype._mouseHandler = function(event)
 	{
-		event.preventDefault();
-		event.stopImmediatePropagation();
-		event.stopPropagation();
 		
 		var bounds = this._canvas.getBoundingClientRect();
-		var x = event.clientX - bounds.left;
-		var y = event.clientY - bounds.top;
+		var x = 0;
+		var y = 0;
+		var touch = null;
+		
+		
+		if( event.type == "touchstart" || 
+			event.type == "touchmove" || 
+			event.type == "touchend" 
+		)
+		{
+			touch = event.touches[0];
+			
+			if( event.type == "touchmove" )
+			{
+				event.preventDefault();
+				event.stopImmediatePropagation();
+				event.stopPropagation();
+			}
+			
+			x = touch.clientX - bounds.left;
+			y = touch.clientY - bounds.top;
+		}
+		else
+		{
+			event.preventDefault();
+			event.stopImmediatePropagation();
+			event.stopPropagation();
+			x = event.clientX - bounds.left;
+			y = event.clientY - bounds.top;
+		}
 		var activeChild = this.getObjectUnder(x,y);
 		var mouseEvent = null;
 		var i = 0;
@@ -114,6 +148,9 @@
 		this._lastMouseY = this.mouseY >> 0;
 		this.mouseX = x >> 0;
 		this.mouseY = y >> 0;
+		
+		if( activeChild == null )
+			activeChild = this;
 		
 			
 		if( event.type == "mousemove" && this._lastActiveChild != activeChild )
@@ -237,26 +274,26 @@
 	{
 		var curTime = new Date().getTime();
 		var scope = this;
-		var context = scope._context;
-		var canvas = scope._canvas;
+		var context = this._context;
+		var canvas = this._canvas;
 		
-		this.width = scope._canvas.width;
-		this.height = scope._canvas.height;
+		this.width = this._canvas.width;
+		this.height = this._canvas.height;
 		
-		scope._frameCount++;
+		this._frameCount++;
 		
-		if( curTime - scope._lastTime > 1000 )
+		if( curTime - this._lastTime > 1000 )
 		{
-			scope._fps = scope._frameCount;
-			scope._frameCount = 0;
-			scope._lastTime = curTime;
+			this._fps = this._frameCount;
+			this._frameCount = 0;
+			this._lastTime = curTime;
 		}
 		
-		if( scope.background == true )
+		if( this.background == true )
 		{
 			context.save();
 			context.beginPath();
-			context.fillStyle = scope.backgroundColor;
+			context.fillStyle = this.backgroundColor;
 			context.fillRect( 0, 0, canvas.width, canvas.height );
 			context.fill();
 			context.restore();
@@ -265,13 +302,12 @@
 		{
 			context.clearRect(0,0,canvas.width,canvas.height);
 		}
+		
 		context.save();
-		
-		scope.draw(context);
-		
+		this.draw(context);
 		context.restore();
 		
-		scope.dispatchEvent(new tomahawk_ns.Event(tomahawk_ns.Event.ENTER_FRAME,true,true));
+		this.dispatchEvent(new tomahawk_ns.Event(tomahawk_ns.Event.ENTER_FRAME,true,true));
 		window.requestAnimationFrame(	function()
 										{
 											scope.enterFrame();

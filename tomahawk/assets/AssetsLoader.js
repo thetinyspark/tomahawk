@@ -86,8 +86,8 @@ AssetsLoader.prototype.load = function()
 AssetsLoader.prototype._progressHandler = function(image,alias)
 {
 	this._data[alias] = image;
-	this.load();
 	this.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.PROGRESS, true, true) );
+	this.load();
 };
 
 AssetsLoader.prototype._errorHandler = function()

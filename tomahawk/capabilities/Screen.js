@@ -10,12 +10,12 @@
 	
 	Screen.getInnerWidth = function(stage)
 	{
-		return stage.getCanvas().parent.offsetWidth;
+		return stage.getCanvas().parentNode.offsetWidth;
 	};
 
 	Screen.getInnerHeight = function(stage)
 	{
-		return stage.getCanvas().parent.offsetHeight;
+		return stage.getCanvas().parentNode.offsetHeight;
 	};
 
 	Screen.getWindowWidth = function()

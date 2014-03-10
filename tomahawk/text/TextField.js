@@ -319,7 +319,6 @@
 			context.restore();
 		}
 		
-		
 		tomahawk_ns.DisplayObjectContainer.prototype.draw.apply(this, [context]);		
 		
 		if( this._focused == true)

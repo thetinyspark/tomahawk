@@ -24,11 +24,14 @@
 		
 		switch( event.type )
 		{
+			case "touchend": type = tomahawk_ns.MouseEvent.CLICK; break;
 			case "click": type = tomahawk_ns.MouseEvent.CLICK; break;
 			case "dblclick": type = tomahawk_ns.MouseEvent.DOUBLE_CLICK; break;
 			case "mousemove": type = tomahawk_ns.MouseEvent.MOUSE_MOVE; break;
+			case "touchmove": type = tomahawk_ns.MouseEvent.MOUSE_MOVE; break;
 			case "mouseup": type = tomahawk_ns.MouseEvent.MOUSE_UP; break;
 			case "mousedown": type = tomahawk_ns.MouseEvent.MOUSE_DOWN; break;
+			case "touchstart": type = tomahawk_ns.MouseEvent.MOUSE_DOWN; break;
 		}
 		
 		msevent = new tomahawk_ns.MouseEvent(type,bubbles,cancelable);

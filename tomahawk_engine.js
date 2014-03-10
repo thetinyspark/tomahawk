@@ -175,8 +175,8 @@ AssetsLoader.prototype.load = function()
 AssetsLoader.prototype._progressHandler = function(image,alias)
 {
 	this._data[alias] = image;
-	this.load();
 	this.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.PROGRESS, true, true) );
+	this.load();
 };
 
 AssetsLoader.prototype._errorHandler = function()
@@ -305,12 +305,12 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	
 	Screen.getInnerWidth = function(stage)
 	{
-		return stage.getCanvas().parent.offsetWidth;
+		return stage.getCanvas().parentNode.offsetWidth;
 	};
 
 	Screen.getInnerHeight = function(stage)
 	{
-		return stage.getCanvas().parent.offsetHeight;
+		return stage.getCanvas().parentNode.offsetHeight;
 	};
 
 	Screen.getWindowWidth = function()
@@ -627,8 +627,10 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		points.push(mat.transformPoint(0,this.height));
 		points.push(mat.transformPoint(this.width, this.height));
 	
-		rect.left = 0xFFFFFFFF;
-		rect.top = 0xFFFFFFFF;
+		rect.left = 2147483648;
+		rect.top = 2147483648;
+		rect.bottom = -2147483648;
+		rect.right = -2147483648;
 	
 		var i = points.length;
 		while( --i > -1 )
@@ -760,6 +762,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 			buffer = document.createElement("canvas");
 			buffer.width = this._cache.width;
 			buffer.height = this._cache.height;
+			
 			context = buffer.getContext("2d");
 			
 			mat = mask.getConcatenedMatrix().prependMatrix( this.getConcatenedMatrix().invert() );
@@ -884,8 +887,10 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		
 		points.push(pt1,pt2,pt3,pt4);
 		
-		rect.left = 0xFFFFFFFF;
-		rect.top = 0xFFFFFFFF;
+		rect.left = 2147483648;
+		rect.top = 2147483648;
+		rect.bottom = -2147483648;
+		rect.right = -2147483648;
 		
 		var i = points.length;
 		while( --i > -1 )
@@ -1720,7 +1725,13 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	Stage.prototype._cache = null;
 	Stage.prototype.background = false;
 	Stage.prototype.backgroundColor = "#0080C0";
+	Stage.prototype._stop = false;
 
+	
+	Stage.prototype._getContext  = function()
+	{
+		return this._canvas.getContext("2d");
+	};
 
 	Stage.prototype.init = function(canvas)
 	{
@@ -1736,11 +1747,14 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		};
 		
 		this._canvas = canvas;
-		this._context = canvas.getContext("2d");
+		this._context = this._getContext();
 		this.addEventListener(tomahawk_ns.Event.ADDED, this, this._eventHandler,true);
 		this.addEventListener(tomahawk_ns.Event.FOCUSED, this, this._eventHandler,true);
 		this.addEventListener(tomahawk_ns.Event.UNFOCUSED, this, this._eventHandler,true);
 		this._canvas.addEventListener("click",callback);
+		this._canvas.addEventListener("touchstart",callback);
+		this._canvas.addEventListener("touchmove",callback);
+		this._canvas.addEventListener("touchend",callback);
 		this._canvas.addEventListener("mousemove",callback);
 		this._canvas.addEventListener("mousedown",callback);
 		this._canvas.addEventListener("mouseup",callback);
@@ -1764,13 +1778,38 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 	Stage.prototype._mouseHandler = function(event)
 	{
-		event.preventDefault();
-		event.stopImmediatePropagation();
-		event.stopPropagation();
 		
 		var bounds = this._canvas.getBoundingClientRect();
-		var x = event.clientX - bounds.left;
-		var y = event.clientY - bounds.top;
+		var x = 0;
+		var y = 0;
+		var touch = null;
+		
+		
+		if( event.type == "touchstart" || 
+			event.type == "touchmove" || 
+			event.type == "touchend" 
+		)
+		{
+			touch = event.touches[0];
+			
+			if( event.type == "touchmove" )
+			{
+				event.preventDefault();
+				event.stopImmediatePropagation();
+				event.stopPropagation();
+			}
+			
+			x = touch.clientX - bounds.left;
+			y = touch.clientY - bounds.top;
+		}
+		else
+		{
+			event.preventDefault();
+			event.stopImmediatePropagation();
+			event.stopPropagation();
+			x = event.clientX - bounds.left;
+			y = event.clientY - bounds.top;
+		}
 		var activeChild = this.getObjectUnder(x,y);
 		var mouseEvent = null;
 		var i = 0;
@@ -1778,6 +1817,9 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		this._lastMouseY = this.mouseY >> 0;
 		this.mouseX = x >> 0;
 		this.mouseY = y >> 0;
+		
+		if( activeChild == null )
+			activeChild = this;
 		
 			
 		if( event.type == "mousemove" && this._lastActiveChild != activeChild )
@@ -1901,26 +1943,26 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	{
 		var curTime = new Date().getTime();
 		var scope = this;
-		var context = scope._context;
-		var canvas = scope._canvas;
+		var context = this._context;
+		var canvas = this._canvas;
 		
-		this.width = scope._canvas.width;
-		this.height = scope._canvas.height;
+		this.width = this._canvas.width;
+		this.height = this._canvas.height;
 		
-		scope._frameCount++;
+		this._frameCount++;
 		
-		if( curTime - scope._lastTime > 1000 )
+		if( curTime - this._lastTime > 1000 )
 		{
-			scope._fps = scope._frameCount;
-			scope._frameCount = 0;
-			scope._lastTime = curTime;
+			this._fps = this._frameCount;
+			this._frameCount = 0;
+			this._lastTime = curTime;
 		}
 		
-		if( scope.background == true )
+		if( this.background == true )
 		{
 			context.save();
 			context.beginPath();
-			context.fillStyle = scope.backgroundColor;
+			context.fillStyle = this.backgroundColor;
 			context.fillRect( 0, 0, canvas.width, canvas.height );
 			context.fill();
 			context.restore();
@@ -1929,13 +1971,12 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		{
 			context.clearRect(0,0,canvas.width,canvas.height);
 		}
+		
 		context.save();
-		
-		scope.draw(context);
-		
+		this.draw(context);
 		context.restore();
 		
-		scope.dispatchEvent(new tomahawk_ns.Event(tomahawk_ns.Event.ENTER_FRAME,true,true));
+		this.dispatchEvent(new tomahawk_ns.Event(tomahawk_ns.Event.ENTER_FRAME,true,true));
 		window.requestAnimationFrame(	function()
 										{
 											scope.enterFrame();
@@ -3004,11 +3045,14 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		
 		switch( event.type )
 		{
+			case "touchend": type = tomahawk_ns.MouseEvent.CLICK; break;
 			case "click": type = tomahawk_ns.MouseEvent.CLICK; break;
 			case "dblclick": type = tomahawk_ns.MouseEvent.DOUBLE_CLICK; break;
 			case "mousemove": type = tomahawk_ns.MouseEvent.MOUSE_MOVE; break;
+			case "touchmove": type = tomahawk_ns.MouseEvent.MOUSE_MOVE; break;
 			case "mouseup": type = tomahawk_ns.MouseEvent.MOUSE_UP; break;
 			case "mousedown": type = tomahawk_ns.MouseEvent.MOUSE_DOWN; break;
+			case "touchstart": type = tomahawk_ns.MouseEvent.MOUSE_DOWN; break;
 		}
 		
 		msevent = new tomahawk_ns.MouseEvent(type,bubbles,cancelable);
@@ -5226,7 +5270,6 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 			context.stroke();
 			context.restore();
 		}
-		
 		
 		tomahawk_ns.DisplayObjectContainer.prototype.draw.apply(this, [context]);		
 		
