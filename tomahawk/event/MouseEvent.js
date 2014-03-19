@@ -24,7 +24,7 @@
 		
 		switch( event.type )
 		{
-			case "touchend": type = tomahawk_ns.MouseEvent.CLICK; break;
+			case "touchend": type = tomahawk_ns.MouseEvent.MOUSE_UP; break;
 			case "click": type = tomahawk_ns.MouseEvent.CLICK; break;
 			case "dblclick": type = tomahawk_ns.MouseEvent.DOUBLE_CLICK; break;
 			case "mousemove": type = tomahawk_ns.MouseEvent.MOUSE_MOVE; break;

@@ -175,7 +175,7 @@
 	Keyboard.MAP[Keyboard.B]={normal:"b",shift:"B",altgr:""};
 	Keyboard.MAP[Keyboard.C]={normal:"c",shift:"C",altgr:""};
 	Keyboard.MAP[Keyboard.D]={normal:"d",shift:"D",altgr:""};
-	Keyboard.MAP[Keyboard.E]={normal:"e",shift:"E",altgr:""};
+	Keyboard.MAP[Keyboard.E]={normal:"e",shift:"E",altgr:"€"};
 	Keyboard.MAP[Keyboard.F]={normal:"f",shift:"F",altgr:""};
 	Keyboard.MAP[Keyboard.G]={normal:"g",shift:"G",altgr:""};
 	Keyboard.MAP[Keyboard.H]={normal:"h",shift:"H",altgr:""};

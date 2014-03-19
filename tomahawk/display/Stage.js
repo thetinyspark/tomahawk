@@ -126,12 +126,22 @@
 			if( event.type == "touchmove" )
 			{
 				event.preventDefault();
-				event.stopImmediatePropagation();
-				event.stopPropagation();
+				//event.stopImmediatePropagation();
+				//event.stopPropagation();
 			}
 			
-			x = touch.clientX - bounds.left;
-			y = touch.clientY - bounds.top;
+			
+			if( event.type != "touchend" )
+			{			
+				x = parseInt(touch.clientX) - bounds.left;
+				y = parseInt(touch.clientY) - bounds.top;
+			}
+			else
+			{
+				x = this.mouseX;
+				y = this.mouseY;
+			}
+			
 		}
 		else
 		{

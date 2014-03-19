@@ -421,7 +421,7 @@
 		var word = null;
 		var i = 0;
 		var max = this.children.length;
-		var lineY = 0;
+		var lineY = this.padding;
 		var lineX = this.padding;
 		var lineHeight = 0;
 		var lineWidth = 0;
