@@ -20,6 +20,7 @@
 	Word.prototype.index = 0;
 	Word.prototype.text = "";
 	Word.prototype.needRefresh = false;
+	Word.prototype.forceRefresh = true;
 	
 	Word.prototype.getNumLetters = function()
 	{
@@ -87,7 +88,7 @@
 	
 	Word.prototype.refresh = function()
 	{
-		if( this.needRefresh != true )
+		if( this.needRefresh != true && this.forceRefresh != true)
 			return;
 			
 		var max = this.children.length;
@@ -120,9 +121,13 @@
 		
 		this.width = currentX;
 		this.needRefresh = false;
-		this._cache = null;
-		this.updateCache();
-		this.cacheAsBitmap = true;
+		
+		if( this.forceRefresh == false )
+		{
+			this._cache = null;
+			this.updateCache();
+			this.cacheAsBitmap = true;
+		}
 	};
 	
 	Word.prototype.cut = function(index)

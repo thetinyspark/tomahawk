@@ -15,6 +15,7 @@
 	Tomahawk.registerClass(TextField,"TextField");
 	Tomahawk.extend("TextField","DisplayObjectContainer");
 
+	TextField.prototype.forceRefresh		= false;		
 	TextField.prototype.defaultTextFormat 	= null;
 	TextField.prototype.currentIndex 		= null;
 	TextField.prototype.background 			= false;
@@ -22,7 +23,7 @@
 	TextField.prototype.padding 			= 0;
 	TextField.prototype.backgroundColor 	= "white";
 	TextField.prototype.borderColor 		= "black";
-	TextField.prototype.autoSize 			= false;
+	TextField.prototype.autoSize 			= true;
 	TextField.prototype.focusable			= true;
 	
 	TextField.prototype._focused 			= false;
@@ -282,6 +283,23 @@
 		}
 	};
 	
+	TextField.prototype.getBoundingRectIn = function(spaceCoordinates)
+	{
+		var width = this.width;
+		var height = this.height;
+		var bounds = tomahawk_ns.DisplayObjectContainer.prototype.getBoundingRectIn.apply(this,[spaceCoordinates]);
+		
+		if( bounds.width < width ) 
+			bounds.width = width;
+			
+		if( bounds.height < height ) 
+			bounds.height = height;
+			
+		bounds.right = bounds.left + bounds.width;
+		bounds.bottom = bounds.top + bounds.height;
+		return bounds;
+	};
+	
 	TextField.prototype.draw = function(context)
 	{
 		var currentIndexLetter = this.getLetterAt(this.currentIndex);
@@ -300,7 +318,10 @@
 			context.save();
 			context.beginPath();
 			context.fillStyle = this.backgroundColor;
-			context.fillRect(0,0,this.width,this.height);
+			context.fillRect(	-this.padding,
+								-this.padding,
+								this.width + this.padding * 2,
+								this.height + this.padding * 2);
 			context.fill();
 			context.restore();
 		}
@@ -310,11 +331,11 @@
 			context.save();
 			context.beginPath();
 			context.strokeStyle = this.borderColor;
-			context.moveTo(0,0);
-			context.lineTo(this.width,0);
-			context.lineTo(this.width,this.height);
-			context.lineTo(0,this.height);
-			context.lineTo(0,0);
+			context.moveTo(- this.padding,- this.padding);
+			context.lineTo(this.width + this.padding,- this.padding);
+			context.lineTo(this.width + this.padding,this.height + this.padding);
+			context.lineTo( -this.padding,this.height + this.padding);
+			context.lineTo(-this.padding,-this.padding);
 			context.stroke();
 			context.restore();
 		}
@@ -357,9 +378,7 @@
 		}
 	};
 
-	
-	
-	
+
 	TextField.prototype._cutWord = function(word)
 	{
 		var letters = 0;
@@ -413,6 +432,7 @@
 		return ( a.getStartIndex() < b.getStartIndex() ) ? -1 : 1;
 	};
 	
+	
 	TextField.prototype._refresh = function()
 	{
 		var rowIndex = 0;
@@ -421,11 +441,12 @@
 		var word = null;
 		var i = 0;
 		var max = this.children.length;
-		var lineY = this.padding;
-		var lineX = this.padding;
+		var lineY = 0;
+		var lineX = 0;
 		var lineHeight = 0;
 		var lineWidth = 0;
 		var maxWidth = this.width - ( this.padding * 2 );
+		var aligned = false;
 		
 		this.children.sort( this._sortWords );
 		
@@ -433,7 +454,10 @@
 		{		
 			word = this.children[i];
 			word.index = i;
+			word.forceRefresh = this.forceRefresh;
 			word.refresh();
+			
+			aligned = false;
 
 			lineHeight = ( lineHeight < word.height ) ? word.height : lineHeight;
 			
@@ -446,12 +470,13 @@
 				lineWidth = 0;
 				currentRow = new Array();
 				lineHeight = word.height;
+				aligned = true;
 			}
 			
 			lineWidth += word.width;
 			currentRow.push(word);
 			
-			if( i == max - 1 )
+			if( i == max - 1 && aligned == false )
 			{
 				lineY += lineHeight;
 				this._alignRow( currentRow, rowIndex, lineX, lineY, lineWidth, lineHeight );

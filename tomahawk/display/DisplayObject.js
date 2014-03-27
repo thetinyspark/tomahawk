@@ -135,6 +135,7 @@
 		buffer = document.createElement("canvas");
 		buffer.width = ( bounds.width < 1 ) ? 1 : bounds.width ;
 		buffer.height = ( bounds.height < 1 ) ? 1 : bounds.height ;
+
 		
 		offX = bounds.left;
 		offY = bounds.top;
@@ -198,7 +199,6 @@
 			buffer.height = this._cache.height;
 			
 			context = buffer.getContext("2d");
-			
 			mat = mask.getConcatenedMatrix().prependMatrix( this.getConcatenedMatrix().invert() );
 			
 			context.save();

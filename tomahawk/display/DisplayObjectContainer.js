@@ -137,10 +137,14 @@
 		{
 			child = children[i];
 			
-			if( !child.visible || child.isMask == true )
+			if( !child.visible )
 				continue;
 			
 			child.updateMatrix();
+			
+			if( child.isMask == true )
+				continue;
+			
 			mat = child.matrix;
 			
 			context.save();

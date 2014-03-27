@@ -32,6 +32,11 @@
 
 	MovieClip.prototype.setFrame = function( frameIndex, texture )
 	{
+		if( this.texture == null)
+		{
+			this.setTexture(texture);
+		}
+		
 		this._frames[frameIndex] = texture;
 	};
 
