@@ -47,14 +47,14 @@
 		if( this.stage == null )
 			return;
 			
-		this.stage.addEventListener(Event.ENTER_FRAME, this,this._enterFrameHandler); 
+		this.stage.addEventListener(tomahawk_ns.Event.ENTER_FRAME, this,this._enterFrameHandler); 
 	};
 
 	MovieClip.prototype.stop = function()
 	{
 		if( this.stage == null )
 			return;
-		this.stage.removeEventListener(Event.ENTER_FRAME, this,this._enterFrameHandler); 
+		this.stage.removeEventListener(tomahawk_ns.Event.ENTER_FRAME, this,this._enterFrameHandler); 
 	};
 
 	tomahawk_ns.MovieClip = MovieClip;
