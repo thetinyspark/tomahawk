@@ -4723,6 +4723,7 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	{
 		var context = Letter._metricsContext;
 		var ratio = 1;
+		
 		context.save();
 		
 		this.format.updateContext(context);
@@ -4766,10 +4767,13 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 			context.restore();
 		}
 		
+	
 		this.format.updateContext(context);
 		
-		context.textBaseline = 'top';
+		
+		context.beginPath();
 		context.fillText(this.value,0,0);
+		context.closePath();
 		
 		if( this.format.underline == true )
 		{
@@ -4780,6 +4784,24 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 			context.stroke();
 			context.restore();
 		}	
+		
+		if( this.format.smooth == true )
+		{
+			context.beginPath();
+			this.format.updateSmoothContext(context);
+			context.strokeText(this.value,0,0);
+			context.closePath();
+		}
+		
+		if( this.format.textBorder == true )
+		{
+			context.beginPath();
+			this.format.updateBorderContext(context);
+			context.strokeText(this.value,this.format.textBorderOffsetX,this.format.textBorderOffsetY);
+			context.closePath();
+		}
+		
+		
 	};
 
 	Letter.prototype.clone = function()
@@ -5554,7 +5576,7 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 			word.refresh();
 			lineHeight = ( lineHeight < word.height ) ? word.height : lineHeight;
 			
-			if( lineWidth + word.width > maxWidth || word.newline == true && i != 0)
+			if( i != 0 && ( lineWidth + word.width > maxWidth || word.newline == true ) )
 			{
 				lineY += lineHeight;
 				this._alignRow( currentRow, rowIndex, lineX, lineY, lineWidth, lineHeight );
@@ -5653,13 +5675,18 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	TextFormat.prototype.bold = false;
 	TextFormat.prototype.italic = false;
 	TextFormat.prototype.size = 12;
+	TextFormat.prototype.textBorder = false;
+	TextFormat.prototype.textBorderColor = "black";
+	TextFormat.prototype.textBorderOffsetX = 0;
+	TextFormat.prototype.textBorderOffsetY = 0;
+	TextFormat.prototype.textBorderThickness = 2;
 	
 	TextFormat.prototype.customMetrics = false;
 	TextFormat.prototype.fontBaseWidth = -1;
 	TextFormat.prototype.fontBaseHeight = -1;
 	TextFormat.prototype.fontBaseSize = 0;
 	
-	TextFormat.prototype.smooth = true;
+	TextFormat.prototype.smooth = false;
 	TextFormat.prototype.smoothQuality = 1;
 
 	TextFormat.prototype.updateContext = function(context)
@@ -5669,17 +5696,30 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		
 		context.font = italic+' '+bold+' '+this.size+'px '+this.font;
 		context.fillStyle = this.textColor;
-		
-		if( this.smooth == true )
-		{
-			context.shadowColor = this.textColor;
-			context.shadowBlur = this.smoothQuality;
-		}
+		context.textBaseline = 'top';
 		
 		if( this.underline == true )
 		{
 			context.strokeStyle = this.textColor;
 		}
+	};
+	
+	TextFormat.prototype.updateBorderContext = function(context)
+	{
+		this.updateContext(context);
+		context.shadowColor = this.textBorderColor;
+		context.shadowBlur = this.smoothQuality;
+		context.lineWidth = this.textBorderThickness;
+		context.strokeStyle = this.textBorderColor;
+	};
+	
+	TextFormat.prototype.updateSmoothContext = function(context)
+	{
+		this.updateContext(context);
+		context.strokeStyle = this.textColor;
+		context.lineWidth = this.smoothQuality;
+		context.shadowColor = this.textColor;
+		context.shadowBlur = this.smoothQuality;
 	};
 
 	TextFormat.prototype.clone = function()
@@ -5687,15 +5727,22 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		var format = new tomahawk_ns.TextFormat();
 		format.textColor = this.textColor+"";
 		format.font = this.font+"";
-		format.bold = ( this.bold == true );
-		format.underline = ( this.underline == true );
-		format.italic = ( this.italic == true );
 		format.size = parseInt( this.size );
 		format.fontBaseWidth = parseInt(this.fontBaseWidth);
 		format.fontBaseHeight = parseInt(this.fontBaseHeight);
 		format.fontBaseSize = parseInt(this.fontBaseSize);
 		format.smoothQuality = parseInt(this.smoothQuality);
 		
+		
+		format.textBorderColor = this.textBorderColor;
+		format.textBorderOffsetY = parseInt(this.textBorderOffsetX);
+		format.textBorderOffsetY = parseInt(this.textBorderOffsetY);
+		format.textBorderThickness = parseInt(this.textBorderThickness);
+		
+		format.bold = ( this.bold == true );
+		format.underline = ( this.underline == true );
+		format.italic = ( this.italic == true );
+		format.textBorder = ( this.textBorder == true );
 		format.customMetrics = ( this.customMetrics == true );
 		format.smooth = (this.smooth == true);
 		

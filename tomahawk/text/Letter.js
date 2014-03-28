@@ -36,6 +36,7 @@
 	{
 		var context = Letter._metricsContext;
 		var ratio = 1;
+		
 		context.save();
 		
 		this.format.updateContext(context);
@@ -79,10 +80,13 @@
 			context.restore();
 		}
 		
+	
 		this.format.updateContext(context);
 		
-		context.textBaseline = 'top';
+		
+		context.beginPath();
 		context.fillText(this.value,0,0);
+		context.closePath();
 		
 		if( this.format.underline == true )
 		{
@@ -93,6 +97,24 @@
 			context.stroke();
 			context.restore();
 		}	
+		
+		if( this.format.smooth == true )
+		{
+			context.beginPath();
+			this.format.updateSmoothContext(context);
+			context.strokeText(this.value,0,0);
+			context.closePath();
+		}
+		
+		if( this.format.textBorder == true )
+		{
+			context.beginPath();
+			this.format.updateBorderContext(context);
+			context.strokeText(this.value,this.format.textBorderOffsetX,this.format.textBorderOffsetY);
+			context.closePath();
+		}
+		
+		
 	};
 
 	Letter.prototype.clone = function()

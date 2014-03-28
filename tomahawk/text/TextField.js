@@ -476,7 +476,7 @@
 			word.refresh();
 			lineHeight = ( lineHeight < word.height ) ? word.height : lineHeight;
 			
-			if( lineWidth + word.width > maxWidth || word.newline == true && i != 0)
+			if( i != 0 && ( lineWidth + word.width > maxWidth || word.newline == true ) )
 			{
 				lineY += lineHeight;
 				this._alignRow( currentRow, rowIndex, lineX, lineY, lineWidth, lineHeight );
