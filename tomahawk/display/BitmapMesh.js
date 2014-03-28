@@ -1,12 +1,9 @@
-/**
- * @author The Tiny Spark
- */
-
 (function() {
 	
 	function BitmapMesh(texture)
 	{
 		tomahawk_ns.Bitmap.apply(this,[texture]);
+		this._canvas = document.createElement("canvas");
 	}
 
 	Tomahawk.registerClass( BitmapMesh, "BitmapMesh" );
@@ -45,8 +42,6 @@
 		var uv2 = null;
 		var uv3 = null;
 		
-		//console.clear();
-		
 		for( i = 0; i < max; i+=3 )
 		{
 			index1 = indices[i];
@@ -65,7 +60,6 @@
 	
 	BitmapMesh.prototype._drawTriangle = function(v1,v2,v3,uv1,uv2,uv3, ctx, texture, texW, texH ) 
 	{
-		
         ctx.save(); 
 		
         var x0 = v1[0], x1 = v2[0], x2 = v3[0];
@@ -89,15 +83,18 @@
 		ctx.fillStyle = "black";
 		ctx.lineWidth = 1;
 		
-		ctx.moveTo(x0 - 1, y0 - 1); 
-		ctx.lineTo(x1 - 1, y1 - 1);
-        ctx.lineTo(x2 - 1, y2 - 1); 
-		ctx.lineTo(x0 - 1,y0 - 1);
-		
-		ctx.moveTo(x0 + 1, y0 + 1); 
-		ctx.lineTo(x1 + 1, y1 + 1);
-        ctx.lineTo(x2 + 1, y2 + 1); 
-		ctx.lineTo(x0 + 1, y0 + 1);
+		if( this.showLines == false )
+		{
+			ctx.moveTo(x0 - 1, y0 - 1); 
+			ctx.lineTo(x1 - 1, y1 - 1);
+			ctx.lineTo(x2 - 1, y2 - 1); 
+			ctx.lineTo(x0 - 1,y0 - 1);
+			
+			ctx.moveTo(x0 + 1, y0 + 1); 
+			ctx.lineTo(x1 + 1, y1 + 1);
+			ctx.lineTo(x2 + 1, y2 + 1); 
+			ctx.lineTo(x0 + 1, y0 + 1);
+		}
 		
 		ctx.moveTo(x0, y0 ); 
 		ctx.lineTo(x1, y1 );
@@ -132,7 +129,7 @@
 		{
 			ctx.save();
 			ctx.beginPath(); 
-			ctx.fillStyle = "black";
+			ctx.strokeStyle = "black";
 			ctx.lineWidth = 1;
 			ctx.moveTo(x0, y0 ); 
 			ctx.lineTo(x1, y1 );
@@ -147,5 +144,3 @@
 	tomahawk_ns.BitmapMesh = BitmapMesh;
 
 })();
-
-
