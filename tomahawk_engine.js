@@ -4524,6 +4524,75 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
  */
 (function() {
 	
+	function Font(fontName)
+	{
+		this.fontName = fontName;
+		this.refresh();
+	}
+	
+	Tomahawk.registerClass(Font,"Font");
+
+	Font.prototype.name = null;
+	Font.prototype.baseWidth = 1;
+	Font.prototype.baseHeight = 1;
+	Font.prototype.baseSize = 10;
+	
+	Font.prototype.refresh = function()
+	{
+		var canvas = document.createElement("canvas");
+		var context = canvas.getContext("2d");
+		var letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz";
+		var i = letters.length;
+		var pixels = null;
+		var alpha = -1;
+		var rowLength = 0;
+		var measure = null;
+		
+		canvas.width = canvas.height = 100;
+		context.font = this.baseSize+'px '+this.fontName;
+		context.textBaseline = 'top';
+		context.textAlign = 'start';
+		
+		while( --i > -1 )
+		{
+			context.save();
+			context.beginPath();
+			
+			measure = context.measureText(letters.charAt(i)).width;
+			this.baseWidth = ( this.baseWidth < measure ) ? measure : this.baseWidth;
+			
+			context.fillText(letters.charAt(i),0,0);
+			context.restore();
+		}
+		
+		this.baseWidth += 5;
+
+		pixels = context.getImageData(0,0,100,100).data;
+		
+		i = pixels.length / 4;
+		
+		while( --i > -1 )
+		{
+			alpha = pixels[i*4 + 3];
+			
+			if( alpha > 0 )
+			{
+				this.baseHeight = parseInt(i / canvas.height) + 2;
+				break;
+			}
+		}
+	};
+
+	tomahawk_ns.Font = Font;
+})();
+
+
+
+/**
+ * @author The Tiny Spark
+ */
+(function() {
+	
 	function InputTextField()
 	{
 		tomahawk_ns.SelectableTextField.apply(this);
@@ -4653,11 +4722,32 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	Letter.prototype.updateMetrics = function()
 	{
 		var context = Letter._metricsContext;
+		var ratio = 1;
 		context.save();
 		
 		this.format.updateContext(context);
-		this.textHeight = ( context.measureText('M').width ) * 1.4;
-		this.textWidth = context.measureText(this.value).width;
+		
+	
+		if( this.format.customMetrics == false )
+		{
+			this.textHeight = ( context.measureText('M').width ) * 1.4;
+			this.textWidth = context.measureText(this.value).width;
+		}
+		else
+		{
+			ratio = ( this.format.size / this.format.fontBaseSize );
+			this.textHeight = parseInt(this.format.fontBaseHeight * ratio);
+			
+			if( this.format.fontBaseWidth == -1 )
+			{
+				this.textWidth = context.measureText(this.value).width;
+			}
+			else
+			{
+				this.textWidth = parseInt(this.format.fontBaseWidth * ratio);
+			}
+		}
+		
 		this.width = this.textWidth;
 		this.height = this.textHeight;
 		
@@ -4677,6 +4767,7 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		}
 		
 		this.format.updateContext(context);
+		
 		context.textBaseline = 'top';
 		context.fillText(this.value,0,0);
 		
@@ -4699,6 +4790,8 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		letter.row = this.row;
 		letter.textWidth = this.textWidth;
 		letter.textHeight = this.textHeight;
+		letter.height = this.height;
+		letter.width = this.width;
 		letter.selected = this.selected;
 		
 		return letter;
@@ -5283,6 +5376,27 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		bounds.right = bounds.left + bounds.width;
 		bounds.bottom = bounds.top + bounds.height;
 		return bounds;
+	};	
+	
+	TextField.prototype.updateBounds = function()
+	{
+		var width = this.width;
+		var height = this.height;
+		tomahawk_ns.DisplayObjectContainer.prototype.updateBounds.apply(this);
+		
+		var bounds = this.bounds;
+		
+		if( bounds.width < width ) 
+			bounds.width = width;
+			
+		if( bounds.height < height ) 
+			bounds.height = height;
+			
+		bounds.right = bounds.left + bounds.width;
+		bounds.bottom = bounds.top + bounds.height;
+		
+		this.width = bounds.width;
+		this.height = bounds.height;
 	};
 	
 	TextField.prototype.draw = function(context)
@@ -5303,10 +5417,7 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 			context.save();
 			context.beginPath();
 			context.fillStyle = this.backgroundColor;
-			context.fillRect(	-this.padding,
-								-this.padding,
-								this.width + this.padding * 2,
-								this.height + this.padding * 2);
+			context.fillRect(0,0,this.width,this.height);
 			context.fill();
 			context.restore();
 		}
@@ -5316,11 +5427,11 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 			context.save();
 			context.beginPath();
 			context.strokeStyle = this.borderColor;
-			context.moveTo(- this.padding,- this.padding);
-			context.lineTo(this.width + this.padding,- this.padding);
-			context.lineTo(this.width + this.padding,this.height + this.padding);
-			context.lineTo( -this.padding,this.height + this.padding);
-			context.lineTo(-this.padding,-this.padding);
+			context.moveTo(0,0);
+			context.lineTo(this.width,0);
+			context.lineTo(this.width,this.height);
+			context.lineTo( 0,this.height);
+			context.lineTo(0,0);
 			context.stroke();
 			context.restore();
 		}
@@ -5426,12 +5537,12 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		var word = null;
 		var i = 0;
 		var max = this.children.length;
-		var lineY = 0;
-		var lineX = 0;
+		var lineY = this.padding;
+		var lineX = this.padding;
 		var lineHeight = 0;
 		var lineWidth = 0;
-		var aligned = false;
-		var maxWidth = this.width - ( this.padding * 2 );
+		var maxWidth = this.padding + ( this.width - this.padding * 2 );
+		var textWidth = 0;
 		
 		this.children.sort( this._sortWords );
 		
@@ -5441,17 +5552,13 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 			word.index = i;
 			word.forceRefresh = this.forceRefresh;
 			word.refresh();
-			
-			aligned = false;
-			
 			lineHeight = ( lineHeight < word.height ) ? word.height : lineHeight;
 			
-			if( lineWidth + word.width > maxWidth || word.newline == true )
+			if( lineWidth + word.width > maxWidth || word.newline == true && i != 0)
 			{
 				lineY += lineHeight;
 				this._alignRow( currentRow, rowIndex, lineX, lineY, lineWidth, lineHeight );
-				aligned = true;
-				
+			
 				rowIndex++;
 				lineWidth = 0;
 				currentRow = new Array();
@@ -5461,7 +5568,7 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 			lineWidth += word.width;
 			currentRow.push(word);
 			
-			if( i == max - 1 && aligned == false )
+			if( i == max - 1 )
 			{
 				lineY += lineHeight;
 				this._alignRow( currentRow, rowIndex, lineX, lineY, lineWidth, lineHeight );
@@ -5546,6 +5653,14 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	TextFormat.prototype.bold = false;
 	TextFormat.prototype.italic = false;
 	TextFormat.prototype.size = 12;
+	
+	TextFormat.prototype.customMetrics = false;
+	TextFormat.prototype.fontBaseWidth = -1;
+	TextFormat.prototype.fontBaseHeight = -1;
+	TextFormat.prototype.fontBaseSize = 0;
+	
+	TextFormat.prototype.smooth = true;
+	TextFormat.prototype.smoothQuality = 1;
 
 	TextFormat.prototype.updateContext = function(context)
 	{
@@ -5554,6 +5669,12 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		
 		context.font = italic+' '+bold+' '+this.size+'px '+this.font;
 		context.fillStyle = this.textColor;
+		
+		if( this.smooth == true )
+		{
+			context.shadowColor = this.textColor;
+			context.shadowBlur = this.smoothQuality;
+		}
 		
 		if( this.underline == true )
 		{
@@ -5570,6 +5691,13 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		format.underline = ( this.underline == true );
 		format.italic = ( this.italic == true );
 		format.size = parseInt( this.size );
+		format.fontBaseWidth = parseInt(this.fontBaseWidth);
+		format.fontBaseHeight = parseInt(this.fontBaseHeight);
+		format.fontBaseSize = parseInt(this.fontBaseSize);
+		format.smoothQuality = parseInt(this.smoothQuality);
+		
+		format.customMetrics = ( this.customMetrics == true );
+		format.smooth = (this.smooth == true);
 		
 		return format;
 	};
@@ -5701,6 +5829,7 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		}
 		
 		this.width = currentX;
+		
 		this.needRefresh = false;
 		
 		if( this.forceRefresh == false )
@@ -5813,4 +5942,11 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 })();
 
 
+
+
+
+/**
+ * ...
+ * @author Hatshepsout
+ */
 

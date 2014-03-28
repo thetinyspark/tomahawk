@@ -120,6 +120,7 @@
 		}
 		
 		this.width = currentX;
+		
 		this.needRefresh = false;
 		
 		if( this.forceRefresh == false )

@@ -298,6 +298,27 @@
 		bounds.right = bounds.left + bounds.width;
 		bounds.bottom = bounds.top + bounds.height;
 		return bounds;
+	};	
+	
+	TextField.prototype.updateBounds = function()
+	{
+		var width = this.width;
+		var height = this.height;
+		tomahawk_ns.DisplayObjectContainer.prototype.updateBounds.apply(this);
+		
+		var bounds = this.bounds;
+		
+		if( bounds.width < width ) 
+			bounds.width = width;
+			
+		if( bounds.height < height ) 
+			bounds.height = height;
+			
+		bounds.right = bounds.left + bounds.width;
+		bounds.bottom = bounds.top + bounds.height;
+		
+		this.width = bounds.width;
+		this.height = bounds.height;
 	};
 	
 	TextField.prototype.draw = function(context)
@@ -318,10 +339,7 @@
 			context.save();
 			context.beginPath();
 			context.fillStyle = this.backgroundColor;
-			context.fillRect(	-this.padding,
-								-this.padding,
-								this.width + this.padding * 2,
-								this.height + this.padding * 2);
+			context.fillRect(0,0,this.width,this.height);
 			context.fill();
 			context.restore();
 		}
@@ -331,11 +349,11 @@
 			context.save();
 			context.beginPath();
 			context.strokeStyle = this.borderColor;
-			context.moveTo(- this.padding,- this.padding);
-			context.lineTo(this.width + this.padding,- this.padding);
-			context.lineTo(this.width + this.padding,this.height + this.padding);
-			context.lineTo( -this.padding,this.height + this.padding);
-			context.lineTo(-this.padding,-this.padding);
+			context.moveTo(0,0);
+			context.lineTo(this.width,0);
+			context.lineTo(this.width,this.height);
+			context.lineTo( 0,this.height);
+			context.lineTo(0,0);
 			context.stroke();
 			context.restore();
 		}
@@ -441,12 +459,12 @@
 		var word = null;
 		var i = 0;
 		var max = this.children.length;
-		var lineY = 0;
-		var lineX = 0;
+		var lineY = this.padding;
+		var lineX = this.padding;
 		var lineHeight = 0;
 		var lineWidth = 0;
-		var aligned = false;
-		var maxWidth = this.width - ( this.padding * 2 );
+		var maxWidth = this.padding + ( this.width - this.padding * 2 );
+		var textWidth = 0;
 		
 		this.children.sort( this._sortWords );
 		
@@ -456,17 +474,13 @@
 			word.index = i;
 			word.forceRefresh = this.forceRefresh;
 			word.refresh();
-			
-			aligned = false;
-			
 			lineHeight = ( lineHeight < word.height ) ? word.height : lineHeight;
 			
-			if( lineWidth + word.width > maxWidth || word.newline == true )
+			if( lineWidth + word.width > maxWidth || word.newline == true && i != 0)
 			{
 				lineY += lineHeight;
 				this._alignRow( currentRow, rowIndex, lineX, lineY, lineWidth, lineHeight );
-				aligned = true;
-				
+			
 				rowIndex++;
 				lineWidth = 0;
 				currentRow = new Array();
@@ -476,7 +490,7 @@
 			lineWidth += word.width;
 			currentRow.push(word);
 			
-			if( i == max - 1 && aligned == false )
+			if( i == max - 1 )
 			{
 				lineY += lineHeight;
 				this._alignRow( currentRow, rowIndex, lineX, lineY, lineWidth, lineHeight );

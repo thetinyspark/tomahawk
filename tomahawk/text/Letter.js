@@ -35,11 +35,32 @@
 	Letter.prototype.updateMetrics = function()
 	{
 		var context = Letter._metricsContext;
+		var ratio = 1;
 		context.save();
 		
 		this.format.updateContext(context);
-		this.textHeight = ( context.measureText('M').width ) * 1.4;
-		this.textWidth = context.measureText(this.value).width;
+		
+	
+		if( this.format.customMetrics == false )
+		{
+			this.textHeight = ( context.measureText('M').width ) * 1.4;
+			this.textWidth = context.measureText(this.value).width;
+		}
+		else
+		{
+			ratio = ( this.format.size / this.format.fontBaseSize );
+			this.textHeight = parseInt(this.format.fontBaseHeight * ratio);
+			
+			if( this.format.fontBaseWidth == -1 )
+			{
+				this.textWidth = context.measureText(this.value).width;
+			}
+			else
+			{
+				this.textWidth = parseInt(this.format.fontBaseWidth * ratio);
+			}
+		}
+		
 		this.width = this.textWidth;
 		this.height = this.textHeight;
 		
@@ -59,6 +80,7 @@
 		}
 		
 		this.format.updateContext(context);
+		
 		context.textBaseline = 'top';
 		context.fillText(this.value,0,0);
 		
@@ -81,6 +103,8 @@
 		letter.row = this.row;
 		letter.textWidth = this.textWidth;
 		letter.textHeight = this.textHeight;
+		letter.height = this.height;
+		letter.width = this.width;
 		letter.selected = this.selected;
 		
 		return letter;
