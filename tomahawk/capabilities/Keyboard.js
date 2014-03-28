@@ -8,6 +8,36 @@
 	function Keyboard(){}
 	
 	Tomahawk.registerClass( Keyboard, "Keyboard" );
+	
+	Keyboard._createInput = function()
+	{
+		if( Keyboard._input == null )
+		{
+			var input = document.createElement("input");
+			input.style.position = "absolute";
+			input.style.left = "-1000px";
+			input.style.top = "0";
+			input.style.width = "10px";
+			input.style.height = "10px";
+			document.body.appendChild(input);
+			Keyboard._input = input;
+		}
+		
+	};
+	
+	Keyboard._input = null;
+	
+	Keyboard.activate = function(stage)
+	{
+		Keyboard._createInput();
+		Keyboard._input.focus();
+	};	
+	
+	Keyboard.deactivate = function(stage)
+	{
+		Keyboard._createInput();
+		Keyboard._input.unfocus();
+	};
 
 	Keyboard.keyCodeToChar = function(keyCode, shiftKey, ctrlKey, altKey)
 	{

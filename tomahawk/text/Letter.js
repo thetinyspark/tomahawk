@@ -38,10 +38,10 @@
 		context.save();
 		
 		this.format.updateContext(context);
-		this.textHeight = ( context.measureText('M').width );
+		this.textHeight = ( context.measureText('M').width ) * 1.4;
 		this.textWidth = context.measureText(this.value).width;
 		this.width = this.textWidth;
-		this.height = this.textHeight * 1.4;
+		this.height = this.textHeight;
 		
 		context.restore();
 	};
@@ -53,7 +53,9 @@
 			context.save();
 			context.beginPath();
 			context.fillStyle = this.format.backgroundSelectedColor;
-			context.fillRect(0, 0, this.textWidth, this.textHeight );
+			context.textBaseline = 'top';
+			//context.fillRect(0, 0, this.textWidth, this.textHeight );
+			context.fillRect(0, 0, this.textWidth, 0);
 			context.fill();
 			context.restore();
 		}

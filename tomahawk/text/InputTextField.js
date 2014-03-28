@@ -18,6 +18,19 @@
 		this.stage.addEventListener( tomahawk_ns.KeyEvent.KEY_DOWN, this, this._keyHandler );
 	};
 	
+	InputTextField.prototype.setFocus = function(value)
+	{
+		if( value == true )
+		{
+			tomahawk_ns.Keyboard.activate();
+		}
+		else
+		{
+			tomahawk_ns.Keyboard.deactivate();
+		}
+		tomahawk_ns.SelectableTextField.prototype.setFocus.apply(this,[value]);
+	};
+	
 	InputTextField.prototype._keyHandler = function(event)
 	{
 		if( this.getFocus() == false )

@@ -15,7 +15,7 @@
 	Tomahawk.registerClass(TextField,"TextField");
 	Tomahawk.extend("TextField","DisplayObjectContainer");
 
-	TextField.prototype.forceRefresh		= false;		
+	TextField.prototype.forceRefresh		= true;		
 	TextField.prototype.defaultTextFormat 	= null;
 	TextField.prototype.currentIndex 		= null;
 	TextField.prototype.background 			= false;
@@ -445,8 +445,8 @@
 		var lineX = 0;
 		var lineHeight = 0;
 		var lineWidth = 0;
-		var maxWidth = this.width - ( this.padding * 2 );
 		var aligned = false;
+		var maxWidth = this.width - ( this.padding * 2 );
 		
 		this.children.sort( this._sortWords );
 		
@@ -458,19 +458,19 @@
 			word.refresh();
 			
 			aligned = false;
-
+			
 			lineHeight = ( lineHeight < word.height ) ? word.height : lineHeight;
 			
 			if( lineWidth + word.width > maxWidth || word.newline == true )
 			{
 				lineY += lineHeight;
 				this._alignRow( currentRow, rowIndex, lineX, lineY, lineWidth, lineHeight );
+				aligned = true;
 				
 				rowIndex++;
 				lineWidth = 0;
 				currentRow = new Array();
 				lineHeight = word.height;
-				aligned = true;
 			}
 			
 			lineWidth += word.width;
@@ -485,7 +485,7 @@
 		
 		if( this.autoSize == true && word != null )
 		{
-			this.height = word.y + word.height;
+			this.height = word.y + ( word.height * 1.5 );
 		}
 		
 		
