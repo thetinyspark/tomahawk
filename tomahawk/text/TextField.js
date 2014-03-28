@@ -485,12 +485,9 @@
 		
 		if( this.autoSize == true && word != null )
 		{
-			this.height = word.y + ( word.height * 1.5 );
+			this.height = word.y + ( word.height );
 		}
 		
-		
-		//this._cache = null;
-		//this.cacheAsBitmap = true;
 		this._lastWidth = this.width;
 	};
 	

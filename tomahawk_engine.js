@@ -4671,15 +4671,14 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 			context.save();
 			context.beginPath();
 			context.fillStyle = this.format.backgroundSelectedColor;
-			context.textBaseline = 'top';
-			//context.fillRect(0, 0, this.textWidth, this.textHeight );
 			context.fillRect(0, 0, this.textWidth, 0);
 			context.fill();
 			context.restore();
 		}
 		
 		this.format.updateContext(context);
-		context.fillText(this.value,0,this.textHeight);
+		context.textBaseline = 'top';
+		context.fillText(this.value,0,0);
 		
 		if( this.format.underline == true )
 		{
@@ -5471,12 +5470,9 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		
 		if( this.autoSize == true && word != null )
 		{
-			this.height = word.y + ( word.height * 1.5 );
+			this.height = word.y + ( word.height );
 		}
 		
-		
-		//this._cache = null;
-		//this.cacheAsBitmap = true;
 		this._lastWidth = this.width;
 	};
 	
