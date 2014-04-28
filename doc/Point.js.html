@@ -25,14 +25,14 @@
         <meta property="og:locale" content="fr_FR"/>
         <meta property="og:title" content="Tomahawk, moteur 2D"/>
         <meta property="og:description" content="Documentation du moteur d'affichage 2D : Tomahawk"/>
-        <meta property="og:url" content="http://the-tiny-spark.com/tomahawk/Source: display/Bitmap.js"/>
+        <meta property="og:url" content="http://the-tiny-spark.com/tomahawk/Source: geom/Point.js"/>
         <meta property="og:site_name" content="The Tiny Spark"/>
         <meta property='og:image' content='http://the-tiny-spark.com/tomahawk/assets/images/tomahawk.jpg'/>
         <meta property='og:image' content='http://the-tiny-spark.com/tomahawk/assets/images/ground.png'/>
         <meta property='og:image' content='http://the-tiny-spark.com/tomahawk/assets/images/hero.png'/>
         <meta property='og:image' content='http://the-tiny-spark.com/social/connect.jpg'/>
 
-        <title>JSDoc: Source: display/Bitmap.js</title>
+        <title>JSDoc: Source: geom/Point.js</title>
 		
 		<link rel="stylesheet" media="screen" href="http://the-tiny-spark.com/assets/css/font-awesome.min.css" type="text/css"/>
         <link rel="stylesheet" media="screen" href="http://the-tiny-spark.com/assets/css/studio.css" type="text/css"/>
@@ -129,7 +129,7 @@
 
 			<div id="main">
 
-				<h1 class="page-title">Source: display/Bitmap.js</h1>
+				<h1 class="page-title">Source: geom/Point.js</h1>
 
 				
 
@@ -168,70 +168,54 @@
 
 (function() {
 	
+	
 	/**
-	* @class Bitmap
-	* @memberOf tomahawk_ns
-	* @param {Texture2D} the drawing texture.
-	* @augments {DisplayObject}
-	* @constructor
-	*/
-	function Bitmap(texture)
+	 * @class Point
+	 * @description Represents a basic 2d point
+	 * @memberOf tomahawk_ns
+	 * @param {Number} x the x value of the point on the x axis
+	 * @param {Number} y the y value of the point on the y axis
+	 * @constructor
+	 **/
+	function Point(x,y)
 	{
-		tomahawk_ns.DisplayObject.apply(this);
-		
-		if( texture == undefined )
-			return;
-			
-		this.setTexture(texture);
+		this.x = x, this.y = y
 	}
-
-	Tomahawk.registerClass( Bitmap, "Bitmap" );
-	Tomahawk.extend( "Bitmap", "DisplayObject" );
-
-	/**
-	 * The current drawing texture.
-	 * @public
-	 * @property texture
-	 * @type Texture2D
-	 * @memberOf tomahawk_ns.Bitmap
-	 * @default null
-	 */
-	Bitmap.prototype.texture = null;
+	
+	Tomahawk.registerClass( Point, "Point" );
 	
 	/**
-	* @public
-	* @method setTexture
-	* @param {Texture2D} texture 
-	* @memberOf tomahawk_ns.Bitmap
+	* @member {Number} x the x position of  the point
+	* @memberOf tomahawk_ns.Point.prototype
 	**/
-	Bitmap.prototype.setTexture = function(texture)
+	Point.prototype.x = 0;
+	/**
+	* @member {Number} y the y position of  the point
+	* @memberOf tomahawk_ns.Point.prototype
+	**/
+	Point.prototype.y = 0;
+	
+	
+	/**
+	* @method distanceBetween
+	* @description returns a distance between two points
+	* @memberOf tomahawk_ns.Point
+	* @param {tomahawk_ns.Point} pointA
+	* @param {tomahawk_ns.Point} pointB
+	* @returns {Number}
+	**/
+	Point.distanceBetween = function(pointA, pointB)
 	{
-		this.texture = texture;
-		this.width = this.texture.rect[2];
-		this.height = this.texture.rect[3];
-	};
-
-	/**
-	* @public
-	* @method draw
-	* Draws the display object into the specified context
-	* @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
-	* @memberOf tomahawk_ns.Bitmap 
-	**/
-	Bitmap.prototype.draw = function( context )
-	{	
-		var rect = this.texture.rect;
-		var data = this.texture.data;
-			
-		context.drawImage(	data, rect[0], rect[1], rect[2], rect[3], 0, 0, this.width, this.height );
+		var distX = ( pointB.x - pointA.x ) * ( pointB.x - pointA.x );
+		var distY = ( pointB.y - pointA.y ) * ( pointB.y - pointA.y );
+		var segLength = Math.sqrt( distX + distY );  
+		return segLength;
 	};
 	
-	tomahawk_ns.Bitmap = Bitmap;
 
-})();
-
-
-</code></pre>
+	
+	tomahawk_ns.Point = Point;
+})();</code></pre>
         </article>
     </section>
 

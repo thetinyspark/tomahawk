@@ -29,7 +29,15 @@
 
 (function() {
 	
-
+	/**
+	 * @class Point3D
+	 * @memberOf tomahawk_ns
+	 * @description a basic 3D point
+	 * @constructor
+	 * @param {Number} x the value on the x axis
+	 * @param {Number} y the value on the y axis
+	 * @param {Number} z the value on the z axis
+	 **/
 	function Point3D(x,y,z)
 	{
 		this.x = x || 0;
@@ -39,9 +47,26 @@
 	
 	Tomahawk.registerClass( Point3D, "Point3D" );
 	
-	
+	/**
+	* @member x
+	* @memberOf tomahawk_ns.Point3D.prototype
+	* @type {Number}
+	* @description the value on the x axis.
+	**/
 	Point3D.prototype.x = 0;
+	/**
+	* @member y
+	* @memberOf tomahawk_ns.Point3D.prototype
+	* @type {Number}
+	* @description the value on the y axis.
+	**/
 	Point3D.prototype.y = 0;
+	/**
+	* @member z
+	* @memberOf tomahawk_ns.Point3D.prototype
+	* @type {Number}
+	* @description the value on the z axis.
+	**/
 	Point3D.prototype.z = 0;
 	
 	

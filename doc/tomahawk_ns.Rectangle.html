@@ -25,14 +25,14 @@
         <meta property="og:locale" content="fr_FR"/>
         <meta property="og:title" content="Tomahawk, moteur 2D"/>
         <meta property="og:description" content="Documentation du moteur d'affichage 2D : Tomahawk"/>
-        <meta property="og:url" content="http://the-tiny-spark.com/tomahawk/Source: display/Bitmap.js"/>
+        <meta property="og:url" content="http://the-tiny-spark.com/tomahawk/Class: Rectangle"/>
         <meta property="og:site_name" content="The Tiny Spark"/>
         <meta property='og:image' content='http://the-tiny-spark.com/tomahawk/assets/images/tomahawk.jpg'/>
         <meta property='og:image' content='http://the-tiny-spark.com/tomahawk/assets/images/ground.png'/>
         <meta property='og:image' content='http://the-tiny-spark.com/tomahawk/assets/images/hero.png'/>
         <meta property='og:image' content='http://the-tiny-spark.com/social/connect.jpg'/>
 
-        <title>JSDoc: Source: display/Bitmap.js</title>
+        <title>JSDoc: Class: Rectangle</title>
 		
 		<link rel="stylesheet" media="screen" href="http://the-tiny-spark.com/assets/css/font-awesome.min.css" type="text/css"/>
         <link rel="stylesheet" media="screen" href="http://the-tiny-spark.com/assets/css/studio.css" type="text/css"/>
@@ -129,111 +129,657 @@
 
 			<div id="main">
 
-				<h1 class="page-title">Source: display/Bitmap.js</h1>
+				<h1 class="page-title">Class: Rectangle</h1>
 
 				
 
 
+
+<section>
+
+<header>
+    <h2>
+        <span class="ancestors"><a href="tomahawk_ns.html">tomahawk_ns</a>.</span>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>/*
-* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
-*
-* Copyright (c) 2014 the-tiny-spark.com, inc.
-*
-* Permission is hereby granted, free of charge, to any person
-* obtaining a copy of this software and associated documentation
-* files (the "Software"), to deal in the Software without
-* restriction, including without limitation the rights to use,
-* copy, modify, merge, publish, distribute, sublicense, and/or sell
-* copies of the Software, and to permit persons to whom the
-* Software is furnished to do so, subject to the following
-* conditions:
-*
-* The above copyright notice and this permission notice shall be
-* included in all copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-* OTHER DEALINGS IN THE SOFTWARE.
+    Rectangle
+    </h2>
+    
+        <div class="class-description">Rectangle</div>
+    
+</header>
 
-* @author The Tiny Spark
-*/
+<article>
+    <div class="container-overview">
+    
 
-(function() {
-	
-	/**
-	* @class Bitmap
-	* @memberOf tomahawk_ns
-	* @param {Texture2D} the drawing texture.
-	* @augments {DisplayObject}
-	* @constructor
-	*/
-	function Bitmap(texture)
-	{
-		tomahawk_ns.DisplayObject.apply(this);
-		
-		if( texture == undefined )
-			return;
-			
-		this.setTexture(texture);
-	}
+    
+        
+<dt>
+    <h4 class="name" id="Rectangle"><span class="type-signature"></span>new Rectangle<span class="signature">()</span><span class="type-signature"></span></h4>
 
-	Tomahawk.registerClass( Bitmap, "Bitmap" );
-	Tomahawk.extend( "Bitmap", "DisplayObject" );
+    
+</dt>
+<dd>
 
-	/**
-	 * The current drawing texture.
-	 * @public
-	 * @property texture
-	 * @type Texture2D
-	 * @memberOf tomahawk_ns.Bitmap
-	 * @default null
-	 */
-	Bitmap.prototype.texture = null;
-	
-	/**
-	* @public
-	* @method setTexture
-	* @param {Texture2D} texture 
-	* @memberOf tomahawk_ns.Bitmap
-	**/
-	Bitmap.prototype.setTexture = function(texture)
-	{
-		this.texture = texture;
-		this.width = this.texture.rect[2];
-		this.height = this.texture.rect[3];
-	};
+    
+    <div class="description">
+        Represents a rectangle
+    </div>
+    
 
-	/**
-	* @public
-	* @method draw
-	* Draws the display object into the specified context
-	* @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
-	* @memberOf tomahawk_ns.Bitmap 
-	**/
-	Bitmap.prototype.draw = function( context )
-	{	
-		var rect = this.texture.rect;
-		var data = this.texture.data;
-			
-		context.drawImage(	data, rect[0], rect[1], rect[2], rect[3], 0, 0, this.width, this.height );
-	};
-	
-	tomahawk_ns.Bitmap = Bitmap;
+    
 
-})();
+    
+
+    
+
+    
+<dl class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Rectangle.js.html">geom/Rectangle.js</a>, <a href="Rectangle.js.html#line38">line 38</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
 
 
-</code></pre>
-        </article>
-    </section>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        <dl>
+            
+<dt>
+    <h4 class="name" id="bottom"><span class="type-signature"></span>bottom<span class="type-signature"> :Number</span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        The sum of the y and height properties.
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Number</span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Rectangle.js.html">geom/Rectangle.js</a>, <a href="Rectangle.js.html#line98">line 98</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="height"><span class="type-signature"></span>height<span class="type-signature"> :Number</span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        the height of the rectangle, in pixels.
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Number</span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Rectangle.js.html">geom/Rectangle.js</a>, <a href="Rectangle.js.html#line66">line 66</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="left"><span class="type-signature"></span>left<span class="type-signature"> :Number</span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        The x coordinate of the top-left corner of the rectangle.
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Number</span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Rectangle.js.html">geom/Rectangle.js</a>, <a href="Rectangle.js.html#line74">line 74</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="right"><span class="type-signature"></span>right<span class="type-signature"> :Number</span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        The sum of the x and width properties.
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Number</span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Rectangle.js.html">geom/Rectangle.js</a>, <a href="Rectangle.js.html#line82">line 82</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="top"><span class="type-signature"></span>top<span class="type-signature"> :Number</span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        The y coordinate of the top-left corner of the rectangle.
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Number</span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Rectangle.js.html">geom/Rectangle.js</a>, <a href="Rectangle.js.html#line90">line 90</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="width"><span class="type-signature"></span>width<span class="type-signature"> :Number</span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        the width of the rectangle, in pixels.
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Number</span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Rectangle.js.html">geom/Rectangle.js</a>, <a href="Rectangle.js.html#line58">line 58</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="x"><span class="type-signature"></span>x<span class="type-signature"> :Number</span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        The x coordinate of the top-left corner of the rectangle.
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Number</span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Rectangle.js.html">geom/Rectangle.js</a>, <a href="Rectangle.js.html#line42">line 42</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="y"><span class="type-signature"></span>y<span class="type-signature"> :Number</span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        The y coordinate of the top-left corner of the rectangle.
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Number</span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Rectangle.js.html">geom/Rectangle.js</a>, <a href="Rectangle.js.html#line50">line 50</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        </dl>
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 

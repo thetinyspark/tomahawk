@@ -29,7 +29,15 @@
 
 (function() {
 	
-
+	
+	/**
+	 * @class Point
+	 * @description Represents a basic 2d point
+	 * @memberOf tomahawk_ns
+	 * @param {Number} x the x value of the point on the x axis
+	 * @param {Number} y the y value of the point on the y axis
+	 * @constructor
+	 **/
 	function Point(x,y)
 	{
 		this.x = x, this.y = y
@@ -37,8 +45,26 @@
 	
 	Tomahawk.registerClass( Point, "Point" );
 	
+	/**
+	* @member {Number} x the x position of  the point
+	* @memberOf tomahawk_ns.Point.prototype
+	**/
+	Point.prototype.x = 0;
+	/**
+	* @member {Number} y the y position of  the point
+	* @memberOf tomahawk_ns.Point.prototype
+	**/
+	Point.prototype.y = 0;
 	
-	//static
+	
+	/**
+	* @method distanceBetween
+	* @description returns a distance between two points
+	* @memberOf tomahawk_ns.Point
+	* @param {tomahawk_ns.Point} pointA
+	* @param {tomahawk_ns.Point} pointB
+	* @returns {Number}
+	**/
 	Point.distanceBetween = function(pointA, pointB)
 	{
 		var distX = ( pointB.x - pointA.x ) * ( pointB.x - pointA.x );
@@ -47,8 +73,7 @@
 		return segLength;
 	};
 	
-	Point.prototype.x = 0;
-	Point.prototype.y = 0;
+
 	
 	tomahawk_ns.Point = Point;
 })();

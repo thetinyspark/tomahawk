@@ -25,14 +25,14 @@
         <meta property="og:locale" content="fr_FR"/>
         <meta property="og:title" content="Tomahawk, moteur 2D"/>
         <meta property="og:description" content="Documentation du moteur d'affichage 2D : Tomahawk"/>
-        <meta property="og:url" content="http://the-tiny-spark.com/tomahawk/Source: display/Bitmap.js"/>
+        <meta property="og:url" content="http://the-tiny-spark.com/tomahawk/Source: geom/Point3D.js"/>
         <meta property="og:site_name" content="The Tiny Spark"/>
         <meta property='og:image' content='http://the-tiny-spark.com/tomahawk/assets/images/tomahawk.jpg'/>
         <meta property='og:image' content='http://the-tiny-spark.com/tomahawk/assets/images/ground.png'/>
         <meta property='og:image' content='http://the-tiny-spark.com/tomahawk/assets/images/hero.png'/>
         <meta property='og:image' content='http://the-tiny-spark.com/social/connect.jpg'/>
 
-        <title>JSDoc: Source: display/Bitmap.js</title>
+        <title>JSDoc: Source: geom/Point3D.js</title>
 		
 		<link rel="stylesheet" media="screen" href="http://the-tiny-spark.com/assets/css/font-awesome.min.css" type="text/css"/>
         <link rel="stylesheet" media="screen" href="http://the-tiny-spark.com/assets/css/studio.css" type="text/css"/>
@@ -129,7 +129,7 @@
 
 			<div id="main">
 
-				<h1 class="page-title">Source: display/Bitmap.js</h1>
+				<h1 class="page-title">Source: geom/Point3D.js</h1>
 
 				
 
@@ -169,69 +169,48 @@
 (function() {
 	
 	/**
-	* @class Bitmap
-	* @memberOf tomahawk_ns
-	* @param {Texture2D} the drawing texture.
-	* @augments {DisplayObject}
-	* @constructor
-	*/
-	function Bitmap(texture)
+	 * @class Point3D
+	 * @memberOf tomahawk_ns
+	 * @description a basic 3D point
+	 * @constructor
+	 * @param {Number} x the value on the x axis
+	 * @param {Number} y the value on the y axis
+	 * @param {Number} z the value on the z axis
+	 **/
+	function Point3D(x,y,z)
 	{
-		tomahawk_ns.DisplayObject.apply(this);
-		
-		if( texture == undefined )
-			return;
-			
-		this.setTexture(texture);
+		this.x = x || 0;
+		this.y = y || 0;
+		this.z = z || 0;
 	}
-
-	Tomahawk.registerClass( Bitmap, "Bitmap" );
-	Tomahawk.extend( "Bitmap", "DisplayObject" );
-
-	/**
-	 * The current drawing texture.
-	 * @public
-	 * @property texture
-	 * @type Texture2D
-	 * @memberOf tomahawk_ns.Bitmap
-	 * @default null
-	 */
-	Bitmap.prototype.texture = null;
+	
+	Tomahawk.registerClass( Point3D, "Point3D" );
 	
 	/**
-	* @public
-	* @method setTexture
-	* @param {Texture2D} texture 
-	* @memberOf tomahawk_ns.Bitmap
+	* @member x
+	* @memberOf tomahawk_ns.Point3D.prototype
+	* @type {Number}
+	* @description the value on the x axis.
 	**/
-	Bitmap.prototype.setTexture = function(texture)
-	{
-		this.texture = texture;
-		this.width = this.texture.rect[2];
-		this.height = this.texture.rect[3];
-	};
-
+	Point3D.prototype.x = 0;
 	/**
-	* @public
-	* @method draw
-	* Draws the display object into the specified context
-	* @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
-	* @memberOf tomahawk_ns.Bitmap 
+	* @member y
+	* @memberOf tomahawk_ns.Point3D.prototype
+	* @type {Number}
+	* @description the value on the y axis.
 	**/
-	Bitmap.prototype.draw = function( context )
-	{	
-		var rect = this.texture.rect;
-		var data = this.texture.data;
-			
-		context.drawImage(	data, rect[0], rect[1], rect[2], rect[3], 0, 0, this.width, this.height );
-	};
+	Point3D.prototype.y = 0;
+	/**
+	* @member z
+	* @memberOf tomahawk_ns.Point3D.prototype
+	* @type {Number}
+	* @description the value on the z axis.
+	**/
+	Point3D.prototype.z = 0;
 	
-	tomahawk_ns.Bitmap = Bitmap;
-
-})();
-
-
-</code></pre>
+	
+	tomahawk_ns.Point3D = Point3D;
+})();</code></pre>
         </article>
     </section>
 

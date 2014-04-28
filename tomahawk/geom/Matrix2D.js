@@ -475,7 +475,7 @@
 	 * @param {Number} x The x component of the point to transform.
 	 * @param {Number} y The y component of the point to transform.
 	 * @param {Point | Object} [pt] An object to copy the result into. If omitted a generic object with x/y properties will be returned.
-	 * @return {Point} This matrix. Useful for chaining method calls.
+	 * @return {Point}
 	 **/
 	Matrix2D.prototype.transformPoint = function(x, y, pt) {
 		pt = pt||{};

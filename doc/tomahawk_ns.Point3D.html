@@ -25,14 +25,14 @@
         <meta property="og:locale" content="fr_FR"/>
         <meta property="og:title" content="Tomahawk, moteur 2D"/>
         <meta property="og:description" content="Documentation du moteur d'affichage 2D : Tomahawk"/>
-        <meta property="og:url" content="http://the-tiny-spark.com/tomahawk/Source: display/Bitmap.js"/>
+        <meta property="og:url" content="http://the-tiny-spark.com/tomahawk/Class: Point3D"/>
         <meta property="og:site_name" content="The Tiny Spark"/>
         <meta property='og:image' content='http://the-tiny-spark.com/tomahawk/assets/images/tomahawk.jpg'/>
         <meta property='og:image' content='http://the-tiny-spark.com/tomahawk/assets/images/ground.png'/>
         <meta property='og:image' content='http://the-tiny-spark.com/tomahawk/assets/images/hero.png'/>
         <meta property='og:image' content='http://the-tiny-spark.com/social/connect.jpg'/>
 
-        <title>JSDoc: Source: display/Bitmap.js</title>
+        <title>JSDoc: Class: Point3D</title>
 		
 		<link rel="stylesheet" media="screen" href="http://the-tiny-spark.com/assets/css/font-awesome.min.css" type="text/css"/>
         <link rel="stylesheet" media="screen" href="http://the-tiny-spark.com/assets/css/studio.css" type="text/css"/>
@@ -129,111 +129,421 @@
 
 			<div id="main">
 
-				<h1 class="page-title">Source: display/Bitmap.js</h1>
+				<h1 class="page-title">Class: Point3D</h1>
 
 				
 
 
+
+<section>
+
+<header>
+    <h2>
+        <span class="ancestors"><a href="tomahawk_ns.html">tomahawk_ns</a>.</span>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>/*
-* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
-*
-* Copyright (c) 2014 the-tiny-spark.com, inc.
-*
-* Permission is hereby granted, free of charge, to any person
-* obtaining a copy of this software and associated documentation
-* files (the "Software"), to deal in the Software without
-* restriction, including without limitation the rights to use,
-* copy, modify, merge, publish, distribute, sublicense, and/or sell
-* copies of the Software, and to permit persons to whom the
-* Software is furnished to do so, subject to the following
-* conditions:
-*
-* The above copyright notice and this permission notice shall be
-* included in all copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-* OTHER DEALINGS IN THE SOFTWARE.
+    Point3D
+    </h2>
+    
+        <div class="class-description">Point3D</div>
+    
+</header>
 
-* @author The Tiny Spark
-*/
+<article>
+    <div class="container-overview">
+    
 
-(function() {
-	
-	/**
-	* @class Bitmap
-	* @memberOf tomahawk_ns
-	* @param {Texture2D} the drawing texture.
-	* @augments {DisplayObject}
-	* @constructor
-	*/
-	function Bitmap(texture)
-	{
-		tomahawk_ns.DisplayObject.apply(this);
-		
-		if( texture == undefined )
-			return;
-			
-		this.setTexture(texture);
-	}
+    
+        
+<dt>
+    <h4 class="name" id="Point3D"><span class="type-signature"></span>new Point3D<span class="signature">(x, y, z)</span><span class="type-signature"></span></h4>
 
-	Tomahawk.registerClass( Bitmap, "Bitmap" );
-	Tomahawk.extend( "Bitmap", "DisplayObject" );
+    
+</dt>
+<dd>
 
-	/**
-	 * The current drawing texture.
-	 * @public
-	 * @property texture
-	 * @type Texture2D
-	 * @memberOf tomahawk_ns.Bitmap
-	 * @default null
-	 */
-	Bitmap.prototype.texture = null;
-	
-	/**
-	* @public
-	* @method setTexture
-	* @param {Texture2D} texture 
-	* @memberOf tomahawk_ns.Bitmap
-	**/
-	Bitmap.prototype.setTexture = function(texture)
-	{
-		this.texture = texture;
-		this.width = this.texture.rect[2];
-		this.height = this.texture.rect[3];
-	};
+    
+    <div class="description">
+        a basic 3D point
+    </div>
+    
 
-	/**
-	* @public
-	* @method draw
-	* Draws the display object into the specified context
-	* @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
-	* @memberOf tomahawk_ns.Bitmap 
-	**/
-	Bitmap.prototype.draw = function( context )
-	{	
-		var rect = this.texture.rect;
-		var data = this.texture.data;
-			
-		context.drawImage(	data, rect[0], rect[1], rect[2], rect[3], 0, 0, this.width, this.height );
-	};
-	
-	tomahawk_ns.Bitmap = Bitmap;
+    
 
-})();
+    
+
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>x</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
 
 
-</code></pre>
-        </article>
-    </section>
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the value on the x axis</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>y</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the value on the y axis</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>z</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the value on the z axis</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+    
+
+    
+<dl class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Point3D.js.html">geom/Point3D.js</a>, <a href="Point3D.js.html#line41">line 41</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        <dl>
+            
+<dt>
+    <h4 class="name" id="x"><span class="type-signature"></span>x<span class="type-signature"> :Number</span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        the value on the x axis.
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Number</span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Point3D.js.html">geom/Point3D.js</a>, <a href="Point3D.js.html#line50">line 50</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="y"><span class="type-signature"></span>y<span class="type-signature"> :Number</span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        the value on the y axis.
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Number</span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Point3D.js.html">geom/Point3D.js</a>, <a href="Point3D.js.html#line57">line 57</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="z"><span class="type-signature"></span>z<span class="type-signature"> :Number</span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        the value on the z axis.
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Number</span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Point3D.js.html">geom/Point3D.js</a>, <a href="Point3D.js.html#line64">line 64</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        </dl>
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 
