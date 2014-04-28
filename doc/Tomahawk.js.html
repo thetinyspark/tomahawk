@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Tomahawk.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Tomahawk.js</h1>
+
+    
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+
+
+
+/** 
+*@namespace 
+**/
+var tomahawk_ns = new Object();
+tomahawk_ns.version = 1.0;
+
+/**
+* @class Tomahawk
+* Core Framework class
+* @constructor
+*/
+function Tomahawk(){}
+
+Tomahawk._classes = new Object();
+Tomahawk._extends = new Array();
+	
+
+	Tomahawk._funcTab = null;
+
+	/**
+	* @method registerClass
+	* @memberOf Tomahawk
+	* @description Register a class definition
+	* @params {class} the class definition
+	* @params {string} the class definition alias which will be used for inheritance
+	*/
+	Tomahawk.registerClass = function( classDef, className )
+	{
+		Tomahawk._classes[className] = classDef;
+	};
+
+	/**
+	* @method extend
+	* @memberOf Tomahawk
+	* @description Make child Inherits ancestor
+	* @params {class} childAlias the child definition alias
+	* @params {string} ancestorAlias the ancestor definition alias
+	*/
+	Tomahawk.extend = function( p_child, p_ancestor )
+	{
+		Tomahawk._extends.push({"child":p_child,"ancestor":p_ancestor,"done":false});
+	};
+
+	/**
+	* @method run
+	* @memberOf Tomahawk
+	* @description run the framework, apply inheritances to classes
+	*/
+	Tomahawk.run = function()
+	{
+		var obj = null;
+		var i = 0;
+		var max = Tomahawk._extends.length;
+		
+		Tomahawk._funcTab = new Object();
+		
+		for (i = 0; i &lt; max; i++ )
+		{
+			obj = Tomahawk._extends[i];
+			Tomahawk._inherits( obj );
+		}
+	}
+	
+	Tomahawk._getParentClass = function(child)
+	{
+		var i = 0;
+		var max = Tomahawk._extends.length;
+		
+		for (i = 0; i &lt; max; i++ )
+		{
+			obj = Tomahawk._extends[i];
+			if( obj["child"] == child )
+				return obj;
+		}
+		return null;
+	};
+	
+	Tomahawk._inherits = function( obj )
+	{
+		var child = null;
+		var ancestor = null;
+		var superParent = Tomahawk._getParentClass(obj["ancestor"]);
+		
+		if( superParent != null &amp;&amp; superParent.done == false)
+			Tomahawk._inherits(superParent);
+
+		child = Tomahawk._classes[obj["child"]];
+		ancestor = Tomahawk._classes[obj["ancestor"]];
+		obj.done = true;
+		
+		var func = new Object();
+	
+		if( child != null &amp;&amp; ancestor != null )
+		{	
+			for( var prop in ancestor.prototype )
+			{
+				func[prop] = ancestor.prototype[prop];
+			}
+			
+			for( var prop in child.prototype )
+			{
+				func[prop] = child.prototype[prop];
+			}
+		}
+		
+		child.prototype = func;
+	};
+
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="Tomahawk.html">Tomahawk</a></li><li><a href="tomahawk_ns.Bitmap.html">Bitmap</a></li><li><a href="tomahawk_ns.BrightnessFilter.html">BrightnessFilter</a></li><li><a href="tomahawk_ns.ContrastFilter.html">ContrastFilter</a></li><li><a href="tomahawk_ns.Event.html">Event</a></li><li><a href="tomahawk_ns.EventDispatcher.html">EventDispatcher</a></li><li><a href="tomahawk_ns.GrayScaleFilter.html">GrayScaleFilter</a></li><li><a href="tomahawk_ns.KeyEvent.html">KeyEvent</a></li><li><a href="tomahawk_ns.Matrix2D.html">Matrix2D</a></li><li><a href="tomahawk_ns.MouseEvent.html">MouseEvent</a></li><li><a href="tomahawk_ns.PixelFilter.html">PixelFilter</a></li><li><a href="tomahawk_ns.ShadowBlurFilter.html">ShadowBlurFilter</a></li></ul><h3>Namespaces</h3><ul><li><a href="tomahawk_ns.html">tomahawk_ns</a></li></ul>
+</nav>
+
+<br clear="both">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-dev</a> on Mon Apr 28 2014 19:19:12 GMT+0200 (CEST)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
