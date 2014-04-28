@@ -30,7 +30,14 @@
 	
 
 (function() {
-
+	
+	/**
+	 * @class ContrastFilter
+	 * @description a basic ContrastFilter
+	 * @memberOf tomahawk_ns
+	 * @augments tomahawk_ns.PixelFilter
+	 * @constructor
+	 **/
 	function ContrastFilter()
 	{
 		tomahawk_ns.PixelFilter.apply(this);
@@ -39,8 +46,17 @@
 	Tomahawk.registerClass( ContrastFilter, "ContrastFilter" );
 	Tomahawk.extend( "ContrastFilter", "PixelFilter" );
 	
+	/**
+	* @member {Number} value contrast intensity.
+	* @memberOf tomahawk_ns.ContrastFilter.prototype
+	**/
 	ContrastFilter.prototype.value = 0;
 
+	/**
+	* @method process
+	* @memberOf tomahawk_ns.ContrastFilter.prototype
+	* @description apply the filter process on the DisplayObject
+	**/
 	ContrastFilter.prototype.process = function()
 	{
 		if( this.value == 0 )

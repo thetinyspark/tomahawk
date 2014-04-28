@@ -84,7 +84,7 @@
 	Event.prototype.currentTarget = null;
 
 	/**
-	* @member {Object} stopPropagation stop the bubbling phase
+	* @method stopPropagation stop the bubbling phase
 	* @memberOf tomahawk_ns.Event.prototype
 	**/
 	Event.prototype.stopPropagation = function()
@@ -94,52 +94,52 @@
 	};
 
 	/**
-	* @property {Object} FOCUSED focused
+	* @property {String} FOCUSED focused
 	* @memberOf tomahawk_ns.Event
 	**/
 	Event.FOCUSED			= "focused";
 	/**
-	* @property {Object} UNFOCUSED unfocused
+	* @property {String} UNFOCUSED unfocused
 	* @memberOf tomahawk_ns.Event
 	**/
 	Event.UNFOCUSED			= "unfocused";
 	/**
-	* @property {Object} ADDED added
+	* @property {String} ADDED added
 	* @memberOf tomahawk_ns.Event
 	**/
 	Event.ADDED 			= "added";
 	/**
-	* @property {Object} ADDED_TO_STAGE addedToStage
+	* @property {String} ADDED_TO_STAGE addedToStage
 	* @memberOf tomahawk_ns.Event
 	**/
 	Event.ADDED_TO_STAGE 	= "addedToStage";
 	/**
-	* @property {Object} ENTER_FRAME enterFrame
+	* @property {String} ENTER_FRAME enterFrame
 	* @memberOf tomahawk_ns.Event
 	**/
 	Event.ENTER_FRAME 		= "enterFrame";
 	/**
-	* @property {Object} REMOVED removed
+	* @property {String} REMOVED removed
 	* @memberOf tomahawk_ns.Event
 	**/
 	Event.REMOVED 			= "removed";
 	/**
-	* @property {Object} REMOVED_FROM_STAGE removedFromStage
+	* @property {String} REMOVED_FROM_STAGE removedFromStage
 	* @memberOf tomahawk_ns.Event
 	**/
 	Event.REMOVED_FROM_STAGE= "removedFromStage";
 	/**
-	* @property {Object} IO_ERROR ioError
+	* @property {String} IO_ERROR ioError
 	* @memberOf tomahawk_ns.Event
 	**/
 	Event.IO_ERROR			= "ioError";
 	/**
-	* @property {Object} PROGRESS progress
+	* @property {String} PROGRESS progress
 	* @memberOf tomahawk_ns.Event
 	**/
 	Event.PROGRESS			= "progress";
 	/**
-	* @property {Object} COMPLETE complete
+	* @property {String} COMPLETE complete
 	* @memberOf tomahawk_ns.Event
 	**/
 	Event.COMPLETE			= "complete";

@@ -102,7 +102,7 @@
 	* @param {String} type The event type.
 	* @param {Boolean} bubbles Indicates whether the event will bubble through the display list.
 	* @param {Boolean} cancelable Indicates whether the default behaviour of this event can be cancelled.
-	* @eturns {tomahawk_ns.KeyEvent}
+	* @returns {tomahawk_ns.KeyEvent}
 	**/
 	KeyEvent.fromNativeEvent = function(event,bubbles,cancelable)
 	{

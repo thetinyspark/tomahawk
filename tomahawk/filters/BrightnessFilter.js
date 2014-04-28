@@ -29,6 +29,13 @@
 
 (function() {
 	
+	/**
+	 * @class BrightnessFilter
+	 * @description a basic BrightnessFilter
+	 * @memberOf tomahawk_ns
+	 * @augments tomahawk_ns.PixelFilter
+	 * @constructor
+	 **/
 	function BrightnessFilter()
 	{
 		tomahawk_ns.PixelFilter.apply(this);
@@ -37,8 +44,17 @@
 	Tomahawk.registerClass( BrightnessFilter, "BrightnessFilter" );
 	Tomahawk.extend( "BrightnessFilter", "PixelFilter" );
 	
+	/**
+	* @member {Number} value brightness intensity.
+	* @memberOf tomahawk_ns.BrightnessFilter.prototype
+	**/
 	BrightnessFilter.prototype.value = 0;
-
+	
+	/**
+	* @method process
+	* @memberOf tomahawk_ns.BrightnessFilter.prototype
+	* @description apply the filter process on the DisplayObject
+	**/
 	BrightnessFilter.prototype.process = function()
 	{
 		if( this.value == 0 )

@@ -50,7 +50,7 @@
 
 
 	/**
-	* @method {Object} fromNativeMouseEvent converts an original MouseEvent into a regular tomahawk_ns.MouseEvent one
+	* @method fromNativeMouseEvent converts an original MouseEvent into a regular tomahawk_ns.MouseEvent one
 	* @memberOf tomahawk_ns.MouseEvent
 	* @returns {tomahawk_ns.MouseEvent}
 	**/

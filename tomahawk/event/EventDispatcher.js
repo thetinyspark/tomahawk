@@ -49,8 +49,12 @@
 	EventDispatcher.prototype._listeners = null;
 
 	/**
-	* @method {Object} addEventListener Add an event listener to the current EventDispatcher
+	* Add an event listener to the current EventDispatcher
+	* @method addEventListener
 	* @memberOf tomahawk_ns.EventDispatcher.prototype
+	* @param {String} type The event type.
+	* @param {Object} scope the scope of the callback function
+	* @param {Function} a callback function which will be called when a matching event will be dispatch.
 	**/
 	EventDispatcher.prototype.addEventListener = function( type, scope, callback, useCapture )
 	{
@@ -64,9 +68,11 @@
 	};
 	
 	/**
-	* @method {String} hasEventListener indicates if the current EventDispatcher has an event listener for the type passed in parameter.
+	* @description indicates if the current EventDispatcher has an event listener for the type passed in parameter.
+	* @method hasEventListener 
 	* @memberOf tomahawk_ns.EventDispatcher.prototype
 	* @returns {Boolean}
+	* @params {String} type the type of the event listener
 	**/
 	EventDispatcher.prototype.hasEventListener = function(type)
 	{
@@ -83,6 +89,13 @@
 		}
 	};
 
+	/**
+	* @description send an event trought all the Display list from the current EventDispatcher to the stage
+	* @method dispatchEvent 
+	* @memberOf tomahawk_ns.EventDispatcher.prototype
+	* @returns {Boolean}
+	* @param {tomahawk_ns.Event} event the event to dispatch
+	**/
 	EventDispatcher.prototype.dispatchEvent = function( event )
 	{
 		this._listeners = this._listeners || new Array();
@@ -124,6 +137,14 @@
 		}
 	};
 
+	/**
+	* Remove ( if exists ) an event listener to the current EventDispatcher
+	* @method removeEventListener
+	* @memberOf tomahawk_ns.EventDispatcher.prototype
+	* @param {String} type The event type.
+	* @param {Object} scope the scope of the callback function
+	* @param {Function} a callback function which will be called when a matching event will be dispatch.
+	**/
 	EventDispatcher.prototype.removeEventListener = function( type, scope, callback, useCapture )
 	{
 		var obj = new Object();
@@ -140,11 +161,21 @@
 		this._listeners = arr;
 	};
 
+	/**
+	* Remove all event listeners of the current EventDispatcher
+	* @method removeEventListeners
+	* @memberOf tomahawk_ns.EventDispatcher.prototype
+	**/
 	EventDispatcher.prototype.removeEventListeners = function()
 	{
 		this._listeners = new Array();
 	};
 	
+	/**
+	* Destroy properly the current EventDispatcher
+	* @method destroy
+	* @memberOf tomahawk_ns.EventDispatcher.prototype
+	**/
 	EventDispatcher.prototype.destroy = function()
 	{
 		this.removeEventListeners();

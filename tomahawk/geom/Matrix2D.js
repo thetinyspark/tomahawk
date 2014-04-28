@@ -33,18 +33,16 @@
  */
 
 (function() {
-	
-	/**
-	 * Contains properties and methods shared by all events for use with
-	 * 
+	 /**
 	 * @class Matrix2D
-	 * A Basic implementation of a Matrix3x3 
-	 * @param {Number} a.
-	 * @param {Number} b.
-	 * @param {Number} c.
-	 * @param {Number} d.
-	 * @param {Number} tx.
-	 * @param {Number} ty.
+	 * @description A Basic implementation of a Matrix3x3 
+	 * @memberOf tomahawk_ns
+	 * @param {Number} a
+	 * @param {Number} b
+	 * @param {Number} c
+	 * @param {Number} d
+	 * @param {Number} tx
+	 * @param {Number} ty
 	 * @constructor
 	 **/
 	function Matrix2D(a, b, c, d, tx, ty)
@@ -56,47 +54,22 @@
 	Tomahawk.registerClass( Matrix2D, "Matrix2D" );
 	
 	Matrix2D.prototype._stack = null;
-
-	/**
-	 * Save the current Matrix state
-	 * @method save
-	 * @memberOf Matrix2D
-	 * @return null
-	 **/
-	Matrix2D.prototype.save = function()
-	{
-		this._stack.push(this.a,this.b,this.c,this.d,this.tx,this.ty);
-	};
-
-	/**
-	 * Restore the las saved matrix state
-	 * @method save
-	 * @memberOf Matrix2D
-	 * @return null
-	 **/
-	Matrix2D.prototype.restore = function()
-	{
-		this.ty = this._stack.pop();
-		this.tx = this._stack.pop();
-		this.d = this._stack.pop();
-		this.c = this._stack.pop();
-		this.b = this._stack.pop();
-		this.a = this._stack.pop();
-	};
-
+	
 	// static public properties:
 	/**
 	 * An identity matrix, representing a null transformation.
+	 * @memberOf tomahawk_ns.Matrix2D
 	 * @property identity
 	 * @static
 	 * @type Matrix2D
-	 * @memberOf Matrix2D
+	 * @memberOf tomhawk_ns.Matrix2D
 	 * @readonly
 	 **/
-	Matrix2D.prototype.identity = null;// set at bottom of class definition.
+	Matrix2D.identity = null;// set at bottom of class definition.
 
 	/**
 	 * Multiplier for converting degrees to radians. Used internally by Matrix2D.
+	 * @memberOf tomahawk_ns.Matrix2D
 	 * @property DEG_TO_RAD
 	 * @static
 	 * @final
@@ -105,52 +78,55 @@
 	 **/
 	Matrix2D.DEG_TO_RAD = Math.PI/180;
 
+	
+	
+	
 
 // public properties:
 	/**
 	 * Position (0, 0) in a 3x3 affine transformation matrix.
-	 * @property a
+	 * @member a
 	 * @type Number
-	 * @memberOf Matrix2D
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 **/
 	Matrix2D.prototype.a = 1;
 
 	/**
 	 * Position (0, 1) in a 3x3 affine transformation matrix.
-	 * @property b
-	 * @memberOf Matrix2D
+	 * @member b
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @type Number
 	 **/
 	Matrix2D.prototype.b = 0;
 
 	/**
 	 * Position (1, 0) in a 3x3 affine transformation matrix.
-	 * @property c
-	 * @memberOf Matrix2D
+	 * @member c
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @type Number
 	 **/
 	Matrix2D.prototype.c = 0;
 
 	/**
 	 * Position (1, 1) in a 3x3 affine transformation matrix.
-	 * @property d
-	 * @memberOf Matrix2D
+	 * @member d
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @type Number
 	 **/
 	Matrix2D.prototype.d = 1;
 
 	/**
 	 * Position (2, 0) in a 3x3 affine transformation matrix.
-	 * @property tx
-	 * @memberOf Matrix2D
+	 * @member tx
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @type Number
 	 **/
 	Matrix2D.prototype.tx = 0;
 
 	/**
 	 * Position (2, 1) in a 3x3 affine transformation matrix.
-	 * @property ty
-	 * @memberOf Matrix2D
+	 * @member ty
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @type Number
 	 **/
 	Matrix2D.prototype.ty = 0;
@@ -161,7 +137,7 @@
 	/**
 	 * Initialization method. Can also be used to reinitialize the instance.
 	 * @method initialize
-	 * @memberOf Matrix2D
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @param {Number} [a=1] Specifies the a property for the new matrix.
 	 * @param {Number} [b=0] Specifies the b property for the new matrix.
 	 * @param {Number} [c=0] Specifies the c property for the new matrix.
@@ -184,6 +160,7 @@
 	/**
 	 * Concatenates the specified matrix properties with this matrix. All parameters are required.
 	 * @method prepend
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @param {Number} a
 	 * @param {Number} b
 	 * @param {Number} c
@@ -207,9 +184,38 @@
 		return this;
 	};
 
+		/**
+	 * @description Save the current Matrix state
+	 * @method save
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
+	 * @return null
+	 **/
+	Matrix2D.prototype.save = function()
+	{
+		this._stack.push(this.a,this.b,this.c,this.d,this.tx,this.ty);
+	};
+
+	/**
+	 * Restore the las saved matrix state
+	 * @method save
+	 * @memberOf tomhawk_ns.Matrix2D.prototype
+	 * @return null
+	 **/
+	Matrix2D.prototype.restore = function()
+	{
+		this.ty = this._stack.pop();
+		this.tx = this._stack.pop();
+		this.d = this._stack.pop();
+		this.c = this._stack.pop();
+		this.b = this._stack.pop();
+		this.a = this._stack.pop();
+	};
+
+	
 	/**
 	 * Appends the specified matrix properties with this matrix. All parameters are required.
 	 * @method append
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @param {Number} a
 	 * @param {Number} b
 	 * @param {Number} c
@@ -236,6 +242,7 @@
 	/**
 	 * Prepends the specified matrix with this matrix.
 	 * @method prependMatrix
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @param {Matrix2D} matrix
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
@@ -247,6 +254,7 @@
 	/**
 	 * Appends the specified matrix with this matrix.
 	 * @method appendMatrix
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @param {Matrix2D} matrix
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
@@ -260,6 +268,7 @@
 	 * For example, you can use this to generate a matrix from a display object: var mtx = new Matrix2D();
 	 * mtx.prependTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation);
 	 * @method prependTransform
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @param {Number} x
 	 * @param {Number} y
 	 * @param {Number} scaleX
@@ -302,6 +311,7 @@
 	 * For example, you can use this to generate a matrix from a display object: var mtx = new Matrix2D();
 	 * mtx.appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation);
 	 * @method appendTransform
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @param {Number} x
 	 * @param {Number} y
 	 * @param {Number} scaleX
@@ -345,6 +355,7 @@
 	/**
 	 * Applies a rotation transformation to the matrix.
 	 * @method rotate
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @param {Number} angle The angle in radians. To use degrees, multiply by <code>Math.PI/180</code>.
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
@@ -368,6 +379,7 @@
 	/**
 	 * Applies a skew transformation to the matrix.
 	 * @method skew
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @param {Number} skewX The amount to skew horizontally in degrees.
 	 * @param {Number} skewY The amount to skew vertically in degrees.
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
@@ -382,6 +394,7 @@
 	/**
 	 * Applies a scale transformation to the matrix.
 	 * @method scale
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @param {Number} x The amount to scale horizontally
 	 * @param {Number} y The amount to scale vertically
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
@@ -399,6 +412,7 @@
 	/**
 	 * Translates the matrix on the x and y axes.
 	 * @method translate
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @param {Number} x
 	 * @param {Number} y
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
@@ -412,6 +426,7 @@
 	/**
 	 * Sets the properties of the matrix to those of an identity matrix (one that applies a null transformation).
 	 * @method identity
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
 	Matrix2D.prototype.identity = function() {
@@ -423,6 +438,7 @@
 	/**
 	 * Inverts the matrix, causing it to perform the opposite transformation.
 	 * @method invert
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
 	Matrix2D.prototype.invert = function() {
@@ -445,6 +461,7 @@
 	/**
 	 * Returns true if the matrix is an identity matrix.
 	 * @method isIdentity
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @return {Boolean}
 	 **/
 	Matrix2D.prototype.isIdentity = function() {
@@ -454,6 +471,7 @@
 	/**
 	 * Transforms a point according to this matrix.
 	 * @method transformPoint
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @param {Number} x The x component of the point to transform.
 	 * @param {Number} y The y component of the point to transform.
 	 * @param {Point | Object} [pt] An object to copy the result into. If omitted a generic object with x/y properties will be returned.
@@ -471,6 +489,7 @@
 	 * may not match the transform properties you used to generate the matrix, though they will produce the same visual
 	 * results.
 	 * @method decompose
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @param {Object} target The object to apply the transform properties to. If null, then a new object will be returned.
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	*/
@@ -502,6 +521,7 @@
 	/**
 	 * Reinitializes all matrix properties to those specified.
 	 * @method reinitialize
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @param {Number} [a=1] Specifies the a property for the new matrix.
 	 * @param {Number} [b=0] Specifies the b property for the new matrix.
 	 * @param {Number} [c=0] Specifies the c property for the new matrix.
@@ -518,6 +538,7 @@
 	/**
 	 * Copies all properties from the specified matrix to this matrix.
 	 * @method copy
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @param {Matrix2D} matrix The matrix to copy properties from.
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	*/
@@ -528,6 +549,7 @@
 	/**
 	 * Returns a clone of the Matrix2D instance.
 	 * @method clone
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @return {Matrix2D} a clone of the Matrix2D instance.
 	 **/
 	Matrix2D.prototype.clone = function() {
@@ -537,13 +559,14 @@
 	/**
 	 * Returns a string representation of this object.
 	 * @method toString
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @return {String} a string representation of the instance.
 	 **/
 	Matrix2D.prototype.toString = function() {
 		return "[Matrix2D (a="+this.a+" b="+this.b+" c="+this.c+" d="+this.d+" tx="+this.tx+" ty="+this.ty+")]";
 	};
 
-	// this has to be populated after the class is defined:
+	
 	Matrix2D.identity = new Matrix2D();
 	tomahawk_ns.Matrix2D = Matrix2D;
 	

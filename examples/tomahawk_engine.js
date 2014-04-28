@@ -3335,7 +3335,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	Event.prototype.currentTarget = null;
 
 	/**
-	* @member {Object} stopPropagation stop the bubbling phase
+	* @method stopPropagation stop the bubbling phase
 	* @memberOf tomahawk_ns.Event.prototype
 	**/
 	Event.prototype.stopPropagation = function()
@@ -3345,52 +3345,52 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	};
 
 	/**
-	* @property {Object} FOCUSED focused
+	* @property {String} FOCUSED focused
 	* @memberOf tomahawk_ns.Event
 	**/
 	Event.FOCUSED			= "focused";
 	/**
-	* @property {Object} UNFOCUSED unfocused
+	* @property {String} UNFOCUSED unfocused
 	* @memberOf tomahawk_ns.Event
 	**/
 	Event.UNFOCUSED			= "unfocused";
 	/**
-	* @property {Object} ADDED added
+	* @property {String} ADDED added
 	* @memberOf tomahawk_ns.Event
 	**/
 	Event.ADDED 			= "added";
 	/**
-	* @property {Object} ADDED_TO_STAGE addedToStage
+	* @property {String} ADDED_TO_STAGE addedToStage
 	* @memberOf tomahawk_ns.Event
 	**/
 	Event.ADDED_TO_STAGE 	= "addedToStage";
 	/**
-	* @property {Object} ENTER_FRAME enterFrame
+	* @property {String} ENTER_FRAME enterFrame
 	* @memberOf tomahawk_ns.Event
 	**/
 	Event.ENTER_FRAME 		= "enterFrame";
 	/**
-	* @property {Object} REMOVED removed
+	* @property {String} REMOVED removed
 	* @memberOf tomahawk_ns.Event
 	**/
 	Event.REMOVED 			= "removed";
 	/**
-	* @property {Object} REMOVED_FROM_STAGE removedFromStage
+	* @property {String} REMOVED_FROM_STAGE removedFromStage
 	* @memberOf tomahawk_ns.Event
 	**/
 	Event.REMOVED_FROM_STAGE= "removedFromStage";
 	/**
-	* @property {Object} IO_ERROR ioError
+	* @property {String} IO_ERROR ioError
 	* @memberOf tomahawk_ns.Event
 	**/
 	Event.IO_ERROR			= "ioError";
 	/**
-	* @property {Object} PROGRESS progress
+	* @property {String} PROGRESS progress
 	* @memberOf tomahawk_ns.Event
 	**/
 	Event.PROGRESS			= "progress";
 	/**
-	* @property {Object} COMPLETE complete
+	* @property {String} COMPLETE complete
 	* @memberOf tomahawk_ns.Event
 	**/
 	Event.COMPLETE			= "complete";
@@ -3453,8 +3453,12 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	EventDispatcher.prototype._listeners = null;
 
 	/**
-	* @method {Object} addEventListener Add an event listener to the current EventDispatcher
+	* Add an event listener to the current EventDispatcher
+	* @method addEventListener
 	* @memberOf tomahawk_ns.EventDispatcher.prototype
+	* @param {String} type The event type.
+	* @param {Object} scope the scope of the callback function
+	* @param {Function} a callback function which will be called when a matching event will be dispatch.
 	**/
 	EventDispatcher.prototype.addEventListener = function( type, scope, callback, useCapture )
 	{
@@ -3468,9 +3472,11 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	};
 	
 	/**
-	* @method {String} hasEventListener indicates if the current EventDispatcher has an event listener for the type passed in parameter.
+	* @description indicates if the current EventDispatcher has an event listener for the type passed in parameter.
+	* @method hasEventListener 
 	* @memberOf tomahawk_ns.EventDispatcher.prototype
 	* @returns {Boolean}
+	* @params {String} type the type of the event listener
 	**/
 	EventDispatcher.prototype.hasEventListener = function(type)
 	{
@@ -3487,6 +3493,13 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		}
 	};
 
+	/**
+	* @description send an event trought all the Display list from the current EventDispatcher to the stage
+	* @method dispatchEvent 
+	* @memberOf tomahawk_ns.EventDispatcher.prototype
+	* @returns {Boolean}
+	* @param {tomahawk_ns.Event} event the event to dispatch
+	**/
 	EventDispatcher.prototype.dispatchEvent = function( event )
 	{
 		this._listeners = this._listeners || new Array();
@@ -3528,6 +3541,14 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		}
 	};
 
+	/**
+	* Remove ( if exists ) an event listener to the current EventDispatcher
+	* @method removeEventListener
+	* @memberOf tomahawk_ns.EventDispatcher.prototype
+	* @param {String} type The event type.
+	* @param {Object} scope the scope of the callback function
+	* @param {Function} a callback function which will be called when a matching event will be dispatch.
+	**/
 	EventDispatcher.prototype.removeEventListener = function( type, scope, callback, useCapture )
 	{
 		var obj = new Object();
@@ -3544,11 +3565,21 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		this._listeners = arr;
 	};
 
+	/**
+	* Remove all event listeners of the current EventDispatcher
+	* @method removeEventListeners
+	* @memberOf tomahawk_ns.EventDispatcher.prototype
+	**/
 	EventDispatcher.prototype.removeEventListeners = function()
 	{
 		this._listeners = new Array();
 	};
 	
+	/**
+	* Destroy properly the current EventDispatcher
+	* @method destroy
+	* @memberOf tomahawk_ns.EventDispatcher.prototype
+	**/
 	EventDispatcher.prototype.destroy = function()
 	{
 		this.removeEventListeners();
@@ -3666,7 +3697,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	* @param {String} type The event type.
 	* @param {Boolean} bubbles Indicates whether the event will bubble through the display list.
 	* @param {Boolean} cancelable Indicates whether the default behaviour of this event can be cancelled.
-	* @eturns {tomahawk_ns.KeyEvent}
+	* @returns {tomahawk_ns.KeyEvent}
 	**/
 	KeyEvent.fromNativeEvent = function(event,bubbles,cancelable)
 	{
@@ -3782,7 +3813,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 
 	/**
-	* @method {Object} fromNativeMouseEvent converts an original MouseEvent into a regular tomahawk_ns.MouseEvent one
+	* @method fromNativeMouseEvent converts an original MouseEvent into a regular tomahawk_ns.MouseEvent one
 	* @memberOf tomahawk_ns.MouseEvent
 	* @returns {tomahawk_ns.MouseEvent}
 	**/
@@ -3884,6 +3915,13 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 (function() {
 	
+	/**
+	 * @class BrightnessFilter
+	 * @description the base class for all filters
+	 * @memberOf tomahawk_ns
+	 * @augments tomahawk_ns.PixelFilter
+	 * @constructor
+	 **/
 	function BrightnessFilter()
 	{
 		tomahawk_ns.PixelFilter.apply(this);
@@ -3892,8 +3930,18 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	Tomahawk.registerClass( BrightnessFilter, "BrightnessFilter" );
 	Tomahawk.extend( "BrightnessFilter", "PixelFilter" );
 	
+	/**
+	* @member {Number} value brightness intensity.
+	* @memberOf tomahawk_ns.BrightnessFilter.prototype
+	**/
 	BrightnessFilter.prototype.value = 0;
-
+	
+	/**
+	* @protected
+	* @method process
+	* @memberOf tomahawk_ns.BrightnessFilter.prototype
+	* @description apply the filter process on the DisplayObject
+	**/
 	BrightnessFilter.prototype.process = function()
 	{
 		if( this.value == 0 )
@@ -4090,10 +4138,26 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 (function() {
 
+	/**
+	 * @class PixelFilter
+	 * @description the base class for all filters
+	 * @memberOf tomahawk_ns
+	 * @constructor
+	 **/
 	function PixelFilter(){}
+	
 	Tomahawk.registerClass( PixelFilter, "PixelFilter" );
 
+	/**
+	* @property {Number} BEFORE_DRAWING_FILTER 0
+	* @memberOf tomahawk_ns.PixelFilter
+	**/
 	PixelFilter.BEFORE_DRAWING_FILTER = 0;
+	
+	/**
+	* @property {Number} BEFORE_DRAWING_FILTER 0
+	* @memberOf tomahawk_ns.PixelFilter
+	**/
 	PixelFilter.AFTER_DRAWING_FILTER = 1;
 	
 	PixelFilter.prototype._canvas = null;
@@ -4101,21 +4165,53 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	PixelFilter.prototype._object = null;
 	PixelFilter.prototype.type = 1;
 	
+	/**
+	* @method getPixels
+	* @memberOf tomahawk_ns.PixelFilter.prototype
+	* @description return the pixels of the linked DisplayObject into the region defined by (x,y,width,height)
+	* @param {Number} x the x coordinates of top left corner of the region.
+	* @param {Number} y the y coordinates of top left corner of the region.
+	* @param {Number} width the width of the region.
+	* @param {Number} height the height of the region.
+	* @returns {ImageData}
+	**/
 	PixelFilter.prototype.getPixels = function(x,y,width,height)
 	{
 		return this._context.getImageData(x,y,width,height);
 	};
 
+	/**
+	* @method setPixels
+	* @memberOf tomahawk_ns.PixelFilter.prototype
+	* @description set the pixels of the linked DisplayObject from the point defined by (x,y)
+	* @param {ImageData} pixels an ImageData object
+	* @param {Number} x the x coordinates of top left corner from which the pixels will be set.
+	* @param {Number} y the y coordinates of top left corner from which the pixels will be set.
+	**/
 	PixelFilter.prototype.setPixels = function(pixels,x,y)
 	{
 		this._context.putImageData(pixels,x,y);
 	};
 
+	/**
+	* @protected
+	* @method process
+	* @memberOf tomahawk_ns.PixelFilter.prototype
+	* @description apply the filter process on the DisplayObject
+	**/
 	PixelFilter.prototype.process = function()
 	{
 		//code de notre filtre ici
 	};
 
+	/**
+	* @method apply
+	* @memberOf tomahawk_ns.PixelFilter.prototype
+	* @description apply the filter on the canvas passed in param
+	* @param {HTMLCanvasElement} canvas the canvas used by the current filter.
+	* @param {Canvas2DRenderingContext} context the context used by the current filter.
+	* @param {tomahawk_ns.DisplayObject} object the DisplayObject on which the filter will be applied to
+	**/
 	PixelFilter.prototype.apply = function(canvas, context, object)
 	{
 		this._canvas = canvas;
@@ -4124,7 +4220,20 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		this.process();
 	};
 
+	/**
+	* @method getOffsetX
+	* @memberOf tomahawk_ns.PixelFilter.prototype
+	* @description returns the extra pixels generated by the filter on the x axis
+	* @returns {Number}
+	**/
 	PixelFilter.prototype.getOffsetX = function(){ return 0};
+	
+	/**
+	* @method getOffsetY
+	* @memberOf tomahawk_ns.PixelFilter.prototype
+	* @description returns the extra pixels generated by the filter on the y axis
+	* @returns {Number}
+	**/
 	PixelFilter.prototype.getOffsetY = function(){ return 0};
 	
 	tomahawk_ns.PixelFilter = PixelFilter;

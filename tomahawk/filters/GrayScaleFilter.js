@@ -29,6 +29,13 @@
 
 (function() {
 	
+	/**
+	 * @class GrayScaleFilter
+	 * @description a basic GrayScaleFilter
+	 * @memberOf tomahawk_ns
+	 * @augments tomahawk_ns.PixelFilter
+	 * @constructor
+	 **/
 	function GrayScaleFilter()
 	{
 		tomahawk_ns.PixelFilter.apply(this);
@@ -37,6 +44,11 @@
 	Tomahawk.registerClass( GrayScaleFilter, "GrayScaleFilter" );
 	Tomahawk.extend( "GrayScaleFilter", "PixelFilter" );
 
+	/**
+	* @method process
+	* @memberOf tomahawk_ns.GrayScaleFilter.prototype
+	* @description apply the filter process on the DisplayObject
+	**/
 	GrayScaleFilter.prototype.process = function()
 	{
 		var pixels = this.getPixels(0,0,this._canvas.width,this._canvas.height);

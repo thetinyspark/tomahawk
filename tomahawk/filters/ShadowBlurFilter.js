@@ -30,6 +30,13 @@
 
 (function() {
 	
+	/**
+	 * @class ShadowBlurFilter
+	 * @description a basic ShadowBlurFilter
+	 * @memberOf tomahawk_ns
+	 * @augments tomahawk_ns.PixelFilter
+	 * @constructor
+	 **/
 	function ShadowBlurFilter()
 	{
 		tomahawk_ns.PixelFilter.apply(this);
@@ -39,11 +46,32 @@
 	Tomahawk.registerClass( ShadowBlurFilter, "ShadowBlurFilter" );
 	Tomahawk.extend( "ShadowBlurFilter", "PixelFilter" );
 	
+	/**
+	* @member {Number} shadowOffsetX shadow offset on the x axis.
+	* @memberOf tomahawk_ns.ShadowBlurFilter.prototype
+	**/
 	ShadowBlurFilter.prototype.shadowOffsetX = 1;
+	/**
+	* @member {Number} shadowOffsetY shadow offset on the y axis.
+	* @memberOf tomahawk_ns.ShadowBlurFilter.prototype
+	**/
 	ShadowBlurFilter.prototype.shadowOffsetY = 1;
+	/**
+	* @member {Number} shadowBlur intensity of the shadow blur.
+	* @memberOf tomahawk_ns.ShadowBlurFilter.prototype
+	**/
 	ShadowBlurFilter.prototype.shadowBlur 	= 100;
+	/**
+	* @member {Number} shadowColor the color of the shadow.
+	* @memberOf tomahawk_ns.ShadowBlurFilter.prototype
+	**/
 	ShadowBlurFilter.prototype.shadowColor 	= "white";
-
+	
+	/**
+	* @method process
+	* @memberOf tomahawk_ns.ShadowBlurFilter.prototype
+	* @description apply the filter process on the DisplayObject
+	**/
 	ShadowBlurFilter.prototype.process = function()
 	{
 		var context = this._canvas.getContext("2d");

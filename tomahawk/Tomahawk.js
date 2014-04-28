@@ -27,9 +27,9 @@
 * @author The Tiny Spark
 */
 
-
-
-//namespace
+/** 
+*@namespace 
+**/
 var tomahawk_ns = new Object();
 tomahawk_ns.version = 1.0;
 
