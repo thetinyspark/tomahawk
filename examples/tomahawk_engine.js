@@ -1,12 +1,45 @@
 
 
-/**
- * @author The Tiny Spark
- */
- 
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+
+
+
 //namespace
 var tomahawk_ns = new Object();
+tomahawk_ns.version = 1.0;
 
+/**
+* @class Tomahawk
+* Core Framework class
+* @constructor
+*/
 function Tomahawk(){}
 
 Tomahawk._classes = new Object();
@@ -15,16 +48,35 @@ Tomahawk._extends = new Array();
 
 	Tomahawk._funcTab = null;
 
+	/**
+	* @method registerClass
+	* @memberOf Tomahawk
+	* @description Register a class definition
+	* @params {class} the class definition
+	* @params {string} the class definition alias which will be used for inheritance
+	*/
 	Tomahawk.registerClass = function( classDef, className )
 	{
 		Tomahawk._classes[className] = classDef;
 	};
 
+	/**
+	* @method extend
+	* @memberOf Tomahawk
+	* @description Make child Inherits ancestor
+	* @params {class} childAlias the child definition alias
+	* @params {string} ancestorAlias the ancestor definition alias
+	*/
 	Tomahawk.extend = function( p_child, p_ancestor )
 	{
 		Tomahawk._extends.push({"child":p_child,"ancestor":p_ancestor,"done":false});
 	};
 
+	/**
+	* @method run
+	* @memberOf Tomahawk
+	* @description run the framework, apply inheritances to classes
+	*/
 	Tomahawk.run = function()
 	{
 		var obj = null;
@@ -89,9 +141,33 @@ Tomahawk._extends = new Array();
 
 
 
-/**
- * @author The Tiny Spark
- */
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+* @author The Tiny Spark
+*/
  
  (function() {
 	
@@ -199,9 +275,33 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 
 
-/**
- * @author The Tiny Spark
- */
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+* @author The Tiny Spark
+*/
 
 (function() {
 	
@@ -295,9 +395,33 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 
 
-/**
- * @author The Tiny Spark
- */
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+* @author The Tiny Spark
+*/
  
  (function() {
 	
@@ -334,7 +458,8 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		
 		this.dispatchEvent(keyboardEvent);
 		
-		if( keyboardEvent.keyCode == tomahawk_ns.Keyboard.BACKSPACE )
+		if( keyboardEvent.keyCode == tomahawk_ns.Keyboard.BACKSPACE ||
+		keyboardEvent.keyCode == tomahawk_ns.Keyboard.SPACE)
 		{
 			event.preventDefault();
 			event.stopPropagation();
@@ -577,10 +702,34 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 
 
-/**
- * @author The Tiny Spark
- */
- 
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+* @author The Tiny Spark
+*/
+
  (function() {
 	 
 	function Screen(){}
@@ -612,13 +761,11 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 
 
-/**
-* @author The Tiny Spark
-* Bitmap
-* Visit http://createjs.com/ for documentation, updates and examples.
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
 *
-* Copyright (c) 2010 gskinner.com, inc.
-* 
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
 * files (the "Software"), to deal in the Software without
@@ -627,10 +774,10 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 * copies of the Software, and to permit persons to whom the
 * Software is furnished to do so, subject to the following
 * conditions:
-* 
+*
 * The above copyright notice and this permission notice shall be
 * included in all copies or substantial portions of the Software.
-* 
+*
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -639,24 +786,19 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 * OTHER DEALINGS IN THE SOFTWARE.
-*/
 
-/**
- *
- * @module Tomahawk
- * @main Tomahawk
- */
+* @author The Tiny Spark
+*/
 
 (function() {
 	
 	/**
-	 * Contains properties and methods shared by all events for use with
-	 * {{#crossLink "DisplayObject"}}{{/crossLink}}.
-	 * 
-	 * @class Bitmap
-	 * @param {Texture2D} the drawing texture.
-	 * @constructor
-	 **/
+	* @class Bitmap
+	* @memberOf tomahawk_ns
+	* @param {Texture2D} the drawing texture.
+	* @augments {DisplayObject}
+	* @constructor
+	*/
 	function Bitmap(texture)
 	{
 		tomahawk_ns.DisplayObject.apply(this);
@@ -672,15 +814,20 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 	/**
 	 * The current drawing texture.
+	 * @public
 	 * @property texture
 	 * @type Texture2D
+	 * @memberOf tomahawk_ns.Bitmap
 	 * @default null
 	 */
 	Bitmap.prototype.texture = null;
 	
 	/**
-	 * @param {Texture2D} texture 
-	 **/
+	* @public
+	* @method setTexture
+	* @param {Texture2D} texture 
+	* @memberOf tomahawk_ns.Bitmap
+	**/
 	Bitmap.prototype.setTexture = function(texture)
 	{
 		this.texture = texture;
@@ -689,9 +836,12 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	};
 
 	/**
-	 * Draws the display object into the specified context
-	 * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
-	 **/
+	* @public
+	* @method draw
+	* Draws the display object into the specified context
+	* @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
+	* @memberOf tomahawk_ns.Bitmap 
+	**/
 	Bitmap.prototype.draw = function( context )
 	{	
 		var rect = this.texture.rect;
@@ -700,7 +850,6 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		context.drawImage(	data, rect[0], rect[1], rect[2], rect[3], 0, 0, this.width, this.height );
 	};
 	
-	//namespace
 	tomahawk_ns.Bitmap = Bitmap;
 
 })();
@@ -709,6 +858,35 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 
 
+
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
 
 (function() {
 	
@@ -847,9 +1025,34 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 
 
-/**
- * @author The Tiny Spark
- */
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
 
 (function() {
 
@@ -1247,9 +1450,35 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 
 
-/**
- * @author The Tiny Spark
- */
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+
 (function() {
 	
 	function DisplayObjectContainer()
@@ -1554,9 +1783,35 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 
 
-/**
- * @author The Tiny Spark
- */
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+
 (function() {
 	
 	function Mouse(){}
@@ -1574,14 +1829,38 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	};
 	
 	tomahawk_ns.Mouse = Mouse;
-	
 })();
 
 
 
-/**
- * @author The Tiny Spark
- */
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
  
 (function() {
 	
@@ -1650,9 +1929,35 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 
 
-/**
- * @author The Tiny Spark
- */
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+
 (function() {
 		
 	function Shape()
@@ -1865,9 +2170,34 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 
 
-/**
- * @author The Tiny Spark
- */
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
 
 (function() {
 
@@ -1965,9 +2295,33 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 
 
-/**
- * @author The Tiny Spark
- */
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+* @author The Tiny Spark
+*/
 
 (function() {
 	
@@ -2307,9 +2661,35 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 
 
-/**
- * @author The Tiny Spark
- */
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+
 (function() {
 	
 	
@@ -2483,10 +2863,34 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 
 
-/**
- * ...
- * @author Hatshepsout
- */
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
 
 (function() {
 	
@@ -2696,9 +3100,34 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 
 
-/**
- * @author The Tiny Spark
- */
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
 
 (function() {
 
@@ -2821,10 +3250,9 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 
 /*
-* Event
-* Visit http://createjs.com/ for documentation, updates and examples.
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
 *
-* Copyright (c) 2010 gskinner.com, inc.
+* Copyright (c) 2014 the-tiny-spark.com, inc.
 *
 * Permission is hereby granted, free of charge, to any person
 * obtaining a copy of this software and associated documentation
@@ -2846,27 +3274,21 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 * OTHER DEALINGS IN THE SOFTWARE.
+
 * @author The Tiny Spark
 */
-
-/**
- *
- * @module Tomahawk
- * @main Tomahawk
- */
 
 (function() {	
 	
 	/**
-	 * Contains properties and methods shared by all events for use with
-	 * {{#crossLink "EventDispatcher"}}{{/crossLink}}.
-	 * 
 	 * @class Event
+	 * @memberOf tomahawk_ns
 	 * @param {String} type The event type.
 	 * @param {Boolean} bubbles Indicates whether the event will bubble through the display list.
 	 * @param {Boolean} cancelable Indicates whether the default behaviour of this event can be cancelled.
 	 * @constructor
 	 **/
+	 
 	function Event(type, bubbles, cancelable)
 	{
 		this.type = type;
@@ -2876,29 +3298,101 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 	Tomahawk.registerClass( Event, "Event" );
 
+	/**
+	* @member {String} type the type of the event.
+	* @memberOf tomahawk_ns.Event.prototype
+	**/
 	Event.prototype.type = null;
+	
+	/**
+	* @member {Boolean} bubbles indicates if the event can "bubble" or not.
+	* @memberOf tomahawk_ns.Event.prototype
+	**/
 	Event.prototype.bubbles = false;
+	
+	/**
+	* @member {Boolean} cancelable indicates if the event is cancelable or not.
+	* @memberOf tomahawk_ns.Event.prototype
+	**/
 	Event.prototype.cancelable = true;
+	
+	/**
+	* @member {Object} data an object attached to the event.
+	* @memberOf tomahawk_ns.Event.prototype
+	**/
 	Event.prototype.data = null;
+	
+	/**
+	* @member {tomahawk_ns.EventDispatcher} target the original dispatcher of the event
+	* @memberOf tomahawk_ns.Event.prototype
+	**/
 	Event.prototype.target = null;
+	
+	/**
+	* @member {tomahawk_ns.EventDispatcher} currentTarget the actual dispatcher of the event
+	* @memberOf tomahawk_ns.Event.prototype
+	**/
 	Event.prototype.currentTarget = null;
 
+	/**
+	* @member {Object} stopPropagation stop the bubbling phase
+	* @memberOf tomahawk_ns.Event.prototype
+	**/
 	Event.prototype.stopPropagation = function()
 	{
 		if( this.cancelable == true )
 			this.bubbles = false;
 	};
 
-
-	Event.FOCUSED			= "focused"
-	Event.UNFOCUSED			= "unfocused"
+	/**
+	* @property {Object} FOCUSED focused
+	* @memberOf tomahawk_ns.Event
+	**/
+	Event.FOCUSED			= "focused";
+	/**
+	* @property {Object} UNFOCUSED unfocused
+	* @memberOf tomahawk_ns.Event
+	**/
+	Event.UNFOCUSED			= "unfocused";
+	/**
+	* @property {Object} ADDED added
+	* @memberOf tomahawk_ns.Event
+	**/
 	Event.ADDED 			= "added";
+	/**
+	* @property {Object} ADDED_TO_STAGE addedToStage
+	* @memberOf tomahawk_ns.Event
+	**/
 	Event.ADDED_TO_STAGE 	= "addedToStage";
+	/**
+	* @property {Object} ENTER_FRAME enterFrame
+	* @memberOf tomahawk_ns.Event
+	**/
 	Event.ENTER_FRAME 		= "enterFrame";
+	/**
+	* @property {Object} REMOVED removed
+	* @memberOf tomahawk_ns.Event
+	**/
 	Event.REMOVED 			= "removed";
+	/**
+	* @property {Object} REMOVED_FROM_STAGE removedFromStage
+	* @memberOf tomahawk_ns.Event
+	**/
 	Event.REMOVED_FROM_STAGE= "removedFromStage";
+	/**
+	* @property {Object} IO_ERROR ioError
+	* @memberOf tomahawk_ns.Event
+	**/
 	Event.IO_ERROR			= "ioError";
+	/**
+	* @property {Object} PROGRESS progress
+	* @memberOf tomahawk_ns.Event
+	**/
 	Event.PROGRESS			= "progress";
+	/**
+	* @property {Object} COMPLETE complete
+	* @memberOf tomahawk_ns.Event
+	**/
 	Event.COMPLETE			= "complete";
 	
 	
@@ -2908,12 +3402,42 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 
 
-/**
- * @author The Tiny Spark
- */
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
 
 (function() {
 	
+	/**
+	 * @class EventDispatcher
+	 * @memberOf tomahawk_ns
+	 * @constructor
+	 **/
 	function EventDispatcher()
 	{
 		this._listeners = new Array();
@@ -2921,9 +3445,17 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 	Tomahawk.registerClass( EventDispatcher, "EventDispatcher" );
 
+	/**
+	* @member {tomahawk_ns.EventDispatcher} parent the parent of the current EventDispatcher
+	* @memberOf tomahawk_ns.EventDispatcher.prototype
+	**/
 	EventDispatcher.prototype.parent = null;
 	EventDispatcher.prototype._listeners = null;
 
+	/**
+	* @method {Object} addEventListener Add an event listener to the current EventDispatcher
+	* @memberOf tomahawk_ns.EventDispatcher.prototype
+	**/
 	EventDispatcher.prototype.addEventListener = function( type, scope, callback, useCapture )
 	{
 		this._listeners = this._listeners || new Array();
@@ -2934,7 +3466,12 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		obj.useCapture = useCapture;
 		this._listeners.push(obj);
 	};
-
+	
+	/**
+	* @method {String} hasEventListener indicates if the current EventDispatcher has an event listener for the type passed in parameter.
+	* @memberOf tomahawk_ns.EventDispatcher.prototype
+	* @returns {Boolean}
+	**/
 	EventDispatcher.prototype.hasEventListener = function(type)
 	{
 		if( this._listeners == null )
@@ -3025,11 +3562,45 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 
 
-/**
- * @author The Tiny Spark
- */
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+
 (function() {	
 
+	/**
+	 * @class KeyEvent
+	 * @memberOf tomahawk_ns
+	 * @param {String} type The event type.
+	 * @param {Boolean} bubbles Indicates whether the event will bubble through the display list.
+	 * @param {Boolean} cancelable Indicates whether the default behaviour of this event can be cancelled.
+	 * @constructor
+	 **/
 	function KeyEvent(type, bubbles, cancelable)
 	{
 		this.type = type;
@@ -3040,15 +3611,63 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	Tomahawk.registerClass( KeyEvent, "KeyEvent" );
 	Tomahawk.extend( "Keyboard", "Event" );
 
+	/**
+	* @member {String} value the value of the event
+	* @memberOf tomahawk_ns.KeyEvent.prototype
+	**/
 	KeyEvent.prototype.value = "";
+	
+	/**
+	* @member {Number} keyCode the keyCode of the event
+	* @memberOf tomahawk_ns.KeyEvent.prototype
+	**/
 	KeyEvent.prototype.keyCode = 0;
+	
+	/**
+	* @member {Boolean} isCharacter Indicates if the touch pressed corresponds to a character
+	* @memberOf tomahawk_ns.KeyEvent.prototype
+	**/
 	KeyEvent.prototype.isCharacter = false;
+	
+	/**
+	* @member {Number} charCode the charCode of the event
+	* @memberOf tomahawk_ns.KeyEvent.prototype
+	**/
 	KeyEvent.prototype.charCode = 0;
+	
+	/**
+	* @member {Boolean} ctrlKey Indicates weither the ctrlKey is pressed or not
+	* @memberOf tomahawk_ns.KeyEvent.prototype
+	**/
 	KeyEvent.prototype.crtlKey = false;
+	
+	/**
+	* @member {Boolean} shiftKey Indicates weither the shiftKey is pressed or not
+	* @memberOf tomahawk_ns.KeyEvent.prototype
+	**/
 	KeyEvent.prototype.shiftKey = false;
+	
+	/**
+	* @member {Boolean} altKey Indicates weither the altKey is pressed or not
+	* @memberOf tomahawk_ns.KeyEvent.prototype
+	**/
 	KeyEvent.prototype.altKey = false;
+	
+	/**
+	* @member {KeyboardEvent} nativeEvent the native javascript event
+	* @memberOf tomahawk_ns.KeyEvent.prototype
+	**/
 	KeyEvent.prototype.nativeEvent = null;
 
+	/**
+	* @method fromNativeEvent
+	* @memberOf tomahawk_ns.KeyEvent
+	* @description converts the native javascript event to a regular tomahawk_ns.KeyEvent one.
+	* @param {String} type The event type.
+	* @param {Boolean} bubbles Indicates whether the event will bubble through the display list.
+	* @param {Boolean} cancelable Indicates whether the default behaviour of this event can be cancelled.
+	* @eturns {tomahawk_ns.KeyEvent}
+	**/
 	KeyEvent.fromNativeEvent = function(event,bubbles,cancelable)
 	{
 		var type = "";
@@ -3079,8 +3698,22 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	};
 
 
+	/**
+	* @property {String} KEY_UP "keyup"
+	* @memberOf tomahawk_ns.KeyEvent
+	**/
 	KeyEvent.KEY_UP = "keyup";
+	
+	/**
+	* @property {String} KEY_DOWN "keydown"
+	* @memberOf tomahawk_ns.KeyEvent
+	**/
 	KeyEvent.KEY_DOWN = "keydown";
+	
+	/**
+	* @property {String} KEY_PRESS "keypress"
+	* @memberOf tomahawk_ns.KeyEvent
+	**/
 	KeyEvent.KEY_PRESS = "keypress";
 
 	tomahawk_ns.KeyEvent = KeyEvent;
@@ -3097,16 +3730,46 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 
 
-/**
- * @author The Tiny Spark
- */
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+
 (function() {
 	
-	function MouseEvent(){}
-
-	Tomahawk.registerClass( MouseEvent, "MouseEvent" );
-	Tomahawk.extend( "MouseEvent", "Event" );
-
+	/**
+	 * @class MouseEvent
+	 * @memberOf tomahawk_ns
+	 * @augments tomahawk_ns.Event
+	 * @param {String} type The event type.
+	 * @param {Boolean} bubbles Indicates whether the event will bubble through the display list.
+	 * @param {Boolean} cancelable Indicates whether the default behaviour of this event can be cancelled.
+	 * @constructor
+	 **/
 	function MouseEvent(type, bubbles, cancelable)
 	{
 		this.type = type;
@@ -3114,6 +3777,15 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		this.bubbles = bubbles;
 	}
 
+	Tomahawk.registerClass( MouseEvent, "MouseEvent" );
+	Tomahawk.extend( "MouseEvent", "Event" );
+
+
+	/**
+	* @method {Object} fromNativeMouseEvent converts an original MouseEvent into a regular tomahawk_ns.MouseEvent one
+	* @memberOf tomahawk_ns.MouseEvent
+	* @returns {tomahawk_ns.MouseEvent}
+	**/
 	MouseEvent.fromNativeMouseEvent = function(event,bubbles,cancelable,x,y)
 	{
 		var type = "";
@@ -3139,12 +3811,40 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		return msevent;
 	};
 
+	/**
+	* @property {Object} CLICK
+	* @memberOf tomahawk_ns.MouseEvent click
+	**/
 	MouseEvent.CLICK 			= "click";
+	/**
+	* @property {Object} DOUBLE_CLICK doubleClick
+	* @memberOf tomahawk_ns.MouseEvent
+	**/
 	MouseEvent.DOUBLE_CLICK 	= "doubleClick";
+	/**
+	* @property {Object} ROLL_OVER rollOver
+	* @memberOf tomahawk_ns.MouseEvent
+	**/
 	MouseEvent.ROLL_OVER 		= "rollOver";
+	/**
+	* @property {Object} ROLL_OUT rollOut
+	* @memberOf tomahawk_ns.MouseEvent
+	**/
 	MouseEvent.ROLL_OUT 		= "rollOut";
+	/**
+	* @property {Object} MOUSE_MOVE mouseMove
+	* @memberOf tomahawk_ns.MouseEvent
+	**/
 	MouseEvent.MOUSE_MOVE 		= "mouseMove";
+	/**
+	* @property {Object} MOUSE_UP mouseUp
+	* @memberOf tomahawk_ns.MouseEvent
+	**/
 	MouseEvent.MOUSE_UP 		= "mouseUp";
+	/**
+	* @property {Object} MOUSE_DOWN mouseDown
+	* @memberOf tomahawk_ns.MouseEvent
+	**/
 	MouseEvent.MOUSE_DOWN 		= "mouseDown";
 
 	tomahawk_ns.MouseEvent = MouseEvent;
@@ -3153,9 +3853,35 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 
 
-/**
- * @author The Tiny Spark
- */
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+
 (function() {
 	
 	function BrightnessFilter()
@@ -3192,6 +3918,35 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 })();
 
 
+
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
 
 	
 
@@ -3242,9 +3997,35 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 
 
-/**
- * @author The Tiny Spark
- */
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+
 (function() {
 	
 	function GrayScaleFilter()
@@ -3278,10 +4059,35 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 
 
-/**
- * @author The Tiny Spark
- */
- 
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+
 (function() {
 
 	function PixelFilter(){}
@@ -3327,9 +4133,36 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 
 
-/**
- * @author The Tiny Spark
- */
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+
+
 (function() {
 	
 	function ShadowBlurFilter()
@@ -3363,15 +4196,38 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 
 
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+
 /**
- * @author The Tiny Spark
- * original file extracted from createJs and modified a bit for Tomahawk
- */
- 
- /**
- *
- * @module Tomahawk
- * @main Tomahawk
+ * original file extracted from createJs ( http://www.createjs.com ) 
+ * and modified a bit for Tomahawk
  */
 
 (function() {
@@ -3380,12 +4236,13 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	 * Contains properties and methods shared by all events for use with
 	 * 
 	 * @class Matrix2D
-	 * @param {int} a.
-	 * @param {int} b.
-	 * @param {int} c.
-	 * @param {int} d.
-	 * @param {int} tx.
-	 * @param {int} ty.
+	 * A Basic implementation of a Matrix3x3 
+	 * @param {Number} a.
+	 * @param {Number} b.
+	 * @param {Number} c.
+	 * @param {Number} d.
+	 * @param {Number} tx.
+	 * @param {Number} ty.
 	 * @constructor
 	 **/
 	function Matrix2D(a, b, c, d, tx, ty)
@@ -3401,6 +4258,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	/**
 	 * Save the current Matrix state
 	 * @method save
+	 * @memberOf Matrix2D
 	 * @return null
 	 **/
 	Matrix2D.prototype.save = function()
@@ -3409,8 +4267,11 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	};
 
 	/**
-	* restore the last saved matrix
-	**/
+	 * Restore the las saved matrix state
+	 * @method save
+	 * @memberOf Matrix2D
+	 * @return null
+	 **/
 	Matrix2D.prototype.restore = function()
 	{
 		this.ty = this._stack.pop();
@@ -3427,6 +4288,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	 * @property identity
 	 * @static
 	 * @type Matrix2D
+	 * @memberOf Matrix2D
 	 * @readonly
 	 **/
 	Matrix2D.prototype.identity = null;// set at bottom of class definition.
@@ -3447,12 +4309,14 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	 * Position (0, 0) in a 3x3 affine transformation matrix.
 	 * @property a
 	 * @type Number
+	 * @memberOf Matrix2D
 	 **/
 	Matrix2D.prototype.a = 1;
 
 	/**
 	 * Position (0, 1) in a 3x3 affine transformation matrix.
 	 * @property b
+	 * @memberOf Matrix2D
 	 * @type Number
 	 **/
 	Matrix2D.prototype.b = 0;
@@ -3460,6 +4324,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	/**
 	 * Position (1, 0) in a 3x3 affine transformation matrix.
 	 * @property c
+	 * @memberOf Matrix2D
 	 * @type Number
 	 **/
 	Matrix2D.prototype.c = 0;
@@ -3467,6 +4332,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	/**
 	 * Position (1, 1) in a 3x3 affine transformation matrix.
 	 * @property d
+	 * @memberOf Matrix2D
 	 * @type Number
 	 **/
 	Matrix2D.prototype.d = 1;
@@ -3474,6 +4340,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	/**
 	 * Position (2, 0) in a 3x3 affine transformation matrix.
 	 * @property tx
+	 * @memberOf Matrix2D
 	 * @type Number
 	 **/
 	Matrix2D.prototype.tx = 0;
@@ -3481,6 +4348,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	/**
 	 * Position (2, 1) in a 3x3 affine transformation matrix.
 	 * @property ty
+	 * @memberOf Matrix2D
 	 * @type Number
 	 **/
 	Matrix2D.prototype.ty = 0;
@@ -3491,6 +4359,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	/**
 	 * Initialization method. Can also be used to reinitialize the instance.
 	 * @method initialize
+	 * @memberOf Matrix2D
 	 * @param {Number} [a=1] Specifies the a property for the new matrix.
 	 * @param {Number} [b=0] Specifies the b property for the new matrix.
 	 * @param {Number} [c=0] Specifies the c property for the new matrix.
@@ -3881,10 +4750,35 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 
 
-/**
- * ...
- * @author Thot
- */
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+
 (function() {
 
 function Matrix4x4()
@@ -4484,10 +5378,35 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 
 
 
-/**
- * @author The Tiny Spark
- */
- 
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+
 (function() {
 	
 
@@ -4516,10 +5435,35 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 
 
 
-/**
- * @author The Tiny Spark
- */
- 
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+
 (function() {
 	
 
@@ -4569,10 +5513,34 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 
 
 
-/**
- * ...
- * @author Hatshepsout
- */
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
 
 (function() {
 	
@@ -4608,6 +5576,35 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 })();
 
 
+
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
 
 (function() {
 	
@@ -4697,9 +5694,35 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 
 
 
-/**
- * @author The Tiny Spark
- */
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+
 (function() {
 	
 	function InputTextField()
@@ -4780,9 +5803,34 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 
 
 
-/**
- * @author The Tiny Spark
- */
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
 
 (function() {
 	
@@ -4908,9 +5956,35 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 
 
 
-/**
- * @author The Tiny Spark
- */
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+
 (function() {
 	
 
@@ -5183,9 +6257,35 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 
 
 
-/**
- * @author The Tiny Spark
- */
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+
 (function() {
 	
 	function TextField()
@@ -5746,9 +6846,35 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 
 
 
-/**
- * @author The Tiny Spark
- */
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+
 (function() {
 	
 	function TextFormat(){}
@@ -5836,10 +6962,34 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 
 
 
-/**
- * ...
- * @author Hatshepsout
- */
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
 
 (function() {
 	
@@ -5989,9 +7139,34 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 
 
 
-/**
- * @author The Tiny Spark
- */
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
 
 (function() {
 	
@@ -6014,9 +7189,35 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 
 
 
-/**
- * @author The Tiny Spark
- */
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+
 (function() {
 	
 	function TextureAtlas()
@@ -6071,11 +7272,4 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 })();
 
 
-
-
-
-/**
- * ...
- * @author Hatshepsout
- */
 
