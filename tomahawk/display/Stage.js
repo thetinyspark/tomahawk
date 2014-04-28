@@ -9,21 +9,7 @@
 	{
 		tomahawk_ns.DisplayObject._collide = 0;
 		tomahawk_ns.DisplayObjectContainer.apply(this);
-			// useful
-		window.requestAnimationFrame = (function()
-		{
-			
-			return  window.requestAnimationFrame       ||  //Chromium 
-					window.webkitRequestAnimationFrame ||  //Webkit
-					window.mozRequestAnimationFrame    || //Mozilla Geko
-					window.oRequestAnimationFrame      || //Opera Presto
-					window.msRequestAnimationFrame     || //IE Trident?
-					function(callback, element){ //Fallback function
-						window.setTimeout(callback, 10);                
-					}
-			 
-		})();
-		
+		this.setFPS(1000);
 		this.stage = this;
 	}
 
@@ -42,7 +28,7 @@
 		return tomahawk_ns.Stage._instances[stageName];
 	};
 
-
+	
 	Stage.prototype._lastTime = 0;
 	Stage.prototype._frameCount = 0;
 	Stage.prototype._fps = 0;
@@ -58,7 +44,6 @@
 	Stage.prototype.backgroundColor = "#0080C0";
 	Stage.prototype._stop = false;
 
-	
 	Stage.prototype._getContext  = function()
 	{
 		return this._canvas.getContext("2d");
@@ -66,16 +51,7 @@
 
 	Stage.prototype.init = function(canvas)
 	{
-		var scope = this;
-		var callback = function(event)
-		{
-			scope._mouseHandler(event);
-		};
-		
-		var callbackKey = function(event)
-		{
-			scope._keyboardHandler(event);
-		};
+		var callback = this._mouseHandler.bind(this);
 		
 		this._canvas = canvas;
 		this._context = this._getContext();
@@ -91,30 +67,16 @@
 		this._canvas.addEventListener("mouseup",callback);
 		this._canvas.addEventListener("dblclick",callback);
 		
-		
-		window.addEventListener("keyup",callbackKey);
-		window.addEventListener("keydown",callbackKey);
-		window.addEventListener("keypress",callbackKey);
+		this._enterFrame = this.enterFrame.bind(this);
 		this.enterFrame();		
 	};
-
-	Stage.prototype._keyboardHandler = function(event)
-	{
-		if( event.type == "keyup" )
-			tomahawk_ns.Keyboard.toggleShift(event.keyCode);
-		
-		var keyboardEvent = tomahawk_ns.KeyEvent.fromNativeEvent(event, true, true);
-		this.dispatchEvent(keyboardEvent);
-	};
-
+	
 	Stage.prototype._mouseHandler = function(event)
 	{
-		
 		var bounds = this._canvas.getBoundingClientRect();
 		var x = 0;
 		var y = 0;
 		var touch = null;
-		
 		
 		if( event.type == "touchstart" || 
 			event.type == "touchmove" || 
@@ -318,16 +280,26 @@
 		context.restore();
 		
 		this.dispatchEvent(new tomahawk_ns.Event(tomahawk_ns.Event.ENTER_FRAME,true,true));
-		window.requestAnimationFrame(	function()
-										{
-											scope.enterFrame();
-										}
-		);
+		window.requestAnimationFrame(this._enterFrame);
 	};
 
 	Stage.prototype.setFPS = function(value)
 	{
 		this._fps = value;
+		
+		window.requestAnimationFrame = (function()
+		{
+			
+			return  window.requestAnimationFrame       ||  //Chromium 
+					window.webkitRequestAnimationFrame ||  //Webkit
+					window.mozRequestAnimationFrame    || //Mozilla Geko
+					window.oRequestAnimationFrame      || //Opera Presto
+					window.msRequestAnimationFrame     || //IE Trident?
+					function(callback, element){ //Fallback function
+						window.setTimeout(callback, parseInt(1000/value));                
+					}
+			 
+		})();
 	};
 
 	Stage.prototype.drawFPS = function()

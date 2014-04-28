@@ -34,38 +34,37 @@
 
 	Letter.prototype.updateMetrics = function()
 	{
+		
 		var context = Letter._metricsContext;
-		var ratio = 1;
+		var font = tomahawk_ns.Font.getFont( this.format.font );
+		var measure = font.measureText(this.value, this.format.size);
 		
 		context.save();
 		
-		this.format.updateContext(context);
-		
-	
-		if( this.format.customMetrics == false )
+		if( this.value == " " )
 		{
-			this.textHeight = ( context.measureText('M').width ) * 1.4;
-			this.textWidth = context.measureText(this.value).width;
-		}
-		else
-		{
-			ratio = ( this.format.size / this.format.fontBaseSize );
-			this.textHeight = parseInt(this.format.fontBaseHeight * ratio);
-			
-			if( this.format.fontBaseWidth == -1 )
-			{
-				this.textWidth = context.measureText(this.value).width;
-			}
-			else
-			{
-				this.textWidth = parseInt(this.format.fontBaseWidth * ratio);
-			}
+			this.format.updateContext(context);
+			measure.width = context.measureText(" ").width;
 		}
 		
+		this.textWidth = measure.width;
+		this.textHeight = measure.height;
 		this.width = this.textWidth;
 		this.height = this.textHeight;
 		
 		context.restore();
+		// TODO
+		
+		//var context = Letter._metricsContext;
+		//context.save();
+		//
+		//this.format.updateContext(context);
+		//this.textHeight = ( context.measureText('M').width );
+		//this.textWidth = context.measureText(this.value).width;
+		//this.width = this.textWidth;
+		//this.height = this.textHeight * 1.4;
+		//
+		//context.restore();
 	};
 
 	Letter.prototype.draw = function(context)
@@ -75,9 +74,17 @@
 			context.save();
 			context.beginPath();
 			context.fillStyle = this.format.backgroundSelectedColor;
-			context.fillRect(0, 0, this.textWidth, 0);
+			context.fillRect(0, 0, this.width, this.height);
 			context.fill();
 			context.restore();
+		}
+		
+		if( this.format.textBorder == true )
+		{
+			context.beginPath();
+			this.format.updateBorderContext(context);
+			context.strokeText(this.value,this.format.textBorderOffsetX,this.format.textBorderOffsetY);
+			context.closePath();
 		}
 		
 	
@@ -97,24 +104,6 @@
 			context.stroke();
 			context.restore();
 		}	
-		
-		if( this.format.smooth == true )
-		{
-			context.beginPath();
-			this.format.updateSmoothContext(context);
-			context.strokeText(this.value,0,0);
-			context.closePath();
-		}
-		
-		if( this.format.textBorder == true )
-		{
-			context.beginPath();
-			this.format.updateBorderContext(context);
-			context.strokeText(this.value,this.format.textBorderOffsetX,this.format.textBorderOffsetY);
-			context.closePath();
-		}
-		
-		
 	};
 
 	Letter.prototype.clone = function()

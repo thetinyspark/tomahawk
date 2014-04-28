@@ -263,6 +263,7 @@
 				letter.selected = false;
 			}
 		}
+		
 		this._refreshNextFrame = true;
 	};
 

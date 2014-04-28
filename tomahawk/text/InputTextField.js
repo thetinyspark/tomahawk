@@ -6,28 +6,14 @@
 	function InputTextField()
 	{
 		tomahawk_ns.SelectableTextField.apply(this);
-		this.addEventListener( tomahawk_ns.Event.ADDED_TO_STAGE, this, this._inputTextFieldAddedHandler );
+		tomahawk_ns.Keyboard.getInstance().addEventListener( tomahawk_ns.KeyEvent.KEY_UP, this, this._keyHandler );
 	}
 
 	Tomahawk.registerClass(InputTextField,"InputTextField");
 	Tomahawk.extend("InputTextField","SelectableTextField");
-
-	InputTextField.prototype._inputTextFieldAddedHandler = function(event)
-	{
-		this.removeEventListener( tomahawk_ns.Event.ADDED_TO_STAGE, this, this._inputTextFieldAddedHandler );
-		this.stage.addEventListener( tomahawk_ns.KeyEvent.KEY_DOWN, this, this._keyHandler );
-	};
 	
 	InputTextField.prototype.setFocus = function(value)
 	{
-		if( value == true )
-		{
-			tomahawk_ns.Keyboard.activate();
-		}
-		else
-		{
-			tomahawk_ns.Keyboard.deactivate();
-		}
 		tomahawk_ns.SelectableTextField.prototype.setFocus.apply(this,[value]);
 	};
 	

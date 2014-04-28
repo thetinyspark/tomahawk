@@ -26,6 +26,7 @@
 	{
 		var type = "";
 		var newEvent = null;
+		var charCode = event.which || event.keyCode;
 		
 		switch( event.type )
 		{
@@ -41,10 +42,13 @@
 		newEvent.ctrlKey = event.ctrlKey;
 		newEvent.shiftKey = event.shiftKey;
 		newEvent.altKey = event.altKey;
-		newEvent.value = tomahawk_ns.Keyboard.keyCodeToChar(event.keyCode, event.shiftKey, event.ctrlKey, event.altKey);
+		//newEvent.value = ( event.type == "keypress" ) ? String.fromCharCode(charCode) : tomahawk_ns.Keyboard.keyCodeToChar(event.keyCode);
+		newEvent.value = tomahawk_ns.Keyboard.keyCodeToChar(event.keyCode);
 		newEvent.isCharacter = tomahawk_ns.Keyboard.isMapped(event.keyCode);
 		newEvent.which = event.which;
 		return newEvent;
+		
+		//tomahawk_ns.Keyboard.keyCodeToChar(event.keyCode, event.shiftKey, event.ctrlKey, event.altKey);
 	};
 
 

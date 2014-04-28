@@ -38,6 +38,9 @@
 		this.process();
 	};
 
+	PixelFilter.prototype.getOffsetX = function(){ return 0};
+	PixelFilter.prototype.getOffsetY = function(){ return 0};
+	
 	tomahawk_ns.PixelFilter = PixelFilter;
 
 })();

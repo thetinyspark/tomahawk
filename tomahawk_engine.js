@@ -300,40 +300,45 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
  (function() {
 	
 	 
-	function Keyboard(){}
+	function Keyboard()
+	{
+		var callbackKey = this._keyboardHandler.bind(this);
+		window.removeEventListener("keyup",callbackKey);
+		window.removeEventListener("keydown",callbackKey);
+		window.removeEventListener("keypress",callbackKey);
+		
+		window.addEventListener("keyup",callbackKey);
+		window.addEventListener("keydown",callbackKey);
+		window.addEventListener("keypress",callbackKey);
+	}
 	
 	Tomahawk.registerClass( Keyboard, "Keyboard" );
+	Tomahawk.extend( "Keyboard", "EventDispatcher" );
 	
-	Keyboard._createInput = function()
+	Keyboard.getInstance = function()
 	{
-		if( Keyboard._input == null )
-		{
-			var input = document.createElement("input");
-			input.style.position = "absolute";
-			input.style.left = "-1000px";
-			input.style.top = "0";
-			input.style.width = "10px";
-			input.style.height = "10px";
-			document.body.appendChild(input);
-			Keyboard._input = input;
-		}
+		if( tomahawk_ns.Keyboard._instance == null )
+			tomahawk_ns.Keyboard._instance = new tomahawk_ns.Keyboard();
+			
+		return tomahawk_ns.Keyboard._instance;
+	};
+	
+	Keyboard.prototype._keyboardHandler = function(event)
+	{	
+		if( event.type == "keyup" )
+			tomahawk_ns.Keyboard.toggleShift(event.keyCode);
+			
+		var keyboardEvent = tomahawk_ns.KeyEvent.fromNativeEvent(event, true, true);
 		
+		this.dispatchEvent(keyboardEvent);
+		
+		if( keyboardEvent.keyCode == tomahawk_ns.Keyboard.BACKSPACE )
+		{
+			event.preventDefault();
+			event.stopPropagation();
+		}
 	};
 	
-	Keyboard._input = null;
-	
-	Keyboard.activate = function(stage)
-	{
-		Keyboard._createInput();
-		Keyboard._input.focus();
-	};	
-	
-	Keyboard.deactivate = function(stage)
-	{
-		Keyboard._createInput();
-		Keyboard._input.unfocus();
-	};
-
 	Keyboard.keyCodeToChar = function(keyCode, shiftKey, ctrlKey, altKey)
 	{
 		var obj = Keyboard.MAP[keyCode];
@@ -735,19 +740,6 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		ctx.fillStyle = "black";
 		ctx.lineWidth = 1;
 		
-		if( this.showLines == false )
-		{
-			ctx.moveTo(x0 - 1, y0 - 1); 
-			ctx.lineTo(x1 - 1, y1 - 1);
-			ctx.lineTo(x2 - 1, y2 - 1); 
-			ctx.lineTo(x0 - 1,y0 - 1);
-			
-			ctx.moveTo(x0 + 1, y0 + 1); 
-			ctx.lineTo(x1 + 1, y1 + 1);
-			ctx.lineTo(x2 + 1, y2 + 1); 
-			ctx.lineTo(x0 + 1, y0 + 1);
-		}
-		
 		ctx.moveTo(x0, y0 ); 
 		ctx.lineTo(x1, y1 );
         ctx.lineTo(x2, y2 ); 
@@ -934,7 +926,16 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		var offY = 0;
 		var bounds = this.getBoundingRectIn(this);
 		var cacheAsBitmap = this.cacheAsBitmap;
-		buffer = document.createElement("canvas");
+		
+		if( this._cache == null )
+		{
+			buffer = document.createElement("canvas");
+		}
+		else
+		{
+			buffer = this._cache;
+		}
+		
 		buffer.width = ( bounds.width < 1 ) ? 1 : bounds.width ;
 		buffer.height = ( bounds.height < 1 ) ? 1 : bounds.height ;
 
@@ -948,6 +949,14 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		// before drawing filters
 		if( filters != null )
 		{		
+			//i = filters.length;
+			//
+			//while( --i > -1 )
+			//{
+				//buffer.width += filters[i].getOffsetX();
+				//buffer.height += filters[i].getOffsetY();
+			//}
+			
 			i = filters.length;
 			
 			while( --i > -1 )
@@ -1068,20 +1077,6 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 	DisplayObject.prototype.hitTest = function(x,y)
 	{		
-		//var pt1 = null;
-		//var current = this;
-		//var mat = this.matrix.clone();
-		//
-		//while( current != null )
-		//{
-			//mat.prependMatrix(current.matrix );
-			//current = current.parent;
-		//}
-		//
-		//mat = mat.clone().invert();
-		//
-		//pt1 = mat.transformPoint(x,y);
-		
 		var pt1 = this.globalToLocal(x,y);
 		
 		if( pt1.x < 0 || pt1.x > this.width || pt1.y < 0 || pt1.y > this.height )
@@ -1926,21 +1921,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	{
 		tomahawk_ns.DisplayObject._collide = 0;
 		tomahawk_ns.DisplayObjectContainer.apply(this);
-			// useful
-		window.requestAnimationFrame = (function()
-		{
-			
-			return  window.requestAnimationFrame       ||  //Chromium 
-					window.webkitRequestAnimationFrame ||  //Webkit
-					window.mozRequestAnimationFrame    || //Mozilla Geko
-					window.oRequestAnimationFrame      || //Opera Presto
-					window.msRequestAnimationFrame     || //IE Trident?
-					function(callback, element){ //Fallback function
-						window.setTimeout(callback, 10);                
-					}
-			 
-		})();
-		
+		this.setFPS(1000);
 		this.stage = this;
 	}
 
@@ -1959,7 +1940,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		return tomahawk_ns.Stage._instances[stageName];
 	};
 
-
+	
 	Stage.prototype._lastTime = 0;
 	Stage.prototype._frameCount = 0;
 	Stage.prototype._fps = 0;
@@ -1975,7 +1956,6 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	Stage.prototype.backgroundColor = "#0080C0";
 	Stage.prototype._stop = false;
 
-	
 	Stage.prototype._getContext  = function()
 	{
 		return this._canvas.getContext("2d");
@@ -1983,16 +1963,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 	Stage.prototype.init = function(canvas)
 	{
-		var scope = this;
-		var callback = function(event)
-		{
-			scope._mouseHandler(event);
-		};
-		
-		var callbackKey = function(event)
-		{
-			scope._keyboardHandler(event);
-		};
+		var callback = this._mouseHandler.bind(this);
 		
 		this._canvas = canvas;
 		this._context = this._getContext();
@@ -2008,30 +1979,16 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		this._canvas.addEventListener("mouseup",callback);
 		this._canvas.addEventListener("dblclick",callback);
 		
-		
-		window.addEventListener("keyup",callbackKey);
-		window.addEventListener("keydown",callbackKey);
-		window.addEventListener("keypress",callbackKey);
+		this._enterFrame = this.enterFrame.bind(this);
 		this.enterFrame();		
 	};
-
-	Stage.prototype._keyboardHandler = function(event)
-	{
-		if( event.type == "keyup" )
-			tomahawk_ns.Keyboard.toggleShift(event.keyCode);
-		
-		var keyboardEvent = tomahawk_ns.KeyEvent.fromNativeEvent(event, true, true);
-		this.dispatchEvent(keyboardEvent);
-	};
-
+	
 	Stage.prototype._mouseHandler = function(event)
 	{
-		
 		var bounds = this._canvas.getBoundingClientRect();
 		var x = 0;
 		var y = 0;
 		var touch = null;
-		
 		
 		if( event.type == "touchstart" || 
 			event.type == "touchmove" || 
@@ -2235,16 +2192,26 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		context.restore();
 		
 		this.dispatchEvent(new tomahawk_ns.Event(tomahawk_ns.Event.ENTER_FRAME,true,true));
-		window.requestAnimationFrame(	function()
-										{
-											scope.enterFrame();
-										}
-		);
+		window.requestAnimationFrame(this._enterFrame);
 	};
 
 	Stage.prototype.setFPS = function(value)
 	{
 		this._fps = value;
+		
+		window.requestAnimationFrame = (function()
+		{
+			
+			return  window.requestAnimationFrame       ||  //Chromium 
+					window.webkitRequestAnimationFrame ||  //Webkit
+					window.mozRequestAnimationFrame    || //Mozilla Geko
+					window.oRequestAnimationFrame      || //Opera Presto
+					window.msRequestAnimationFrame     || //IE Trident?
+					function(callback, element){ //Fallback function
+						window.setTimeout(callback, parseInt(1000/value));                
+					}
+			 
+		})();
 	};
 
 	Stage.prototype.drawFPS = function()
@@ -2990,6 +2957,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	{
 		var type = "";
 		var newEvent = null;
+		var charCode = event.which || event.keyCode;
 		
 		switch( event.type )
 		{
@@ -3005,10 +2973,13 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		newEvent.ctrlKey = event.ctrlKey;
 		newEvent.shiftKey = event.shiftKey;
 		newEvent.altKey = event.altKey;
-		newEvent.value = tomahawk_ns.Keyboard.keyCodeToChar(event.keyCode, event.shiftKey, event.ctrlKey, event.altKey);
+		//newEvent.value = ( event.type == "keypress" ) ? String.fromCharCode(charCode) : tomahawk_ns.Keyboard.keyCodeToChar(event.keyCode);
+		newEvent.value = tomahawk_ns.Keyboard.keyCodeToChar(event.keyCode);
 		newEvent.isCharacter = tomahawk_ns.Keyboard.isMapped(event.keyCode);
 		newEvent.which = event.which;
 		return newEvent;
+		
+		//tomahawk_ns.Keyboard.keyCodeToChar(event.keyCode, event.shiftKey, event.ctrlKey, event.altKey);
 	};
 
 
@@ -3251,6 +3222,9 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		this.process();
 	};
 
+	PixelFilter.prototype.getOffsetX = function(){ return 0};
+	PixelFilter.prototype.getOffsetY = function(){ return 0};
+	
 	tomahawk_ns.PixelFilter = PixelFilter;
 
 })();
@@ -3811,8 +3785,7 @@ Matrix4x4.prototype.init = function( 		a, b, c, d,
 											
 										
 		
-	var container = null;
-	container = new Array();
+	var container = new Array();
 
 	container[0] 	= a;
 	container[1] 	= b;
@@ -4519,68 +4492,87 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 
 
 
-/**
- * @author The Tiny Spark
- */
 (function() {
 	
-	function Font(fontName)
+	function Font(fontName, fontURL )
 	{
-		this.fontName = fontName;
-		this.refresh();
+		this.name = fontName;
+		this.url = fontURL;
+		this.sizes = new Object();
 	}
 	
-	Tomahawk.registerClass(Font,"Font");
-
-	Font.prototype.name = null;
-	Font.prototype.baseWidth = 1;
-	Font.prototype.baseHeight = 1;
-	Font.prototype.baseSize = 10;
+	Font._div = document.createElement("div");
+	Font._style = document.createElement("style");
+	Font._fonts = new Object();
+	Font.prototype.maxWidth = 0;
+	Font.prototype.maxHeight = 0;
 	
-	Font.prototype.refresh = function()
+	Font.addFont = function(fontName, fontURL)
 	{
-		var canvas = document.createElement("canvas");
-		var context = canvas.getContext("2d");
-		var letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz";
-		var i = letters.length;
-		var pixels = null;
-		var alpha = -1;
-		var rowLength = 0;
-		var measure = null;
-		
-		canvas.width = canvas.height = 100;
-		context.font = this.baseSize+'px '+this.fontName;
-		context.textBaseline = 'top';
-		context.textAlign = 'start';
-		
-		while( --i > -1 )
+		var font = new tomahawk_ns.Font(fontName,fontURL);
+		tomahawk_ns.Font._fonts[fontName] = font;
+	};	
+	
+	Font.getFont = function(fontName)
+	{
+		if( !tomahawk_ns.Font._fonts[fontName])
 		{
-			context.save();
-			context.beginPath();
-			
-			measure = context.measureText(letters.charAt(i)).width;
-			this.baseWidth = ( this.baseWidth < measure ) ? measure : this.baseWidth;
-			
-			context.fillText(letters.charAt(i),0,0);
-			context.restore();
+			tomahawk_ns.Font.addFont(fontName);
 		}
 		
-		this.baseWidth += 5;
-
-		pixels = context.getImageData(0,0,100,100).data;
+		return tomahawk_ns.Font._fonts[fontName];
+	};
+	
+	Font.prototype.name = null;
+	Font.prototype.url = null;
+	Font.prototype.bold = false;
+	Font.prototype.italic = false;
+	Font.prototype.baseSize = 60;
+	Font.prototype.sizes = null;
+	
+	Font.prototype.measureText = function(text, size)
+	{
+		var div = Font._div;
+		var width = 0
+		var height = 0;
+		var obj = new Object();
+		var result = new Object();
+		var ratio = size / this.baseSize;
 		
-		i = pixels.length / 4;
-		
-		while( --i > -1 )
-		{
-			alpha = pixels[i*4 + 3];
+		if( this.sizes[text] == undefined )
+		{	
+			div.style.position = 'absolute';
+			div.style.top = '100px';
+			div.style.left = '-1000px';
+			div.style.width = 'auto';
+			div.style.fontFamily = this.name;
+			div.style.fontWeight = ( this.bold == true ) ? 'bold' : 'normal';
+			div.style.fontStyle = ( this.italic == true ) ? 'italic' : 'normal';
+			div.style.fontSize = this.baseSize + 'px';
 			
-			if( alpha > 0 )
-			{
-				this.baseHeight = parseInt(i / canvas.height) + 2;
-				break;
-			}
+			if( !div.parentNode )
+				document.body.appendChild(div);
+		
+			div.innerHTML = text;
+			
+			width = div.offsetWidth;
+			height = div.offsetHeight;
+			
+			this.maxWidth = ( width > this.maxWidth ) ? width : this.maxWidth;
+			this.maxHeight = ( height > this.maxHeight ) ? height : this.maxHeight;
+			
+			document.body.removeChild(div);
+		
+			obj.width = parseInt(width);
+			obj.height = parseInt(height);
+			
+			this.sizes[text] = obj;
 		}
+			
+		result.width = parseInt(this.sizes[text].width * ratio);
+		result.height = parseInt(this.sizes[text].height * ratio);
+		
+		return result;
 	};
 
 	tomahawk_ns.Font = Font;
@@ -4596,28 +4588,14 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	function InputTextField()
 	{
 		tomahawk_ns.SelectableTextField.apply(this);
-		this.addEventListener( tomahawk_ns.Event.ADDED_TO_STAGE, this, this._inputTextFieldAddedHandler );
+		tomahawk_ns.Keyboard.getInstance().addEventListener( tomahawk_ns.KeyEvent.KEY_UP, this, this._keyHandler );
 	}
 
 	Tomahawk.registerClass(InputTextField,"InputTextField");
 	Tomahawk.extend("InputTextField","SelectableTextField");
-
-	InputTextField.prototype._inputTextFieldAddedHandler = function(event)
-	{
-		this.removeEventListener( tomahawk_ns.Event.ADDED_TO_STAGE, this, this._inputTextFieldAddedHandler );
-		this.stage.addEventListener( tomahawk_ns.KeyEvent.KEY_DOWN, this, this._keyHandler );
-	};
 	
 	InputTextField.prototype.setFocus = function(value)
 	{
-		if( value == true )
-		{
-			tomahawk_ns.Keyboard.activate();
-		}
-		else
-		{
-			tomahawk_ns.Keyboard.deactivate();
-		}
 		tomahawk_ns.SelectableTextField.prototype.setFocus.apply(this,[value]);
 	};
 	
@@ -4721,38 +4699,37 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 
 	Letter.prototype.updateMetrics = function()
 	{
+		
 		var context = Letter._metricsContext;
-		var ratio = 1;
+		var font = tomahawk_ns.Font.getFont( this.format.font );
+		var measure = font.measureText(this.value, this.format.size);
 		
 		context.save();
 		
-		this.format.updateContext(context);
-		
-	
-		if( this.format.customMetrics == false )
+		if( this.value == " " )
 		{
-			this.textHeight = ( context.measureText('M').width ) * 1.4;
-			this.textWidth = context.measureText(this.value).width;
-		}
-		else
-		{
-			ratio = ( this.format.size / this.format.fontBaseSize );
-			this.textHeight = parseInt(this.format.fontBaseHeight * ratio);
-			
-			if( this.format.fontBaseWidth == -1 )
-			{
-				this.textWidth = context.measureText(this.value).width;
-			}
-			else
-			{
-				this.textWidth = parseInt(this.format.fontBaseWidth * ratio);
-			}
+			this.format.updateContext(context);
+			measure.width = context.measureText(" ").width;
 		}
 		
+		this.textWidth = measure.width;
+		this.textHeight = measure.height;
 		this.width = this.textWidth;
 		this.height = this.textHeight;
 		
 		context.restore();
+		// TODO
+		
+		//var context = Letter._metricsContext;
+		//context.save();
+		//
+		//this.format.updateContext(context);
+		//this.textHeight = ( context.measureText('M').width );
+		//this.textWidth = context.measureText(this.value).width;
+		//this.width = this.textWidth;
+		//this.height = this.textHeight * 1.4;
+		//
+		//context.restore();
 	};
 
 	Letter.prototype.draw = function(context)
@@ -4762,9 +4739,17 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 			context.save();
 			context.beginPath();
 			context.fillStyle = this.format.backgroundSelectedColor;
-			context.fillRect(0, 0, this.textWidth, 0);
+			context.fillRect(0, 0, this.width, this.height);
 			context.fill();
 			context.restore();
+		}
+		
+		if( this.format.textBorder == true )
+		{
+			context.beginPath();
+			this.format.updateBorderContext(context);
+			context.strokeText(this.value,this.format.textBorderOffsetX,this.format.textBorderOffsetY);
+			context.closePath();
 		}
 		
 	
@@ -4784,24 +4769,6 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 			context.stroke();
 			context.restore();
 		}	
-		
-		if( this.format.smooth == true )
-		{
-			context.beginPath();
-			this.format.updateSmoothContext(context);
-			context.strokeText(this.value,0,0);
-			context.closePath();
-		}
-		
-		if( this.format.textBorder == true )
-		{
-			context.beginPath();
-			this.format.updateBorderContext(context);
-			context.strokeText(this.value,this.format.textBorderOffsetX,this.format.textBorderOffsetY);
-			context.closePath();
-		}
-		
-		
 	};
 
 	Letter.prototype.clone = function()
@@ -5089,6 +5056,7 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 				letter.selected = false;
 			}
 		}
+		
 		this._refreshNextFrame = true;
 	};
 
@@ -5115,7 +5083,7 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	Tomahawk.registerClass(TextField,"TextField");
 	Tomahawk.extend("TextField","DisplayObjectContainer");
 
-	TextField.prototype.forceRefresh		= true;		
+	TextField.prototype.forceRefresh		= false;		
 	TextField.prototype.defaultTextFormat 	= null;
 	TextField.prototype.currentIndex 		= null;
 	TextField.prototype.background 			= false;
@@ -5123,7 +5091,7 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	TextField.prototype.padding 			= 0;
 	TextField.prototype.backgroundColor 	= "white";
 	TextField.prototype.borderColor 		= "black";
-	TextField.prototype.autoSize 			= true;
+	TextField.prototype.autoSize 			= false;
 	TextField.prototype.focusable			= true;
 	
 	TextField.prototype._focused 			= false;
@@ -5263,7 +5231,7 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		
 		for( i = 0; i < max; i++ )
 		{
-			this.addCharAt(value[i], i);
+			this.addCharAt(value[i], i, (value[i] == "\n") );
 		}
 	};
 
@@ -5341,7 +5309,8 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		this.setCurrentIndex(index-1);
 		this._refreshNextFrame = true;
 	
-		this._text = this._text.substr(0,index-1) + this._text.substr(index+1);
+		//this._text = this._text.substr(0,index-1) + this._text.substr(index+1);
+		this._text = this._text.substr(0,index) + this._text.substr(index+1);
 		
 		currentWord.removeLetterAt( index - currentWord.getStartIndex() );
 		
@@ -5707,19 +5676,15 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	TextFormat.prototype.updateBorderContext = function(context)
 	{
 		this.updateContext(context);
-		context.shadowColor = this.textBorderColor;
-		context.shadowBlur = this.smoothQuality;
+		
+		if( this.smooth == true )
+		{
+			context.shadowColor = this.textBorderColor;
+			context.shadowBlur = this.smoothQuality;
+		}
+		
 		context.lineWidth = this.textBorderThickness;
 		context.strokeStyle = this.textBorderColor;
-	};
-	
-	TextFormat.prototype.updateSmoothContext = function(context)
-	{
-		this.updateContext(context);
-		context.strokeStyle = this.textColor;
-		context.lineWidth = this.smoothQuality;
-		context.shadowColor = this.textColor;
-		context.shadowBlur = this.smoothQuality;
 	};
 
 	TextFormat.prototype.clone = function()

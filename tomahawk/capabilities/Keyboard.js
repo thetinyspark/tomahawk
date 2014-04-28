@@ -5,40 +5,45 @@
  (function() {
 	
 	 
-	function Keyboard(){}
+	function Keyboard()
+	{
+		var callbackKey = this._keyboardHandler.bind(this);
+		window.removeEventListener("keyup",callbackKey);
+		window.removeEventListener("keydown",callbackKey);
+		window.removeEventListener("keypress",callbackKey);
+		
+		window.addEventListener("keyup",callbackKey);
+		window.addEventListener("keydown",callbackKey);
+		window.addEventListener("keypress",callbackKey);
+	}
 	
 	Tomahawk.registerClass( Keyboard, "Keyboard" );
+	Tomahawk.extend( "Keyboard", "EventDispatcher" );
 	
-	Keyboard._createInput = function()
+	Keyboard.getInstance = function()
 	{
-		if( Keyboard._input == null )
-		{
-			var input = document.createElement("input");
-			input.style.position = "absolute";
-			input.style.left = "-1000px";
-			input.style.top = "0";
-			input.style.width = "10px";
-			input.style.height = "10px";
-			document.body.appendChild(input);
-			Keyboard._input = input;
-		}
+		if( tomahawk_ns.Keyboard._instance == null )
+			tomahawk_ns.Keyboard._instance = new tomahawk_ns.Keyboard();
+			
+		return tomahawk_ns.Keyboard._instance;
+	};
+	
+	Keyboard.prototype._keyboardHandler = function(event)
+	{	
+		if( event.type == "keyup" )
+			tomahawk_ns.Keyboard.toggleShift(event.keyCode);
+			
+		var keyboardEvent = tomahawk_ns.KeyEvent.fromNativeEvent(event, true, true);
 		
+		this.dispatchEvent(keyboardEvent);
+		
+		if( keyboardEvent.keyCode == tomahawk_ns.Keyboard.BACKSPACE )
+		{
+			event.preventDefault();
+			event.stopPropagation();
+		}
 	};
 	
-	Keyboard._input = null;
-	
-	Keyboard.activate = function(stage)
-	{
-		Keyboard._createInput();
-		Keyboard._input.focus();
-	};	
-	
-	Keyboard.deactivate = function(stage)
-	{
-		Keyboard._createInput();
-		Keyboard._input.unfocus();
-	};
-
 	Keyboard.keyCodeToChar = function(keyCode, shiftKey, ctrlKey, altKey)
 	{
 		var obj = Keyboard.MAP[keyCode];

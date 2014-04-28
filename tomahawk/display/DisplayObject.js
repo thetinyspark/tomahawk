@@ -132,7 +132,16 @@
 		var offY = 0;
 		var bounds = this.getBoundingRectIn(this);
 		var cacheAsBitmap = this.cacheAsBitmap;
-		buffer = document.createElement("canvas");
+		
+		if( this._cache == null )
+		{
+			buffer = document.createElement("canvas");
+		}
+		else
+		{
+			buffer = this._cache;
+		}
+		
 		buffer.width = ( bounds.width < 1 ) ? 1 : bounds.width ;
 		buffer.height = ( bounds.height < 1 ) ? 1 : bounds.height ;
 
@@ -146,6 +155,14 @@
 		// before drawing filters
 		if( filters != null )
 		{		
+			//i = filters.length;
+			//
+			//while( --i > -1 )
+			//{
+				//buffer.width += filters[i].getOffsetX();
+				//buffer.height += filters[i].getOffsetY();
+			//}
+			
 			i = filters.length;
 			
 			while( --i > -1 )
@@ -266,20 +283,6 @@
 
 	DisplayObject.prototype.hitTest = function(x,y)
 	{		
-		//var pt1 = null;
-		//var current = this;
-		//var mat = this.matrix.clone();
-		//
-		//while( current != null )
-		//{
-			//mat.prependMatrix(current.matrix );
-			//current = current.parent;
-		//}
-		//
-		//mat = mat.clone().invert();
-		//
-		//pt1 = mat.transformPoint(x,y);
-		
 		var pt1 = this.globalToLocal(x,y);
 		
 		if( pt1.x < 0 || pt1.x > this.width || pt1.y < 0 || pt1.y > this.height )

@@ -19,8 +19,7 @@ Matrix4x4.prototype.init = function( 		a, b, c, d,
 											
 										
 		
-	var container = null;
-	container = new Array();
+	var container = new Array();
 
 	container[0] 	= a;
 	container[1] 	= b;

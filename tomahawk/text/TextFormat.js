@@ -45,19 +45,15 @@
 	TextFormat.prototype.updateBorderContext = function(context)
 	{
 		this.updateContext(context);
-		context.shadowColor = this.textBorderColor;
-		context.shadowBlur = this.smoothQuality;
+		
+		if( this.smooth == true )
+		{
+			context.shadowColor = this.textBorderColor;
+			context.shadowBlur = this.smoothQuality;
+		}
+		
 		context.lineWidth = this.textBorderThickness;
 		context.strokeStyle = this.textBorderColor;
-	};
-	
-	TextFormat.prototype.updateSmoothContext = function(context)
-	{
-		this.updateContext(context);
-		context.strokeStyle = this.textColor;
-		context.lineWidth = this.smoothQuality;
-		context.shadowColor = this.textColor;
-		context.shadowBlur = this.smoothQuality;
 	};
 
 	TextFormat.prototype.clone = function()

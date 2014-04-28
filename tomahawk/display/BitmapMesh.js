@@ -83,19 +83,6 @@
 		ctx.fillStyle = "black";
 		ctx.lineWidth = 1;
 		
-		if( this.showLines == false )
-		{
-			ctx.moveTo(x0 - 1, y0 - 1); 
-			ctx.lineTo(x1 - 1, y1 - 1);
-			ctx.lineTo(x2 - 1, y2 - 1); 
-			ctx.lineTo(x0 - 1,y0 - 1);
-			
-			ctx.moveTo(x0 + 1, y0 + 1); 
-			ctx.lineTo(x1 + 1, y1 + 1);
-			ctx.lineTo(x2 + 1, y2 + 1); 
-			ctx.lineTo(x0 + 1, y0 + 1);
-		}
-		
 		ctx.moveTo(x0, y0 ); 
 		ctx.lineTo(x1, y1 );
         ctx.lineTo(x2, y2 ); 

@@ -15,7 +15,7 @@
 	Tomahawk.registerClass(TextField,"TextField");
 	Tomahawk.extend("TextField","DisplayObjectContainer");
 
-	TextField.prototype.forceRefresh		= true;		
+	TextField.prototype.forceRefresh		= false;		
 	TextField.prototype.defaultTextFormat 	= null;
 	TextField.prototype.currentIndex 		= null;
 	TextField.prototype.background 			= false;
@@ -23,7 +23,7 @@
 	TextField.prototype.padding 			= 0;
 	TextField.prototype.backgroundColor 	= "white";
 	TextField.prototype.borderColor 		= "black";
-	TextField.prototype.autoSize 			= true;
+	TextField.prototype.autoSize 			= false;
 	TextField.prototype.focusable			= true;
 	
 	TextField.prototype._focused 			= false;
@@ -163,7 +163,7 @@
 		
 		for( i = 0; i < max; i++ )
 		{
-			this.addCharAt(value[i], i);
+			this.addCharAt(value[i], i, (value[i] == "\n") );
 		}
 	};
 
@@ -241,7 +241,8 @@
 		this.setCurrentIndex(index-1);
 		this._refreshNextFrame = true;
 	
-		this._text = this._text.substr(0,index-1) + this._text.substr(index+1);
+		//this._text = this._text.substr(0,index-1) + this._text.substr(index+1);
+		this._text = this._text.substr(0,index) + this._text.substr(index+1);
 		
 		currentWord.removeLetterAt( index - currentWord.getStartIndex() );
 		

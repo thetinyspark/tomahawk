@@ -1,65 +1,84 @@
-/**
- * @author The Tiny Spark
- */
 (function() {
 	
-	function Font(fontName)
+	function Font(fontName, fontURL )
 	{
-		this.fontName = fontName;
-		this.refresh();
+		this.name = fontName;
+		this.url = fontURL;
+		this.sizes = new Object();
 	}
 	
-	Tomahawk.registerClass(Font,"Font");
-
-	Font.prototype.name = null;
-	Font.prototype.baseWidth = 1;
-	Font.prototype.baseHeight = 1;
-	Font.prototype.baseSize = 10;
+	Font._div = document.createElement("div");
+	Font._style = document.createElement("style");
+	Font._fonts = new Object();
+	Font.prototype.maxWidth = 0;
+	Font.prototype.maxHeight = 0;
 	
-	Font.prototype.refresh = function()
+	Font.addFont = function(fontName, fontURL)
 	{
-		var canvas = document.createElement("canvas");
-		var context = canvas.getContext("2d");
-		var letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz";
-		var i = letters.length;
-		var pixels = null;
-		var alpha = -1;
-		var rowLength = 0;
-		var measure = null;
-		
-		canvas.width = canvas.height = 100;
-		context.font = this.baseSize+'px '+this.fontName;
-		context.textBaseline = 'top';
-		context.textAlign = 'start';
-		
-		while( --i > -1 )
+		var font = new tomahawk_ns.Font(fontName,fontURL);
+		tomahawk_ns.Font._fonts[fontName] = font;
+	};	
+	
+	Font.getFont = function(fontName)
+	{
+		if( !tomahawk_ns.Font._fonts[fontName])
 		{
-			context.save();
-			context.beginPath();
-			
-			measure = context.measureText(letters.charAt(i)).width;
-			this.baseWidth = ( this.baseWidth < measure ) ? measure : this.baseWidth;
-			
-			context.fillText(letters.charAt(i),0,0);
-			context.restore();
+			tomahawk_ns.Font.addFont(fontName);
 		}
 		
-		this.baseWidth += 5;
-
-		pixels = context.getImageData(0,0,100,100).data;
+		return tomahawk_ns.Font._fonts[fontName];
+	};
+	
+	Font.prototype.name = null;
+	Font.prototype.url = null;
+	Font.prototype.bold = false;
+	Font.prototype.italic = false;
+	Font.prototype.baseSize = 60;
+	Font.prototype.sizes = null;
+	
+	Font.prototype.measureText = function(text, size)
+	{
+		var div = Font._div;
+		var width = 0
+		var height = 0;
+		var obj = new Object();
+		var result = new Object();
+		var ratio = size / this.baseSize;
 		
-		i = pixels.length / 4;
-		
-		while( --i > -1 )
-		{
-			alpha = pixels[i*4 + 3];
+		if( this.sizes[text] == undefined )
+		{	
+			div.style.position = 'absolute';
+			div.style.top = '100px';
+			div.style.left = '-1000px';
+			div.style.width = 'auto';
+			div.style.fontFamily = this.name;
+			div.style.fontWeight = ( this.bold == true ) ? 'bold' : 'normal';
+			div.style.fontStyle = ( this.italic == true ) ? 'italic' : 'normal';
+			div.style.fontSize = this.baseSize + 'px';
 			
-			if( alpha > 0 )
-			{
-				this.baseHeight = parseInt(i / canvas.height) + 2;
-				break;
-			}
+			if( !div.parentNode )
+				document.body.appendChild(div);
+		
+			div.innerHTML = text;
+			
+			width = div.offsetWidth;
+			height = div.offsetHeight;
+			
+			this.maxWidth = ( width > this.maxWidth ) ? width : this.maxWidth;
+			this.maxHeight = ( height > this.maxHeight ) ? height : this.maxHeight;
+			
+			document.body.removeChild(div);
+		
+			obj.width = parseInt(width);
+			obj.height = parseInt(height);
+			
+			this.sizes[text] = obj;
 		}
+			
+		result.width = parseInt(this.sizes[text].width * ratio);
+		result.height = parseInt(this.sizes[text].height * ratio);
+		
+		return result;
 	};
 
 	tomahawk_ns.Font = Font;
