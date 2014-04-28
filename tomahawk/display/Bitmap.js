@@ -1,9 +1,41 @@
 /**
- * @author The Tiny Spark
- */
+* @author The Tiny Spark
+* Bitmap
+* Visit http://createjs.com/ for documentation, updates and examples.
+*
+* Copyright (c) 2010 gskinner.com, inc.
+* 
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+* 
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+* 
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+*/
 
 (function() {
 	
+	/**
+	* @class Bitmap
+	* @memberOf tomahawk_ns
+	* @param {Texture2D} the drawing texture.
+	* @augments {DisplayObject}
+	* @constructor
+	*/
 	function Bitmap(texture)
 	{
 		tomahawk_ns.DisplayObject.apply(this);
@@ -17,8 +49,22 @@
 	Tomahawk.registerClass( Bitmap, "Bitmap" );
 	Tomahawk.extend( "Bitmap", "DisplayObject" );
 
+	/**
+	 * The current drawing texture.
+	 * @public
+	 * @property texture
+	 * @type Texture2D
+	 * @memberOf tomahawk_ns.Bitmap
+	 * @default null
+	 */
 	Bitmap.prototype.texture = null;
 	
+	/**
+	* @public
+	* @method setTexture
+	* @param {Texture2D} texture 
+	* @memberOf tomahawk_ns.Bitmap
+	**/
 	Bitmap.prototype.setTexture = function(texture)
 	{
 		this.texture = texture;
@@ -26,6 +72,13 @@
 		this.height = this.texture.rect[3];
 	};
 
+	/**
+	* @public
+	* @method draw
+	* Draws the display object into the specified context
+	* @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
+	* @memberOf tomahawk_ns.Bitmap 
+	**/
 	Bitmap.prototype.draw = function( context )
 	{	
 		var rect = this.texture.rect;

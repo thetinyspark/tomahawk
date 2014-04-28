@@ -3,6 +3,8 @@
 /**
  * @author The Tiny Spark
  */
+ 
+//namespace
 var tomahawk_ns = new Object();
 
 function Tomahawk(){}
@@ -611,11 +613,50 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 
 /**
- * @author The Tiny Spark
+* @author The Tiny Spark
+* Bitmap
+* Visit http://createjs.com/ for documentation, updates and examples.
+*
+* Copyright (c) 2010 gskinner.com, inc.
+* 
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+* 
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+* 
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+*/
+
+/**
+ *
+ * @module Tomahawk
+ * @main Tomahawk
  */
 
 (function() {
 	
+	/**
+	 * Contains properties and methods shared by all events for use with
+	 * {{#crossLink "DisplayObject"}}{{/crossLink}}.
+	 * 
+	 * @class Bitmap
+	 * @param {Texture2D} the drawing texture.
+	 * @constructor
+	 **/
 	function Bitmap(texture)
 	{
 		tomahawk_ns.DisplayObject.apply(this);
@@ -629,8 +670,17 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	Tomahawk.registerClass( Bitmap, "Bitmap" );
 	Tomahawk.extend( "Bitmap", "DisplayObject" );
 
+	/**
+	 * The current drawing texture.
+	 * @property texture
+	 * @type Texture2D
+	 * @default null
+	 */
 	Bitmap.prototype.texture = null;
 	
+	/**
+	 * @param {Texture2D} texture 
+	 **/
 	Bitmap.prototype.setTexture = function(texture)
 	{
 		this.texture = texture;
@@ -638,6 +688,10 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		this.height = this.texture.rect[3];
 	};
 
+	/**
+	 * Draws the display object into the specified context
+	 * @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
+	 **/
 	Bitmap.prototype.draw = function( context )
 	{	
 		var rect = this.texture.rect;
@@ -646,6 +700,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		context.drawImage(	data, rect[0], rect[1], rect[2], rect[3], 0, 0, this.width, this.height );
 	};
 	
+	//namespace
 	tomahawk_ns.Bitmap = Bitmap;
 
 })();
@@ -2765,12 +2820,53 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 
 
+/*
+* Event
+* Visit http://createjs.com/ for documentation, updates and examples.
+*
+* Copyright (c) 2010 gskinner.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+* @author The Tiny Spark
+*/
+
 /**
- * @author The Tiny Spark
+ *
+ * @module Tomahawk
+ * @main Tomahawk
  */
 
 (function() {	
 	
+	/**
+	 * Contains properties and methods shared by all events for use with
+	 * {{#crossLink "EventDispatcher"}}{{/crossLink}}.
+	 * 
+	 * @class Event
+	 * @param {String} type The event type.
+	 * @param {Boolean} bubbles Indicates whether the event will bubble through the display list.
+	 * @param {Boolean} cancelable Indicates whether the default behaviour of this event can be cancelled.
+	 * @constructor
+	 **/
 	function Event(type, bubbles, cancelable)
 	{
 		this.type = type;
@@ -3271,9 +3367,27 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
  * @author The Tiny Spark
  * original file extracted from createJs and modified a bit for Tomahawk
  */
+ 
+ /**
+ *
+ * @module Tomahawk
+ * @main Tomahawk
+ */
+
 (function() {
 	
-
+	/**
+	 * Contains properties and methods shared by all events for use with
+	 * 
+	 * @class Matrix2D
+	 * @param {int} a.
+	 * @param {int} b.
+	 * @param {int} c.
+	 * @param {int} d.
+	 * @param {int} tx.
+	 * @param {int} ty.
+	 * @constructor
+	 **/
 	function Matrix2D(a, b, c, d, tx, ty)
 	{
 		this.initialize(a, b, c, d, tx, ty);
@@ -3284,11 +3398,19 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	
 	Matrix2D.prototype._stack = null;
 
+	/**
+	 * Save the current Matrix state
+	 * @method save
+	 * @return null
+	 **/
 	Matrix2D.prototype.save = function()
 	{
 		this._stack.push(this.a,this.b,this.c,this.d,this.tx,this.ty);
 	};
 
+	/**
+	* restore the last saved matrix
+	**/
 	Matrix2D.prototype.restore = function()
 	{
 		this.ty = this._stack.pop();
@@ -3300,7 +3422,6 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	};
 
 	// static public properties:
-
 	/**
 	 * An identity matrix, representing a null transformation.
 	 * @property identity
@@ -3522,9 +3643,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
 	Matrix2D.prototype.appendTransform = function(x, y, scaleX, scaleY, rotation, skewX, skewY, regX, regY) {
-		
-		tomahawk_ns.Matrix2D.TOTAL_COUNT++;
-		
+
 		if (rotation%360) {
 			var r = rotation*Matrix2D.DEG_TO_RAD;
 			var cos = Math.cos(r);
@@ -3755,8 +3874,6 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 	// this has to be populated after the class is defined:
 	Matrix2D.identity = new Matrix2D();
-	
-	Matrix2D.TOTAL_COUNT = 0;
 	tomahawk_ns.Matrix2D = Matrix2D;
 	
 })();

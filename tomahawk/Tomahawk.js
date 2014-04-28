@@ -1,8 +1,15 @@
 /**
  * @author The Tiny Spark
  */
+ 
+//namespace
 var tomahawk_ns = new Object();
 
+/**
+* @class Tomahawk
+* Core Framework class
+* @constructor
+*/
 function Tomahawk(){}
 
 Tomahawk._classes = new Object();
@@ -11,16 +18,35 @@ Tomahawk._extends = new Array();
 
 	Tomahawk._funcTab = null;
 
+	/**
+	* @method registerClass
+	* @memberOf Tomahawk
+	* @description Register a class definition
+	* @params {class} the class definition
+	* @params {string} the class definition alias which will be used for inheritance
+	*/
 	Tomahawk.registerClass = function( classDef, className )
 	{
 		Tomahawk._classes[className] = classDef;
 	};
 
+	/**
+	* @method extend
+	* @memberOf Tomahawk
+	* @description Make child Inherits ancestor
+	* @params {class} childAlias the child definition alias
+	* @params {string} ancestorAlias the ancestor definition alias
+	*/
 	Tomahawk.extend = function( p_child, p_ancestor )
 	{
 		Tomahawk._extends.push({"child":p_child,"ancestor":p_ancestor,"done":false});
 	};
 
+	/**
+	* @method run
+	* @memberOf Tomahawk
+	* @description run the framework, apply inheritances to classes
+	*/
 	Tomahawk.run = function()
 	{
 		var obj = null;

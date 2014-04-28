@@ -37,7 +37,8 @@
 		
 		this.dispatchEvent(keyboardEvent);
 		
-		if( keyboardEvent.keyCode == tomahawk_ns.Keyboard.BACKSPACE )
+		if( keyboardEvent.keyCode == tomahawk_ns.Keyboard.BACKSPACE ||
+		keyboardEvent.keyCode == tomahawk_ns.Keyboard.SPACE)
 		{
 			event.preventDefault();
 			event.stopPropagation();

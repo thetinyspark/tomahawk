@@ -1,4 +1,0 @@
-TODO
-
-- make some examples
-- implement a maxCacheSize Feature for mobile platform

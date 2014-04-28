@@ -2,9 +2,22 @@
  * @author The Tiny Spark
  * original file extracted from createJs and modified a bit for Tomahawk
  */
+
 (function() {
 	
-
+	/**
+	 * Contains properties and methods shared by all events for use with
+	 * 
+	 * @class Matrix2D
+	 * A Basic implementation of a Matrix3x3 
+	 * @param {Number} a.
+	 * @param {Number} b.
+	 * @param {Number} c.
+	 * @param {Number} d.
+	 * @param {Number} tx.
+	 * @param {Number} ty.
+	 * @constructor
+	 **/
 	function Matrix2D(a, b, c, d, tx, ty)
 	{
 		this.initialize(a, b, c, d, tx, ty);
@@ -15,11 +28,23 @@
 	
 	Matrix2D.prototype._stack = null;
 
+	/**
+	 * Save the current Matrix state
+	 * @method save
+	 * @memberOf Matrix2D
+	 * @return null
+	 **/
 	Matrix2D.prototype.save = function()
 	{
 		this._stack.push(this.a,this.b,this.c,this.d,this.tx,this.ty);
 	};
 
+	/**
+	 * Restore the las saved matrix state
+	 * @method save
+	 * @memberOf Matrix2D
+	 * @return null
+	 **/
 	Matrix2D.prototype.restore = function()
 	{
 		this.ty = this._stack.pop();
@@ -31,12 +56,12 @@
 	};
 
 	// static public properties:
-
 	/**
 	 * An identity matrix, representing a null transformation.
 	 * @property identity
 	 * @static
 	 * @type Matrix2D
+	 * @memberOf Matrix2D
 	 * @readonly
 	 **/
 	Matrix2D.prototype.identity = null;// set at bottom of class definition.
@@ -57,12 +82,14 @@
 	 * Position (0, 0) in a 3x3 affine transformation matrix.
 	 * @property a
 	 * @type Number
+	 * @memberOf Matrix2D
 	 **/
 	Matrix2D.prototype.a = 1;
 
 	/**
 	 * Position (0, 1) in a 3x3 affine transformation matrix.
 	 * @property b
+	 * @memberOf Matrix2D
 	 * @type Number
 	 **/
 	Matrix2D.prototype.b = 0;
@@ -70,6 +97,7 @@
 	/**
 	 * Position (1, 0) in a 3x3 affine transformation matrix.
 	 * @property c
+	 * @memberOf Matrix2D
 	 * @type Number
 	 **/
 	Matrix2D.prototype.c = 0;
@@ -77,6 +105,7 @@
 	/**
 	 * Position (1, 1) in a 3x3 affine transformation matrix.
 	 * @property d
+	 * @memberOf Matrix2D
 	 * @type Number
 	 **/
 	Matrix2D.prototype.d = 1;
@@ -84,6 +113,7 @@
 	/**
 	 * Position (2, 0) in a 3x3 affine transformation matrix.
 	 * @property tx
+	 * @memberOf Matrix2D
 	 * @type Number
 	 **/
 	Matrix2D.prototype.tx = 0;
@@ -91,6 +121,7 @@
 	/**
 	 * Position (2, 1) in a 3x3 affine transformation matrix.
 	 * @property ty
+	 * @memberOf Matrix2D
 	 * @type Number
 	 **/
 	Matrix2D.prototype.ty = 0;
@@ -101,6 +132,7 @@
 	/**
 	 * Initialization method. Can also be used to reinitialize the instance.
 	 * @method initialize
+	 * @memberOf Matrix2D
 	 * @param {Number} [a=1] Specifies the a property for the new matrix.
 	 * @param {Number} [b=0] Specifies the b property for the new matrix.
 	 * @param {Number} [c=0] Specifies the c property for the new matrix.
@@ -253,9 +285,7 @@
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
 	Matrix2D.prototype.appendTransform = function(x, y, scaleX, scaleY, rotation, skewX, skewY, regX, regY) {
-		
-		tomahawk_ns.Matrix2D.TOTAL_COUNT++;
-		
+
 		if (rotation%360) {
 			var r = rotation*Matrix2D.DEG_TO_RAD;
 			var cos = Math.cos(r);
@@ -486,8 +516,6 @@
 
 	// this has to be populated after the class is defined:
 	Matrix2D.identity = new Matrix2D();
-	
-	Matrix2D.TOTAL_COUNT = 0;
 	tomahawk_ns.Matrix2D = Matrix2D;
 	
 })();
