@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="fr-FR">
+    <head>
+        <meta charset="utf-8"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+        <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0"/>
+
+        <!-- ref -->
+        <meta name="robots" content="Index,Follow"/>
+        <meta name="description" content="D꤯uvrez Tomahawk, un moteur 2D avec la balise canvas."/>
+        <meta name="keywords" content="freelance, d귥loppeur, web, joomla, wordpress, html5, jeux, intꨲateur, css, ajax, jquery, javascript"/>
+        <meta name="publisher" content="Nicolas Legrand"/>
+
+        <!--[if IE]>
+        <meta http-equiv="imagetoolbar" content="no" />
+        <![endif]-->
+
+        <!--  social sharing -->
+        <meta name="identifier-url" content="http://the-tiny-spark.com/" />
+        <meta name="revisit-after" content="7 days" />
+
+        <meta property="fb:admins" content="TheTinySpark"/>
+        <meta property="og:type" content="website"/>
+        <meta property="og:locale" content="fr_FR"/>
+        <meta property="og:title" content="Tomahawk, moteur 2D"/>
+        <meta property="og:description" content="Documentation du moteur d'affichage 2D : Tomahawk"/>
+        <meta property="og:url" content="http://the-tiny-spark.com/tomahawk/Source: text/TextField.js"/>
+        <meta property="og:site_name" content="The Tiny Spark"/>
+        <meta property='og:image' content='http://the-tiny-spark.com/tomahawk/assets/images/tomahawk.jpg'/>
+        <meta property='og:image' content='http://the-tiny-spark.com/tomahawk/assets/images/ground.png'/>
+        <meta property='og:image' content='http://the-tiny-spark.com/tomahawk/assets/images/hero.png'/>
+        <meta property='og:image' content='http://the-tiny-spark.com/social/connect.jpg'/>
+
+        <title>JSDoc: Source: text/TextField.js</title>
+		
+		<link rel="stylesheet" media="screen" href="http://the-tiny-spark.com/assets/css/font-awesome.min.css" type="text/css"/>
+        <link rel="stylesheet" media="screen" href="http://the-tiny-spark.com/assets/css/studio.css" type="text/css"/>
+        <link rel="shortcut icon" href="http://the-tiny-spark.com/favicon.ico">
+
+		<script src="scripts/prettify/prettify.js"> </script>
+		<script src="scripts/prettify/lang-css.js"> </script>
+		<!--[if lt IE 9]>
+		  <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+		<link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+		<link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+
+       
+        <script type="text/javascript">
+
+            function gaq(cat, action, optValue) {
+                _gaq.push(['_trackEvent', cat, action, optValue]);
+            }
+
+            function openMenu(event) {
+
+                if (event.type == 'click') {
+                    var menu = document.getElementById("menuList");
+
+                    if (menu.style.display == 'none' || menu.style.display == '')
+                        menu.style.display = 'block';
+                    else
+                        menu.style.display = 'none';
+
+                }
+            }
+
+            (function(i, s, o, g, r, a, m) {
+                i['GoogleAnalyticsObject'] = r;
+                i[r] = i[r] || function() {
+                    (i[r].q = i[r].q || []).push(arguments)
+                }, i[r].l = 1 * new Date();
+                a = s.createElement(o),
+                        m = s.getElementsByTagName(o)[0];
+                a.async = 1;
+                a.src = g;
+                m.parentNode.insertBefore(a, m)
+            })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+            ga('create', 'UA-45878258-1', 'the-tiny-spark.com');
+            ga('send', 'pageview');
+
+            ///////-----------------------------------------------------------------------------////////
+            var _gaq = _gaq || [];
+            _gaq.push(['_setAccount', 'UA-45878258-1']);
+            _gaq.push(['_trackPageview']);
+
+            (function() {
+                var ga = document.createElement('script');
+                ga.type = 'text/javascript';
+                ga.async = true;
+                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                var s = document.getElementsByTagName('script')[0];
+                s.parentNode.insertBefore(ga, s);
+            })();
+
+        </script>
+    </head>
+	
+	<body class="tomahawk colour">
+    <div class="contentBig">
+
+        <div id="header">
+		
+		<div class="content">
+			<h1>
+				<a href="http://the-tiny-spark.com/" onclick="gaq('home', 'click', 'returnto');">
+					The Tiny Spark
+				</a>
+			</h1>
+			
+			<ul id="menuList" class="pc">
+				<li><a href="http://the-tiny-spark.com/about.php" onclick="gaq('toplink', 'click', 'about');" class="">A propos</a></li>
+				<li><a href="http://the-tiny-spark.com/competences.php" onclick="gaq('toplink', 'click', 'competences');" class="">Comp&eacute;tences</a></li>
+				<li><a href="http://the-tiny-spark.com/work.php" onclick="gaq('toplink', 'click', 'references');" class="">R&eacute;alisations</a></li>
+				<li><a href="http://the-tiny-spark.com/labs.php" onclick="gaq('toplink', 'click', 'labs');" class="current">Labs</a></li>
+				<li><a href="http://the-tiny-spark.com/tools/index.php" onclick="gaq('toplink', 'click', 'tools');" class="">Outils</a></li>
+			</ul>
+			
+			<p class="mobile floatR menuMobile"><a href="javascript:;" id="menuDisplay" onclick="openMenu(event);return false;"><i class="icon-align-justify"></i></a></p>
+		</div>        
+		
+		</div>
+
+        <div id="main_content">
+
+
+
+			<div id="main">
+
+				<h1 class="page-title">Source: text/TextField.js</h1>
+
+				
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+
+(function() {
+	
+	/**
+	 * @class TextField
+	 * @memberOf tomahawk_ns
+	 * @description The TextField class is used to create display objects for text display.
+	 * @constructor
+	 * @augments tomahawk_ns.DisplayObjectContainer
+	 **/
+	function TextField()
+	{
+		tomahawk_ns.DisplayObjectContainer.apply(this);
+		this.defaultTextFormat = new tomahawk_ns.TextFormat();
+		this.width = this.height = 100;
+		this._letters = new Array();
+		this._text = "";
+	}
+
+	Tomahawk.registerClass(TextField,"TextField");
+	Tomahawk.extend("TextField","DisplayObjectContainer");
+
+	/**
+	* @member forceRefresh
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @type {Boolean}
+	* @default false
+	* @description Forces the refresh of the TextField at every frame.
+	**/
+	TextField.prototype.forceRefresh		= false;		
+	
+	/**
+	* @member defaultTextFormat
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @type {tomahawk_ns.TextFormat}
+	* @default null
+	* @description Specifies the format applied to newly inserted text.
+	**/
+	TextField.prototype.defaultTextFormat 	= null;
+	
+	/**
+	* @member currentIndex
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @type {Number}
+	* @default 0
+	* @description The index of the insertion point (caret) position.
+	**/
+	TextField.prototype.currentIndex 		= 0;
+	
+	/**
+	* @member background
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @type {Boolean}
+	* @default false
+	* @description Specifies whether the text field has a background fill. If true, the text field has a background fill. If false, the text field has no background fill. Use the backgroundColor property to set the background color of a text field.
+	**/
+	TextField.prototype.background 			= false;
+	
+	/**
+	* @member border
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @type {Boolean}
+	* @default false
+	* @description Specifies whether the text field has a border. If true, the text field has a border. If false, the text field has no border. Use the borderColor property to set the border color.
+	**/
+	TextField.prototype.border 				= false;
+	
+	/**
+	* @member padding
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @type {Number}
+	* @default 0
+	* @description Specifies the internal padding of the text field. 
+	**/
+	TextField.prototype.padding 			= 0;
+	
+	/**
+	* @member backgroundColor
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @type {string}
+	* @description The color of the text field background.
+	* @default "#ffffff"
+	**/
+	TextField.prototype.backgroundColor 	= "#ffffff";
+	
+	/**
+	* @member borderColor
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @type {string}
+	* @description The color of the text field border.
+	* @default "#000000"
+	**/
+	TextField.prototype.borderColor 		= "#000000";
+	
+	/**
+	* @member autoSize
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @type {Boolean}
+	* @description Specifies if the text field height will match the real text height.
+	* @default false
+	**/
+	TextField.prototype.autoSize 			= false;
+	
+	/**
+	* @member focusable
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @type {Boolean}
+	* @description Specifies if the current display object can have the focus or not.
+	* @default true
+	**/
+	TextField.prototype.focusable			= true;
+	
+	
+	TextField.prototype._focused 			= false;
+	TextField.prototype._lastWidth 			= 0;
+	TextField.prototype._refreshNextFrame 	= true;
+	TextField.prototype._textAlign 			= "left";
+	TextField.prototype._text 				= null;
+	TextField.prototype._drawCursor	 		= false;
+	TextField.prototype._drawCursorTime 	= 0;
+	TextField.prototype._letters 			= null;
+	
+	
+	/**
+	* @property {String} ALIGN_LEFT left
+	* @memberOf tomahawk_ns.TextField
+	* @type {string}
+	* @description Constant aligns text to the left within the text field.
+	**/
+	TextField.ALIGN_LEFT 					= "left";
+
+	/**
+	* @property {String} ALIGN_CENTER center
+	* @memberOf tomahawk_ns.TextField
+	* @type {string}
+	* @description Constant centers the text in the text field.
+	**/
+	TextField.ALIGN_CENTER 					= "center";
+	
+	/**
+	* @property {String} ALIGN_RIGHT right
+	* @memberOf tomahawk_ns.TextField
+	* @type {string}
+	* @description Constant aligns text to the right within the text field.
+	**/
+	TextField.ALIGN_RIGHT 					= "right";
+	
+	/**
+	* @property {String} ALIGN_JUSTIFY justify
+	* @memberOf tomahawk_ns.TextField
+	* @type {string}
+	* @description Constant justifies text within the text field.
+	**/
+	TextField.ALIGN_JUSTIFY 				= "justify";
+
+	/**
+	* @method getTextAlign
+	* @description Returns the current text align
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @returns {String} the current text align
+	**/
+	TextField.prototype.getTextAlign = function()
+	{
+		return this._textAlign;
+	};
+	
+	/**
+	* @method setTextAlign
+	* @description Sets the current text align
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @param {String} value the text align
+	**/
+	TextField.prototype.setTextAlign = function(value)
+	{
+		if( this._textAlign == value )
+			return;
+			
+		this._textAlign = value;
+		this._refreshNextFrame = true;
+	};
+	
+	/**
+	* @method setCurrentIndex
+	* @description Sets the index of the insertion point (caret) position.
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @param {Number} index the new index of the insertion point
+	**/
+	TextField.prototype.setCurrentIndex = function(index)
+	{
+		if( this.currentIndex == index )
+			return;
+			
+		this.currentIndex = index;
+		this._refreshNextFrame = true;
+	};
+	
+	/**
+	* @method getCurrentIndex
+	* @description Returns the index of the insertion point (caret) position.
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @returns {Number} the index of the insertion point (caret) position
+	**/
+	TextField.prototype.getCurrentIndex = function()
+	{
+		return this.currentIndex;
+	};
+	
+	/**
+	* @method setFocus
+	* @description Gives focus to the text field, specified by the value parameter. If value != true the current focus is removed.
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @param {Boolean} value
+	**/
+	TextField.prototype.setFocus = function(value)
+	{
+		if( this._focused == value )
+			return;
+			
+		this._focused = value;
+		var type = ( this._focused == true ) ? tomahawk_ns.Event.FOCUSED : tomahawk_ns.Event.UNFOCUSED;
+		var focusEvent = new tomahawk_ns.Event( type, true, true );
+		this.dispatchEvent(focusEvent);
+		
+		if( this._focused == false )
+		{
+			this.setCurrentIndex(-1);
+		}
+		else
+		{
+			this.setCurrentIndex(0);
+		}
+	};
+
+	/**
+	* @method getFocus
+	* @description Specifies whether the current text field has the focus 
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @returns {Boolean} the value of the current focus
+	**/
+	TextField.prototype.getFocus = function()
+	{
+		return this._focused;
+	};
+
+	/**
+	* @method setTextFormat
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @description Applies the text formatting that the format parameter specifies to the specified text in a text field.
+	* @param {tomahawk_ns.TextFormat} format A TextFormat object that contains character and paragraph formatting information
+	* @param {Number} startIndex an integer that specifies the zero-based index position specifying the first character of the desired range of text.
+	* @param {Number} [endIndex=undefined] An integer that specifies the first character after the desired text span. As designed, if you specify startIndex and endIndex values, the text from beginIndex to endIndex-1 is updated.
+	**/
+	TextField.prototype.setTextFormat = function( format, startIndex, endIndex )
+	{
+		var end = ( endIndex == undefined ) ? startIndex : endIndex;
+		var i = startIndex;
+		var letter = null;
+		var word = null;
+		var currentWord = null;
+		
+		for( ; i &lt;= end; i++ )
+		{
+			letter = this.getLetterAt(i);
+			if( letter != null )
+			{
+				this._refreshNextFrame = true;
+				letter.setTextFormat(format);
+				if( letter.parent != null )
+					letter.parent.needRefresh = true;
+			}
+		}
+	};
+
+	/**
+	* @method getTextFormat
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @description Returns a TextFormat object containing a copy of the text format of the character at the index position.
+	* @param {Number} index An integer that specifies the location of a letter within the text field.
+	* @returns {tomahawk_ns.TextFormat}
+	**/
+	TextField.prototype.getTextFormat = function(index)
+	{
+		var letter = this.getLetterAt(index);
+		if( letter == null )
+			return this.defaultTextFormat.clone();
+			
+		return letter.format.clone();
+	};
+
+	/**
+	* @method getText
+	* @description Returns a string that is the current text in the text field.
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @returns {String} the current text in the text field
+	**/
+	TextField.prototype.getText = function()
+	{
+		return this._text;
+	};
+
+	/**
+	* @description Set the current text of the text field specified by the "value" parameter
+	* @method setText
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @param {String} value the new text of the text field
+	**/
+	TextField.prototype.setText = function(value)
+	{
+		if( this._text == value )
+			return;
+			
+		this._text = "";
+		
+		while( this.children.length > 0 )
+			this.removeChildAt(0);
+			
+		this._letters = new Array();
+			
+		var i = 0;
+		var max = value.length;
+		
+		for( i = 0; i &lt; max; i++ )
+		{
+			this.addCharAt(value[i], i );
+		}
+	};
+
+	/**
+	* @description Returns all the letters objects of the text field
+	* @method getLetters
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @returns {Array} all the letters of the text field
+	**/
+	TextField.prototype.getLetters = function()
+	{
+		return this._letters;
+	};
+
+	/**
+	* @description Returns the letter object at the index specified by the "index" parameter.
+	* @method getLetterAt
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @param {Number} index the index of the letter you want to retrieve
+	* @returns {tomahawk_ns.Letter} A Letter object
+	**/
+	TextField.prototype.getLetterAt = function(index)
+	{
+		var letters = this.getLetters();
+		return letters[index] || null;
+	};
+	
+	/**
+	* @description Returns the word object at the index specified by the "index" parameter within the text field
+	* @method getLetterAt
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @param {Number} index the index
+	* @returns {tomahawk_ns.Word} A Word object
+	**/
+	TextField.prototype.getWordAt = function(index)
+	{
+		var letter = this.getLetterAt(index);
+		var word = null;
+		
+		if( letter == null )
+			return null;
+			
+		word = letter.parent;
+		
+		return word;
+	};
+
+	/**
+	* @method addCharAt
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @param {String} value The DisplayObject instance to add as a child of this DisplayObjectContainer instance.
+	* @param {Number} index The index position to which the character is added.
+	* @description Adds a character to this text field instance at the index specified by the index parameter The character is added at the index position specified. If you specify a currently occupied index position, the character that exists at that position and all higher positions are moved up one position in the text.
+	**/
+	TextField.prototype.addCharAt = function(value,index)
+	{
+		var wordIndex =  ( index == 0 ) ? 0 : index - 1 ;
+		var letter = new tomahawk_ns.Letter();
+		var previous = this.getLetterAt(index-1);
+		var currentWord = this.getWordAt(wordIndex);
+		var tab1 = this._letters.slice(0,index);
+		var tab2 = this._letters.slice(index);
+		
+		//create letter
+		isNewline = ( value == "\n" );
+		letter.value = value;
+		letter.newline = isNewline;
+		letter.setTextFormat( ( previous == null ) ? this.defaultTextFormat.clone() : previous.format.clone() );
+		
+		//rebuild letters array
+		tab1.push(letter);
+		this._letters = tab1.concat(tab2);
+		
+		this.setCurrentIndex(index); //set current index
+		this._refreshNextFrame = true; //refresh textfield at next frame
+		this._text = this._text.substr(0,index) + value + this._text.substr(index); // rebuild text value
+		
+		if( currentWord == null )
+		{
+			currentWord = new tomahawk_ns.Word();
+		}
+		
+		this.addChild(currentWord);
+		currentWord.needRefresh = true;
+		currentWord.addLetterAt(letter,index - currentWord.getStartIndex());
+		
+		this._resetLettersIndex(); // reset letters index
+		this._cutWord(currentWord); // cut the word if necessary
+	};
+	
+	/**
+	* @method removeCharAt
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @param {Number} index The index of the character to remove.
+	* @returns {tomahawk_ns.Letter} The Letter instance that was removed.
+	* @description Removes a character from the specified index position in the text of the text field.
+	**/
+	TextField.prototype.removeCharAt = function(index)
+	{
+		var letter = this.getLetterAt(index);
+		var previous = this.getLetterAt(index-1);
+		
+		if( letter == null )
+			return;
+			
+		var currentWord = letter.parent;
+		
+		this._letters.splice(index,1);
+		this.setCurrentIndex(index-1);
+		this._refreshNextFrame = true;
+	
+		//this._text = this._text.substr(0,index-1) + this._text.substr(index+1);
+		this._text = this._text.substr(0,index) + this._text.substr(index+1);
+		
+		currentWord.removeLetterAt( index - currentWord.getStartIndex() );
+		
+		if( currentWord.getNumLetters() == 0 )
+			this.removeChild(currentWord);
+			
+		this._resetLettersIndex();
+	};
+
+	/**
+	* @description Adds the text specified by the "value" parameter at the index specified by the "index" parameter to the text field.
+	* @method addTextAt
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @param {string} value the text you want to add
+	* @param {string} index the index at which you want to insert your text
+	**/
+	TextField.prototype.addTextAt = function(value,index)
+	{
+		var i = value.length;
+		while( --i > -1 )
+		{
+			this.addCharAt(value[i],index);
+		}
+		
+		this.setCurrentIndex(index);
+	};
+	
+	/**
+	* @description Removes the text between the indexes specified by the "startIndex" and the "endIndex" parameters within the text field.
+	* @method removeTextBetween
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @param {Number} startIndex the index from which you want to remove the text
+	* @param {Number} endIndex the index to which you want to remove the text
+	**/
+	TextField.prototype.removeTextBetween = function(startIndex,endIndex)
+	{
+		var i = this.getLetters().length;
+		var letters = new Array();
+		var letter = null;
+		
+		while( --i > -1 )
+		{
+			if( i >= startIndex &amp;&amp; i &lt;= endIndex )
+			{
+				letters.push( this.getLetterAt(i) );
+			}
+		}
+		
+		while( letters.length > 0 )
+		{
+			letter = letters.shift();
+			this.removeCharAt(letter.index);
+		}
+	};
+	
+	
+	
+	TextField.prototype.getBoundingRectIn = function(spaceCoordinates)
+	{
+		var width = this.width;
+		var height = this.height;
+		var bounds = tomahawk_ns.DisplayObjectContainer.prototype.getBoundingRectIn.apply(this,[spaceCoordinates]);
+		
+		if( bounds.width &lt; width ) 
+			bounds.width = width;
+			
+		if( bounds.height &lt; height ) 
+			bounds.height = height;
+			
+		bounds.right = bounds.left + bounds.width;
+		bounds.bottom = bounds.top + bounds.height;
+		return bounds;
+	};	
+	
+	TextField.prototype.updateBounds = function()
+	{
+		var width = this.width;
+		var height = this.height;
+		tomahawk_ns.DisplayObjectContainer.prototype.updateBounds.apply(this);
+		
+		var bounds = this.bounds;
+		
+		if( bounds.width &lt; width ) 
+			bounds.width = width;
+			
+		if( bounds.height &lt; height ) 
+			bounds.height = height;
+			
+		bounds.right = bounds.left + bounds.width;
+		bounds.bottom = bounds.top + bounds.height;
+		
+		this.width = bounds.width;
+		this.height = bounds.height;
+	};
+	
+	TextField.prototype.draw = function(context)
+	{
+		var currentIndexLetter = this.getLetterAt(this.currentIndex);
+		var bounds = null;
+		var time = null;
+		
+		if( this._lastWidth != this.width || this._refreshNextFrame == true )
+		{
+			this._refresh();	
+			this._lastWidth = this.width;
+			this._refreshNextFrame = false;
+		}
+		
+		if( this.background == true )
+		{
+			context.save();
+			context.beginPath();
+			context.fillStyle = this.backgroundColor;
+			context.fillRect(0,0,this.width,this.height);
+			context.fill();
+			context.restore();
+		}
+		
+		if( this.border == true )
+		{
+			context.save();
+			context.beginPath();
+			context.strokeStyle = this.borderColor;
+			context.moveTo(0,0);
+			context.lineTo(this.width,0);
+			context.lineTo(this.width,this.height);
+			context.lineTo( 0,this.height);
+			context.lineTo(0,0);
+			context.stroke();
+			context.restore();
+		}
+		
+		tomahawk_ns.DisplayObjectContainer.prototype.draw.apply(this, [context]);		
+		
+		if( this._focused == true)
+		{
+			time = new Date().getTime();
+			
+			if( currentIndexLetter != null )
+			{
+				bounds = currentIndexLetter.getBoundingRectIn(this);
+			}
+			else
+			{
+				bounds = new tomahawk_ns.Rectangle();
+				bounds.left = bounds.x = 0;
+				bounds.width = bounds.right = 5;
+				bounds.top = bounds.y = 0;
+				bounds.bottom = bounds.height = 10;
+			}
+			
+			if( time - this._drawCursorTime > 500 )
+			{
+				this._drawCursor = ( this._drawCursor == true ) ? false: true;
+				this._drawCursorTime = time;
+			}
+			
+			if( this._drawCursor == true )
+			{
+				context.save();
+				context.beginPath();
+				context.strokeStyle = "black";
+				context.moveTo(	bounds.right,bounds.top);
+				context.lineTo(	bounds.right,bounds.bottom );
+				context.stroke();
+				context.restore();
+			}
+		}
+	};
+
+
+	TextField.prototype._cutWord = function(word)
+	{
+		var letters = 0;
+		var i = 0;
+		var nextWord = null;
+		var cut = true;
+		var currentLetter = null;
+		
+		while( cut == true )
+		{
+			cut = false;
+			letters = word.getLetters();
+			i = letters.length;
+			
+			while( --i > -1 )
+			{
+				currentLetter = letters[i];
+				if( ( currentLetter.value == " " || currentLetter.newline == true ) &amp;&amp; i > 0 )
+				{
+					nextWord = word.cut(i);
+					cut = true;
+					this.addChild( nextWord );
+					
+					nextWord.newline = currentLetter.newline;
+					nextWord.needRefresh = word.needRefresh = true;
+					break;
+				}
+			}
+		}
+		
+		if( word.text.length == 0 )
+			this.removeChild(word);
+	};
+
+	TextField.prototype._resetLettersIndex = function(start)
+	{
+		var letters = this.getLetters();
+		var i = 0;
+		var max = letters.length;
+		var currentLetter = null;
+		
+		for( i = 0; i &lt; max; i++ )
+		{
+			currentLetter = letters[i];
+			currentLetter.index = i;
+		}
+	};
+	
+	TextField.prototype._sortWords = function(a,b)
+	{
+		return ( a.getStartIndex() &lt; b.getStartIndex() ) ? -1 : 1;
+	};
+	
+	TextField.prototype._refresh = function()
+	{
+		var rowIndex = 0;
+		var currentRow = new Array();
+		var rowWord = null;
+		var word = null;
+		var i = 0;
+		var max = this.children.length;
+		var lineY = this.padding;
+		var lineX = this.padding;
+		var lineHeight = 0;
+		var lineWidth = 0;
+		var maxWidth = this.padding + ( this.width - this.padding * 2 );
+		var textWidth = 0;
+		
+		this.children.sort( this._sortWords );
+		
+		for( i = 0; i &lt; max; i++ )
+		{		
+			word = this.children[i];
+			word.index = i;
+			word.forceRefresh = this.forceRefresh;
+			word.refresh();
+			lineHeight = ( lineHeight &lt; word.height ) ? word.height : lineHeight;
+			
+			if( i != 0 &amp;&amp; ( lineWidth + word.width > maxWidth || word.newline == true ) )
+			{
+				lineY += lineHeight;
+				this._alignRow( currentRow, rowIndex, lineX, lineY, lineWidth, lineHeight );
+			
+				rowIndex++;
+				lineWidth = 0;
+				currentRow = new Array();
+				lineHeight = word.height;
+			}
+			
+			lineWidth += word.width;
+			currentRow.push(word);
+			
+			if( i == max - 1 )
+			{
+				lineY += lineHeight;
+				this._alignRow( currentRow, rowIndex, lineX, lineY, lineWidth, lineHeight );
+			}
+		}
+		
+		if( this.autoSize == true &amp;&amp; word != null )
+		{
+			this.height = word.y + ( word.height );
+		}
+		
+		this._lastWidth = this.width;
+	};
+	
+	TextField.prototype._alignRow = function( currentRow, rowIndex, lineX, lineY, lineWidth, lineHeight )
+	{
+		if( currentRow.length == 0 )
+			return;
+			
+		var maxWidth = this.width - ( this.padding * 2 );
+		var word = currentRow[0];
+		var offsetX = lineX;
+		var marginLeft = 0;
+		var textAlign = this._textAlign;
+		var i = 0;
+		var max = currentRow.length;
+		var currentX = 0;
+				
+		if( textAlign == tomahawk_ns.TextField.ALIGN_LEFT )
+		{
+			offsetX = lineX;
+		}
+		
+		if( textAlign == tomahawk_ns.TextField.ALIGN_CENTER )
+		{
+			offsetX = lineX + ( ( maxWidth - lineWidth ) * 0.5 );
+		}
+			
+		if( textAlign == tomahawk_ns.TextField.ALIGN_RIGHT )
+		{
+			offsetX = lineX + ( maxWidth - lineWidth );
+		}
+		
+		// on ne justifie que si la ligne est occupée à minimum 70% sinon c'est aligné à gauche
+		if( textAlign == tomahawk_ns.TextField.ALIGN_JUSTIFY &amp;&amp; lineWidth >= ( maxWidth * 0.7 ) )
+		{
+			offsetX = lineX;
+			marginLeft = ( maxWidth - lineWidth ) / ( currentRow.length - 1 );
+		}
+		
+		currentX = offsetX;
+		
+		for( i = 0; i &lt; max; i++ )
+		{
+			word = currentRow[i];
+			word.y = lineY - word.height;
+			word.x = currentX;
+			
+			currentX += word.width + marginLeft;
+		}
+	};
+	
+
+	tomahawk_ns.TextField = TextField;
+})();
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+			</div>
+
+			<nav>
+				<h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="Tomahawk.html">Tomahawk</a></li><li><a href="tomahawk_ns.AssetsLoader.html">AssetsLoader</a></li><li><a href="tomahawk_ns.AssetsManager.html">AssetsManager</a></li><li><a href="tomahawk_ns.Bitmap.html">Bitmap</a></li><li><a href="tomahawk_ns.BitmapMesh.html">BitmapMesh</a></li><li><a href="tomahawk_ns.BrightnessFilter.html">BrightnessFilter</a></li><li><a href="tomahawk_ns.ContrastFilter.html">ContrastFilter</a></li><li><a href="tomahawk_ns.DisplayObject.html">DisplayObject</a></li><li><a href="tomahawk_ns.DisplayObjectContainer.html">DisplayObjectContainer</a></li><li><a href="tomahawk_ns.Event.html">Event</a></li><li><a href="tomahawk_ns.EventDispatcher.html">EventDispatcher</a></li><li><a href="tomahawk_ns.Font.html">Font</a></li><li><a href="tomahawk_ns.GrayScaleFilter.html">GrayScaleFilter</a></li><li><a href="tomahawk_ns.InputTextField.html">InputTextField</a></li><li><a href="tomahawk_ns.Keyboard.html">Keyboard</a></li><li><a href="tomahawk_ns.KeyEvent.html">KeyEvent</a></li><li><a href="tomahawk_ns.Letter.html">Letter</a></li><li><a href="tomahawk_ns.Matrix2D.html">Matrix2D</a></li><li><a href="tomahawk_ns.Matrix4x4.html">Matrix4x4</a></li><li><a href="tomahawk_ns.Mouse.html">Mouse</a></li><li><a href="tomahawk_ns.MouseEvent.html">MouseEvent</a></li><li><a href="tomahawk_ns.MovieClip.html">MovieClip</a></li><li><a href="tomahawk_ns.PixelFilter.html">PixelFilter</a></li><li><a href="tomahawk_ns.Point.html">Point</a></li><li><a href="tomahawk_ns.Point3D.html">Point3D</a></li><li><a href="tomahawk_ns.QuadTreeContainer.html">QuadTreeContainer</a></li><li><a href="tomahawk_ns.QuadTreeNode.html">QuadTreeNode</a></li><li><a href="tomahawk_ns.Rectangle.html">Rectangle</a></li><li><a href="tomahawk_ns.Screen.html">Screen</a></li><li><a href="tomahawk_ns.SelectableTextField.html">SelectableTextField</a></li><li><a href="tomahawk_ns.ShadowBlurFilter.html">ShadowBlurFilter</a></li><li><a href="tomahawk_ns.Shape.html">Shape</a></li><li><a href="tomahawk_ns.Sprite.html">Sprite</a></li><li><a href="tomahawk_ns.Sprite3D.html">Sprite3D</a></li><li><a href="tomahawk_ns.Stage.html">Stage</a></li><li><a href="tomahawk_ns.TextField.html">TextField</a></li><li><a href="tomahawk_ns.TextFormat.html">TextFormat</a></li><li><a href="tomahawk_ns.Texture.html">Texture</a></li><li><a href="tomahawk_ns.TextureAtlas.html">TextureAtlas</a></li><li><a href="tomahawk_ns.Vector3D.html">Vector3D</a></li><li><a href="tomahawk_ns.Word.html">Word</a></li></ul><h3>Namespaces</h3><ul><li><a href="tomahawk_ns.html">tomahawk_ns</a></li></ul>
+			</nav>
+
+			<br clear="both">
+			
+		</div>
+		
+        <div id="footer">
+            <div class="contact">
+				<div class="section">
+					<p>
+						Vous avez un projet ? Contactez-nous, nous serons ravis de faire votre connaissance ! 
+						<a href="http://the-tiny-spark.com/contact.php" class="buttons" onclick="gaq('footerlink', 'click', 'contact');">CONTACT</a>
+					</p>
+				</div>
+			</div>
+
+			<div class="middle">
+				<div class="content overflow">
+					<div class="w35 floatL">
+						<h3>The Tiny Spark</h3>
+						<p>Collectif d'ind&eacute;pendants proche de Paris.</p>
+						<p>The Tiny Spark, sous ce nom se cachent des passionn&eacute;s du web qui mettent tous leurs talents &agrave; votre service.</p>
+					</div>
+
+					<div class="w60 overflow floatR">
+						<div class="sectionFooter floatL">
+							<h4>A propos</h4>
+							<ul>
+								<li><a href="http://the-tiny-spark.com/about.php" onclick="gaq('footerlink', 'click', 'about');">Pr&eacute;sentation</a></li>
+								<li><a href="http://the-tiny-spark.com/contact.php" onclick="gaq('footerlink', 'click', 'contact');">Contact</a></li>
+							</ul>
+						</div>
+						<div class="sectionFooter floatL">
+							<h4>Comp&eacute;tences</h4>
+							<ul>
+								<li><a href="http://the-tiny-spark.com/about.php#conseil" onclick="gaq('footerlink', 'click', 'about');">Conseil</a></li>
+								<li><a href="http://the-tiny-spark.com/projects/applications.php" onclick="gaq('footerlink', 'click', 'prj_us');">R&eacute;alisation</a></li>
+								<li><a href="http://the-tiny-spark.com/competences.php" onclick="gaq('footerlink', 'click', 'competences');">Offre</a></li>
+							</ul>
+						</div>
+						<div class="sectionFooter floatL">
+							<h4>R&eacute;alisations</h4>
+							<ul>
+								<li><a href="http://the-tiny-spark.com/projects/applications.php" onclick="gaq('footerlink', 'click', 'prj_us');">Notre travail</a></li>
+								<li><a href="http://the-tiny-spark.com/projects/pitch.php" onclick="gaq('footerlink', 'click', 'prj_pitch');">Magic Park</a></li>
+								<li><a href="http://the-tiny-spark.com/projects/ogos.php" onclick="gaq('footerlink', 'click', 'prj_ogos');">Ogos</a></li>
+								<li><a href="http://the-tiny-spark.com/projects/everlife.php" onclick="gaq('footerlink', 'click', 'prj_everlife');">Everlife</a></li>
+							</ul>
+						</div>
+						<div class="sectionFooter floatL">
+							<h4>Labs</h4>
+							<ul>
+								<li><a href="http://www.totem.the-tiny-spark.com/" onclick="gaq('footerlink', 'click', 'TOTEM');">Totem</a></li>
+								<li><a href="http://the-tiny-spark.com/tomahawk/index.php" onclick="gaq('footerlink', 'click', 'TOMAHAWK');">Tomahawk</a></li>
+								<li><a href="https://docs.google.com/document/d/1Ye1Ow72rHtskR3Lf_FdOPl4MsqWAl-rEsnt0K3QO05M/edit#" onclick="gaq('footerlink', 'click', 'book');">Cr&eacute;er un moteur d'affichage, <em>Livre blanc</em></a></li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="lastLayer overflow">
+				<p class="floatL">The Tiny Spark &COPY; 2014</p>
+				<ul class="social floatR">
+					<li>
+						<a href="https://www.facebook.com/TheTinySpark" target="_blank" title="Facebook" onclick="gaq('footerlink', 'click', 'facebook');">
+							<i class="icon-facebook"></i>
+						</a>
+					</li>                    
+					<li>
+						<a href="http://www.pinterest.com/tinylittlespark/" target="_blank" title="Pinterest" onclick="gaq('footerlink', 'click', 'pinterest');">
+							<i class="icon-pinterest"></i>
+						</a>
+					</li>
+					<li>
+						<a href="http://the-tiny-spark.com/mentions.php" title="Mentions L&eacute;gales" onclick="gaq('footerlink', 'click', 'mentions');" class="">
+							<i class="icon-bookmark"></i>
+						</a>
+					</li>
+					<li>
+						<a href="http://www.totem.the-tiny-spark.com" title="Totem" target="_blank" onclick="gaq('footerlink', 'click', 'totem');">
+							<i class="icon-gamepad"></i>
+						</a>
+					</li>
+				</ul>
+			</div>        
+		</div>
+
+	</div>
+	<script> prettyPrint(); </script>
+	<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

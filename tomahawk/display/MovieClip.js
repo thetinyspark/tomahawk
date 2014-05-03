@@ -29,7 +29,13 @@
  
 (function() {
 	
-
+	/**
+	 * @class MovieClip
+	 * @memberOf tomahawk_ns
+	 * @description ...
+	 * @constructor
+	 * @augments tomahawk_ns.Bitmap
+	 **/
 	function MovieClip(texture)
 	{
 		tomahawk_ns.Bitmap.apply(this, [texture]);

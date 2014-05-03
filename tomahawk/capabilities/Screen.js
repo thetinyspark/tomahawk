@@ -28,6 +28,12 @@
 
  (function() {
 	 
+	/**
+	 * @class Screen
+	 * @memberOf tomahawk_ns
+	 * @description ...
+	 * @constructor
+	 **/
 	function Screen(){}
 
 	Tomahawk.registerClass(Screen,"Screen");

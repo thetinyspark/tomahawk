@@ -28,7 +28,12 @@
 
 (function() {
 	
-		
+	/**
+	 * @class AssetsManager
+	 * @memberOf tomahawk_ns
+	 * @description ...
+	 * @constructor
+	 **/
 	function AssetsManager()
 	{
 		this._images = new Object();

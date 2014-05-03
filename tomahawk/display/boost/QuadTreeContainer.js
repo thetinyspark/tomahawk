@@ -29,7 +29,13 @@
 
 (function() {
 	
-	
+	/**
+	 * @class QuadTreeContainer
+	 * @memberOf tomahawk_ns
+	 * @description ...
+	 * @constructor
+	 * @augments tomahawk_ns.Sprite
+	 **/
 	function QuadTreeContainer(left,right,top,bottom,childrenPerNode, maxDepth)
 	{
 		tomahawk_ns.Sprite.apply(this);

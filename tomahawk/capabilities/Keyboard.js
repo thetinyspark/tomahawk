@@ -28,7 +28,13 @@
  
  (function() {
 	
-	 
+	/**
+	 * @class Keyboard
+	 * @memberOf tomahawk_ns
+	 * @description ...
+	 * @constructor
+	 * @augments tomahawk_ns.EventDispatcher
+	 **/
 	function Keyboard()
 	{
 		var callbackKey = this._keyboardHandler.bind(this);

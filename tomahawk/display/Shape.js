@@ -29,6 +29,13 @@
 
 (function() {
 		
+	/**
+	 * @class Shape
+	 * @memberOf tomahawk_ns
+	 * @description ...
+	 * @constructor
+	 * @augments tomahawk_ns.DisplayObject
+	 **/
 	function Shape()
 	{
 		tomahawk_ns.DisplayObject.apply(this);

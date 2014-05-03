@@ -29,6 +29,12 @@
 
 (function() {
 	
+	/**
+	 * @class QuadTreeNode
+	 * @memberOf tomahawk_ns
+	 * @description ...
+	 * @constructor	
+	 **/
 	function QuadTreeNode(left,right,top,bottom, depth, maxChildren, maxDepth)
 	{
 		this.left = left;

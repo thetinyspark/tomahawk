@@ -29,6 +29,13 @@
 
 (function() {
 
+	/**
+	 * @class Sprite3D
+	 * @memberOf tomahawk_ns
+	 * @description ...
+	 * @constructor
+	 * @augments tomahawk_ns.Sprite
+	 **/
 	function Sprite3D()
 	{
 		tomahawk_ns.Sprite.apply(this);

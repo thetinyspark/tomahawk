@@ -30,6 +30,14 @@ header
     padding: 6px 4px;
 }
 
+.en_EN{
+	display: none;
+}
+
+.fr_FR{
+	display: block;
+}
+
 .class-description {
     font-style: italic;
     font-family: Palatino, 'Palatino Linotype', serif;

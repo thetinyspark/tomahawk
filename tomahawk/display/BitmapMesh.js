@@ -29,6 +29,13 @@
 
 (function() {
 	
+	/**
+	 * @class BitmapMesh
+	 * @memberOf tomahawk_ns
+	 * @description ...
+	 * @constructor
+	 * @augments tomahawk_ns.Bitmap
+	 **/
 	function BitmapMesh(texture)
 	{
 		tomahawk_ns.Bitmap.apply(this,[texture]);

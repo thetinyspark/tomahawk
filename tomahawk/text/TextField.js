@@ -29,6 +29,13 @@
 
 (function() {
 	
+	/**
+	 * @class TextField
+	 * @memberOf tomahawk_ns
+	 * @description The TextField class is used to create display objects for text display.
+	 * @constructor
+	 * @augments tomahawk_ns.DisplayObjectContainer
+	 **/
 	function TextField()
 	{
 		tomahawk_ns.DisplayObjectContainer.apply(this);
@@ -41,16 +48,96 @@
 	Tomahawk.registerClass(TextField,"TextField");
 	Tomahawk.extend("TextField","DisplayObjectContainer");
 
+	/**
+	* @member forceRefresh
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @type {Boolean}
+	* @default false
+	* @description Forces the refresh of the TextField at every frame.
+	**/
 	TextField.prototype.forceRefresh		= false;		
+	
+	/**
+	* @member defaultTextFormat
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @type {tomahawk_ns.TextFormat}
+	* @default null
+	* @description Specifies the format applied to newly inserted text.
+	**/
 	TextField.prototype.defaultTextFormat 	= null;
-	TextField.prototype.currentIndex 		= null;
+	
+	/**
+	* @member currentIndex
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @type {Number}
+	* @default 0
+	* @description The index of the insertion point (caret) position.
+	**/
+	TextField.prototype.currentIndex 		= 0;
+	
+	/**
+	* @member background
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @type {Boolean}
+	* @default false
+	* @description Specifies whether the text field has a background fill. If true, the text field has a background fill. If false, the text field has no background fill. Use the backgroundColor property to set the background color of a text field.
+	**/
 	TextField.prototype.background 			= false;
+	
+	/**
+	* @member border
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @type {Boolean}
+	* @default false
+	* @description Specifies whether the text field has a border. If true, the text field has a border. If false, the text field has no border. Use the borderColor property to set the border color.
+	**/
 	TextField.prototype.border 				= false;
+	
+	/**
+	* @member padding
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @type {Number}
+	* @default 0
+	* @description Specifies the internal padding of the text field. 
+	**/
 	TextField.prototype.padding 			= 0;
-	TextField.prototype.backgroundColor 	= "white";
-	TextField.prototype.borderColor 		= "black";
+	
+	/**
+	* @member backgroundColor
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @type {string}
+	* @description The color of the text field background.
+	* @default "#ffffff"
+	**/
+	TextField.prototype.backgroundColor 	= "#ffffff";
+	
+	/**
+	* @member borderColor
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @type {string}
+	* @description The color of the text field border.
+	* @default "#000000"
+	**/
+	TextField.prototype.borderColor 		= "#000000";
+	
+	/**
+	* @member autoSize
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @type {Boolean}
+	* @description Specifies if the text field height will match the real text height.
+	* @default false
+	**/
 	TextField.prototype.autoSize 			= false;
+	
+	/**
+	* @member focusable
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @type {Boolean}
+	* @description Specifies if the current display object can have the focus or not.
+	* @default true
+	**/
 	TextField.prototype.focusable			= true;
+	
 	
 	TextField.prototype._focused 			= false;
 	TextField.prototype._lastWidth 			= 0;
@@ -61,17 +148,56 @@
 	TextField.prototype._drawCursorTime 	= 0;
 	TextField.prototype._letters 			= null;
 	
+	
+	/**
+	* @property {String} ALIGN_LEFT left
+	* @memberOf tomahawk_ns.TextField
+	* @type {string}
+	* @description Constant aligns text to the left within the text field.
+	**/
 	TextField.ALIGN_LEFT 					= "left";
+
+	/**
+	* @property {String} ALIGN_CENTER center
+	* @memberOf tomahawk_ns.TextField
+	* @type {string}
+	* @description Constant centers the text in the text field.
+	**/
 	TextField.ALIGN_CENTER 					= "center";
+	
+	/**
+	* @property {String} ALIGN_RIGHT right
+	* @memberOf tomahawk_ns.TextField
+	* @type {string}
+	* @description Constant aligns text to the right within the text field.
+	**/
 	TextField.ALIGN_RIGHT 					= "right";
+	
+	/**
+	* @property {String} ALIGN_JUSTIFY justify
+	* @memberOf tomahawk_ns.TextField
+	* @type {string}
+	* @description Constant justifies text within the text field.
+	**/
 	TextField.ALIGN_JUSTIFY 				= "justify";
 
-	
+	/**
+	* @method getTextAlign
+	* @description Returns the current text align
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @returns {String} the current text align
+	**/
 	TextField.prototype.getTextAlign = function()
 	{
 		return this._textAlign;
 	};
 	
+	/**
+	* @method setTextAlign
+	* @description Sets the current text align
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @param {String} value the text align
+	**/
 	TextField.prototype.setTextAlign = function(value)
 	{
 		if( this._textAlign == value )
@@ -81,6 +207,12 @@
 		this._refreshNextFrame = true;
 	};
 	
+	/**
+	* @method setCurrentIndex
+	* @description Sets the index of the insertion point (caret) position.
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @param {Number} index the new index of the insertion point
+	**/
 	TextField.prototype.setCurrentIndex = function(index)
 	{
 		if( this.currentIndex == index )
@@ -89,29 +221,24 @@
 		this.currentIndex = index;
 		this._refreshNextFrame = true;
 	};
-
-	TextField.prototype.getWordRangeAt = function(index)
-	{
-		var letter = null;
-		var word = this.getWordAt(index);
-		var start = -1;
-		var index = -1;
-		var end = -1;
-		
-		if( word != null )
-		{			
-			start = word.getStartIndex();
-			end = word.getEndIndex();
-		}
-		
-		return {start: start, end: end};
-	};
-
+	
+	/**
+	* @method getCurrentIndex
+	* @description Returns the index of the insertion point (caret) position.
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @returns {Number} the index of the insertion point (caret) position
+	**/
 	TextField.prototype.getCurrentIndex = function()
 	{
 		return this.currentIndex;
 	};
-
+	
+	/**
+	* @method setFocus
+	* @description Gives focus to the text field, specified by the value parameter. If value != true the current focus is removed.
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @param {Boolean} value
+	**/
 	TextField.prototype.setFocus = function(value)
 	{
 		if( this._focused == value )
@@ -132,11 +259,25 @@
 		}
 	};
 
+	/**
+	* @method getFocus
+	* @description Specifies whether the current text field has the focus 
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @returns {Boolean} the value of the current focus
+	**/
 	TextField.prototype.getFocus = function()
 	{
 		return this._focused;
 	};
 
+	/**
+	* @method setTextFormat
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @description Applies the text formatting that the format parameter specifies to the specified text in a text field.
+	* @param {tomahawk_ns.TextFormat} format A TextFormat object that contains character and paragraph formatting information
+	* @param {Number} startIndex an integer that specifies the zero-based index position specifying the first character of the desired range of text.
+	* @param {Number} [endIndex=undefined] An integer that specifies the first character after the desired text span. As designed, if you specify startIndex and endIndex values, the text from beginIndex to endIndex-1 is updated.
+	**/
 	TextField.prototype.setTextFormat = function( format, startIndex, endIndex )
 	{
 		var end = ( endIndex == undefined ) ? startIndex : endIndex;
@@ -158,6 +299,13 @@
 		}
 	};
 
+	/**
+	* @method getTextFormat
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @description Returns a TextFormat object containing a copy of the text format of the character at the index position.
+	* @param {Number} index An integer that specifies the location of a letter within the text field.
+	* @returns {tomahawk_ns.TextFormat}
+	**/
 	TextField.prototype.getTextFormat = function(index)
 	{
 		var letter = this.getLetterAt(index);
@@ -167,11 +315,23 @@
 		return letter.format.clone();
 	};
 
+	/**
+	* @method getText
+	* @description Returns a string that is the current text in the text field.
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @returns {String} the current text in the text field
+	**/
 	TextField.prototype.getText = function()
 	{
 		return this._text;
 	};
 
+	/**
+	* @description Set the current text of the text field specified by the "value" parameter
+	* @method setText
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @param {String} value the new text of the text field
+	**/
 	TextField.prototype.setText = function(value)
 	{
 		if( this._text == value )
@@ -189,21 +349,41 @@
 		
 		for( i = 0; i < max; i++ )
 		{
-			this.addCharAt(value[i], i, (value[i] == "\n") );
+			this.addCharAt(value[i], i );
 		}
 	};
 
+	/**
+	* @description Returns all the letters objects of the text field
+	* @method getLetters
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @returns {Array} all the letters of the text field
+	**/
 	TextField.prototype.getLetters = function()
 	{
 		return this._letters;
 	};
 
+	/**
+	* @description Returns the letter object at the index specified by the "index" parameter.
+	* @method getLetterAt
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @param {Number} index the index of the letter you want to retrieve
+	* @returns {tomahawk_ns.Letter} A Letter object
+	**/
 	TextField.prototype.getLetterAt = function(index)
 	{
 		var letters = this.getLetters();
 		return letters[index] || null;
 	};
 	
+	/**
+	* @description Returns the word object at the index specified by the "index" parameter within the text field
+	* @method getLetterAt
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @param {Number} index the index
+	* @returns {tomahawk_ns.Word} A Word object
+	**/
 	TextField.prototype.getWordAt = function(index)
 	{
 		var letter = this.getLetterAt(index);
@@ -217,7 +397,14 @@
 		return word;
 	};
 
-	TextField.prototype.addCharAt = function(value,index,isNewline)
+	/**
+	* @method addCharAt
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @param {String} value The DisplayObject instance to add as a child of this DisplayObjectContainer instance.
+	* @param {Number} index The index position to which the character is added.
+	* @description Adds a character to this text field instance at the index specified by the index parameter The character is added at the index position specified. If you specify a currently occupied index position, the character that exists at that position and all higher positions are moved up one position in the text.
+	**/
+	TextField.prototype.addCharAt = function(value,index)
 	{
 		var wordIndex =  ( index == 0 ) ? 0 : index - 1 ;
 		var letter = new tomahawk_ns.Letter();
@@ -227,7 +414,7 @@
 		var tab2 = this._letters.slice(index);
 		
 		//create letter
-		isNewline = ( isNewline == true ) ? true : false;
+		isNewline = ( value == "\n" );
 		letter.value = value;
 		letter.newline = isNewline;
 		letter.setTextFormat( ( previous == null ) ? this.defaultTextFormat.clone() : previous.format.clone() );
@@ -253,6 +440,13 @@
 		this._cutWord(currentWord); // cut the word if necessary
 	};
 	
+	/**
+	* @method removeCharAt
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @param {Number} index The index of the character to remove.
+	* @returns {tomahawk_ns.Letter} The Letter instance that was removed.
+	* @description Removes a character from the specified index position in the text of the text field.
+	**/
 	TextField.prototype.removeCharAt = function(index)
 	{
 		var letter = this.getLetterAt(index);
@@ -278,6 +472,13 @@
 		this._resetLettersIndex();
 	};
 
+	/**
+	* @description Adds the text specified by the "value" parameter at the index specified by the "index" parameter to the text field.
+	* @method addTextAt
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @param {string} value the text you want to add
+	* @param {string} index the index at which you want to insert your text
+	**/
 	TextField.prototype.addTextAt = function(value,index)
 	{
 		var i = value.length;
@@ -288,7 +489,14 @@
 		
 		this.setCurrentIndex(index);
 	};
-
+	
+	/**
+	* @description Removes the text between the indexes specified by the "startIndex" and the "endIndex" parameters within the text field.
+	* @method removeTextBetween
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @param {Number} startIndex the index from which you want to remove the text
+	* @param {Number} endIndex the index to which you want to remove the text
+	**/
 	TextField.prototype.removeTextBetween = function(startIndex,endIndex)
 	{
 		var i = this.getLetters().length;
@@ -309,6 +517,8 @@
 			this.removeCharAt(letter.index);
 		}
 	};
+	
+	
 	
 	TextField.prototype.getBoundingRectIn = function(spaceCoordinates)
 	{
@@ -476,7 +686,6 @@
 	{
 		return ( a.getStartIndex() < b.getStartIndex() ) ? -1 : 1;
 	};
-	
 	
 	TextField.prototype._refresh = function()
 	{

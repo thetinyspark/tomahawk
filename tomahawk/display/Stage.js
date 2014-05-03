@@ -28,7 +28,13 @@
 
 (function() {
 	
-
+	/**
+	 * @class Stage
+	 * @memberOf tomahawk_ns
+	 * @description ...
+	 * @constructor
+	 * @augments tomahawk_ns.DisplayObjectContainer
+	 **/
 	function Stage()
 	{
 		tomahawk_ns.DisplayObject._collide = 0;

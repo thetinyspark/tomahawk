@@ -29,6 +29,12 @@
 
 (function() {
 	
+	/**
+	 * @class Texture
+	 * @memberOf tomahawk_ns
+	 * @description ....
+	 * @constructor
+	 **/
 	function Texture(){}
 
 	Tomahawk.registerClass( Texture, "Texture" );

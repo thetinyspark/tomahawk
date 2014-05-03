@@ -29,25 +29,96 @@
 
 (function() {
 	
-	function Font(fontName, fontURL )
+	/**
+	 * @class Font
+	 * @memberOf tomahawk_ns
+	 * @description The Font class is currently useful only to find out information about fonts; you cannot alter a font by using this class. You cannot use the Font class to load external fonts.
+	 * @constructor
+	 **/
+	function Font(fontName)
 	{
 		this.name = fontName;
-		this.url = fontURL;
 		this.sizes = new Object();
 	}
+		
+	/**
+	* @member name
+	* @memberOf tomahawk_ns.Font.prototype
+	* @type {string}
+	* @description the font name
+	**/
+	Font.prototype.name = null;
 	
-	Font._div = document.createElement("div");
-	Font._style = document.createElement("style");
-	Font._fonts = new Object();
+	/**
+	* @member bold
+	* @memberOf tomahawk_ns.Font.prototype
+	* @type {Boolean}
+	* @description defines if the font is bold or not.
+	**/
+	Font.prototype.bold = false;
+	
+	/**
+	* @member italic
+	* @memberOf tomahawk_ns.Font.prototype
+	* @type {Boolean}
+	* @description defines if the font is in italic or not.
+	**/
+	Font.prototype.italic = false;
+	
+	/**
+	* @protected
+	* @member baseSize
+	* @memberOf tomahawk_ns.Font.prototype
+	* @type {Number}
+	* @description the base size of the font, used internally to measure text.
+	**/
+	Font.prototype.baseSize = 60;
+	
+	/**
+	* @protected
+	* @member sizes
+	* @memberOf tomahawk_ns.Font.prototype
+	* @type {Object}
+	* @description An object that stores all the sizes of each character in the corresponding font.
+	**/
+	Font.prototype.sizes = null;
+		
+	/**
+	* @member maxWidth
+	* @memberOf tomahawk_ns.Font.prototype
+	* @type {Number}
+	* @description max char width for this font
+	**/
 	Font.prototype.maxWidth = 0;
+	
+	/**
+	* @member maxHeight
+	* @memberOf tomahawk_ns.Font.prototype
+	* @type {Number}
+	* @description max char height for this font
+	**/
 	Font.prototype.maxHeight = 0;
 	
+	
+	/**
+	* @method addFont
+	* @description create and register a new Font object, you have to specify a 'valid' font name, Arial for example.
+	* @memberOf tomahawk_ns.Font
+	* @param {string} fontName the font name.
+	**/
 	Font.addFont = function(fontName, fontURL)
 	{
-		var font = new tomahawk_ns.Font(fontName,fontURL);
+		var font = new tomahawk_ns.Font(fontName);
 		tomahawk_ns.Font._fonts[fontName] = font;
 	};	
 	
+	/**
+	* @method getFont
+	* @description get an instance of Font according to the fontName passed in param, you have to specify a 'valid' font name, Arial for example. If there's no instance of {tomahawk_ns.Font} who matches the fontName, a regular one is automatically created.
+	* @memberOf tomahawk_ns.Font
+	* @param {string} fontName the font name
+	* @returns {tomahawk_ns.Font}
+	**/
 	Font.getFont = function(fontName)
 	{
 		if( !tomahawk_ns.Font._fonts[fontName])
@@ -58,13 +129,14 @@
 		return tomahawk_ns.Font._fonts[fontName];
 	};
 	
-	Font.prototype.name = null;
-	Font.prototype.url = null;
-	Font.prototype.bold = false;
-	Font.prototype.italic = false;
-	Font.prototype.baseSize = 60;
-	Font.prototype.sizes = null;
-	
+	/**
+	* @method measureText
+	* @description calculate the width and the height of the text passed in param, for the font size passed in param.
+	* @memberOf tomahawk_ns.Font.prototype
+	* @param {string} text the text you want to measure
+	* @param {Numbr} size the fontSize of the text
+	* @returns {Object} an object with 'width' and 'height' properties
+	**/
 	Font.prototype.measureText = function(text, size)
 	{
 		var div = Font._div;
@@ -110,5 +182,9 @@
 		return result;
 	};
 
+	Font._div = document.createElement("div");
+	Font._style = document.createElement("style");
+	Font._fonts = new Object();
+	
 	tomahawk_ns.Font = Font;
 })();

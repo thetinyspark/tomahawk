@@ -29,6 +29,12 @@
 
 (function() {
 	
+	/**
+	 * @class TextureAtlas
+	 * @memberOf tomahawk_ns
+	 * @description ...
+	 * @constructor
+	 **/
 	function TextureAtlas()
 	{
 		this._textures = new Array();

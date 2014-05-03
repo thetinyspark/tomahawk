@@ -29,7 +29,13 @@
 
 (function() {
 	
-
+	/**
+	 * @class SelectableTextField
+	 * @memberOf tomahawk_ns
+	 * @description The SelectableTextField class is used to create display objects for text display and selection.
+	 * @constructor
+	 * @augments tomahawk_ns.TextField
+	 **/
 	function SelectableTextField()
 	{
 		tomahawk_ns.TextField.apply(this);
@@ -51,26 +57,6 @@
 		return null;
 	};
 
-	SelectableTextField.prototype._selectCurrentWord = function()
-	{
-		this.unSelect();
-		var range = this.getWordRangeAt(this.getCurrentIndex());
-		this.selectBetween(range.start,range.end);
-	};
-
-	SelectableTextField.prototype._setIndexUnderMouse = function(x,y)
-	{
-		var pt = this.globalToLocal(x, y);
-		var letters = this.getLettersIn(pt.x,pt.y,1,1);
-		this.unSelect();
-		
-		if( letters.length > 0 )
-		{
-			this.setCurrentIndex( letters[0].index );
-		}
-	};
-
-	
 	SelectableTextField.prototype.setFocus = function(value)
 	{
 		tomahawk_ns.TextField.prototype.setFocus.apply(this,[value]);
@@ -91,6 +77,34 @@
 		this.unSelect();
 	};
 	
+	SelectableTextField.prototype._selectCurrentWord = function()
+	{
+		this.unSelect();
+		var word = this.getWordAt(this.getCurrentIndex());
+		var start = -1;
+		var end = -1;
+		
+		if( word != null )
+		{			
+			start = word.getStartIndex();
+			end = word.getEndIndex();
+		}
+		
+		this.selectBetween(start,end);
+	};
+
+	SelectableTextField.prototype._setIndexUnderMouse = function(x,y)
+	{
+		var pt = this.globalToLocal(x, y);
+		var letters = this.getLettersIn(pt.x,pt.y,1,1);
+		this.unSelect();
+		
+		if( letters.length > 0 )
+		{
+			this.setCurrentIndex( letters[0].index );
+		}
+	};
+
 	SelectableTextField.prototype._mouseEventHandler = function(event)
 	{
 		if( event.type == tomahawk_ns.MouseEvent.DOUBLE_CLICK )
@@ -142,6 +156,15 @@
 
 	};
 
+	/**
+	* @method selectInto
+	* @description Selects all the letters within the zone defined by the x,y,width,height parameters within the text field.
+	* @memberOf tomahawk_ns.SelectableTextField.prototype
+	* @param {Number} x the x position of the selection zone
+	* @param {Number} y the y position of the selection zone
+	* @param {Number} width the width of the selection zone
+	* @param {Number} height the height of the selection zone
+	**/
 	SelectableTextField.prototype.selectInto = function(x,y,width,height)
 	{
 		var result = this.getLettersIn(x,y,width,height);
@@ -160,6 +183,16 @@
 		this.selectBetween(start,end);
 	};
 
+	/**
+	* @description Returns an Array of letters that match the zone defined by the x,y,width,height parameters within the text field.
+	* @method getLettersIn
+	* @memberOf tomahawk_ns.SelectableTextField.prototype
+	* @param {Number} x the x position of the selection zone
+	* @param {Number} y the y position of the selection zone
+	* @param {Number} width the width of the selection zone
+	* @param {Number} height the height of the selection zone
+	* @returns {Array} an Array of Letters objects
+	**/
 	SelectableTextField.prototype.getLettersIn = function(x,y,width,height)
 	{
 		var letters = this.getLetters();
@@ -204,6 +237,12 @@
 		return result;
 	};
 
+	/**
+	* @method getSelectionRange
+	* @memberOf tomahawk_ns.SelectableTextField.prototype
+	* @returns {Object} An object with "start" and "end" properties
+	* @description Returns an object which defines the indexes between the text field is selected.
+	**/
 	SelectableTextField.prototype.getSelectionRange = function()
 	{
 		var start = -1;
@@ -232,17 +271,33 @@
 		return {start: start, end: end};
 	};
 
+	/**
+	* @method isSelected
+	* @memberOf tomahawk_ns.SelectableTextField.prototype
+	* @returns {Boolean} true if selected, false it not.
+	* @description Indicates wether a portion of the text is selected within the text field.
+	**/
 	SelectableTextField.prototype.isSelected = function()
 	{
 		var range =  this.getSelectionRange();
 		return ( range.start >= 0 && range.end > range.start );
 	};
 
+	/**
+	* @method selectAll
+	* @memberOf tomahawk_ns.SelectableTextField.prototype
+	* @description Sets as selected all the text within the text field.
+	**/
 	SelectableTextField.prototype.selectAll = function()
 	{
 		this.selectBetween(0,this.getLetters().length);
 	};
 
+	/**
+	* @method unSelect
+	* @memberOf tomahawk_ns.SelectableTextField.prototype
+	* @description Removes all selection within the text field.
+	**/
 	SelectableTextField.prototype.unSelect = function()
 	{
 		var letters = this.getLetters();
@@ -263,7 +318,14 @@
 		
 		this._refreshNextFrame = true;
 	};
-
+	
+	/**
+	* @method selectBetween
+	* @memberOf tomahawk_ns.SelectableTextField.prototype
+	* @param {Number} startIndex The zero-based index value of the first character in the selection (for example, the first character is 0, the second character is 1, and so on).
+	* @param {Number} endIndex  The zero-based index value of the last character in the selection.
+	* @description Sets as selected the text designated by the index values of the first and last characters, which are specified with the beginIndex and endIndex parameters.
+	**/
 	SelectableTextField.prototype.selectBetween = function(startIndex, endIndex)
 	{
 		var letters = this.getLetters();
@@ -293,5 +355,6 @@
 		this._refreshNextFrame = true;
 	};
 
+	
 	tomahawk_ns.SelectableTextField = SelectableTextField;
 })();

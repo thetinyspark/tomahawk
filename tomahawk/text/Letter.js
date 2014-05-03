@@ -29,7 +29,13 @@
 
 (function() {
 	
- 
+	/**
+	 * @class Letter
+	 * @memberOf tomahawk_ns
+	 * @description A Letter object is a DisplayObject that displays a Letter according to his format.
+	 * @augments tomahawk_ns.DisplayObject
+	 * @constructor
+	 **/
 	function Letter(value)
 	{
 		tomahawk_ns.DisplayObject.apply(this);		
@@ -41,22 +47,74 @@
 	Tomahawk.registerClass(Letter,"Letter");
 	Tomahawk.extend("Letter","DisplayObject");
 
+	/**
+	* @member newline
+	* @memberOf tomahawk_ns.Letter.prototype
+	* @type {Boolean}
+	* @description Defines if the character is a newline character
+	**/
 	Letter.prototype.newline 			= false;
+	/**
+	* @member value
+	* @memberOf tomahawk_ns.Letter.prototype
+	* @type {string}
+	* @description The value of the character (a or b or ... )
+	**/
 	Letter.prototype.value 				= "";
+	/**
+	* @member format
+	* @memberOf tomahawk_ns.Letter.prototype
+	* @type {tomahawk_ns.TextFormat}
+	* @description An instance of TextFormat.
+	**/
 	Letter.prototype.format 			= null;
+	/**
+	* @member index
+	* @memberOf tomahawk_ns.Letter.prototype
+	* @type {tNumber}
+	* @description The position of the letter in the TextField
+	**/
 	Letter.prototype.index 				= 0;
+	/**
+	* @member textWidth
+	* @memberOf tomahawk_ns.Letter.prototype
+	* @type {Number}
+	* @description The actual width of this letter
+	**/
 	Letter.prototype.textWidth 			= 0;	
+	/**
+	* @member textHeight
+	* @memberOf tomahawk_ns.Letter.prototype
+	* @type {Number}
+	* @description The actual height of this letter
+	**/
 	Letter.prototype.textHeight 		= 0;	
+	/**
+	* @member selected
+	* @memberOf tomahawk_ns.Letter.prototype
+	* @type {Boolean}
+	* @description Defines if the letter is selected or not
+	**/
 	Letter.prototype.selected			= false;
 	Letter._metricsContext				= null;
 	
-	
+	/**
+	* @method setTextFormat
+	* @memberOf tomahawk_ns.Letter.prototype
+	* @description Sets the letter format
+	* @param {tomahawk_ns.TextFormat} value the instance of TextFormat
+	**/
 	Letter.prototype.setTextFormat = function(value)
 	{
 		this.format = value;
 		this.updateMetrics();
 	};
 
+	/**
+	* @method updateMetrics
+	* @memberOf tomahawk_ns.Letter.prototype
+	* @description Update all the measure of the letter
+	**/
 	Letter.prototype.updateMetrics = function()
 	{
 		
@@ -92,6 +150,12 @@
 		//context.restore();
 	};
 
+	/**
+	* @method draws the DisplayObject on the stage
+	* @memberOf tomahawk_ns.Letter.prototype
+	* @description Draws the display object into the specified context
+	* @param {Canvas2DRenderingContext} the context of the canvas on which you want to draw the DisplayObject
+	**/
 	Letter.prototype.draw = function(context)
 	{
 		if( this.selected == true )
@@ -131,6 +195,13 @@
 		}	
 	};
 
+	
+	/**
+	* @method clone
+	* @memberOf tomahawk_ns.Letter.prototype
+	* @description returns a clone of this Letter
+	* @returns {tomahawk_ns.Letter} a new Letter object
+	**/
 	Letter.prototype.clone = function()
 	{
 		var letter = new tomahawk_ns.Letter(this.value);

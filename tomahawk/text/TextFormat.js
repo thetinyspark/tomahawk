@@ -29,6 +29,12 @@
 
 (function() {
 	
+	/**
+	 * @class TextFormat
+	 * @memberOf tomahawk_ns
+	 * @description ....
+	 * @constructor
+	 **/
 	function TextFormat(){}
 	Tomahawk.registerClass( TextFormat, "TextFormat" );
 

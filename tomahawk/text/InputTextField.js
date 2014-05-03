@@ -29,6 +29,13 @@
 
 (function() {
 	
+	/**
+	 * @class InputTextField
+	 * @memberOf tomahawk_ns
+	 * @description The InputTextField class is used to create display objects for text display,selection and input.
+	 * @constructor
+	 * @augments tomahawk_ns.SelectableTextField
+	 **/
 	function InputTextField()
 	{
 		tomahawk_ns.SelectableTextField.apply(this);
@@ -37,7 +44,7 @@
 
 	Tomahawk.registerClass(InputTextField,"InputTextField");
 	Tomahawk.extend("InputTextField","SelectableTextField");
-	
+
 	InputTextField.prototype.setFocus = function(value)
 	{
 		tomahawk_ns.SelectableTextField.prototype.setFocus.apply(this,[value]);
@@ -93,11 +100,10 @@
 			{
 				if( event.keyCode == tomahawk_ns.Keyboard.ENTER )
 				{
-					text = "";
-					newline = true;
+					text = "\n";
 				}
 				
-				this.addCharAt(text,this.getCurrentIndex() + 1, newline);
+				this.addCharAt(text,this.getCurrentIndex() + 1);
 			}
 		}
 	};

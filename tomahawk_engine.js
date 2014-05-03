@@ -29,9 +29,9 @@
 * @author The Tiny Spark
 */
 
-
-
-//namespace
+/** 
+*@namespace 
+**/
 var tomahawk_ns = new Object();
 tomahawk_ns.version = 1.0;
 
@@ -171,7 +171,13 @@ Tomahawk._extends = new Array();
  
  (function() {
 	
-
+/**
+ * @class AssetsLoader
+ * @memberOf tomahawk_ns
+ * @description ...
+ * @constructor
+ * @augments tomahawk_ns.EventDispatcher
+ **/
 function AssetsLoader()
 {
 	this._loadingList = new Array();
@@ -305,7 +311,12 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 (function() {
 	
-		
+	/**
+	 * @class AssetsManager
+	 * @memberOf tomahawk_ns
+	 * @description ...
+	 * @constructor
+	 **/
 	function AssetsManager()
 	{
 		this._images = new Object();
@@ -425,7 +436,13 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
  
  (function() {
 	
-	 
+	/**
+	 * @class Keyboard
+	 * @memberOf tomahawk_ns
+	 * @description ...
+	 * @constructor
+	 * @augments tomahawk_ns.EventDispatcher
+	 **/
 	function Keyboard()
 	{
 		var callbackKey = this._keyboardHandler.bind(this);
@@ -727,11 +744,73 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 * OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+
+(function() {
+	
+	/**
+	 * @class Mouse
+	 * @memberOf tomahawk_ns
+	 * @description ...
+	 * @constructor
+	 **/
+	function Mouse(){}
+
+	Tomahawk.registerClass( Mouse, "Mouse" );
+	
+	Mouse.RESIZE = "se-resize";
+	Mouse.MOVE = "move";
+	Mouse.POINTER = "pointer";
+	Mouse.DEFAULT = "default";
+
+	Mouse.setCursor = function(value,domElement)
+	{
+		domElement.style.cursor = value;
+	};
+	
+	tomahawk_ns.Mouse = Mouse;
+})();
+
+
+
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
 * @author The Tiny Spark
 */
 
  (function() {
 	 
+	/**
+	 * @class Screen
+	 * @memberOf tomahawk_ns
+	 * @description ...
+	 * @constructor
+	 **/
 	function Screen(){}
 
 	Tomahawk.registerClass(Screen,"Screen");
@@ -795,8 +874,8 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	/**
 	* @class Bitmap
 	* @memberOf tomahawk_ns
-	* @param {Texture2D} the drawing texture.
-	* @augments {DisplayObject}
+	* @param {tomahawk_ns.Texture} [texture=undefined] the drawing texture.
+	* @augments tomahawk_ns.DisplayObject
 	* @constructor
 	*/
 	function Bitmap(texture)
@@ -813,20 +892,19 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	Tomahawk.extend( "Bitmap", "DisplayObject" );
 
 	/**
-	 * The current drawing texture.
-	 * @public
-	 * @property texture
-	 * @type Texture2D
-	 * @memberOf tomahawk_ns.Bitmap
+	 * @description The current drawing texture.
+	 * @member texture
+	 * @type {tomahawk_ns.Texture}
+	 * @memberOf tomahawk_ns.Bitmap.prototype
 	 * @default null
 	 */
 	Bitmap.prototype.texture = null;
 	
 	/**
-	* @public
+	* @description Sets the Bitmap current Texture.
 	* @method setTexture
-	* @param {Texture2D} texture 
-	* @memberOf tomahawk_ns.Bitmap
+	* @param {tomahawk_ns.Texture} texture 
+	* @memberOf tomahawk_ns.Bitmap.prototype
 	**/
 	Bitmap.prototype.setTexture = function(texture)
 	{
@@ -835,13 +913,6 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		this.height = this.texture.rect[3];
 	};
 
-	/**
-	* @public
-	* @method draw
-	* Draws the display object into the specified context
-	* @param {CanvasRenderingContext2D} ctx The canvas 2D context object to draw into.
-	* @memberOf tomahawk_ns.Bitmap 
-	**/
 	Bitmap.prototype.draw = function( context )
 	{	
 		var rect = this.texture.rect;
@@ -890,6 +961,13 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 (function() {
 	
+	/**
+	 * @class BitmapMesh
+	 * @memberOf tomahawk_ns
+	 * @description ...
+	 * @constructor
+	 * @augments tomahawk_ns.Bitmap
+	 **/
 	function BitmapMesh(texture)
 	{
 		tomahawk_ns.Bitmap.apply(this,[texture]);
@@ -1056,7 +1134,15 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 (function() {
 
-	
+	/**
+	 * @abstract
+	 * @class DisplayObject
+	 * @memberOf tomahawk_ns
+	 * @constructor
+	 * @augments tomahawk_ns.EventDispatcher
+	 * @description The DisplayObject class is the base class for all objects that can be placed on the display list.
+	 * The DisplayObject class supports basic functionality like the x and y position of an object, as well as more advanced properties of the object such as its transformation matrix. DisplayObject is an abstract base class; therefore, you cannot call DisplayObject directly. All display objects inherit from the DisplayObject class.
+	 **/
 	function DisplayObject()
 	{
 		tomahawk_ns.EventDispatcher.apply(this);
@@ -1068,40 +1154,249 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	Tomahawk.registerClass( DisplayObject, "DisplayObject" );
 	Tomahawk.extend( "DisplayObject", "EventDispatcher" );
 
+	/**
+	* @member name
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {String}
+	* @description Indicates the instance name of the DisplayObject.
+	* @default null
+	**/
 	DisplayObject.prototype.name 				= null;
+	
+	/**
+	* @member parent
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {tomahawk_ns.DisplayObjectContainer}
+	* @description Indicates the DisplayObjectContainer object that contains this display object.
+	* @default null
+	**/
 	DisplayObject.prototype.parent 				= null;
+	
+	/**
+	* @member x
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Number}
+	* @default 0
+	* @description Indicates the x coordinate of the DisplayObject instance relative to the local coordinates of the parent DisplayObjectContainer.
+	**/
 	DisplayObject.prototype.x 					= 0;
+	
+	/**
+	* @member y
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Number}
+	* @default 0
+	* @description Indicates the y coordinate of the DisplayObject instance relative to the local coordinates of the parent DisplayObjectContainer.
+	**/
 	DisplayObject.prototype.y 					= 0;
+	
+	/**
+	* @member pivotX
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Number}
+	* @default 0
+	* @description Indicates the x coordinate of the DisplayObject instance registration point
+	**/
 	DisplayObject.prototype.pivotX 				= 0;
+	
+	/**
+	* @member pivotY
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Number}
+	* @default 0
+	* @description Indicates the y coordinate of the DisplayObject instance registration point
+	**/
 	DisplayObject.prototype.pivotY 				= 0;
+	
+	/**
+	* @member skewX
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Number}
+	* @default 0
+	* @description Indicates the skew on the x axis of the DisplayObject instance
+	**/
 	DisplayObject.prototype.skewX 				= 0;
+	
+	/**
+	* @member skewY
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Number}
+	* @default 0
+	* @description Indicates the skew on the y axis of the DisplayObject instance
+	**/
 	DisplayObject.prototype.skewY 				= 0;
+	
+	/**
+	* @member scaleX
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Number}
+	* @description Indicates the horizontal scale (percentage) of the object as applied from the registration point.
+	* @default 1
+	**/
 	DisplayObject.prototype.scaleX 				= 1;
+	
+	/**
+	* @member scaleY
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Number}
+	* @default 1
+	* @description Indicates the vertical scale (percentage) of the object as applied from the registration point.
+	**/
 	DisplayObject.prototype.scaleY 				= 1;
+	
+	/**
+	* @default 0
+	* @member width
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Number}
+	* @description Indicates the width of the display object, in pixels.
+	**/
 	DisplayObject.prototype.width 				= 0;
+	
+	/**
+	* @default 0
+	* @member height
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Number}
+	* @description Indicates the height of the display object, in pixels.
+	**/
 	DisplayObject.prototype.height 				= 0;
+	
+	/**
+	* @member rotation
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Number}
+	* @description Indicates the rotation of the DisplayObject instance, in degrees, from its original orientation.
+	**/
 	DisplayObject.prototype.rotation 			= 0;
+	
+	/**
+	* @member stage
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {tomahawk_ns.Stage}
+	* @description The Stage of the display object.
+	* @default null
+	**/
 	DisplayObject.prototype.stage 				= null;
-
+	
+	/**
+	* @member alpha
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Number}
+	* @description Indicates the alpha transparency value of the object specified.
+	* @default 1
+	**/
 	DisplayObject.prototype.alpha 				= 1;
+	
+	/**
+	* @member mouseEnabled
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Boolean}
+	* @description Specifies whether this object receives mouse, or other user input, messages.
+	* @default true
+	**/
 	DisplayObject.prototype.mouseEnabled 		= true;
+	
+	/**
+	* @member handCursor
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Boolean}
+	* @description A Boolean value that indicates whether the pointing hand (hand cursor) appears when the pointer rolls over this sprite
+	* @default false
+	**/
 	DisplayObject.prototype.handCursor 			= false;
+	
+	/**
+	* @member visible
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Boolean}
+	* @description Whether or not the display object is visible.
+	* @default true
+	**/
 	DisplayObject.prototype.visible 			= true;
+	
+	/**
+	* @member isMask
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Boolean}
+	* @description Defines if the current DisplayObject is masking another one
+	* @default false
+	**/
 	DisplayObject.prototype.isMask				= false;
+	
+	/**
+	* @member filters
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Array}
+	* @description An indexed array that contains each filter object currently associated with the display object.
+	* @default null
+	**/
 	DisplayObject.prototype.filters 			= null;
+	
+	/**
+	* @member mask
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {tomahawk_ns.DisplayObject}
+	* @description The calling display object is masked by the specified mask object.
+	* @default null
+	**/
 	DisplayObject.prototype.mask 				= null;
+	
+	/**
+	* @member matrix
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {tomahawk_ns.Matrix2D}
+	* @description The transformation matrix of the DisplayObject
+	* @default null
+	**/
 	DisplayObject.prototype.matrix 				= null;
+	
+	/**
+	* @member bounds
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {tomahawk_ns.Rectangle}
+	* @description Indicates a rectangle that defines the area of the display object relative to his parent coordinate system. You must set the updateNextFrame ( or the autoUpdate ) property to true and call the updateBounds method to actualize this Rectangle.
+	* @default null
+	**/
 	DisplayObject.prototype.bounds 				= null;
-	DisplayObject.prototype._concatenedMatrix 	= null;
+	
+	/**
+	* @member cacheAsBitmap
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Boolean}
+	* @description If set to true, the object is caching an internal representation of the display object.
+	* @default true
+	**/
 	DisplayObject.prototype.cacheAsBitmap		= false;
+	
+	/**
+	* @member autoUpdate
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Boolean}
+	* @description If set to true, the matrix of the DisplayObject will be computed at every frame
+	* @default true
+	**/
 	DisplayObject.prototype.autoUpdate			= true;
+	
+	/**
+	* @member updateNextFrame
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Boolean}
+	* @default true
+	* @description If set to true, the transformation matrix will be update at next frame.
+	**/
 	DisplayObject.prototype.updateNextFrame		= true;
 	
+	DisplayObject.prototype._concatenedMatrix 	= null;
 	DisplayObject.prototype._cache 				= null;
 	DisplayObject.prototype._cacheOffsetX 		= 0;
 	DisplayObject.prototype._cacheOffsetY 		= 0;
 	
-
+	/**
+	* @method updateBounds
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @description Updates the bounds of the current DisplayObject if his updateNextFrame || autoUpdate = true
+	**/
 	DisplayObject.prototype.updateBounds = function()
 	{		
 		var rect = new tomahawk_ns.Rectangle();
@@ -1135,6 +1430,12 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		this.bounds = rect;
 	};
 	
+	/**
+	* @method setMask
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @param {tomahawk_ns.DisplayObject} the new mask of the current DisplayObject
+	* @description Defines the DisplayObject passed in param as the mask of the current DisplayObject 
+	**/
 	DisplayObject.prototype.setMask = function( mask )
 	{
 		if( this.mask != null )
@@ -1150,6 +1451,11 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		}
 	};
 
+	/**
+	* @method updateMatrix
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @description Updates the matrix of the DisplayObject if his updateNextFrame || autoUpdate = true
+	**/
 	DisplayObject.prototype.updateMatrix = function()
 	{
 		if( this.autoUpdate == false && this.updateNextFrame == false )
@@ -1174,6 +1480,12 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		this.updateNextFrame = false;
 	};
 
+	/**
+	* @description Updates the cache of the DisplayObject instance and returns it.
+	* @method updateCache
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @returns {HTMLCanvasElement} the cache canvas of the DisplayObject
+	**/
 	DisplayObject.prototype.updateCache = function()
 	{	
 		var buffer = null;
@@ -1248,8 +1560,15 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		this._cache = buffer;
 		this._cacheOffsetX = offX;
 		this._cacheOffsetY = offY;
+		return buffer;
 	};
-
+	
+	/**
+	* @method drawComposite
+	* @description Draw the DisplayObject instance into the specified context with mask and filters.
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @param {Canvas2DRenderingContext} drawContext the Canvas2DRenderingContext context on which you want to draw.
+	**/
 	DisplayObject.prototype.drawComposite = function(drawContext)
 	{
 		if( this._cache == null || this.cacheAsBitmap == false )
@@ -1295,10 +1614,22 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		}
 	};
 
+	/**
+	* @method draw
+	* @description Draws the DisplayObject instance into the specified context
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @param {Canvas2DRenderingContext} drawContext the Canvas2DRenderingContext context on which you want to draw.
+	**/
 	DisplayObject.prototype.draw = function(context)
 	{
 	};
 	
+	/**
+	* @method getConcatenedMatrix
+	* @description Returns the combined transformation matrixes of the DisplayObject instance and all of its parent objects, back to the stage level.
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @param {Boolean} forceUpdate Forces the update of the current DisplayObject and all his parents
+	**/
 	DisplayObject.prototype.getConcatenedMatrix = function(forceUpdate)
 	{
 		var current = this;
@@ -1319,6 +1650,14 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		return this._concatenedMatrix;
 	};
 
+	/**
+	* @method localToGlobal
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @param {Number} x
+	* @param {Number} y
+	* @returns {tomahawk_ns.Point}
+	* @description Converts the point object from the DisplayObject's (local) coordinates to the Stage (global) coordinates.
+	**/
 	DisplayObject.prototype.localToGlobal = function(x,y)
 	{
 		var matrix = this.getConcatenedMatrix();
@@ -1326,6 +1665,14 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		return new tomahawk_ns.Point(pt.x,pt.y);
 	};
 
+	/**
+	* @method globalToLocal
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @param {Number} x
+	* @param {Number} y
+	* @returns {tomahawk_ns.Point}
+	* @description Converts the point object from the Stage (global) coordinates to the DisplayObject's (local) coordinates.
+	**/
 	DisplayObject.prototype.globalToLocal = function(x,y)
 	{
 		var matrix = this.getConcatenedMatrix().clone().invert();
@@ -1333,6 +1680,14 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		return new tomahawk_ns.Point(pt.x,pt.y);
 	};
 
+	/**
+	* @method hitTest
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @param {Number} x
+	* @param {Number} y
+	* @returns {Boolean}
+	* @description Evaluates the DisplayObject instance to see if it overlaps or intersects with the point specified by the x and y parameters. The x and y parameters specify a point in the coordinate space of the Stage, not the display object container that contains the display object (unless that display object container is the Stage).
+	**/
 	DisplayObject.prototype.hitTest = function(x,y)
 	{		
 		var pt1 = this.globalToLocal(x,y);
@@ -1343,6 +1698,13 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 			return true;
 	};
 
+	/**
+	* @method isChildOf
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @param {tomahawk_ns.DisplayObject} obj
+	* @returns {Boolean}
+	* @description Indicates if the DisplayObject "obj" is a child of the DisplayObject instance
+	**/
 	DisplayObject.prototype.isChildOf = function( obj )
 	{
 		var curParent = this.parent;
@@ -1357,6 +1719,13 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		return false;
 	};
 
+	/**
+	* @method getBoundingRectIn
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @param {tomahawk_ns.DisplayObject} spaceCoordinates
+	* @returns {tomahawk_ns.Rectangle}
+	* @description Returns a rectangle that defines the area of the display object relative to the coordinate system of the spaceCoordinates object.
+	**/
 	DisplayObject.prototype.getBoundingRectIn = function(spaceCoordinates)
 	{
 		this.updateNextFrame = true;
@@ -1396,25 +1765,14 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		rect.height = rect.bottom - rect.top;
 		return rect;
 	};
-	
-	DisplayObject.prototype.getNestedChildren = function()
-	{
-		return new Array(this);
-	}
-	
-	DisplayObject.prototype.destroy = function()
-	{
-		this._cache = null;
-		this.setMask(null);
-		
-		if( this.parent != null )
-		{
-			this.parent.removeChild(this);
-		}
-		
-		tomahawk_ns.EventDispatcher.prototype.destroy.apply(this);
-	};
-	
+
+	/**
+	* @method snapshot
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @param {tomahawk_ns.Matrix2D} [transformMatrix=undefined] The transformation matrix to apply
+	* @returns {HTMLCanvasElement}
+	* @description Returns a snapshot of the DisplayObject instance, applying the transformMatrix
+	**/
 	DisplayObject.prototype.snapshot = function(transformMatrix)
 	{
 		var mat = transformMatrix || new tomahawk_ns.Matrix2D();
@@ -1438,6 +1796,24 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		this.updateBounds();
 		
 		return canvas;
+	};
+	
+	/**
+	* @method destroy
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @description Kill the DisplayObject instance and free all his ressources
+	**/
+	DisplayObject.prototype.destroy = function()
+	{
+		this._cache = null;
+		this.setMask(null);
+		
+		if( this.parent != null )
+		{
+			this.parent.removeChild(this);
+		}
+		
+		tomahawk_ns.EventDispatcher.prototype.destroy.apply(this);
 	};
 	
 	tomahawk_ns.DisplayObject = DisplayObject;
@@ -1481,6 +1857,13 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 (function() {
 	
+	/**
+	 * @class DisplayObjectContainer
+	 * @memberOf tomahawk_ns
+	 * @description The DisplayObjectContainer class is the base class for all objects that can serve as display object containers on the display list. The display list manages all objects displayed in the canvas. Use the DisplayObjectContainer class to arrange the display objects in the display list. Each DisplayObjectContainer object has its own child list for organizing the z-order of the objects. The z-order is the front-to-back order that determines which object is drawn in front, which is behind, and so on. DisplayObjectContainer is an abstract base class; therefore, you cannot call DisplayObjectContainer directly.
+	 * @constructor
+	 * @augments tomahawk_ns.DisplayObject
+	 **/
 	function DisplayObjectContainer()
 	{
 		tomahawk_ns.DisplayObject.apply(this);
@@ -1490,15 +1873,43 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	Tomahawk.registerClass( DisplayObjectContainer, "DisplayObjectContainer" );
 	Tomahawk.extend( "DisplayObjectContainer", "DisplayObject" );
 
+	/**
+	* @member children
+	* @memberOf tomahawk_ns.DisplayObjectContainer.prototype
+	* @type {Array}
+	* @description the child list of the DisplayObjectContainer instance
+	* @default null
+	**/
 	DisplayObjectContainer.prototype.children = null;
+	
+	/**
+	* @member isContainer
+	* @memberOf tomahawk_ns.DisplayObjectContainer.prototype
+	* @type {Boolean}
+	* @description Defines if the current DisplayObjectContainer is a container or not ( actually always sets to true )
+	* @default true
+	**/
 	DisplayObjectContainer.prototype.isContainer = true;
 
-	
+	/**
+	* @method setChildIndex
+	* @memberOf tomahawk_ns.DisplayObjectContainer.prototype
+	* @param {tomahawk_ns.DisplayObject} child The child DisplayObject instance for which you want to change the index number.
+	* @param {Number} index The resulting index number for the child display object.
+	* @description Changes the position of an existing child in the display object container.
+	**/
 	DisplayObjectContainer.prototype.setChildIndex = function(child,index)
 	{
 		this.addChildAt(child,index);
 	};
 	
+	/**
+	* @method addChild
+	* @memberOf tomahawk_ns.DisplayObjectContainer.prototype
+	* @param {tomahawk_ns.DisplayObject} child The DisplayObject instance to add as a child of this DisplayObjectContainer instance.
+	* @returns {tomahawk_ns.DisplayObject} The DisplayObject instance that you pass in the child parameter.
+	* @description Adds a child DisplayObject instance to this DisplayObjectContainer instance. The child is added to the front (top) of all other children in this DisplayObjectContainer instance. (To add a child to a specific index position, use the addChildAt() method.) If you add a child object that already has a different display object container as a parent, the object is removed from the child list of the other display object container.
+	**/
 	DisplayObjectContainer.prototype.addChild = function(child)
 	{
 		if( child.parent )
@@ -1511,11 +1922,25 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		child.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.ADDED, true, true) );
 	};
 
+	/**
+	* @method getChildAt
+	* @memberOf tomahawk_ns.DisplayObjectContainer.prototype
+	* @param {Number} index The index position of the child object.
+	* @returns {tomahawk_ns.DisplayObject} The child display object at the specified index position.
+	* @description Returns the child display object instance that exists at the specified index.
+	**/
 	DisplayObjectContainer.prototype.getChildAt = function (index)
 	{
 		return this.children[index];
 	};
 
+	/**
+	* @method getChildByName
+	* @memberOf tomahawk_ns.DisplayObjectContainer.prototype
+	* @param {String} name The name of the child to return.
+	* @returns {tomahawk_ns.DisplayObject} The child display object with the specified name.
+	* @description Returns the child display object that exists with the specified name. If more that one child display object has the specified name, the method returns the first object in the child list.
+	**/
 	DisplayObjectContainer.prototype.getChildByName = function(name)
 	{
 		var children = this.children;
@@ -1530,23 +1955,13 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		return null;
 	};
 
-	DisplayObjectContainer.prototype.hitTest = function(x,y)
-	{
-		var children = this.children;
-		var i = children.length;
-		var child = null;
-		
-		while( --i > -1 )
-		{
-			child = children[i];
-			
-			if( child.hitTest(x,y) )
-				return true;
-		}
-		
-		return false;
-	};
-
+	/**
+	* @method addChildAt
+	* @memberOf tomahawk_ns.DisplayObjectContainer.prototype
+	* @param {tomahawk_ns.DisplayObject} child The DisplayObject instance to add as a child of this DisplayObjectContainer instance.
+	* @param {Number} index The index position to which the child is added. If you specify a currently occupied index position, the child object that exists at that position and all higher positions are moved up one position in the child list.
+	* @description Adds a child DisplayObject instance to this DisplayObjectContainer instance. The child is added at the index position specified. An index of 0 represents the back (bottom) of the display list for this DisplayObjectContainer object.
+	**/
 	DisplayObjectContainer.prototype.addChildAt = function(child, index)
 	{
 		if( child.parent != null )
@@ -1562,11 +1977,25 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		child.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.ADDED, true, true) );
 	};
 	
+	/**
+	* @method getChildIndex
+	* @memberOf tomahawk_ns.DisplayObjectContainer.prototype
+	* @param {tomahawk_ns.DisplayObject} child The DisplayObject instance to identify.
+	* @returns {Number}  The index position of the child display object to identify.
+	* @description Returns the index position of a child DisplayObject instance.
+	**/
 	DisplayObjectContainer.prototype.getChildIndex = function(child)
 	{
 		return this.children.indexOf(child);
 	};
 
+	/**
+	* @method removeChildAt
+	* @memberOf tomahawk_ns.DisplayObjectContainer.prototype
+	* @param {Number} index The child index of the DisplayObject to remove.
+	* @returns {tomahawk_ns.DisplayObject} The DisplayObject instance that was removed.
+	* @description Removes a child DisplayObject from the specified index position in the child list of the DisplayObjectContainer.
+	**/
 	DisplayObjectContainer.prototype.removeChildAt = function(index)
 	{
 		var child = this.children[index];
@@ -1578,7 +2007,12 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		child.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.REMOVED, true, true) );
 		return child;
 	};
-
+	
+	/**
+	* @method removeChildren
+	* @memberOf tomahawk_ns.DisplayObjectContainer.prototype
+	* @description Removes all child DisplayObject instances from the child list of the DisplayObjectContainer instance.
+	**/
 	DisplayObjectContainer.prototype.removeChildren = function()
 	{
 		while( this.children.length > 0 )
@@ -1587,6 +2021,13 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		}
 	};
 	
+	/**
+	* @method removeChild
+	* @memberOf tomahawk_ns.DisplayObjectContainer.prototype
+	* @param {tomahawk_ns.DisplayObject} child The DisplayObject instance to remove
+	* @returns {tomahawk_ns.DisplayObject} The DisplayObject instance to remove
+	* @description Removes the specified child DisplayObject instance from the child list of the DisplayObjectContainer instance.
+	**/
 	DisplayObjectContainer.prototype.removeChild = function(child)
 	{
 		var index = this.children.indexOf(child);
@@ -1603,6 +2044,73 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		return child;
 	};
 
+	/**
+	* @method getObjectUnder
+	* @memberOf tomahawk_ns.DisplayObjectContainer.prototype
+	* @returns {Array}
+	* @description Returns an Array with the first nested child of the DisplayObjectContainer instance which overlaps or intersects with the point specified by the x and y parameters. The x and y parameters specify a point in the coordinate space of the Stage, not the display object container that contains the display object (unless that display object container is the Stage).
+	**/
+	DisplayObjectContainer.prototype.getObjectUnder = function(x,y)
+	{
+		var under = null;
+		var children = this.children;
+		var i = children.length;
+		var child = null;
+		
+		while( --i > -1 )
+		{
+			child = children[i];
+			
+			if( child.mouseEnabled == false )
+				continue;
+					
+			if( child.isContainer )
+			{				
+				under = child.getObjectUnder(x,y);
+				
+				if( under != null )
+				{
+					return under;
+				}
+			}
+			else
+			{	
+				if( child.hitTest(x,y) == true )
+				{
+					return child;
+				}
+			}
+		}
+		
+		return null;
+	};
+	
+	/**
+	* @method getNestedChildren
+	* @memberOf tomahawk_ns.DisplayObjectContainer.prototype
+	* @returns {Array}
+	* @description Returns an Array with all the nested children of the DisplayObjectContainer instance 
+	**/
+	DisplayObjectContainer.prototype.getNestedChildren = function()
+	{
+		var list = new Array();
+		var subChild = null;
+		var i = this.children.length;
+		
+		while( --i > -1 )
+		{
+			subChild = this.children[i];
+			if( subChild.isContainer == true )
+			{
+				list = list.concat(subChild.getNestedChildren());
+			}
+			
+			list.push(subChild);
+		}
+		
+		return list;
+	}
+	
 	DisplayObjectContainer.prototype.draw = function( context )
 	{	
 		var children = this.children;
@@ -1709,10 +2217,9 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		
 		return rect;
 	};
-
-	DisplayObjectContainer.prototype.getObjectUnder = function(x,y)
+	
+	DisplayObjectContainer.prototype.hitTest = function(x,y)
 	{
-		var under = null;
 		var children = this.children;
 		var i = children.length;
 		var child = null;
@@ -1721,49 +2228,12 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		{
 			child = children[i];
 			
-			if( child.mouseEnabled == false )
-				continue;
-					
-			if( child.isContainer )
-			{				
-				under = child.getObjectUnder(x,y);
-				
-				if( under != null )
-				{
-					return under;
-				}
-			}
-			else
-			{	
-				if( child.hitTest(x,y) == true )
-				{
-					return child;
-				}
-			}
+			if( child.hitTest(x,y) )
+				return true;
 		}
 		
-		return null;
+		return false;
 	};
-
-	DisplayObjectContainer.prototype.getNestedChildren = function()
-	{
-		var list = new Array();
-		var subChild = null;
-		var i = this.children.length;
-		
-		while( --i > -1 )
-		{
-			subChild = this.children[i];
-			if( subChild.isContainer == true )
-			{
-				list = list.concat(subChild.getNestedChildren());
-			}
-			
-			list.push(subChild);
-		}
-		
-		return list;
-	}
 
 	DisplayObjectContainer.prototype.destroy = function()
 	{
@@ -1811,60 +2281,16 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 * @author The Tiny Spark
 */
-
-(function() {
-	
-	function Mouse(){}
-
-	Tomahawk.registerClass( Mouse, "Mouse" );
-	
-	Mouse.RESIZE = "se-resize";
-	Mouse.MOVE = "move";
-	Mouse.POINTER = "pointer";
-	Mouse.DEFAULT = "default";
-
-	Mouse.setCursor = function(value,domElement)
-	{
-		domElement.style.cursor = value;
-	};
-	
-	tomahawk_ns.Mouse = Mouse;
-})();
-
-
-
-/*
-* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
-*
-* Copyright (c) 2014 the-tiny-spark.com, inc.
-*
-* Permission is hereby granted, free of charge, to any person
-* obtaining a copy of this software and associated documentation
-* files (the "Software"), to deal in the Software without
-* restriction, including without limitation the rights to use,
-* copy, modify, merge, publish, distribute, sublicense, and/or sell
-* copies of the Software, and to permit persons to whom the
-* Software is furnished to do so, subject to the following
-* conditions:
-*
-* The above copyright notice and this permission notice shall be
-* included in all copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-* OTHER DEALINGS IN THE SOFTWARE.
-
-* @author The Tiny Spark
-*/
  
 (function() {
 	
-
+	/**
+	 * @class MovieClip
+	 * @memberOf tomahawk_ns
+	 * @description ...
+	 * @constructor
+	 * @augments tomahawk_ns.Bitmap
+	 **/
 	function MovieClip(texture)
 	{
 		tomahawk_ns.Bitmap.apply(this, [texture]);
@@ -1960,6 +2386,13 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 (function() {
 		
+	/**
+	 * @class Shape
+	 * @memberOf tomahawk_ns
+	 * @description ...
+	 * @constructor
+	 * @augments tomahawk_ns.DisplayObject
+	 **/
 	function Shape()
 	{
 		tomahawk_ns.DisplayObject.apply(this);
@@ -2201,6 +2634,13 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 (function() {
 
+	/**
+	 * @class Sprite
+	 * @memberOf tomahawk_ns
+	 * @description ...
+	 * @constructor
+	 * @augments tomahawk_ns.DisplayObjectContainer
+	 **/
 	function Sprite()
 	{
 		tomahawk_ns.DisplayObjectContainer.apply(this);
@@ -2325,7 +2765,13 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 (function() {
 	
-
+	/**
+	 * @class Stage
+	 * @memberOf tomahawk_ns
+	 * @description ...
+	 * @constructor
+	 * @augments tomahawk_ns.DisplayObjectContainer
+	 **/
 	function Stage()
 	{
 		tomahawk_ns.DisplayObject._collide = 0;
@@ -2692,7 +3138,13 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 (function() {
 	
-	
+	/**
+	 * @class QuadTreeContainer
+	 * @memberOf tomahawk_ns
+	 * @description ...
+	 * @constructor
+	 * @augments tomahawk_ns.Sprite
+	 **/
 	function QuadTreeContainer(left,right,top,bottom,childrenPerNode, maxDepth)
 	{
 		tomahawk_ns.Sprite.apply(this);
@@ -2894,6 +3346,12 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 (function() {
 	
+	/**
+	 * @class QuadTreeNode
+	 * @memberOf tomahawk_ns
+	 * @description ...
+	 * @constructor	
+	 **/
 	function QuadTreeNode(left,right,top,bottom, depth, maxChildren, maxDepth)
 	{
 		this.left = left;
@@ -3131,6 +3589,13 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 (function() {
 
+	/**
+	 * @class Sprite3D
+	 * @memberOf tomahawk_ns
+	 * @description ...
+	 * @constructor
+	 * @augments tomahawk_ns.Sprite
+	 **/
 	function Sprite3D()
 	{
 		tomahawk_ns.Sprite.apply(this);
@@ -3917,7 +4382,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	
 	/**
 	 * @class BrightnessFilter
-	 * @description the base class for all filters
+	 * @description a basic BrightnessFilter
 	 * @memberOf tomahawk_ns
 	 * @augments tomahawk_ns.PixelFilter
 	 * @constructor
@@ -3937,7 +4402,6 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	BrightnessFilter.prototype.value = 0;
 	
 	/**
-	* @protected
 	* @method process
 	* @memberOf tomahawk_ns.BrightnessFilter.prototype
 	* @description apply the filter process on the DisplayObject
@@ -3999,7 +4463,14 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	
 
 (function() {
-
+	
+	/**
+	 * @class ContrastFilter
+	 * @description a basic ContrastFilter
+	 * @memberOf tomahawk_ns
+	 * @augments tomahawk_ns.PixelFilter
+	 * @constructor
+	 **/
 	function ContrastFilter()
 	{
 		tomahawk_ns.PixelFilter.apply(this);
@@ -4008,8 +4479,17 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	Tomahawk.registerClass( ContrastFilter, "ContrastFilter" );
 	Tomahawk.extend( "ContrastFilter", "PixelFilter" );
 	
+	/**
+	* @member {Number} value contrast intensity.
+	* @memberOf tomahawk_ns.ContrastFilter.prototype
+	**/
 	ContrastFilter.prototype.value = 0;
 
+	/**
+	* @method process
+	* @memberOf tomahawk_ns.ContrastFilter.prototype
+	* @description apply the filter process on the DisplayObject
+	**/
 	ContrastFilter.prototype.process = function()
 	{
 		if( this.value == 0 )
@@ -4076,6 +4556,13 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 (function() {
 	
+	/**
+	 * @class GrayScaleFilter
+	 * @description a basic GrayScaleFilter
+	 * @memberOf tomahawk_ns
+	 * @augments tomahawk_ns.PixelFilter
+	 * @constructor
+	 **/
 	function GrayScaleFilter()
 	{
 		tomahawk_ns.PixelFilter.apply(this);
@@ -4084,6 +4571,11 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	Tomahawk.registerClass( GrayScaleFilter, "GrayScaleFilter" );
 	Tomahawk.extend( "GrayScaleFilter", "PixelFilter" );
 
+	/**
+	* @method process
+	* @memberOf tomahawk_ns.GrayScaleFilter.prototype
+	* @description apply the filter process on the DisplayObject
+	**/
 	GrayScaleFilter.prototype.process = function()
 	{
 		var pixels = this.getPixels(0,0,this._canvas.width,this._canvas.height);
@@ -4194,7 +4686,6 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	};
 
 	/**
-	* @protected
 	* @method process
 	* @memberOf tomahawk_ns.PixelFilter.prototype
 	* @description apply the filter process on the DisplayObject
@@ -4274,6 +4765,13 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 (function() {
 	
+	/**
+	 * @class ShadowBlurFilter
+	 * @description a basic ShadowBlurFilter
+	 * @memberOf tomahawk_ns
+	 * @augments tomahawk_ns.PixelFilter
+	 * @constructor
+	 **/
 	function ShadowBlurFilter()
 	{
 		tomahawk_ns.PixelFilter.apply(this);
@@ -4283,11 +4781,32 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	Tomahawk.registerClass( ShadowBlurFilter, "ShadowBlurFilter" );
 	Tomahawk.extend( "ShadowBlurFilter", "PixelFilter" );
 	
+	/**
+	* @member {Number} shadowOffsetX shadow offset on the x axis.
+	* @memberOf tomahawk_ns.ShadowBlurFilter.prototype
+	**/
 	ShadowBlurFilter.prototype.shadowOffsetX = 1;
+	/**
+	* @member {Number} shadowOffsetY shadow offset on the y axis.
+	* @memberOf tomahawk_ns.ShadowBlurFilter.prototype
+	**/
 	ShadowBlurFilter.prototype.shadowOffsetY = 1;
+	/**
+	* @member {Number} shadowBlur intensity of the shadow blur.
+	* @memberOf tomahawk_ns.ShadowBlurFilter.prototype
+	**/
 	ShadowBlurFilter.prototype.shadowBlur 	= 100;
+	/**
+	* @member {Number} shadowColor the color of the shadow.
+	* @memberOf tomahawk_ns.ShadowBlurFilter.prototype
+	**/
 	ShadowBlurFilter.prototype.shadowColor 	= "white";
-
+	
+	/**
+	* @method process
+	* @memberOf tomahawk_ns.ShadowBlurFilter.prototype
+	* @description apply the filter process on the DisplayObject
+	**/
 	ShadowBlurFilter.prototype.process = function()
 	{
 		var context = this._canvas.getContext("2d");
@@ -4340,18 +4859,16 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
  */
 
 (function() {
-	
-	/**
-	 * Contains properties and methods shared by all events for use with
-	 * 
+	 /**
 	 * @class Matrix2D
-	 * A Basic implementation of a Matrix3x3 
-	 * @param {Number} a.
-	 * @param {Number} b.
-	 * @param {Number} c.
-	 * @param {Number} d.
-	 * @param {Number} tx.
-	 * @param {Number} ty.
+	 * @description A Basic implementation of a Matrix3x3 
+	 * @memberOf tomahawk_ns
+	 * @param {Number} a
+	 * @param {Number} b
+	 * @param {Number} c
+	 * @param {Number} d
+	 * @param {Number} tx
+	 * @param {Number} ty
 	 * @constructor
 	 **/
 	function Matrix2D(a, b, c, d, tx, ty)
@@ -4363,47 +4880,22 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	Tomahawk.registerClass( Matrix2D, "Matrix2D" );
 	
 	Matrix2D.prototype._stack = null;
-
-	/**
-	 * Save the current Matrix state
-	 * @method save
-	 * @memberOf Matrix2D
-	 * @return null
-	 **/
-	Matrix2D.prototype.save = function()
-	{
-		this._stack.push(this.a,this.b,this.c,this.d,this.tx,this.ty);
-	};
-
-	/**
-	 * Restore the las saved matrix state
-	 * @method save
-	 * @memberOf Matrix2D
-	 * @return null
-	 **/
-	Matrix2D.prototype.restore = function()
-	{
-		this.ty = this._stack.pop();
-		this.tx = this._stack.pop();
-		this.d = this._stack.pop();
-		this.c = this._stack.pop();
-		this.b = this._stack.pop();
-		this.a = this._stack.pop();
-	};
-
+	
 	// static public properties:
 	/**
 	 * An identity matrix, representing a null transformation.
+	 * @memberOf tomahawk_ns.Matrix2D
 	 * @property identity
 	 * @static
 	 * @type Matrix2D
-	 * @memberOf Matrix2D
+	 * @memberOf tomhawk_ns.Matrix2D
 	 * @readonly
 	 **/
-	Matrix2D.prototype.identity = null;// set at bottom of class definition.
+	Matrix2D.identity = null;// set at bottom of class definition.
 
 	/**
 	 * Multiplier for converting degrees to radians. Used internally by Matrix2D.
+	 * @memberOf tomahawk_ns.Matrix2D
 	 * @property DEG_TO_RAD
 	 * @static
 	 * @final
@@ -4412,52 +4904,55 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	 **/
 	Matrix2D.DEG_TO_RAD = Math.PI/180;
 
+	
+	
+	
 
 // public properties:
 	/**
 	 * Position (0, 0) in a 3x3 affine transformation matrix.
-	 * @property a
+	 * @member a
 	 * @type Number
-	 * @memberOf Matrix2D
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 **/
 	Matrix2D.prototype.a = 1;
 
 	/**
 	 * Position (0, 1) in a 3x3 affine transformation matrix.
-	 * @property b
-	 * @memberOf Matrix2D
+	 * @member b
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @type Number
 	 **/
 	Matrix2D.prototype.b = 0;
 
 	/**
 	 * Position (1, 0) in a 3x3 affine transformation matrix.
-	 * @property c
-	 * @memberOf Matrix2D
+	 * @member c
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @type Number
 	 **/
 	Matrix2D.prototype.c = 0;
 
 	/**
 	 * Position (1, 1) in a 3x3 affine transformation matrix.
-	 * @property d
-	 * @memberOf Matrix2D
+	 * @member d
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @type Number
 	 **/
 	Matrix2D.prototype.d = 1;
 
 	/**
 	 * Position (2, 0) in a 3x3 affine transformation matrix.
-	 * @property tx
-	 * @memberOf Matrix2D
+	 * @member tx
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @type Number
 	 **/
 	Matrix2D.prototype.tx = 0;
 
 	/**
 	 * Position (2, 1) in a 3x3 affine transformation matrix.
-	 * @property ty
-	 * @memberOf Matrix2D
+	 * @member ty
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @type Number
 	 **/
 	Matrix2D.prototype.ty = 0;
@@ -4468,7 +4963,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	/**
 	 * Initialization method. Can also be used to reinitialize the instance.
 	 * @method initialize
-	 * @memberOf Matrix2D
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @param {Number} [a=1] Specifies the a property for the new matrix.
 	 * @param {Number} [b=0] Specifies the b property for the new matrix.
 	 * @param {Number} [c=0] Specifies the c property for the new matrix.
@@ -4491,6 +4986,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	/**
 	 * Concatenates the specified matrix properties with this matrix. All parameters are required.
 	 * @method prepend
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @param {Number} a
 	 * @param {Number} b
 	 * @param {Number} c
@@ -4514,9 +5010,38 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		return this;
 	};
 
+		/**
+	 * @description Save the current Matrix state
+	 * @method save
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
+	 * @return null
+	 **/
+	Matrix2D.prototype.save = function()
+	{
+		this._stack.push(this.a,this.b,this.c,this.d,this.tx,this.ty);
+	};
+
+	/**
+	 * Restore the las saved matrix state
+	 * @method save
+	 * @memberOf tomhawk_ns.Matrix2D.prototype
+	 * @return null
+	 **/
+	Matrix2D.prototype.restore = function()
+	{
+		this.ty = this._stack.pop();
+		this.tx = this._stack.pop();
+		this.d = this._stack.pop();
+		this.c = this._stack.pop();
+		this.b = this._stack.pop();
+		this.a = this._stack.pop();
+	};
+
+	
 	/**
 	 * Appends the specified matrix properties with this matrix. All parameters are required.
 	 * @method append
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @param {Number} a
 	 * @param {Number} b
 	 * @param {Number} c
@@ -4543,6 +5068,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	/**
 	 * Prepends the specified matrix with this matrix.
 	 * @method prependMatrix
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @param {Matrix2D} matrix
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
@@ -4554,6 +5080,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	/**
 	 * Appends the specified matrix with this matrix.
 	 * @method appendMatrix
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @param {Matrix2D} matrix
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
@@ -4567,6 +5094,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	 * For example, you can use this to generate a matrix from a display object: var mtx = new Matrix2D();
 	 * mtx.prependTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation);
 	 * @method prependTransform
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @param {Number} x
 	 * @param {Number} y
 	 * @param {Number} scaleX
@@ -4609,6 +5137,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	 * For example, you can use this to generate a matrix from a display object: var mtx = new Matrix2D();
 	 * mtx.appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation);
 	 * @method appendTransform
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @param {Number} x
 	 * @param {Number} y
 	 * @param {Number} scaleX
@@ -4652,6 +5181,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	/**
 	 * Applies a rotation transformation to the matrix.
 	 * @method rotate
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @param {Number} angle The angle in radians. To use degrees, multiply by <code>Math.PI/180</code>.
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
@@ -4675,6 +5205,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	/**
 	 * Applies a skew transformation to the matrix.
 	 * @method skew
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @param {Number} skewX The amount to skew horizontally in degrees.
 	 * @param {Number} skewY The amount to skew vertically in degrees.
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
@@ -4689,6 +5220,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	/**
 	 * Applies a scale transformation to the matrix.
 	 * @method scale
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @param {Number} x The amount to scale horizontally
 	 * @param {Number} y The amount to scale vertically
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
@@ -4706,6 +5238,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	/**
 	 * Translates the matrix on the x and y axes.
 	 * @method translate
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @param {Number} x
 	 * @param {Number} y
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
@@ -4719,6 +5252,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	/**
 	 * Sets the properties of the matrix to those of an identity matrix (one that applies a null transformation).
 	 * @method identity
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
 	Matrix2D.prototype.identity = function() {
@@ -4730,6 +5264,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	/**
 	 * Inverts the matrix, causing it to perform the opposite transformation.
 	 * @method invert
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
 	Matrix2D.prototype.invert = function() {
@@ -4752,6 +5287,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	/**
 	 * Returns true if the matrix is an identity matrix.
 	 * @method isIdentity
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @return {Boolean}
 	 **/
 	Matrix2D.prototype.isIdentity = function() {
@@ -4761,10 +5297,11 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	/**
 	 * Transforms a point according to this matrix.
 	 * @method transformPoint
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @param {Number} x The x component of the point to transform.
 	 * @param {Number} y The y component of the point to transform.
 	 * @param {Point | Object} [pt] An object to copy the result into. If omitted a generic object with x/y properties will be returned.
-	 * @return {Point} This matrix. Useful for chaining method calls.
+	 * @return {Point}
 	 **/
 	Matrix2D.prototype.transformPoint = function(x, y, pt) {
 		pt = pt||{};
@@ -4778,6 +5315,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	 * may not match the transform properties you used to generate the matrix, though they will produce the same visual
 	 * results.
 	 * @method decompose
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @param {Object} target The object to apply the transform properties to. If null, then a new object will be returned.
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	*/
@@ -4809,6 +5347,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	/**
 	 * Reinitializes all matrix properties to those specified.
 	 * @method reinitialize
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @param {Number} [a=1] Specifies the a property for the new matrix.
 	 * @param {Number} [b=0] Specifies the b property for the new matrix.
 	 * @param {Number} [c=0] Specifies the c property for the new matrix.
@@ -4825,6 +5364,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	/**
 	 * Copies all properties from the specified matrix to this matrix.
 	 * @method copy
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @param {Matrix2D} matrix The matrix to copy properties from.
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	*/
@@ -4835,6 +5375,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	/**
 	 * Returns a clone of the Matrix2D instance.
 	 * @method clone
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @return {Matrix2D} a clone of the Matrix2D instance.
 	 **/
 	Matrix2D.prototype.clone = function() {
@@ -4844,13 +5385,14 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	/**
 	 * Returns a string representation of this object.
 	 * @method toString
+	 * @memberOf tomahawk_ns.Matrix2D.prototype
 	 * @return {String} a string representation of the instance.
 	 **/
 	Matrix2D.prototype.toString = function() {
 		return "[Matrix2D (a="+this.a+" b="+this.b+" c="+this.c+" d="+this.d+" tx="+this.tx+" ty="+this.ty+")]";
 	};
 
-	// this has to be populated after the class is defined:
+	
 	Matrix2D.identity = new Matrix2D();
 	tomahawk_ns.Matrix2D = Matrix2D;
 	
@@ -4889,15 +5431,46 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 */
 
 (function() {
-
+ /**
+ * @class Matrix4x4
+ * @description A Basic implementation of a Matrix4x4 
+ * @memberOf tomahawk_ns
+ * @constructor
+ **/
 function Matrix4x4()
 {
 	this.init (1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
 }
 
-// public
+/**
+ * @memberOf tomahawk_ns.Matrix2D.prototype
+ * @member {Array} data
+ * @description a 16 elements Array that contains the matrix data [a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p]
+ * @readonly
+ **/
 Matrix4x4.prototype.data = null;
 
+ /**
+ * @method init
+ * @description initialize the matrix properties
+ * @memberOf tomahawk_ns.Matrix4x4.prototype
+ * @param {Number} a
+ * @param {Number} b
+ * @param {Number} c
+ * @param {Number} d
+ * @param {Number} e
+ * @param {Number} f
+ * @param {Number} g
+ * @param {Number} h
+ * @param {Number} i
+ * @param {Number} j
+ * @param {Number} k
+ * @param {Number} l
+ * @param {Number} m
+ * @param {Number} n
+ * @param {Number} o
+ * @param {Number} p
+ **/
 Matrix4x4.prototype.init = function( 		a, b, c, d, 
 											e, f, g, h, 
 											i, j, k, l, 
@@ -4929,6 +5502,12 @@ Matrix4x4.prototype.init = function( 		a, b, c, d,
 	
 };
 
+/**
+* @method clone
+* @memberOf tomahawk_ns.Matrix4x4.prototype
+* @description return a clone of the matrix
+* @returns {Matrix4x4}
+**/
 Matrix4x4.prototype.clone = function()
 {
 	var matrix = new tomahawk_ns.Matrix4x4();
@@ -4942,6 +5521,15 @@ Matrix4x4.prototype.clone = function()
 	return matrix;
 };
 
+/**
+* @method translate
+* @memberOf tomahawk_ns.Matrix4x4.prototype
+* @description translate the matrix by tx, ty, and tz
+* @param {Number} tx
+* @param {Number} ty
+* @param {Number} tz
+* @returns {Matrix4x4} This instance. Useful for chaining method calls.
+**/
 Matrix4x4.prototype.translate = function( tx, ty, tz )
 {
 	tomahawk_ns.Matrix4x4._TRANSLATE_MATRIX.data[3] = tx;
@@ -4952,6 +5540,15 @@ Matrix4x4.prototype.translate = function( tx, ty, tz )
 	return this;
 };
 
+/**
+* @method scale
+* @memberOf tomahawk_ns.Matrix4x4.prototype
+* @description scale the matrix by sx, sy, and sz
+* @param {Number} sx
+* @param {Number} sy
+* @param {Number} sz
+* @returns {Matrix4x4} This instance. Useful for chaining method calls.
+**/
 Matrix4x4.prototype.scale = function( sx, sy, sz )
 {	
 	tomahawk_ns.Matrix4x4._SCALE_MATRIX.data[0] = sx;
@@ -4962,6 +5559,15 @@ Matrix4x4.prototype.scale = function( sx, sy, sz )
 	return this;
 };
 
+/**
+* @method rotate
+* @memberOf tomahawk_ns.Matrix4x4.prototype
+* @description rotate the matrix by rx, ry, and rz
+* @param {Number} rx
+* @param {Number} ry
+* @param {Number} rz
+* @returns {Matrix4x4} This instance. Useful for chaining method calls.
+**/
 Matrix4x4.prototype.rotate =  function( rx, ry, rz )
 {
 	var c = tomahawk_ns.Matrix4x4._cos[rx];
@@ -4996,6 +5602,13 @@ Matrix4x4.prototype.rotate =  function( rx, ry, rz )
 	return this;
 };
 
+/**
+* @method rotateX
+* @memberOf tomahawk_ns.Matrix4x4.prototype
+* @description rotate the matrix by p_rotation degrees on the x axis
+* @param {Number} p_rotation
+* @returns {Matrix4x4} This instance. Useful for chaining method calls.
+**/
 Matrix4x4.prototype.rotateX = function( p_rotation )
 {
 	var c = tomahawk_ns.Matrix4x4._cos[p_rotation];
@@ -5010,6 +5623,13 @@ Matrix4x4.prototype.rotateX = function( p_rotation )
 	return this;
 };
 
+/**
+* @method rotateY
+* @memberOf tomahawk_ns.Matrix4x4.prototype
+* @description rotate the matrix by p_rotation degrees on the y axis
+* @param {Number} p_rotation
+* @returns {Matrix4x4} This instance. Useful for chaining method calls.
+**/
 Matrix4x4.prototype.rotateY = function( p_rotation )
 {
 	var c = tomahawk_ns.Matrix4x4._cos[p_rotation];
@@ -5025,6 +5645,13 @@ Matrix4x4.prototype.rotateY = function( p_rotation )
 	return this;
 };
 
+/**
+* @method rotateZ
+* @memberOf tomahawk_ns.Matrix4x4.prototype
+* @description rotate the matrix by p_rotation degrees on the z axis
+* @param {Number} p_rotation
+* @returns {Matrix4x4} This instance. Useful for chaining method calls.
+**/
 Matrix4x4.prototype.rotateZ = function( p_rotation )
 {
 	var c = tomahawk_ns.Matrix4x4._cos[p_rotation];
@@ -5040,6 +5667,13 @@ Matrix4x4.prototype.rotateZ = function( p_rotation )
 	return this;
 };
 
+/**
+* @method multiplyByNumber
+* @memberOf tomahawk_ns.Matrix4x4.prototype
+* @description multiply the current matrix by p_number
+* @param {Number} p_number
+* @returns {Matrix4x4} This instance. Useful for chaining method calls.
+**/
 Matrix4x4.prototype.multiplyByNumber = function( p_number )
 {
 	var data1 = this.data;
@@ -5064,11 +5698,26 @@ Matrix4x4.prototype.multiplyByNumber = function( p_number )
 	return this;
 };
 
-Matrix4x4.prototype.prependMatrix = function(matrix)
-{
-	return matrix.clone().appendMatrix(this);
-};
 
+/**
+* @method appendTransform
+* @memberOf tomahawk_ns.Matrix4x4.prototype
+* @description append transformation on the current matrix around the point defined by pivotX, pivotY and pivotZ
+* @param {Number} p_number
+* @param {Number} x
+* @param {Number} y
+* @param {Number} z
+* @param {Number} scaleX
+* @param {Number} scaleY
+* @param {Number} scaleZ
+* @param {Number} rotationX
+* @param {Number} rotationY
+* @param {Number} rotationZ
+* @param {Number} pivotX
+* @param {Number} pivotY
+* @param {Number} pivotZ
+* @returns {Matrix4x4} This instance. Useful for chaining method calls.
+**/
 Matrix4x4.prototype.appendTransform = function(	x, 
 												y, 
 												z,
@@ -5089,6 +5738,13 @@ Matrix4x4.prototype.appendTransform = function(	x,
 				.translate(-pivotX,-pivotY,-pivotZ);
 };
 
+/**
+ * Prepends the specified matrix with this matrix.
+ * @method prependMatrix
+ * @memberOf tomahawk_ns.Matrix4x4.prototype
+ * @param {Matrix4x4} matrix
+ * @return {Matrix4x4} This matrix. Useful for chaining method calls.
+ **/
 Matrix4x4.prototype.prependMatrix = function( p_mat )
 {
 	var data1 = this.data;
@@ -5127,6 +5783,13 @@ Matrix4x4.prototype.prependMatrix = function( p_mat )
 	return this;
 };
 
+/**
+ * Appends the specified matrix with this matrix.
+ * @method appendMatrix
+ * @memberOf tomahawk_ns.Matrix4x4.prototype
+ * @param {Matrix4x4} matrix
+ * @return {Matrix4x4} This matrix. Useful for chaining method calls.
+ **/
 Matrix4x4.prototype.appendMatrix = function( p_mat )
 {
 	var data1 = this.data;
@@ -5165,7 +5828,12 @@ Matrix4x4.prototype.appendMatrix = function( p_mat )
 	return this;
 };
 
-
+/**
+ * get the matrix determinant
+ * @method appendMatrix
+ * @memberOf tomahawk_ns.Matrix4x4.prototype
+ * @return {Number} the matrix determinant
+ **/
 Matrix4x4.prototype.determinant = function() 
 {
 		var data = this.data;
@@ -5183,12 +5851,24 @@ Matrix4x4.prototype.determinant = function()
                         a20*a01*a12*a33 - a00*a21*a12*a33 - a10*a01*a22*a33 + a00*a11*a22*a33 	);
 };
 
+/**
+ * Sets the properties of the matrix to those of an identity matrix (one that applies a null transformation).
+ * @method identity
+ * @memberOf tomahawk_ns.Matrix4x4.prototype
+ * @return {Matrix4x4} This matrix. Useful for chaining method calls.
+ **/
 Matrix4x4.prototype.identity = function()
 {
 	this.init( 1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1 );
 	return this;
 };
 
+/**
+ * Inverts the matrix, causing it to perform the opposite transformation.
+ * @method invert
+ * @memberOf tomahawk_ns.Matrix4x4.prototype
+ * @return {Matrix4x4} This matrix. Useful for chaining method calls.
+ **/
 Matrix4x4.prototype.invert = function() 
 {
 	var data = this.data;
@@ -5235,6 +5915,12 @@ Matrix4x4.prototype.invert = function()
 	return this;
 };
 
+/**
+ * Transposes the matrix
+ * @method transpose
+ * @memberOf tomahawk_ns.Matrix4x4.prototype
+ * @return {Matrix4x4} This matrix. Useful for chaining method calls.
+ **/
 Matrix4x4.prototype.transpose = function() 
 {		
 	// Cache the matrix values (makes for huge speed increases!)
@@ -5265,7 +5951,12 @@ Matrix4x4.prototype.transpose = function()
 	return this;
 };
 
-
+/**
+ * Sets the matrix frustum
+ * @method frustum
+ * @memberOf tomahawk_ns.Matrix4x4.prototype
+ * @return {Matrix4x4} This matrix. Useful for chaining method calls.
+ **/
 Matrix4x4.prototype.frustum = function(left, right, bottom, top, near, far, dest) 
 {
 	var data = this.data;
@@ -5293,6 +5984,12 @@ Matrix4x4.prototype.frustum = function(left, right, bottom, top, near, far, dest
 	return this;
 };
 
+/**
+ * Applies a perspective on the current matrix
+ * @method perspective
+ * @memberOf tomahawk_ns.Matrix4x4.prototype
+ * @return {Matrix4x4} This matrix. Useful for chaining method calls.
+ **/
 Matrix4x4.prototype.perspective = function(fovy, aspect, near, far) 
 {
 	var top = near * Math.tan(fovy * Math.PI / 360);
@@ -5301,6 +5998,12 @@ Matrix4x4.prototype.perspective = function(fovy, aspect, near, far)
 	return this;
 };
 
+/**
+ * Applies an orthographic projection on the current matrix
+ * @method ortho
+ * @memberOf tomahawk_ns.Matrix4x4.prototype
+ * @return {Matrix4x4} This matrix. Useful for chaining method calls.
+ **/
 Matrix4x4.prototype.ortho = function(left, right, bottom, top, near, far ) 
 {
 	var lr = (left - right);
@@ -5327,6 +6030,12 @@ Matrix4x4.prototype.ortho = function(left, right, bottom, top, near, far )
 	return this;
 };
 
+/**
+ * Returns a string representation of this object.
+ * @method toString
+ * @memberOf tomahawk_ns.Matrix4x4.prototype
+ * @return {String} a string representation of the instance.
+ **/
 Matrix4x4.prototype.str = function() 
 {
 	var data = this.data;
@@ -5337,7 +6046,13 @@ Matrix4x4.prototype.str = function()
 };
 
 
-
+/**
+ * Transforms a Point3D according to this matrix.
+ * @method transformPoint3D
+ * @memberOf tomahawk_ns.Matrix4x4.prototype
+ * @param {tomahawk_ns.Point3D}
+ * @return {tomahawk_ns.Point3D}
+ **/
 Matrix4x4.prototype.transformPoint3D = function(point3D)
 {	
 	//var x = point3D.x, y = point3D.y, z = point3D.z;
@@ -5355,7 +6070,13 @@ Matrix4x4.prototype.transformPoint3D = function(point3D)
 	return point3D;
 };
 
-
+/**
+ * Converts the "mat" matrix into a Matrix2D
+ * @method toMatrix2D
+ * @memberOf tomahawk_ns.Matrix4x4
+ * @param {tomahawk_ns.Matrix4x4} mat the matrix you want to convert
+ * @return {tomahawk_ns.Matrix2D}
+ **/
 Matrix4x4.toMatrix2D = function(mat)
 {
 	var matrix2D = new tomahawk_ns.Matrix2D();
@@ -5369,6 +6090,13 @@ Matrix4x4.toMatrix2D = function(mat)
 	return matrix2D;
 };
 
+/**
+ * Converts the "mat2d" matrix into a Matrix4x4
+ * @method toMatrix4x4
+ * @memberOf tomahawk_ns.Matrix4x4
+ * @param {tomahawk_ns.Matrix2D} mat the matrix you want to convert
+ * @return {tomahawk_ns.Matrix4x4}
+ **/
 Matrix4x4.toMatrix4x4 = function(mat2d)
 {
 	var mat = new tomahawk_ns.Matrix4x4();
@@ -5381,9 +6109,6 @@ Matrix4x4.toMatrix4x4 = function(mat2d)
 	
 	return mat;
 };
-
-
-// static
 
 
 
@@ -5518,7 +6243,15 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 
 (function() {
 	
-
+	
+	/**
+	 * @class Point
+	 * @description Represents a basic 2d point
+	 * @memberOf tomahawk_ns
+	 * @param {Number} x the x value of the point on the x axis
+	 * @param {Number} y the y value of the point on the y axis
+	 * @constructor
+	 **/
 	function Point(x,y)
 	{
 		this.x = x, this.y = y
@@ -5526,8 +6259,26 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	
 	Tomahawk.registerClass( Point, "Point" );
 	
+	/**
+	* @member {Number} x the x position of  the point
+	* @memberOf tomahawk_ns.Point.prototype
+	**/
+	Point.prototype.x = 0;
+	/**
+	* @member {Number} y the y position of  the point
+	* @memberOf tomahawk_ns.Point.prototype
+	**/
+	Point.prototype.y = 0;
 	
-	//static
+	
+	/**
+	* @method distanceBetween
+	* @description returns a distance between two points
+	* @memberOf tomahawk_ns.Point
+	* @param {tomahawk_ns.Point} pointA
+	* @param {tomahawk_ns.Point} pointB
+	* @returns {Number}
+	**/
 	Point.distanceBetween = function(pointA, pointB)
 	{
 		var distX = ( pointB.x - pointA.x ) * ( pointB.x - pointA.x );
@@ -5536,8 +6287,7 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		return segLength;
 	};
 	
-	Point.prototype.x = 0;
-	Point.prototype.y = 0;
+
 	
 	tomahawk_ns.Point = Point;
 })();
@@ -5575,7 +6325,15 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 
 (function() {
 	
-
+	/**
+	 * @class Point3D
+	 * @memberOf tomahawk_ns
+	 * @description a basic 3D point
+	 * @constructor
+	 * @param {Number} x the value on the x axis
+	 * @param {Number} y the value on the y axis
+	 * @param {Number} z the value on the z axis
+	 **/
 	function Point3D(x,y,z)
 	{
 		this.x = x || 0;
@@ -5585,9 +6343,26 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	
 	Tomahawk.registerClass( Point3D, "Point3D" );
 	
-	
+	/**
+	* @member x
+	* @memberOf tomahawk_ns.Point3D.prototype
+	* @type {Number}
+	* @description the value on the x axis.
+	**/
 	Point3D.prototype.x = 0;
+	/**
+	* @member y
+	* @memberOf tomahawk_ns.Point3D.prototype
+	* @type {Number}
+	* @description the value on the y axis.
+	**/
 	Point3D.prototype.y = 0;
+	/**
+	* @member z
+	* @memberOf tomahawk_ns.Point3D.prototype
+	* @type {Number}
+	* @description the value on the z axis.
+	**/
 	Point3D.prototype.z = 0;
 	
 	
@@ -5596,24 +6371,109 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 
 
 
-/**
- * @author The Tiny Spark
- */
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
  
  (function() {
-	
+	 
+	/**
+	 * @class Rectangle
+	 * @memberOf tomahawk_ns
+	 * @description Represents a rectangle
+	 * @constructor
+	 **/
+	function Rectangle(){}
 	
 	Tomahawk.registerClass(Rectangle,"Rectangle");
 
-	function Rectangle(){}
-
+	/**
+	* @member x
+	* @memberOf tomahawk_ns.Rectangle.prototype
+	* @type {Number}
+	* @description The x coordinate of the top-left corner of the rectangle.
+	**/
 	Rectangle.prototype.x 		= 0;
+	
+	/**
+	* @member y
+	* @memberOf tomahawk_ns.Rectangle.prototype
+	* @type {Number}
+	* @description The y coordinate of the top-left corner of the rectangle.
+	**/
 	Rectangle.prototype.y 		= 0;
+	
+	/**
+	* @member width
+	* @memberOf tomahawk_ns.Rectangle.prototype
+	* @type {Number}
+	* @description the width of the rectangle, in pixels.
+	**/
 	Rectangle.prototype.width 	= 0;
+	
+	/**
+	* @member height
+	* @memberOf tomahawk_ns.Rectangle.prototype
+	* @type {Number}
+	* @description the height of the rectangle, in pixels.
+	**/
 	Rectangle.prototype.height 	= 0;
+	
+	/**
+	* @member left
+	* @memberOf tomahawk_ns.Rectangle.prototype
+	* @type {Number}
+	* @description The x coordinate of the top-left corner of the rectangle.
+	**/
 	Rectangle.prototype.left 	= 0;
+	
+	/**
+	* @member right
+	* @memberOf tomahawk_ns.Rectangle.prototype
+	* @type {Number}
+	* @description The sum of the x and width properties.
+	**/
 	Rectangle.prototype.right 	= 0;
+	
+	/**
+	* @member top
+	* @memberOf tomahawk_ns.Rectangle.prototype
+	* @type {Number}
+	* @description The y coordinate of the top-left corner of the rectangle.
+	**/
+	
 	Rectangle.prototype.top 	= 0;
+	/**
+	* @member bottom
+	* @memberOf tomahawk_ns.Rectangle.prototype
+	* @type {Number}
+	* @description The sum of the y and height properties.
+	**/
 	Rectangle.prototype.bottom 	= 0;
 
 	tomahawk_ns.Rectangle = Rectangle;
@@ -5653,6 +6513,12 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 
 (function() {
 	
+	/**
+	 * @class Vector3D
+	 * @memberOf tomahawk_ns
+	 * @description The Vector3D class represents a point or a location in the three-dimensional space using the Cartesian coordinates x, y, and z. As in a two-dimensional space, the x property represents the horizontal axis and the y property represents the vertical axis. In three-dimensional space, the z property represents depth.
+	 * @constructor
+	 **/
 	function Vector3D(x,y,z)
 	{
 		this.x = x || 0;
@@ -5662,11 +6528,45 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	
 	Tomahawk.registerClass( Vector3D, "Vector3D" );
 	
-	
+	/**
+	* @member x
+	* @memberOf tomahawk_ns.Vector3D.prototype
+	* @type {Number}
+	* @description The first element of a Vector3D object, such as the x coordinate of a point in the three-dimensional space.
+	**/
 	Vector3D.prototype.x = 0;
+	
+	/**
+	* @member y
+	* @memberOf tomahawk_ns.Vector3D.prototype
+	* @type {Number}
+	* @description The second element of a Vector3D object, such as the y coordinate of a point in the three-dimensional space.
+	**/
 	Vector3D.prototype.y = 0;
+	
+	/**
+	* @member z
+	* @memberOf tomahawk_ns.Vector3D.prototype
+	* @type {Number}
+	* @description The third element of a Vector3D object, such as the z coordinate of a point in three-dimensional space.
+	**/
 	Vector3D.prototype.z = 0;
 	
+	/**
+	* @member w
+	* @memberOf tomahawk_ns.Vector3D.prototype
+	* @type {Number}
+	* @description The fourth element of a Vector3D object (in addition to the x, y, and z properties) can hold data such as the angle of rotation.
+	**/
+	Vector3D.prototype.w = 0;
+	
+	/**
+	* @method crossProduct
+	* @memberOf tomahawk_ns.Vector3D.prototype
+	* @param {tomahawk_ns.Vector3D} vector A second Vector3D object.
+	* @returns {tomahawk_ns.Vector3D} This Vector3D. Useful for chaining method calls.
+	* @description Returns a new Vector3D object that is perpendicular (at a right angle) to the current Vector3D and another Vector3D object.
+	**/
 	Vector3D.prototype.crossProduct = function(vector)
 	{
 		var x = this.y * vector.z - this.z * vector.y;
@@ -5717,25 +6617,96 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 
 (function() {
 	
-	function Font(fontName, fontURL )
+	/**
+	 * @class Font
+	 * @memberOf tomahawk_ns
+	 * @description The Font class is currently useful only to find out information about fonts; you cannot alter a font by using this class. You cannot use the Font class to load external fonts.
+	 * @constructor
+	 **/
+	function Font(fontName)
 	{
 		this.name = fontName;
-		this.url = fontURL;
 		this.sizes = new Object();
 	}
+		
+	/**
+	* @member name
+	* @memberOf tomahawk_ns.Font.prototype
+	* @type {string}
+	* @description the font name
+	**/
+	Font.prototype.name = null;
 	
-	Font._div = document.createElement("div");
-	Font._style = document.createElement("style");
-	Font._fonts = new Object();
+	/**
+	* @member bold
+	* @memberOf tomahawk_ns.Font.prototype
+	* @type {Boolean}
+	* @description defines if the font is bold or not.
+	**/
+	Font.prototype.bold = false;
+	
+	/**
+	* @member italic
+	* @memberOf tomahawk_ns.Font.prototype
+	* @type {Boolean}
+	* @description defines if the font is in italic or not.
+	**/
+	Font.prototype.italic = false;
+	
+	/**
+	* @protected
+	* @member baseSize
+	* @memberOf tomahawk_ns.Font.prototype
+	* @type {Number}
+	* @description the base size of the font, used internally to measure text.
+	**/
+	Font.prototype.baseSize = 60;
+	
+	/**
+	* @protected
+	* @member sizes
+	* @memberOf tomahawk_ns.Font.prototype
+	* @type {Object}
+	* @description An object that stores all the sizes of each character in the corresponding font.
+	**/
+	Font.prototype.sizes = null;
+		
+	/**
+	* @member maxWidth
+	* @memberOf tomahawk_ns.Font.prototype
+	* @type {Number}
+	* @description max char width for this font
+	**/
 	Font.prototype.maxWidth = 0;
+	
+	/**
+	* @member maxHeight
+	* @memberOf tomahawk_ns.Font.prototype
+	* @type {Number}
+	* @description max char height for this font
+	**/
 	Font.prototype.maxHeight = 0;
 	
+	
+	/**
+	* @method addFont
+	* @description create and register a new Font object, you have to specify a 'valid' font name, Arial for example.
+	* @memberOf tomahawk_ns.Font
+	* @param {string} fontName the font name.
+	**/
 	Font.addFont = function(fontName, fontURL)
 	{
-		var font = new tomahawk_ns.Font(fontName,fontURL);
+		var font = new tomahawk_ns.Font(fontName);
 		tomahawk_ns.Font._fonts[fontName] = font;
 	};	
 	
+	/**
+	* @method getFont
+	* @description get an instance of Font according to the fontName passed in param, you have to specify a 'valid' font name, Arial for example. If there's no instance of {tomahawk_ns.Font} who matches the fontName, a regular one is automatically created.
+	* @memberOf tomahawk_ns.Font
+	* @param {string} fontName the font name
+	* @returns {tomahawk_ns.Font}
+	**/
 	Font.getFont = function(fontName)
 	{
 		if( !tomahawk_ns.Font._fonts[fontName])
@@ -5746,13 +6717,14 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		return tomahawk_ns.Font._fonts[fontName];
 	};
 	
-	Font.prototype.name = null;
-	Font.prototype.url = null;
-	Font.prototype.bold = false;
-	Font.prototype.italic = false;
-	Font.prototype.baseSize = 60;
-	Font.prototype.sizes = null;
-	
+	/**
+	* @method measureText
+	* @description calculate the width and the height of the text passed in param, for the font size passed in param.
+	* @memberOf tomahawk_ns.Font.prototype
+	* @param {string} text the text you want to measure
+	* @param {Numbr} size the fontSize of the text
+	* @returns {Object} an object with 'width' and 'height' properties
+	**/
 	Font.prototype.measureText = function(text, size)
 	{
 		var div = Font._div;
@@ -5798,6 +6770,10 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		return result;
 	};
 
+	Font._div = document.createElement("div");
+	Font._style = document.createElement("style");
+	Font._fonts = new Object();
+	
 	tomahawk_ns.Font = Font;
 })();
 
@@ -5834,6 +6810,13 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 
 (function() {
 	
+	/**
+	 * @class InputTextField
+	 * @memberOf tomahawk_ns
+	 * @description The InputTextField class is used to create display objects for text display,selection and input.
+	 * @constructor
+	 * @augments tomahawk_ns.SelectableTextField
+	 **/
 	function InputTextField()
 	{
 		tomahawk_ns.SelectableTextField.apply(this);
@@ -5842,7 +6825,7 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 
 	Tomahawk.registerClass(InputTextField,"InputTextField");
 	Tomahawk.extend("InputTextField","SelectableTextField");
-	
+
 	InputTextField.prototype.setFocus = function(value)
 	{
 		tomahawk_ns.SelectableTextField.prototype.setFocus.apply(this,[value]);
@@ -5898,11 +6881,10 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 			{
 				if( event.keyCode == tomahawk_ns.Keyboard.ENTER )
 				{
-					text = "";
-					newline = true;
+					text = "\n";
 				}
 				
-				this.addCharAt(text,this.getCurrentIndex() + 1, newline);
+				this.addCharAt(text,this.getCurrentIndex() + 1);
 			}
 		}
 	};
@@ -5943,7 +6925,13 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 
 (function() {
 	
- 
+	/**
+	 * @class Letter
+	 * @memberOf tomahawk_ns
+	 * @description A Letter object is a DisplayObject that displays a Letter according to his format.
+	 * @augments tomahawk_ns.DisplayObject
+	 * @constructor
+	 **/
 	function Letter(value)
 	{
 		tomahawk_ns.DisplayObject.apply(this);		
@@ -5955,22 +6943,74 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	Tomahawk.registerClass(Letter,"Letter");
 	Tomahawk.extend("Letter","DisplayObject");
 
+	/**
+	* @member newline
+	* @memberOf tomahawk_ns.Letter.prototype
+	* @type {Boolean}
+	* @description Defines if the character is a newline character
+	**/
 	Letter.prototype.newline 			= false;
+	/**
+	* @member value
+	* @memberOf tomahawk_ns.Letter.prototype
+	* @type {string}
+	* @description The value of the character (a or b or ... )
+	**/
 	Letter.prototype.value 				= "";
+	/**
+	* @member format
+	* @memberOf tomahawk_ns.Letter.prototype
+	* @type {tomahawk_ns.TextFormat}
+	* @description An instance of TextFormat.
+	**/
 	Letter.prototype.format 			= null;
+	/**
+	* @member index
+	* @memberOf tomahawk_ns.Letter.prototype
+	* @type {tNumber}
+	* @description The position of the letter in the TextField
+	**/
 	Letter.prototype.index 				= 0;
+	/**
+	* @member textWidth
+	* @memberOf tomahawk_ns.Letter.prototype
+	* @type {Number}
+	* @description The actual width of this letter
+	**/
 	Letter.prototype.textWidth 			= 0;	
+	/**
+	* @member textHeight
+	* @memberOf tomahawk_ns.Letter.prototype
+	* @type {Number}
+	* @description The actual height of this letter
+	**/
 	Letter.prototype.textHeight 		= 0;	
+	/**
+	* @member selected
+	* @memberOf tomahawk_ns.Letter.prototype
+	* @type {Boolean}
+	* @description Defines if the letter is selected or not
+	**/
 	Letter.prototype.selected			= false;
 	Letter._metricsContext				= null;
 	
-	
+	/**
+	* @method setTextFormat
+	* @memberOf tomahawk_ns.Letter.prototype
+	* @description Sets the letter format
+	* @param {tomahawk_ns.TextFormat} value the instance of TextFormat
+	**/
 	Letter.prototype.setTextFormat = function(value)
 	{
 		this.format = value;
 		this.updateMetrics();
 	};
 
+	/**
+	* @method updateMetrics
+	* @memberOf tomahawk_ns.Letter.prototype
+	* @description Update all the measure of the letter
+	**/
 	Letter.prototype.updateMetrics = function()
 	{
 		
@@ -6006,6 +7046,12 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		//context.restore();
 	};
 
+	/**
+	* @method draws the DisplayObject on the stage
+	* @memberOf tomahawk_ns.Letter.prototype
+	* @description Draws the display object into the specified context
+	* @param {Canvas2DRenderingContext} the context of the canvas on which you want to draw the DisplayObject
+	**/
 	Letter.prototype.draw = function(context)
 	{
 		if( this.selected == true )
@@ -6045,6 +7091,13 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		}	
 	};
 
+	
+	/**
+	* @method clone
+	* @memberOf tomahawk_ns.Letter.prototype
+	* @description returns a clone of this Letter
+	* @returns {tomahawk_ns.Letter} a new Letter object
+	**/
 	Letter.prototype.clone = function()
 	{
 		var letter = new tomahawk_ns.Letter(this.value);
@@ -6096,7 +7149,13 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 
 (function() {
 	
-
+	/**
+	 * @class SelectableTextField
+	 * @memberOf tomahawk_ns
+	 * @description The SelectableTextField class is used to create display objects for text display and selection.
+	 * @constructor
+	 * @augments tomahawk_ns.TextField
+	 **/
 	function SelectableTextField()
 	{
 		tomahawk_ns.TextField.apply(this);
@@ -6118,26 +7177,6 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		return null;
 	};
 
-	SelectableTextField.prototype._selectCurrentWord = function()
-	{
-		this.unSelect();
-		var range = this.getWordRangeAt(this.getCurrentIndex());
-		this.selectBetween(range.start,range.end);
-	};
-
-	SelectableTextField.prototype._setIndexUnderMouse = function(x,y)
-	{
-		var pt = this.globalToLocal(x, y);
-		var letters = this.getLettersIn(pt.x,pt.y,1,1);
-		this.unSelect();
-		
-		if( letters.length > 0 )
-		{
-			this.setCurrentIndex( letters[0].index );
-		}
-	};
-
-	
 	SelectableTextField.prototype.setFocus = function(value)
 	{
 		tomahawk_ns.TextField.prototype.setFocus.apply(this,[value]);
@@ -6158,6 +7197,34 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		this.unSelect();
 	};
 	
+	SelectableTextField.prototype._selectCurrentWord = function()
+	{
+		this.unSelect();
+		var word = this.getWordAt(this.getCurrentIndex());
+		var start = -1;
+		var end = -1;
+		
+		if( word != null )
+		{			
+			start = word.getStartIndex();
+			end = word.getEndIndex();
+		}
+		
+		this.selectBetween(start,end);
+	};
+
+	SelectableTextField.prototype._setIndexUnderMouse = function(x,y)
+	{
+		var pt = this.globalToLocal(x, y);
+		var letters = this.getLettersIn(pt.x,pt.y,1,1);
+		this.unSelect();
+		
+		if( letters.length > 0 )
+		{
+			this.setCurrentIndex( letters[0].index );
+		}
+	};
+
 	SelectableTextField.prototype._mouseEventHandler = function(event)
 	{
 		if( event.type == tomahawk_ns.MouseEvent.DOUBLE_CLICK )
@@ -6209,6 +7276,15 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 
 	};
 
+	/**
+	* @method selectInto
+	* @description Selects all the letters within the zone defined by the x,y,width,height parameters within the text field.
+	* @memberOf tomahawk_ns.SelectableTextField.prototype
+	* @param {Number} x the x position of the selection zone
+	* @param {Number} y the y position of the selection zone
+	* @param {Number} width the width of the selection zone
+	* @param {Number} height the height of the selection zone
+	**/
 	SelectableTextField.prototype.selectInto = function(x,y,width,height)
 	{
 		var result = this.getLettersIn(x,y,width,height);
@@ -6227,6 +7303,16 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		this.selectBetween(start,end);
 	};
 
+	/**
+	* @description Returns an Array of letters that match the zone defined by the x,y,width,height parameters within the text field.
+	* @method getLettersIn
+	* @memberOf tomahawk_ns.SelectableTextField.prototype
+	* @param {Number} x the x position of the selection zone
+	* @param {Number} y the y position of the selection zone
+	* @param {Number} width the width of the selection zone
+	* @param {Number} height the height of the selection zone
+	* @returns {Array} an Array of Letters objects
+	**/
 	SelectableTextField.prototype.getLettersIn = function(x,y,width,height)
 	{
 		var letters = this.getLetters();
@@ -6271,6 +7357,12 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		return result;
 	};
 
+	/**
+	* @method getSelectionRange
+	* @memberOf tomahawk_ns.SelectableTextField.prototype
+	* @returns {Object} An object with "start" and "end" properties
+	* @description Returns an object which defines the indexes between the text field is selected.
+	**/
 	SelectableTextField.prototype.getSelectionRange = function()
 	{
 		var start = -1;
@@ -6299,17 +7391,33 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		return {start: start, end: end};
 	};
 
+	/**
+	* @method isSelected
+	* @memberOf tomahawk_ns.SelectableTextField.prototype
+	* @returns {Boolean} true if selected, false it not.
+	* @description Indicates wether a portion of the text is selected within the text field.
+	**/
 	SelectableTextField.prototype.isSelected = function()
 	{
 		var range =  this.getSelectionRange();
 		return ( range.start >= 0 && range.end > range.start );
 	};
 
+	/**
+	* @method selectAll
+	* @memberOf tomahawk_ns.SelectableTextField.prototype
+	* @description Sets as selected all the text within the text field.
+	**/
 	SelectableTextField.prototype.selectAll = function()
 	{
 		this.selectBetween(0,this.getLetters().length);
 	};
 
+	/**
+	* @method unSelect
+	* @memberOf tomahawk_ns.SelectableTextField.prototype
+	* @description Removes all selection within the text field.
+	**/
 	SelectableTextField.prototype.unSelect = function()
 	{
 		var letters = this.getLetters();
@@ -6330,7 +7438,14 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		
 		this._refreshNextFrame = true;
 	};
-
+	
+	/**
+	* @method selectBetween
+	* @memberOf tomahawk_ns.SelectableTextField.prototype
+	* @param {Number} startIndex The zero-based index value of the first character in the selection (for example, the first character is 0, the second character is 1, and so on).
+	* @param {Number} endIndex  The zero-based index value of the last character in the selection.
+	* @description Sets as selected the text designated by the index values of the first and last characters, which are specified with the beginIndex and endIndex parameters.
+	**/
 	SelectableTextField.prototype.selectBetween = function(startIndex, endIndex)
 	{
 		var letters = this.getLetters();
@@ -6360,6 +7475,7 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		this._refreshNextFrame = true;
 	};
 
+	
 	tomahawk_ns.SelectableTextField = SelectableTextField;
 })();
 
@@ -6397,6 +7513,13 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 
 (function() {
 	
+	/**
+	 * @class TextField
+	 * @memberOf tomahawk_ns
+	 * @description The TextField class is used to create display objects for text display.
+	 * @constructor
+	 * @augments tomahawk_ns.DisplayObjectContainer
+	 **/
 	function TextField()
 	{
 		tomahawk_ns.DisplayObjectContainer.apply(this);
@@ -6409,16 +7532,96 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	Tomahawk.registerClass(TextField,"TextField");
 	Tomahawk.extend("TextField","DisplayObjectContainer");
 
+	/**
+	* @member forceRefresh
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @type {Boolean}
+	* @default false
+	* @description Forces the refresh of the TextField at every frame.
+	**/
 	TextField.prototype.forceRefresh		= false;		
+	
+	/**
+	* @member defaultTextFormat
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @type {tomahawk_ns.TextFormat}
+	* @default null
+	* @description Specifies the format applied to newly inserted text.
+	**/
 	TextField.prototype.defaultTextFormat 	= null;
-	TextField.prototype.currentIndex 		= null;
+	
+	/**
+	* @member currentIndex
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @type {Number}
+	* @default 0
+	* @description The index of the insertion point (caret) position.
+	**/
+	TextField.prototype.currentIndex 		= 0;
+	
+	/**
+	* @member background
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @type {Boolean}
+	* @default false
+	* @description Specifies whether the text field has a background fill. If true, the text field has a background fill. If false, the text field has no background fill. Use the backgroundColor property to set the background color of a text field.
+	**/
 	TextField.prototype.background 			= false;
+	
+	/**
+	* @member border
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @type {Boolean}
+	* @default false
+	* @description Specifies whether the text field has a border. If true, the text field has a border. If false, the text field has no border. Use the borderColor property to set the border color.
+	**/
 	TextField.prototype.border 				= false;
+	
+	/**
+	* @member padding
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @type {Number}
+	* @default 0
+	* @description Specifies the internal padding of the text field. 
+	**/
 	TextField.prototype.padding 			= 0;
-	TextField.prototype.backgroundColor 	= "white";
-	TextField.prototype.borderColor 		= "black";
+	
+	/**
+	* @member backgroundColor
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @type {string}
+	* @description The color of the text field background.
+	* @default "#ffffff"
+	**/
+	TextField.prototype.backgroundColor 	= "#ffffff";
+	
+	/**
+	* @member borderColor
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @type {string}
+	* @description The color of the text field border.
+	* @default "#000000"
+	**/
+	TextField.prototype.borderColor 		= "#000000";
+	
+	/**
+	* @member autoSize
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @type {Boolean}
+	* @description Specifies if the text field height will match the real text height.
+	* @default false
+	**/
 	TextField.prototype.autoSize 			= false;
+	
+	/**
+	* @member focusable
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @type {Boolean}
+	* @description Specifies if the current display object can have the focus or not.
+	* @default true
+	**/
 	TextField.prototype.focusable			= true;
+	
 	
 	TextField.prototype._focused 			= false;
 	TextField.prototype._lastWidth 			= 0;
@@ -6429,17 +7632,56 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	TextField.prototype._drawCursorTime 	= 0;
 	TextField.prototype._letters 			= null;
 	
+	
+	/**
+	* @property {String} ALIGN_LEFT left
+	* @memberOf tomahawk_ns.TextField
+	* @type {string}
+	* @description Constant aligns text to the left within the text field.
+	**/
 	TextField.ALIGN_LEFT 					= "left";
+
+	/**
+	* @property {String} ALIGN_CENTER center
+	* @memberOf tomahawk_ns.TextField
+	* @type {string}
+	* @description Constant centers the text in the text field.
+	**/
 	TextField.ALIGN_CENTER 					= "center";
+	
+	/**
+	* @property {String} ALIGN_RIGHT right
+	* @memberOf tomahawk_ns.TextField
+	* @type {string}
+	* @description Constant aligns text to the right within the text field.
+	**/
 	TextField.ALIGN_RIGHT 					= "right";
+	
+	/**
+	* @property {String} ALIGN_JUSTIFY justify
+	* @memberOf tomahawk_ns.TextField
+	* @type {string}
+	* @description Constant justifies text within the text field.
+	**/
 	TextField.ALIGN_JUSTIFY 				= "justify";
 
-	
+	/**
+	* @method getTextAlign
+	* @description Returns the current text align
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @returns {String} the current text align
+	**/
 	TextField.prototype.getTextAlign = function()
 	{
 		return this._textAlign;
 	};
 	
+	/**
+	* @method setTextAlign
+	* @description Sets the current text align
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @param {String} value the text align
+	**/
 	TextField.prototype.setTextAlign = function(value)
 	{
 		if( this._textAlign == value )
@@ -6449,6 +7691,12 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		this._refreshNextFrame = true;
 	};
 	
+	/**
+	* @method setCurrentIndex
+	* @description Sets the index of the insertion point (caret) position.
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @param {Number} index the new index of the insertion point
+	**/
 	TextField.prototype.setCurrentIndex = function(index)
 	{
 		if( this.currentIndex == index )
@@ -6457,29 +7705,24 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		this.currentIndex = index;
 		this._refreshNextFrame = true;
 	};
-
-	TextField.prototype.getWordRangeAt = function(index)
-	{
-		var letter = null;
-		var word = this.getWordAt(index);
-		var start = -1;
-		var index = -1;
-		var end = -1;
-		
-		if( word != null )
-		{			
-			start = word.getStartIndex();
-			end = word.getEndIndex();
-		}
-		
-		return {start: start, end: end};
-	};
-
+	
+	/**
+	* @method getCurrentIndex
+	* @description Returns the index of the insertion point (caret) position.
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @returns {Number} the index of the insertion point (caret) position
+	**/
 	TextField.prototype.getCurrentIndex = function()
 	{
 		return this.currentIndex;
 	};
-
+	
+	/**
+	* @method setFocus
+	* @description Gives focus to the text field, specified by the value parameter. If value != true the current focus is removed.
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @param {Boolean} value
+	**/
 	TextField.prototype.setFocus = function(value)
 	{
 		if( this._focused == value )
@@ -6500,11 +7743,25 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		}
 	};
 
+	/**
+	* @method getFocus
+	* @description Specifies whether the current text field has the focus 
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @returns {Boolean} the value of the current focus
+	**/
 	TextField.prototype.getFocus = function()
 	{
 		return this._focused;
 	};
 
+	/**
+	* @method setTextFormat
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @description Applies the text formatting that the format parameter specifies to the specified text in a text field.
+	* @param {tomahawk_ns.TextFormat} format A TextFormat object that contains character and paragraph formatting information
+	* @param {Number} startIndex an integer that specifies the zero-based index position specifying the first character of the desired range of text.
+	* @param {Number} [endIndex=undefined] An integer that specifies the first character after the desired text span. As designed, if you specify startIndex and endIndex values, the text from beginIndex to endIndex-1 is updated.
+	**/
 	TextField.prototype.setTextFormat = function( format, startIndex, endIndex )
 	{
 		var end = ( endIndex == undefined ) ? startIndex : endIndex;
@@ -6526,6 +7783,13 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		}
 	};
 
+	/**
+	* @method getTextFormat
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @description Returns a TextFormat object containing a copy of the text format of the character at the index position.
+	* @param {Number} index An integer that specifies the location of a letter within the text field.
+	* @returns {tomahawk_ns.TextFormat}
+	**/
 	TextField.prototype.getTextFormat = function(index)
 	{
 		var letter = this.getLetterAt(index);
@@ -6535,11 +7799,23 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		return letter.format.clone();
 	};
 
+	/**
+	* @method getText
+	* @description Returns a string that is the current text in the text field.
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @returns {String} the current text in the text field
+	**/
 	TextField.prototype.getText = function()
 	{
 		return this._text;
 	};
 
+	/**
+	* @description Set the current text of the text field specified by the "value" parameter
+	* @method setText
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @param {String} value the new text of the text field
+	**/
 	TextField.prototype.setText = function(value)
 	{
 		if( this._text == value )
@@ -6557,21 +7833,41 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		
 		for( i = 0; i < max; i++ )
 		{
-			this.addCharAt(value[i], i, (value[i] == "\n") );
+			this.addCharAt(value[i], i );
 		}
 	};
 
+	/**
+	* @description Returns all the letters objects of the text field
+	* @method getLetters
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @returns {Array} all the letters of the text field
+	**/
 	TextField.prototype.getLetters = function()
 	{
 		return this._letters;
 	};
 
+	/**
+	* @description Returns the letter object at the index specified by the "index" parameter.
+	* @method getLetterAt
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @param {Number} index the index of the letter you want to retrieve
+	* @returns {tomahawk_ns.Letter} A Letter object
+	**/
 	TextField.prototype.getLetterAt = function(index)
 	{
 		var letters = this.getLetters();
 		return letters[index] || null;
 	};
 	
+	/**
+	* @description Returns the word object at the index specified by the "index" parameter within the text field
+	* @method getLetterAt
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @param {Number} index the index
+	* @returns {tomahawk_ns.Word} A Word object
+	**/
 	TextField.prototype.getWordAt = function(index)
 	{
 		var letter = this.getLetterAt(index);
@@ -6585,7 +7881,14 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		return word;
 	};
 
-	TextField.prototype.addCharAt = function(value,index,isNewline)
+	/**
+	* @method addCharAt
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @param {String} value The DisplayObject instance to add as a child of this DisplayObjectContainer instance.
+	* @param {Number} index The index position to which the character is added.
+	* @description Adds a character to this text field instance at the index specified by the index parameter The character is added at the index position specified. If you specify a currently occupied index position, the character that exists at that position and all higher positions are moved up one position in the text.
+	**/
+	TextField.prototype.addCharAt = function(value,index)
 	{
 		var wordIndex =  ( index == 0 ) ? 0 : index - 1 ;
 		var letter = new tomahawk_ns.Letter();
@@ -6595,7 +7898,7 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		var tab2 = this._letters.slice(index);
 		
 		//create letter
-		isNewline = ( isNewline == true ) ? true : false;
+		isNewline = ( value == "\n" );
 		letter.value = value;
 		letter.newline = isNewline;
 		letter.setTextFormat( ( previous == null ) ? this.defaultTextFormat.clone() : previous.format.clone() );
@@ -6621,6 +7924,13 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		this._cutWord(currentWord); // cut the word if necessary
 	};
 	
+	/**
+	* @method removeCharAt
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @param {Number} index The index of the character to remove.
+	* @returns {tomahawk_ns.Letter} The Letter instance that was removed.
+	* @description Removes a character from the specified index position in the text of the text field.
+	**/
 	TextField.prototype.removeCharAt = function(index)
 	{
 		var letter = this.getLetterAt(index);
@@ -6646,6 +7956,13 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		this._resetLettersIndex();
 	};
 
+	/**
+	* @description Adds the text specified by the "value" parameter at the index specified by the "index" parameter to the text field.
+	* @method addTextAt
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @param {string} value the text you want to add
+	* @param {string} index the index at which you want to insert your text
+	**/
 	TextField.prototype.addTextAt = function(value,index)
 	{
 		var i = value.length;
@@ -6656,7 +7973,14 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		
 		this.setCurrentIndex(index);
 	};
-
+	
+	/**
+	* @description Removes the text between the indexes specified by the "startIndex" and the "endIndex" parameters within the text field.
+	* @method removeTextBetween
+	* @memberOf tomahawk_ns.TextField.prototype
+	* @param {Number} startIndex the index from which you want to remove the text
+	* @param {Number} endIndex the index to which you want to remove the text
+	**/
 	TextField.prototype.removeTextBetween = function(startIndex,endIndex)
 	{
 		var i = this.getLetters().length;
@@ -6677,6 +8001,8 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 			this.removeCharAt(letter.index);
 		}
 	};
+	
+	
 	
 	TextField.prototype.getBoundingRectIn = function(spaceCoordinates)
 	{
@@ -6845,7 +8171,6 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		return ( a.getStartIndex() < b.getStartIndex() ) ? -1 : 1;
 	};
 	
-	
 	TextField.prototype._refresh = function()
 	{
 		var rowIndex = 0;
@@ -6986,6 +8311,12 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 
 (function() {
 	
+	/**
+	 * @class TextFormat
+	 * @memberOf tomahawk_ns
+	 * @description ....
+	 * @constructor
+	 **/
 	function TextFormat(){}
 	Tomahawk.registerClass( TextFormat, "TextFormat" );
 
@@ -7102,6 +8433,13 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 
 (function() {
 	
+	/**
+	 * @class Word
+	 * @memberOf tomahawk_ns
+	 * @description The Word object is a DisplayObjectContainer that contains several Letter objects in order to display a word.
+	 * @augments tomahawk_ns.DisplayObjectContainer
+	 * @constructor
+	 **/
 	function Word()
 	{
 		tomahawk_ns.DisplayObjectContainer.apply(this);
@@ -7111,19 +8449,65 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	Tomahawk.registerClass(Word,"Word");
 	Tomahawk.extend("Word","DisplayObjectContainer");
 	
+	/**
+	* @member row
+	* @memberOf tomahawk_ns.Word.prototype
+	* @type {Number}
+	* @description The row index of this word
+	**/
 	Word.prototype.row = 0;
 	Word.prototype.newline = false;
 	Word.prototype.marginLeft = 0;
+	
+	/**
+	* @member index
+	* @memberOf tomahawk_ns.Word.prototype
+	* @type {Number}
+	* @description The index of this word
+	**/
 	Word.prototype.index = 0;
+	
+	/**
+	* @member text
+	* @memberOf tomahawk_ns.Word.prototype
+	* @type {String}
+	* @description the text of this word
+	**/
 	Word.prototype.text = "";
+	
+	/**
+	* @member needRefresh
+	* @memberOf tomahawk_ns.Word.prototype
+	* @type {Boolean}
+	* @description forces the refresh of the word at next frame
+	**/
 	Word.prototype.needRefresh = false;
+	
+	/**
+	* @member forceRefresh
+	* @memberOf tomahawk_ns.Word.prototype
+	* @type {Boolean}
+	* @description forces the refresh of the word at every frame
+	**/
 	Word.prototype.forceRefresh = true;
 	
+	/**
+	* @description Returns the length of the word
+	* @method getNumLetters
+	* @memberOf tomahawk_ns.Word.prototype
+	* @returns {Number} returns the word length
+	**/
 	Word.prototype.getNumLetters = function()
 	{
 		return this.children.length;
 	};
 	
+	/**
+	* @description Returns the index of the first letter
+	* @method getStartIndex
+	* @memberOf tomahawk_ns.Word.prototype
+	* @returns {Number}
+	**/
 	Word.prototype.getStartIndex = function()
 	{
 		if( this.children.length == 0 )
@@ -7132,6 +8516,12 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		return this.getLetterAt(0).index;
 	};
 	
+	/**
+	* @description Returns the index of the last letter
+	* @method getEndIndex
+	* @memberOf tomahawk_ns.Word.prototype
+	* @returns {Number}
+	**/
 	Word.prototype.getEndIndex = function()
 	{
 		if( this.children.length == 0 )
@@ -7140,6 +8530,13 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		return this.getLetterAt( this.children.length - 1 ).index;
 	};
 	
+	/**
+	* @description Appends a letter to the word
+	* @method addLetter
+	* @param {tomahawk_ns.Letter} letter an instance of a Letter Object
+	* @memberOf tomahawk_ns.Word.prototype
+	* @returns {tomahawk_ns.Letter}
+	**/
 	Word.prototype.addLetter = function(letter)
 	{
 		this.text = this.text + letter.value;
@@ -7147,6 +8544,13 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		return this.addChild(letter);
 	};
 	
+	/**
+	* @description Removes a letter in the word at the corresponding index 
+	* @method removeLetterAt
+	* @param {Number} The letter index
+	* @memberOf tomahawk_ns.Word.prototype
+	* @returns {tomahawk_ns.Letter}
+	**/
 	Word.prototype.removeLetterAt = function(index)
 	{
 		this.text = this.text.substr(0,index) + this.text.substr(index+1);
@@ -7154,6 +8558,13 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		return this.removeChildAt(index);
 	};
 	
+	/**
+	* @description Removes the corresponding letter in the word
+	* @method removeLetter
+	* @param {tomahawk_ns.Letter} letter an instance of a Letter Object
+	* @memberOf tomahawk_ns.Word.prototype
+	* @returns {tomahawk_ns.Letter}
+	**/
 	Word.prototype.removeLetter = function(letter)
 	{
 		var index = this.getChildIndex(letter);
@@ -7166,11 +8577,26 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		return this.removeChild(letter);
 	};
 	
+	/**
+	* @description Returns the letter at the corresponding index in the word
+	* @method getLetterAt
+	* @param {Number} the index of the letter
+	* @memberOf tomahawk_ns.Word.prototype
+	* @returns {tomahawk_ns.Letter}
+	**/
 	Word.prototype.getLetterAt = function(index)
 	{
 		return this.getChildAt(index);
 	};
 		
+	/**
+	* @description Adds the letter "letter" at the specified index in the word.
+	* @method addLetterAt
+	* @param {tomahawk_ns.Letter} the letter you want to add
+	* @param {Number} the index of the letter
+	* @memberOf tomahawk_ns.Word.prototype
+	* @returns {tomahawk_ns.Letter}
+	**/
 	Word.prototype.addLetterAt = function(letter,index)
 	{
 		this.needRefresh = true;
@@ -7178,11 +8604,22 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		this.addChildAt(letter,index);
 	};
 	
+	/**
+	* @description Returns all the letters of the word
+	* @method getLetters
+	* @memberOf tomahawk_ns.Word.prototype
+	* @returns {Array} 
+	**/
 	Word.prototype.getLetters = function()
 	{
 		return this.children;
 	};
 	
+	/**
+	* @description Actualize the appearance of the word
+	* @method refresh
+	* @memberOf tomahawk_ns.Word.prototype
+	**/
 	Word.prototype.refresh = function()
 	{
 		if( this.needRefresh != true && this.forceRefresh != true)
@@ -7228,6 +8665,13 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		}
 	};
 	
+	/**
+	* @description Split the word in two, the cutting point is specified by the "index" parameter. Returns the second Word.
+	* @method cut
+	* @param {Number} the index form which you want to cut the word
+	* @memberOf tomahawk_ns.Word.prototype
+	* @returns {tomahawk_ns.Word}
+	**/
 	Word.prototype.cut = function(index)
 	{
 		var word = new tomahawk_ns.Word();
@@ -7279,6 +8723,12 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 
 (function() {
 	
+	/**
+	 * @class Texture
+	 * @memberOf tomahawk_ns
+	 * @description ....
+	 * @constructor
+	 **/
 	function Texture(){}
 
 	Tomahawk.registerClass( Texture, "Texture" );
@@ -7329,6 +8779,12 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 
 (function() {
 	
+	/**
+	 * @class TextureAtlas
+	 * @memberOf tomahawk_ns
+	 * @description ...
+	 * @constructor
+	 **/
 	function TextureAtlas()
 	{
 		this._textures = new Array();

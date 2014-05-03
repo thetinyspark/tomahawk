@@ -29,6 +29,13 @@
 
 (function() {
 
+	/**
+	 * @class Sprite
+	 * @memberOf tomahawk_ns
+	 * @description ...
+	 * @constructor
+	 * @augments tomahawk_ns.DisplayObjectContainer
+	 **/
 	function Sprite()
 	{
 		tomahawk_ns.DisplayObjectContainer.apply(this);

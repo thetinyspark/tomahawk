@@ -29,6 +29,12 @@
 
 (function() {
 	
+	/**
+	 * @class Mouse
+	 * @memberOf tomahawk_ns
+	 * @description ...
+	 * @constructor
+	 **/
 	function Mouse(){}
 
 	Tomahawk.registerClass( Mouse, "Mouse" );

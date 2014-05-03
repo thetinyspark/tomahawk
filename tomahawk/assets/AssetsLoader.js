@@ -28,7 +28,13 @@
  
  (function() {
 	
-
+/**
+ * @class AssetsLoader
+ * @memberOf tomahawk_ns
+ * @description ...
+ * @constructor
+ * @augments tomahawk_ns.EventDispatcher
+ **/
 function AssetsLoader()
 {
 	this._loadingList = new Array();

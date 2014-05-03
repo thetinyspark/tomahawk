@@ -29,7 +29,15 @@
 
 (function() {
 
-	
+	/**
+	 * @abstract
+	 * @class DisplayObject
+	 * @memberOf tomahawk_ns
+	 * @constructor
+	 * @augments tomahawk_ns.EventDispatcher
+	 * @description The DisplayObject class is the base class for all objects that can be placed on the display list.
+	 * The DisplayObject class supports basic functionality like the x and y position of an object, as well as more advanced properties of the object such as its transformation matrix. DisplayObject is an abstract base class; therefore, you cannot call DisplayObject directly. All display objects inherit from the DisplayObject class.
+	 **/
 	function DisplayObject()
 	{
 		tomahawk_ns.EventDispatcher.apply(this);
@@ -41,40 +49,249 @@
 	Tomahawk.registerClass( DisplayObject, "DisplayObject" );
 	Tomahawk.extend( "DisplayObject", "EventDispatcher" );
 
+	/**
+	* @member name
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {String}
+	* @description Indicates the instance name of the DisplayObject.
+	* @default null
+	**/
 	DisplayObject.prototype.name 				= null;
+	
+	/**
+	* @member parent
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {tomahawk_ns.DisplayObjectContainer}
+	* @description Indicates the DisplayObjectContainer object that contains this display object.
+	* @default null
+	**/
 	DisplayObject.prototype.parent 				= null;
+	
+	/**
+	* @member x
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Number}
+	* @default 0
+	* @description Indicates the x coordinate of the DisplayObject instance relative to the local coordinates of the parent DisplayObjectContainer.
+	**/
 	DisplayObject.prototype.x 					= 0;
+	
+	/**
+	* @member y
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Number}
+	* @default 0
+	* @description Indicates the y coordinate of the DisplayObject instance relative to the local coordinates of the parent DisplayObjectContainer.
+	**/
 	DisplayObject.prototype.y 					= 0;
+	
+	/**
+	* @member pivotX
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Number}
+	* @default 0
+	* @description Indicates the x coordinate of the DisplayObject instance registration point
+	**/
 	DisplayObject.prototype.pivotX 				= 0;
+	
+	/**
+	* @member pivotY
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Number}
+	* @default 0
+	* @description Indicates the y coordinate of the DisplayObject instance registration point
+	**/
 	DisplayObject.prototype.pivotY 				= 0;
+	
+	/**
+	* @member skewX
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Number}
+	* @default 0
+	* @description Indicates the skew on the x axis of the DisplayObject instance
+	**/
 	DisplayObject.prototype.skewX 				= 0;
+	
+	/**
+	* @member skewY
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Number}
+	* @default 0
+	* @description Indicates the skew on the y axis of the DisplayObject instance
+	**/
 	DisplayObject.prototype.skewY 				= 0;
+	
+	/**
+	* @member scaleX
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Number}
+	* @description Indicates the horizontal scale (percentage) of the object as applied from the registration point.
+	* @default 1
+	**/
 	DisplayObject.prototype.scaleX 				= 1;
+	
+	/**
+	* @member scaleY
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Number}
+	* @default 1
+	* @description Indicates the vertical scale (percentage) of the object as applied from the registration point.
+	**/
 	DisplayObject.prototype.scaleY 				= 1;
+	
+	/**
+	* @default 0
+	* @member width
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Number}
+	* @description Indicates the width of the display object, in pixels.
+	**/
 	DisplayObject.prototype.width 				= 0;
+	
+	/**
+	* @default 0
+	* @member height
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Number}
+	* @description Indicates the height of the display object, in pixels.
+	**/
 	DisplayObject.prototype.height 				= 0;
+	
+	/**
+	* @member rotation
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Number}
+	* @description Indicates the rotation of the DisplayObject instance, in degrees, from its original orientation.
+	**/
 	DisplayObject.prototype.rotation 			= 0;
+	
+	/**
+	* @member stage
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {tomahawk_ns.Stage}
+	* @description The Stage of the display object.
+	* @default null
+	**/
 	DisplayObject.prototype.stage 				= null;
-
+	
+	/**
+	* @member alpha
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Number}
+	* @description Indicates the alpha transparency value of the object specified.
+	* @default 1
+	**/
 	DisplayObject.prototype.alpha 				= 1;
+	
+	/**
+	* @member mouseEnabled
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Boolean}
+	* @description Specifies whether this object receives mouse, or other user input, messages.
+	* @default true
+	**/
 	DisplayObject.prototype.mouseEnabled 		= true;
+	
+	/**
+	* @member handCursor
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Boolean}
+	* @description A Boolean value that indicates whether the pointing hand (hand cursor) appears when the pointer rolls over this sprite
+	* @default false
+	**/
 	DisplayObject.prototype.handCursor 			= false;
+	
+	/**
+	* @member visible
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Boolean}
+	* @description Whether or not the display object is visible.
+	* @default true
+	**/
 	DisplayObject.prototype.visible 			= true;
+	
+	/**
+	* @member isMask
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Boolean}
+	* @description Defines if the current DisplayObject is masking another one
+	* @default false
+	**/
 	DisplayObject.prototype.isMask				= false;
+	
+	/**
+	* @member filters
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Array}
+	* @description An indexed array that contains each filter object currently associated with the display object.
+	* @default null
+	**/
 	DisplayObject.prototype.filters 			= null;
+	
+	/**
+	* @member mask
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {tomahawk_ns.DisplayObject}
+	* @description The calling display object is masked by the specified mask object.
+	* @default null
+	**/
 	DisplayObject.prototype.mask 				= null;
+	
+	/**
+	* @member matrix
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {tomahawk_ns.Matrix2D}
+	* @description The transformation matrix of the DisplayObject
+	* @default null
+	**/
 	DisplayObject.prototype.matrix 				= null;
+	
+	/**
+	* @member bounds
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {tomahawk_ns.Rectangle}
+	* @description Indicates a rectangle that defines the area of the display object relative to his parent coordinate system. You must set the updateNextFrame ( or the autoUpdate ) property to true and call the updateBounds method to actualize this Rectangle.
+	* @default null
+	**/
 	DisplayObject.prototype.bounds 				= null;
-	DisplayObject.prototype._concatenedMatrix 	= null;
+	
+	/**
+	* @member cacheAsBitmap
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Boolean}
+	* @description If set to true, the object is caching an internal representation of the display object.
+	* @default true
+	**/
 	DisplayObject.prototype.cacheAsBitmap		= false;
+	
+	/**
+	* @member autoUpdate
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Boolean}
+	* @description If set to true, the matrix of the DisplayObject will be computed at every frame
+	* @default true
+	**/
 	DisplayObject.prototype.autoUpdate			= true;
+	
+	/**
+	* @member updateNextFrame
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Boolean}
+	* @default true
+	* @description If set to true, the transformation matrix will be update at next frame.
+	**/
 	DisplayObject.prototype.updateNextFrame		= true;
 	
+	DisplayObject.prototype._concatenedMatrix 	= null;
 	DisplayObject.prototype._cache 				= null;
 	DisplayObject.prototype._cacheOffsetX 		= 0;
 	DisplayObject.prototype._cacheOffsetY 		= 0;
 	
-
+	/**
+	* @method updateBounds
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @description Updates the bounds of the current DisplayObject if his updateNextFrame || autoUpdate = true
+	**/
 	DisplayObject.prototype.updateBounds = function()
 	{		
 		var rect = new tomahawk_ns.Rectangle();
@@ -108,6 +325,12 @@
 		this.bounds = rect;
 	};
 	
+	/**
+	* @method setMask
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @param {tomahawk_ns.DisplayObject} the new mask of the current DisplayObject
+	* @description Defines the DisplayObject passed in param as the mask of the current DisplayObject 
+	**/
 	DisplayObject.prototype.setMask = function( mask )
 	{
 		if( this.mask != null )
@@ -123,6 +346,11 @@
 		}
 	};
 
+	/**
+	* @method updateMatrix
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @description Updates the matrix of the DisplayObject if his updateNextFrame || autoUpdate = true
+	**/
 	DisplayObject.prototype.updateMatrix = function()
 	{
 		if( this.autoUpdate == false && this.updateNextFrame == false )
@@ -147,6 +375,12 @@
 		this.updateNextFrame = false;
 	};
 
+	/**
+	* @description Updates the cache of the DisplayObject instance and returns it.
+	* @method updateCache
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @returns {HTMLCanvasElement} the cache canvas of the DisplayObject
+	**/
 	DisplayObject.prototype.updateCache = function()
 	{	
 		var buffer = null;
@@ -221,8 +455,15 @@
 		this._cache = buffer;
 		this._cacheOffsetX = offX;
 		this._cacheOffsetY = offY;
+		return buffer;
 	};
-
+	
+	/**
+	* @method drawComposite
+	* @description Draw the DisplayObject instance into the specified context with mask and filters.
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @param {Canvas2DRenderingContext} drawContext the Canvas2DRenderingContext context on which you want to draw.
+	**/
 	DisplayObject.prototype.drawComposite = function(drawContext)
 	{
 		if( this._cache == null || this.cacheAsBitmap == false )
@@ -268,10 +509,22 @@
 		}
 	};
 
+	/**
+	* @method draw
+	* @description Draws the DisplayObject instance into the specified context
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @param {Canvas2DRenderingContext} drawContext the Canvas2DRenderingContext context on which you want to draw.
+	**/
 	DisplayObject.prototype.draw = function(context)
 	{
 	};
 	
+	/**
+	* @method getConcatenedMatrix
+	* @description Returns the combined transformation matrixes of the DisplayObject instance and all of its parent objects, back to the stage level.
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @param {Boolean} forceUpdate Forces the update of the current DisplayObject and all his parents
+	**/
 	DisplayObject.prototype.getConcatenedMatrix = function(forceUpdate)
 	{
 		var current = this;
@@ -292,6 +545,14 @@
 		return this._concatenedMatrix;
 	};
 
+	/**
+	* @method localToGlobal
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @param {Number} x
+	* @param {Number} y
+	* @returns {tomahawk_ns.Point}
+	* @description Converts the point object from the DisplayObject's (local) coordinates to the Stage (global) coordinates.
+	**/
 	DisplayObject.prototype.localToGlobal = function(x,y)
 	{
 		var matrix = this.getConcatenedMatrix();
@@ -299,6 +560,14 @@
 		return new tomahawk_ns.Point(pt.x,pt.y);
 	};
 
+	/**
+	* @method globalToLocal
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @param {Number} x
+	* @param {Number} y
+	* @returns {tomahawk_ns.Point}
+	* @description Converts the point object from the Stage (global) coordinates to the DisplayObject's (local) coordinates.
+	**/
 	DisplayObject.prototype.globalToLocal = function(x,y)
 	{
 		var matrix = this.getConcatenedMatrix().clone().invert();
@@ -306,6 +575,14 @@
 		return new tomahawk_ns.Point(pt.x,pt.y);
 	};
 
+	/**
+	* @method hitTest
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @param {Number} x
+	* @param {Number} y
+	* @returns {Boolean}
+	* @description Evaluates the DisplayObject instance to see if it overlaps or intersects with the point specified by the x and y parameters. The x and y parameters specify a point in the coordinate space of the Stage, not the display object container that contains the display object (unless that display object container is the Stage).
+	**/
 	DisplayObject.prototype.hitTest = function(x,y)
 	{		
 		var pt1 = this.globalToLocal(x,y);
@@ -316,6 +593,13 @@
 			return true;
 	};
 
+	/**
+	* @method isChildOf
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @param {tomahawk_ns.DisplayObject} obj
+	* @returns {Boolean}
+	* @description Indicates if the DisplayObject "obj" is a child of the DisplayObject instance
+	**/
 	DisplayObject.prototype.isChildOf = function( obj )
 	{
 		var curParent = this.parent;
@@ -330,6 +614,13 @@
 		return false;
 	};
 
+	/**
+	* @method getBoundingRectIn
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @param {tomahawk_ns.DisplayObject} spaceCoordinates
+	* @returns {tomahawk_ns.Rectangle}
+	* @description Returns a rectangle that defines the area of the display object relative to the coordinate system of the spaceCoordinates object.
+	**/
 	DisplayObject.prototype.getBoundingRectIn = function(spaceCoordinates)
 	{
 		this.updateNextFrame = true;
@@ -369,25 +660,14 @@
 		rect.height = rect.bottom - rect.top;
 		return rect;
 	};
-	
-	DisplayObject.prototype.getNestedChildren = function()
-	{
-		return new Array(this);
-	}
-	
-	DisplayObject.prototype.destroy = function()
-	{
-		this._cache = null;
-		this.setMask(null);
-		
-		if( this.parent != null )
-		{
-			this.parent.removeChild(this);
-		}
-		
-		tomahawk_ns.EventDispatcher.prototype.destroy.apply(this);
-	};
-	
+
+	/**
+	* @method snapshot
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @param {tomahawk_ns.Matrix2D} [transformMatrix=undefined] The transformation matrix to apply
+	* @returns {HTMLCanvasElement}
+	* @description Returns a snapshot of the DisplayObject instance, applying the transformMatrix
+	**/
 	DisplayObject.prototype.snapshot = function(transformMatrix)
 	{
 		var mat = transformMatrix || new tomahawk_ns.Matrix2D();
@@ -411,6 +691,24 @@
 		this.updateBounds();
 		
 		return canvas;
+	};
+	
+	/**
+	* @method destroy
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @description Kill the DisplayObject instance and free all his ressources
+	**/
+	DisplayObject.prototype.destroy = function()
+	{
+		this._cache = null;
+		this.setMask(null);
+		
+		if( this.parent != null )
+		{
+			this.parent.removeChild(this);
+		}
+		
+		tomahawk_ns.EventDispatcher.prototype.destroy.apply(this);
 	};
 	
 	tomahawk_ns.DisplayObject = DisplayObject;
