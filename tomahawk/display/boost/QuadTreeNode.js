@@ -32,7 +32,7 @@
 	/**
 	 * @class QuadTreeNode
 	 * @memberOf tomahawk_ns
-	 * @description ...
+	 * @description A QuadTreeNode Object defines a leaf of a quadtree structure. Quadtrees are a derived implementation of binary trees which are very efficient in 2d plans.
 	 * @constructor	
 	 **/
 	function QuadTreeNode(left,right,top,bottom, depth, maxChildren, maxDepth)
@@ -59,6 +59,12 @@
 	
 	// iterative  methods
 	
+	/**
+	* @description Adds a display object to the tree node
+	* @method add
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @param {tomahawk_ns.DisplayObject} element the display object you want to add to the tree node
+	**/
 	QuadTreeNode.prototype.add = function(element)
 	{
 		this.remove(element);
@@ -110,6 +116,12 @@
 		}
 	};
 	
+	/**
+	* @description Removes a display object from the tree node
+	* @method remove
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @param {tomahawk_ns.DisplayObject} element the display object you want to remove from the tree node
+	**/
 	QuadTreeNode.prototype.remove = function( element )
 	{
 		var index = -1;
@@ -137,6 +149,16 @@
 		}
 	};
 	
+	/**
+	* @description Returns an Array of DisplayObjects that are visible in the area defined by the left,right,top,bottom parameters.
+	* @method get
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @param {Number} left 
+	* @param {Number} right 
+	* @param {Number} top 
+	* @param {Number} bottom 
+	* @returns {Array} An array of DisplayObject
+	**/
 	QuadTreeNode.prototype.get = function( left, right, top, bottom )
 	{
 		var tick = tomahawk_ns.QuadTreeNode._tick + 1;
@@ -195,6 +217,11 @@
 		return result;
 	};
 	
+	/**
+	* @description Splits the current node into four child nodes. The children of the node will be redispatched throught those new four nodes.
+	* @method split
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	**/
 	QuadTreeNode.prototype.split = function()
 	{
 		var child = null;
@@ -219,19 +246,122 @@
 		this.full = true;
 	};
 	
-	
+	/**
+	* @member full
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {Boolean}
+	* @default false
+	* @description Indicates wether the node is full.
+	**/
 	QuadTreeNode.prototype.full = false;
+	
+	/**
+	* @default 0
+	* @member left
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {Number}
+	* @description The x coordinate of the top-left corner of the node's area.
+	**/
 	QuadTreeNode.prototype.left = 0;
+	
+	/**
+	* @default 0
+	* @member right
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {Number}
+	* @description The x coordinate of the bottom-right corner of the node's area.
+	**/
 	QuadTreeNode.prototype.right = 0;
+	
+	/**
+	* @default 0
+	* @member top
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {Number}
+	* @description The y coordinate of the top-left corner of the node's area.
+	**/
 	QuadTreeNode.prototype.top = 0;
+	
+	
+	/**
+	* @default 0
+	* @member bottom
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {Number}
+	* @description The y coordinate of the bottom-right corner of the node's area.
+	**/
 	QuadTreeNode.prototype.bottom = 0;
+	
+	/**
+	* @default 20
+	* @member maxChildren
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {Number}
+	* @description Indicates the maximum amount of children of that node can stores before splitting itself.
+	**/
 	QuadTreeNode.prototype.maxChildren = 20;
+	
+	/**
+	* @default 0
+	* @member depth
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {Number}
+	* @description Indicates the depth of the node within the quadtree structure
+	**/
 	QuadTreeNode.prototype.depth = 0;
+	
+	/**
+	* @default null
+	* @member node1
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {tomahawk_ns.QuadTreeNode}
+	* @description Indicates the top-left child node of the node.
+	**/
 	QuadTreeNode.prototype.node1 = null;
+	
+	/**
+	* @default null
+	* @member node2
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {tomahawk_ns.QuadTreeNode}
+	* @description Indicates the bottom-left child node of the node.
+	**/
 	QuadTreeNode.prototype.node2 = null;
+	
+	/**
+	* @default null
+	* @member node3
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {tomahawk_ns.QuadTreeNode}
+	* @description Indicates the top-right child node of the node.
+	**/
 	QuadTreeNode.prototype.node3 = null;
+	
+	/**
+	* @default null
+	* @member node4
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {tomahawk_ns.QuadTreeNode}
+	* @description Indicates the bottom-right child node of the node.
+	**/
 	QuadTreeNode.prototype.node4 = null;
+	
+	/**
+	* @default 0
+	* @member limitX
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {tomahawk_ns.QuadTreeNode}
+	* @description Indicates the x coordinate of the splitting boundary within this node.
+	**/
 	QuadTreeNode.prototype.limitX = 0;
+	
+	/**
+	* @default 0
+	* @member limitY
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {tomahawk_ns.QuadTreeNode}
+	* @description Indicates the y coordinate of the splitting boundary within this node.
+	**/
 	QuadTreeNode.prototype.limitY = 0;
 	
 	

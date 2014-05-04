@@ -45,8 +45,7 @@
 		<![endif]-->
 		<link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
 		<link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
-
-       
+			
         <script type="text/javascript">
 
             function gaq(cat, action, optValue) {
@@ -98,7 +97,7 @@
         </script>
     </head>
 	
-	<body class="tomahawk colour">
+	<body class="tomahawk colour documentationJS">
     <div class="contentBig">
 
         <div id="header">
@@ -122,16 +121,19 @@
 		</div>        
 		
 		</div>
+		
+		<div id="doc_nav">
+			<nav>
+				<h2><a href="index.html">Index</a></h2><ul class="toplist"><li><h3>Classes</h3><ul><li><a href="Tomahawk.html">Tomahawk</a></li><li><a href="tomahawk_ns.AssetsLoader.html">AssetsLoader</a></li><li><a href="tomahawk_ns.AssetsManager.html">AssetsManager</a></li><li><a href="tomahawk_ns.Bitmap.html">Bitmap</a></li><li><a href="tomahawk_ns.BitmapMesh.html">BitmapMesh</a></li><li><a href="tomahawk_ns.BrightnessFilter.html">BrightnessFilter</a></li><li><a href="tomahawk_ns.ContrastFilter.html">ContrastFilter</a></li><li><a href="tomahawk_ns.DisplayObject.html">DisplayObject</a></li><li><a href="tomahawk_ns.DisplayObjectContainer.html">DisplayObjectContainer</a></li><li><a href="tomahawk_ns.Event.html">Event</a></li><li><a href="tomahawk_ns.EventDispatcher.html">EventDispatcher</a></li><li><a href="tomahawk_ns.Font.html">Font</a></li><li><a href="tomahawk_ns.GrayScaleFilter.html">GrayScaleFilter</a></li><li><a href="tomahawk_ns.InputTextField.html">InputTextField</a></li><li><a href="tomahawk_ns.Keyboard.html">Keyboard</a></li><li><a href="tomahawk_ns.KeyEvent.html">KeyEvent</a></li><li><a href="tomahawk_ns.Letter.html">Letter</a></li><li><a href="tomahawk_ns.Matrix2D.html">Matrix2D</a></li><li><a href="tomahawk_ns.Matrix4x4.html">Matrix4x4</a></li><li><a href="tomahawk_ns.Mouse.html">Mouse</a></li><li><a href="tomahawk_ns.MouseEvent.html">MouseEvent</a></li><li><a href="tomahawk_ns.MovieClip.html">MovieClip</a></li><li><a href="tomahawk_ns.PixelFilter.html">PixelFilter</a></li><li><a href="tomahawk_ns.Point.html">Point</a></li><li><a href="tomahawk_ns.Point3D.html">Point3D</a></li><li><a href="tomahawk_ns.QuadTreeContainer.html">QuadTreeContainer</a></li><li><a href="tomahawk_ns.QuadTreeNode.html">QuadTreeNode</a></li><li><a href="tomahawk_ns.Rectangle.html">Rectangle</a></li><li><a href="tomahawk_ns.Screen.html">Screen</a></li><li><a href="tomahawk_ns.SelectableTextField.html">SelectableTextField</a></li><li><a href="tomahawk_ns.ShadowBlurFilter.html">ShadowBlurFilter</a></li><li><a href="tomahawk_ns.Shape.html">Shape</a></li><li><a href="tomahawk_ns.Sprite.html">Sprite</a></li><li><a href="tomahawk_ns.Sprite3D.html">Sprite3D</a></li><li><a href="tomahawk_ns.Stage.html">Stage</a></li><li><a href="tomahawk_ns.TextField.html">TextField</a></li><li><a href="tomahawk_ns.TextFormat.html">TextFormat</a></li><li><a href="tomahawk_ns.Texture.html">Texture</a></li><li><a href="tomahawk_ns.TextureAtlas.html">TextureAtlas</a></li><li><a href="tomahawk_ns.Vector3D.html">Vector3D</a></li><li><a href="tomahawk_ns.Word.html">Word</a></li></ul></li><li><h3>Namespaces</h3><ul><li><a href="tomahawk_ns.html">tomahawk_ns</a></li></ul></li></ul>
+			</nav>
+		</div>
 
         <div id="main_content">
-
-
-
+		
 			<div id="main">
-
-				<h1 class="page-title">Source: assets/AssetsLoader.js</h1>
-
-				
+				<div class="left-content">
+					<h1 class="page-title">Source: assets/AssetsLoader.js</h1>
+					
 
 
     
@@ -170,7 +172,7 @@
 /**
  * @class AssetsLoader
  * @memberOf tomahawk_ns
- * @description ...
+ * @description The AssetsLoader class is a basic Image mass loader.
  * @constructor
  * @augments tomahawk_ns.EventDispatcher
  **/
@@ -185,6 +187,12 @@ Tomahawk.extend("AssetsLoader", "EventDispatcher" );
 // singleton
 AssetsLoader._instance = null;
 
+/**
+* @description Returns a unique instance of AssetsLoader, singleton implementation.
+* @method getInstance
+* @memberOf tomahawk_ns.AssetsLoader
+* @returns {tomahawk_ns.AssetsLoader} returns a number
+**/
 AssetsLoader.getInstance = function()
 {
 	if( tomahawk_ns.AssetsLoader._instance == null )
@@ -198,17 +206,34 @@ AssetsLoader.prototype._loadingList = null;
 AssetsLoader.prototype._data = null;
 AssetsLoader.prototype._numFiles = 0;
 
-
+/**
+* @description Returns a key indexed object which contains the loaded data.
+* @method getData
+* @memberOf tomahawk_ns.AssetsLoader.prototype
+* @returns {Object} a key indexed object
+**/
 AssetsLoader.prototype.getData = function()
 {
 	return this._data;
 };
 
+/**
+* @description Cleans the internal loaded data object, call it before another loading task in order to save memory.
+* @method clean
+* @memberOf tomahawk_ns.AssetsLoader.prototype
+**/
 AssetsLoader.prototype.clean = function()
 {
 	this._data = new Object();
 };
 
+/**
+* @description Adds an image to the loading list, with the url specified by the "fileURL" parameter and an alias specified by the "fileAlias" parameter.
+* @method load
+* @param {String] fileURL the url of the image.
+* @param {String] fileAlias The alias of the image used as a key within the object returned by the "getData()" method.
+* @memberOf tomahawk_ns.AssetsLoader.prototype
+**/
 AssetsLoader.prototype.addFile = function(fileURL, fileAlias)
 {
 	// on réinitialise les data
@@ -220,6 +245,11 @@ AssetsLoader.prototype.addFile = function(fileURL, fileAlias)
 	this._numFiles++;
 };
 
+/**
+* @description Starts the loading process.
+* @method load
+* @memberOf tomahawk_ns.AssetsLoader.prototype
+**/
 AssetsLoader.prototype.load = function()
 {
 	if( this._loadingList.length == 0 )
@@ -252,6 +282,18 @@ AssetsLoader.prototype.load = function()
 	}
 };
 
+/**
+* @description Returns the loading progression ( between 0.0 and 1.0 )
+* @method getProgression
+* @memberOf tomahawk_ns.AssetsLoader.prototype
+* @returns {Number}
+**/
+AssetsLoader.prototype.getProgression = function()
+{
+	var progression = ( this._numFiles - this._loadingList.length ) / this._numFiles;
+	return progression;
+};
+
 AssetsLoader.prototype._progressHandler = function(image,alias)
 {
 	this._data[alias] = image;
@@ -265,12 +307,6 @@ AssetsLoader.prototype._errorHandler = function()
 	this.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.IO_ERROR, true, true) );
 };
 
-AssetsLoader.prototype.getProgression = function()
-{
-	var progression = ( this._numFiles - this._loadingList.length ) / this._numFiles;
-	return progression;
-};
-
 tomahawk_ns.AssetsLoader = AssetsLoader;
 })();
 </code></pre>
@@ -280,14 +316,32 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 
 
+				</div>
+				
+				<div class="rigth-ad">
+					<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+					<!-- Skyscraper 120 x 600 -->
+					<ins class="adsbygoogle"
+						 style="display:inline-block;width:120px;height:600px"
+						 data-ad-client="ca-pub-8931349961961991"
+						 data-ad-slot="7816447068"></ins>
+					<script>
+					(adsbygoogle = window.adsbygoogle || []).push({});
+					</script>
+				</div>
+			</div>
+			
+			<div class="footer-ad" style="text-align:center">
+				<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+				<ins class="adsbygoogle"
+					 style="display:inline-block;width:728px;height:90px"
+					 data-ad-client="ca-pub-8931349961961991"
+					 data-ad-slot="3381404260"></ins>
+				<script>
+				(adsbygoogle = window.adsbygoogle || []).push({});
+				</script>
 			</div>
 
-			<nav>
-				<h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="Tomahawk.html">Tomahawk</a></li><li><a href="tomahawk_ns.AssetsLoader.html">AssetsLoader</a></li><li><a href="tomahawk_ns.AssetsManager.html">AssetsManager</a></li><li><a href="tomahawk_ns.Bitmap.html">Bitmap</a></li><li><a href="tomahawk_ns.BitmapMesh.html">BitmapMesh</a></li><li><a href="tomahawk_ns.BrightnessFilter.html">BrightnessFilter</a></li><li><a href="tomahawk_ns.ContrastFilter.html">ContrastFilter</a></li><li><a href="tomahawk_ns.DisplayObject.html">DisplayObject</a></li><li><a href="tomahawk_ns.DisplayObjectContainer.html">DisplayObjectContainer</a></li><li><a href="tomahawk_ns.Event.html">Event</a></li><li><a href="tomahawk_ns.EventDispatcher.html">EventDispatcher</a></li><li><a href="tomahawk_ns.Font.html">Font</a></li><li><a href="tomahawk_ns.GrayScaleFilter.html">GrayScaleFilter</a></li><li><a href="tomahawk_ns.InputTextField.html">InputTextField</a></li><li><a href="tomahawk_ns.Keyboard.html">Keyboard</a></li><li><a href="tomahawk_ns.KeyEvent.html">KeyEvent</a></li><li><a href="tomahawk_ns.Letter.html">Letter</a></li><li><a href="tomahawk_ns.Matrix2D.html">Matrix2D</a></li><li><a href="tomahawk_ns.Matrix4x4.html">Matrix4x4</a></li><li><a href="tomahawk_ns.Mouse.html">Mouse</a></li><li><a href="tomahawk_ns.MouseEvent.html">MouseEvent</a></li><li><a href="tomahawk_ns.MovieClip.html">MovieClip</a></li><li><a href="tomahawk_ns.PixelFilter.html">PixelFilter</a></li><li><a href="tomahawk_ns.Point.html">Point</a></li><li><a href="tomahawk_ns.Point3D.html">Point3D</a></li><li><a href="tomahawk_ns.QuadTreeContainer.html">QuadTreeContainer</a></li><li><a href="tomahawk_ns.QuadTreeNode.html">QuadTreeNode</a></li><li><a href="tomahawk_ns.Rectangle.html">Rectangle</a></li><li><a href="tomahawk_ns.Screen.html">Screen</a></li><li><a href="tomahawk_ns.SelectableTextField.html">SelectableTextField</a></li><li><a href="tomahawk_ns.ShadowBlurFilter.html">ShadowBlurFilter</a></li><li><a href="tomahawk_ns.Shape.html">Shape</a></li><li><a href="tomahawk_ns.Sprite.html">Sprite</a></li><li><a href="tomahawk_ns.Sprite3D.html">Sprite3D</a></li><li><a href="tomahawk_ns.Stage.html">Stage</a></li><li><a href="tomahawk_ns.TextField.html">TextField</a></li><li><a href="tomahawk_ns.TextFormat.html">TextFormat</a></li><li><a href="tomahawk_ns.Texture.html">Texture</a></li><li><a href="tomahawk_ns.TextureAtlas.html">TextureAtlas</a></li><li><a href="tomahawk_ns.Vector3D.html">Vector3D</a></li><li><a href="tomahawk_ns.Word.html">Word</a></li></ul><h3>Namespaces</h3><ul><li><a href="tomahawk_ns.html">tomahawk_ns</a></li></ul>
-			</nav>
-
-			<br clear="both">
-			
 		</div>
 		
         <div id="footer">

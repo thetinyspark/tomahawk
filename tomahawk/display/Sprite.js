@@ -32,7 +32,7 @@
 	/**
 	 * @class Sprite
 	 * @memberOf tomahawk_ns
-	 * @description ...
+	 * @description The Sprite class is a basic display list building block: a display list node that can contain children.
 	 * @constructor
 	 * @augments tomahawk_ns.DisplayObjectContainer
 	 **/
@@ -95,6 +95,12 @@
 		this.___getDragDropMovement___(event);
 	};
 	
+	/**
+	* @method enableDragAndDrop
+	* @memberOf tomahawk_ns.Sprite.prototype
+	* @param {Boolean} value Indicates if the drag and drop feature is enabled or not. 
+	* @description Enables or Disables the drag and drop feature.
+	**/
 	Sprite.prototype.enableDragAndDrop 				= function(value)
 	{
 		this.stopDrag();
@@ -111,6 +117,11 @@
 		this.mouseEnabled = true;
 	};
 	
+	/**
+	* @method startDrag
+	* @memberOf tomahawk_ns.Sprite.prototype
+	* @description Start the dragging operation.
+	**/
 	Sprite.prototype.startDrag 						= function()
 	{
 		this.stopDrag();
@@ -118,6 +129,11 @@
 		this.mouseEnabled = true;
 	};
 	
+	/**
+	* @method stopDrag
+	* @memberOf tomahawk_ns.Sprite.prototype
+	* @description Stop the dragging operation.
+	**/
 	Sprite.prototype.stopDrag 						= function()
 	{
 		this.removeEventListener(tomahawk_ns.MouseEvent.MOUSE_MOVE, this, this.___dragDropHandler___, true );

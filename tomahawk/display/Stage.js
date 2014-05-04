@@ -31,7 +31,7 @@
 	/**
 	 * @class Stage
 	 * @memberOf tomahawk_ns
-	 * @description ...
+	 * @description The Stage class represents the main drawing area, it is the top of the display list.
 	 * @constructor
 	 * @augments tomahawk_ns.DisplayObjectContainer
 	 **/
@@ -48,6 +48,12 @@
 
 	Stage._instances = new Object();
 	
+	/**
+	* @method getInstance
+	* @memberOf tomahawk_ns.Stage
+	* @param {string} stageName 
+	* @returns {tomahawk_ns.Stage} returns a Stage object that matches the "stageName" parameter. If none of the Stage instances corresponds to the "stageName" parameter, one is automatically created and returned. It is a (Multiton || Factory) implementation of the Stage class.
+	**/
 	Stage.getInstance = function(stageName)
 	{
 		stageName = stageName || "defaultStage";
@@ -58,6 +64,39 @@
 		return tomahawk_ns.Stage._instances[stageName];
 	};
 
+	/**
+	* @member mouseX
+	* @memberOf tomahawk_ns.Stage.prototype
+	* @type {Number}
+	* @description the x mouse coordinates on the stage.
+	**/
+	Stage.prototype.mouseX = 0;
+	
+	/**
+	* @member mouseY
+	* @memberOf tomahawk_ns.Stage.prototype
+	* @type {Number}
+	* @description the y mouse coordinates on the stage.
+	**/
+	Stage.prototype.mouseY = 0;
+	
+	/**
+	* @member background
+	* @memberOf tomahawk_ns.Stage.prototype
+	* @type {Boolean}
+	* @default false
+	* @description Specifies whether the stage has a background fill. If true, the stage has a background fill. If false, stage has no background fill. Use the backgroundColor property to set the background color of the stage instance.
+	**/
+	Stage.prototype.background = false;
+	
+	/**
+	* @member backgroundColor
+	* @memberOf tomahawk_ns.Stage.prototype
+	* @type {string}
+	* @description The color of the stage background.
+	* @default "#0080C0"
+	**/
+	Stage.prototype.backgroundColor = "#0080C0";
 	
 	Stage.prototype._lastTime = 0;
 	Stage.prototype._frameCount = 0;
@@ -65,20 +104,17 @@
 	Stage.prototype._canvas = null;
 	Stage.prototype._context = null;
 	Stage.prototype._lastActiveChild = null;
-	Stage.prototype.mouseX = 0;
-	Stage.prototype.mouseY = 0;
 	Stage.prototype._focused = false;
 	Stage.prototype._focusedElement = null;
 	Stage.prototype._cache = null;
-	Stage.prototype.background = false;
-	Stage.prototype.backgroundColor = "#0080C0";
 	Stage.prototype._stop = false;
 
-	Stage.prototype._getContext  = function()
-	{
-		return this._canvas.getContext("2d");
-	};
-
+	/**
+	* @description  Associates the canvas element specified by the "canvas" parameter  to this stage and runs the rendering loop.
+	* @method init
+	* @memberOf tomahawk_ns.Stage.prototype
+	* @param {HTMLCanvasElement} canvas the HTMLCanvasElement element associated to this stage object.
+	**/
 	Stage.prototype.init = function(canvas)
 	{
 		var callback = this._mouseHandler.bind(this);
@@ -101,6 +137,149 @@
 		this.enterFrame();		
 	};
 	
+	/**
+	* @description Returns a point object which determines the movement on x and y axises since the last frame ( in local stage coordinates system ).
+	* @method getMovement
+	* @memberOf tomahawk_ns.Stage.prototype
+	* @returns {tomahawk_ns.Point} a Point object
+	**/
+	Stage.prototype.getMovement = function()
+	{
+		var pt = new Object();
+		pt.x = this.mouseX - this._lastMouseX;
+		pt.y = this.mouseY - this._lastMouseY;
+		
+		return pt;
+	};
+
+	/**
+	* @description The main rendering loop, automatically called at each frame.
+	* @method enterFrame
+	* @memberOf tomahawk_ns.Stage.prototype
+	**/
+	Stage.prototype.enterFrame = function()
+	{
+		var curTime = new Date().getTime();
+		var scope = this;
+		var context = this._context;
+		var canvas = this._canvas;
+		
+		this.width = this._canvas.width;
+		this.height = this._canvas.height;
+		
+		this._frameCount++;
+		
+		if( curTime - this._lastTime > 1000 )
+		{
+			this._fps = this._frameCount;
+			this._frameCount = 0;
+			this._lastTime = curTime;
+		}
+		
+		if( this.background == true )
+		{
+			context.save();
+			context.beginPath();
+			context.fillStyle = this.backgroundColor;
+			context.fillRect( 0, 0, canvas.width, canvas.height );
+			context.fill();
+			context.restore();
+		}
+		else
+		{
+			context.clearRect(0,0,canvas.width,canvas.height);
+		}
+		
+		context.save();
+		this.draw(context);
+		context.restore();
+		
+		this.dispatchEvent(new tomahawk_ns.Event(tomahawk_ns.Event.ENTER_FRAME,true,true));
+		window.requestAnimationFrame(this._enterFrame);
+	};
+
+	/**
+	* @description Sets the current fps but only if the browser doesn't have a valid implementation of window.requestAnimationFrame or equivalent. If there's one, it will be used instead even if you specify another fps value.
+	* @method setFPS
+	* @memberOf tomahawk_ns.Stage.prototype
+	* @param {Number} value the new current fps
+	**/
+	Stage.prototype.setFPS = function(value)
+	{
+		this._fps = value;
+		
+		window.requestAnimationFrame = (function()
+		{
+			
+			return  window.requestAnimationFrame       ||  //Chromium 
+					window.webkitRequestAnimationFrame ||  //Webkit
+					window.mozRequestAnimationFrame    || //Mozilla Geko
+					window.oRequestAnimationFrame      || //Opera Presto
+					window.msRequestAnimationFrame     || //IE Trident?
+					function(callback, element){ //Fallback function
+						window.setTimeout(callback, parseInt(1000/value));                
+					}
+			 
+		})();
+	};
+
+	/**
+	* @method drawFPS
+	* @memberOf tomahawk_ns.Stage.prototype
+	* @description Draws the current fps on the top left corner of the stage.
+	**/
+	Stage.prototype.drawFPS = function()
+	{
+		this._context.save();
+		this._context.beginPath();
+		this._context.fillStyle = "black";
+		this._context.fillRect(0,0,50,15);
+		this._context.fill();
+		this._context.fillStyle = "red";
+		this._context.font = '10pt Arial';
+		this._context.fillText("fps: "+this._fps, 0,15);
+		this._context.restore();
+	};
+
+	/**
+	* @method getCanvas
+	* @memberOf tomahawk_ns.Stage.prototype
+	* @returns {HTMLCanvasElement} An HTMLCanvasElement DOM object
+	* @description Returns the HTMLCanvasElement associated to this stage.
+	**/
+	Stage.prototype.getCanvas = function()
+	{
+		return this._canvas;
+	};
+	
+	/**
+	* @method getContext
+	* @memberOf tomahawk_ns.Stage.prototype
+	* @returns {CanvasRenderingContext2D} A CanvasRenderingContext2D object
+	* @description Returns the CanvasRenderingContext2D associated to this stage's canvas.
+	**/
+	Stage.prototype.getContext = function()
+	{
+		return this._context;
+	};
+
+	/**
+	* @member getFPS
+	* @memberOf tomahawk_ns.Stage.prototype
+	* @description Returns the current fps.
+	* @returns {Number} the current fps
+	**/
+	Stage.prototype.getFPS = function()
+	{
+		return this._fps;
+	};
+
+	
+	Stage.prototype._getContext  = function()
+	{
+		return this._canvas.getContext("2d");
+	};
+
 	Stage.prototype._mouseHandler = function(event)
 	{
 		var bounds = this._canvas.getBoundingClientRect();
@@ -221,15 +400,6 @@
 		}
 	};
 
-	Stage.prototype.getMovement = function()
-	{
-		var pt = new Object();
-		pt.x = this.mouseX - this._lastMouseX;
-		pt.y = this.mouseY - this._lastMouseY;
-		
-		return pt;
-	};
-
 	Stage.prototype._eventHandler = function(event)
 	{
 		var list = null;
@@ -270,94 +440,6 @@
 				
 				break;
 		}
-	};
-
-	Stage.prototype.enterFrame = function()
-	{
-		var curTime = new Date().getTime();
-		var scope = this;
-		var context = this._context;
-		var canvas = this._canvas;
-		
-		this.width = this._canvas.width;
-		this.height = this._canvas.height;
-		
-		this._frameCount++;
-		
-		if( curTime - this._lastTime > 1000 )
-		{
-			this._fps = this._frameCount;
-			this._frameCount = 0;
-			this._lastTime = curTime;
-		}
-		
-		if( this.background == true )
-		{
-			context.save();
-			context.beginPath();
-			context.fillStyle = this.backgroundColor;
-			context.fillRect( 0, 0, canvas.width, canvas.height );
-			context.fill();
-			context.restore();
-		}
-		else
-		{
-			context.clearRect(0,0,canvas.width,canvas.height);
-		}
-		
-		context.save();
-		this.draw(context);
-		context.restore();
-		
-		this.dispatchEvent(new tomahawk_ns.Event(tomahawk_ns.Event.ENTER_FRAME,true,true));
-		window.requestAnimationFrame(this._enterFrame);
-	};
-
-	Stage.prototype.setFPS = function(value)
-	{
-		this._fps = value;
-		
-		window.requestAnimationFrame = (function()
-		{
-			
-			return  window.requestAnimationFrame       ||  //Chromium 
-					window.webkitRequestAnimationFrame ||  //Webkit
-					window.mozRequestAnimationFrame    || //Mozilla Geko
-					window.oRequestAnimationFrame      || //Opera Presto
-					window.msRequestAnimationFrame     || //IE Trident?
-					function(callback, element){ //Fallback function
-						window.setTimeout(callback, parseInt(1000/value));                
-					}
-			 
-		})();
-	};
-
-	Stage.prototype.drawFPS = function()
-	{
-		this._context.save();
-		this._context.beginPath();
-		this._context.fillStyle = "black";
-		this._context.fillRect(0,0,50,15);
-		this._context.fill();
-		this._context.fillStyle = "red";
-		this._context.font = '10pt Arial';
-		this._context.fillText("fps: "+this._fps, 0,15);
-		this._context.restore();
-	};
-
-	Stage.prototype.getCanvas = function()
-	{
-		return this._canvas;
-	};
-
-	Stage.prototype.getContext = function()
-	{
-		return this._context;
-	};
-
-	Stage.prototype.getFPS = function()
-	{
-		return this._fps;
 	};
 
 

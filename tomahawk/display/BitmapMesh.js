@@ -32,7 +32,7 @@
 	/**
 	 * @class BitmapMesh
 	 * @memberOf tomahawk_ns
-	 * @description ...
+	 * @description The BitmapMesh class represents display objects that represent bitmap images. The main difference between a BitmapMesh and a Bitmap instance is that you can deform the current texture with the vertices, uvs and indices properties which defines triangles.
 	 * @constructor
 	 * @augments tomahawk_ns.Bitmap
 	 **/
@@ -45,9 +45,36 @@
 	Tomahawk.registerClass( BitmapMesh, "BitmapMesh" );
 	Tomahawk.extend( "BitmapMesh", "Bitmap" );
 	
+	/**
+	* @member vertices
+	* @memberOf tomahawk_ns.BitmapMesh.prototype
+	* @type {Array}
+	* @description An Array of vertices, used with indices, they defines a sets of triangles.
+	**/
 	BitmapMesh.prototype.vertices = null;
+	
+	/**
+	* @member uvs
+	* @memberOf tomahawk_ns.BitmapMesh.prototype
+	* @type {Array}
+	* @description The Array of UV coordinates attached to each vertex.
+	**/
 	BitmapMesh.prototype.uvs = null;
+	
+	/**
+	* @member indices
+	* @memberOf tomahawk_ns.BitmapMesh.prototype
+	* @type {Array}
+	* @description An Array of indices, used with vertices, they defines a sets of triangles.
+	**/
 	BitmapMesh.prototype.indices = null;
+	
+	/**
+	* @member showLines
+	* @memberOf tomahawk_ns.BitmapMesh.prototype
+	* @type {Boolean}
+	* @description Indicates wether the BitmapMesh instance will display the triangle's lines.
+	**/
 	BitmapMesh.prototype.showLines = false;
 	
 	BitmapMesh.prototype.setTexture = function(texture)

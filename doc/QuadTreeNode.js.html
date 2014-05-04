@@ -45,8 +45,7 @@
 		<![endif]-->
 		<link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
 		<link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
-
-       
+			
         <script type="text/javascript">
 
             function gaq(cat, action, optValue) {
@@ -98,7 +97,7 @@
         </script>
     </head>
 	
-	<body class="tomahawk colour">
+	<body class="tomahawk colour documentationJS">
     <div class="contentBig">
 
         <div id="header">
@@ -122,16 +121,19 @@
 		</div>        
 		
 		</div>
+		
+		<div id="doc_nav">
+			<nav>
+				<h2><a href="index.html">Index</a></h2><ul class="toplist"><li><h3>Classes</h3><ul><li><a href="Tomahawk.html">Tomahawk</a></li><li><a href="tomahawk_ns.AssetsLoader.html">AssetsLoader</a></li><li><a href="tomahawk_ns.AssetsManager.html">AssetsManager</a></li><li><a href="tomahawk_ns.Bitmap.html">Bitmap</a></li><li><a href="tomahawk_ns.BitmapMesh.html">BitmapMesh</a></li><li><a href="tomahawk_ns.BrightnessFilter.html">BrightnessFilter</a></li><li><a href="tomahawk_ns.ContrastFilter.html">ContrastFilter</a></li><li><a href="tomahawk_ns.DisplayObject.html">DisplayObject</a></li><li><a href="tomahawk_ns.DisplayObjectContainer.html">DisplayObjectContainer</a></li><li><a href="tomahawk_ns.Event.html">Event</a></li><li><a href="tomahawk_ns.EventDispatcher.html">EventDispatcher</a></li><li><a href="tomahawk_ns.Font.html">Font</a></li><li><a href="tomahawk_ns.GrayScaleFilter.html">GrayScaleFilter</a></li><li><a href="tomahawk_ns.InputTextField.html">InputTextField</a></li><li><a href="tomahawk_ns.Keyboard.html">Keyboard</a></li><li><a href="tomahawk_ns.KeyEvent.html">KeyEvent</a></li><li><a href="tomahawk_ns.Letter.html">Letter</a></li><li><a href="tomahawk_ns.Matrix2D.html">Matrix2D</a></li><li><a href="tomahawk_ns.Matrix4x4.html">Matrix4x4</a></li><li><a href="tomahawk_ns.Mouse.html">Mouse</a></li><li><a href="tomahawk_ns.MouseEvent.html">MouseEvent</a></li><li><a href="tomahawk_ns.MovieClip.html">MovieClip</a></li><li><a href="tomahawk_ns.PixelFilter.html">PixelFilter</a></li><li><a href="tomahawk_ns.Point.html">Point</a></li><li><a href="tomahawk_ns.Point3D.html">Point3D</a></li><li><a href="tomahawk_ns.QuadTreeContainer.html">QuadTreeContainer</a></li><li><a href="tomahawk_ns.QuadTreeNode.html">QuadTreeNode</a></li><li><a href="tomahawk_ns.Rectangle.html">Rectangle</a></li><li><a href="tomahawk_ns.Screen.html">Screen</a></li><li><a href="tomahawk_ns.SelectableTextField.html">SelectableTextField</a></li><li><a href="tomahawk_ns.ShadowBlurFilter.html">ShadowBlurFilter</a></li><li><a href="tomahawk_ns.Shape.html">Shape</a></li><li><a href="tomahawk_ns.Sprite.html">Sprite</a></li><li><a href="tomahawk_ns.Sprite3D.html">Sprite3D</a></li><li><a href="tomahawk_ns.Stage.html">Stage</a></li><li><a href="tomahawk_ns.TextField.html">TextField</a></li><li><a href="tomahawk_ns.TextFormat.html">TextFormat</a></li><li><a href="tomahawk_ns.Texture.html">Texture</a></li><li><a href="tomahawk_ns.TextureAtlas.html">TextureAtlas</a></li><li><a href="tomahawk_ns.Vector3D.html">Vector3D</a></li><li><a href="tomahawk_ns.Word.html">Word</a></li></ul></li><li><h3>Namespaces</h3><ul><li><a href="tomahawk_ns.html">tomahawk_ns</a></li></ul></li></ul>
+			</nav>
+		</div>
 
         <div id="main_content">
-
-
-
+		
 			<div id="main">
-
-				<h1 class="page-title">Source: display/boost/QuadTreeNode.js</h1>
-
-				
+				<div class="left-content">
+					<h1 class="page-title">Source: display/boost/QuadTreeNode.js</h1>
+					
 
 
     
@@ -171,7 +173,7 @@
 	/**
 	 * @class QuadTreeNode
 	 * @memberOf tomahawk_ns
-	 * @description ...
+	 * @description A QuadTreeNode Object defines a leaf of a quadtree structure. Quadtrees are a derived implementation of binary trees which are very efficient in 2d plans.
 	 * @constructor	
 	 **/
 	function QuadTreeNode(left,right,top,bottom, depth, maxChildren, maxDepth)
@@ -198,6 +200,12 @@
 	
 	// iterative  methods
 	
+	/**
+	* @description Adds a display object to the tree node
+	* @method add
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @param {tomahawk_ns.DisplayObject} element the display object you want to add to the tree node
+	**/
 	QuadTreeNode.prototype.add = function(element)
 	{
 		this.remove(element);
@@ -249,6 +257,12 @@
 		}
 	};
 	
+	/**
+	* @description Removes a display object from the tree node
+	* @method remove
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @param {tomahawk_ns.DisplayObject} element the display object you want to remove from the tree node
+	**/
 	QuadTreeNode.prototype.remove = function( element )
 	{
 		var index = -1;
@@ -276,6 +290,16 @@
 		}
 	};
 	
+	/**
+	* @description Returns an Array of DisplayObjects that are visible in the area defined by the left,right,top,bottom parameters.
+	* @method get
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @param {Number} left 
+	* @param {Number} right 
+	* @param {Number} top 
+	* @param {Number} bottom 
+	* @returns {Array} An array of DisplayObject
+	**/
 	QuadTreeNode.prototype.get = function( left, right, top, bottom )
 	{
 		var tick = tomahawk_ns.QuadTreeNode._tick + 1;
@@ -334,6 +358,11 @@
 		return result;
 	};
 	
+	/**
+	* @description Splits the current node into four child nodes. The children of the node will be redispatched throught those new four nodes.
+	* @method split
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	**/
 	QuadTreeNode.prototype.split = function()
 	{
 		var child = null;
@@ -358,19 +387,122 @@
 		this.full = true;
 	};
 	
-	
+	/**
+	* @member full
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {Boolean}
+	* @default false
+	* @description Indicates wether the node is full.
+	**/
 	QuadTreeNode.prototype.full = false;
+	
+	/**
+	* @default 0
+	* @member left
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {Number}
+	* @description The x coordinate of the top-left corner of the node's area.
+	**/
 	QuadTreeNode.prototype.left = 0;
+	
+	/**
+	* @default 0
+	* @member right
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {Number}
+	* @description The x coordinate of the bottom-right corner of the node's area.
+	**/
 	QuadTreeNode.prototype.right = 0;
+	
+	/**
+	* @default 0
+	* @member top
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {Number}
+	* @description The y coordinate of the top-left corner of the node's area.
+	**/
 	QuadTreeNode.prototype.top = 0;
+	
+	
+	/**
+	* @default 0
+	* @member bottom
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {Number}
+	* @description The y coordinate of the bottom-right corner of the node's area.
+	**/
 	QuadTreeNode.prototype.bottom = 0;
+	
+	/**
+	* @default 20
+	* @member maxChildren
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {Number}
+	* @description Indicates the maximum amount of children of that node can stores before splitting itself.
+	**/
 	QuadTreeNode.prototype.maxChildren = 20;
+	
+	/**
+	* @default 0
+	* @member depth
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {Number}
+	* @description Indicates the depth of the node within the quadtree structure
+	**/
 	QuadTreeNode.prototype.depth = 0;
+	
+	/**
+	* @default null
+	* @member node1
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {tomahawk_ns.QuadTreeNode}
+	* @description Indicates the top-left child node of the node.
+	**/
 	QuadTreeNode.prototype.node1 = null;
+	
+	/**
+	* @default null
+	* @member node2
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {tomahawk_ns.QuadTreeNode}
+	* @description Indicates the bottom-left child node of the node.
+	**/
 	QuadTreeNode.prototype.node2 = null;
+	
+	/**
+	* @default null
+	* @member node3
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {tomahawk_ns.QuadTreeNode}
+	* @description Indicates the top-right child node of the node.
+	**/
 	QuadTreeNode.prototype.node3 = null;
+	
+	/**
+	* @default null
+	* @member node4
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {tomahawk_ns.QuadTreeNode}
+	* @description Indicates the bottom-right child node of the node.
+	**/
 	QuadTreeNode.prototype.node4 = null;
+	
+	/**
+	* @default 0
+	* @member limitX
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {tomahawk_ns.QuadTreeNode}
+	* @description Indicates the x coordinate of the splitting boundary within this node.
+	**/
 	QuadTreeNode.prototype.limitX = 0;
+	
+	/**
+	* @default 0
+	* @member limitY
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {tomahawk_ns.QuadTreeNode}
+	* @description Indicates the y coordinate of the splitting boundary within this node.
+	**/
 	QuadTreeNode.prototype.limitY = 0;
 	
 	
@@ -383,14 +515,32 @@
 
 
 
+				</div>
+				
+				<div class="rigth-ad">
+					<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+					<!-- Skyscraper 120 x 600 -->
+					<ins class="adsbygoogle"
+						 style="display:inline-block;width:120px;height:600px"
+						 data-ad-client="ca-pub-8931349961961991"
+						 data-ad-slot="7816447068"></ins>
+					<script>
+					(adsbygoogle = window.adsbygoogle || []).push({});
+					</script>
+				</div>
+			</div>
+			
+			<div class="footer-ad" style="text-align:center">
+				<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+				<ins class="adsbygoogle"
+					 style="display:inline-block;width:728px;height:90px"
+					 data-ad-client="ca-pub-8931349961961991"
+					 data-ad-slot="3381404260"></ins>
+				<script>
+				(adsbygoogle = window.adsbygoogle || []).push({});
+				</script>
 			</div>
 
-			<nav>
-				<h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="Tomahawk.html">Tomahawk</a></li><li><a href="tomahawk_ns.AssetsLoader.html">AssetsLoader</a></li><li><a href="tomahawk_ns.AssetsManager.html">AssetsManager</a></li><li><a href="tomahawk_ns.Bitmap.html">Bitmap</a></li><li><a href="tomahawk_ns.BitmapMesh.html">BitmapMesh</a></li><li><a href="tomahawk_ns.BrightnessFilter.html">BrightnessFilter</a></li><li><a href="tomahawk_ns.ContrastFilter.html">ContrastFilter</a></li><li><a href="tomahawk_ns.DisplayObject.html">DisplayObject</a></li><li><a href="tomahawk_ns.DisplayObjectContainer.html">DisplayObjectContainer</a></li><li><a href="tomahawk_ns.Event.html">Event</a></li><li><a href="tomahawk_ns.EventDispatcher.html">EventDispatcher</a></li><li><a href="tomahawk_ns.Font.html">Font</a></li><li><a href="tomahawk_ns.GrayScaleFilter.html">GrayScaleFilter</a></li><li><a href="tomahawk_ns.InputTextField.html">InputTextField</a></li><li><a href="tomahawk_ns.Keyboard.html">Keyboard</a></li><li><a href="tomahawk_ns.KeyEvent.html">KeyEvent</a></li><li><a href="tomahawk_ns.Letter.html">Letter</a></li><li><a href="tomahawk_ns.Matrix2D.html">Matrix2D</a></li><li><a href="tomahawk_ns.Matrix4x4.html">Matrix4x4</a></li><li><a href="tomahawk_ns.Mouse.html">Mouse</a></li><li><a href="tomahawk_ns.MouseEvent.html">MouseEvent</a></li><li><a href="tomahawk_ns.MovieClip.html">MovieClip</a></li><li><a href="tomahawk_ns.PixelFilter.html">PixelFilter</a></li><li><a href="tomahawk_ns.Point.html">Point</a></li><li><a href="tomahawk_ns.Point3D.html">Point3D</a></li><li><a href="tomahawk_ns.QuadTreeContainer.html">QuadTreeContainer</a></li><li><a href="tomahawk_ns.QuadTreeNode.html">QuadTreeNode</a></li><li><a href="tomahawk_ns.Rectangle.html">Rectangle</a></li><li><a href="tomahawk_ns.Screen.html">Screen</a></li><li><a href="tomahawk_ns.SelectableTextField.html">SelectableTextField</a></li><li><a href="tomahawk_ns.ShadowBlurFilter.html">ShadowBlurFilter</a></li><li><a href="tomahawk_ns.Shape.html">Shape</a></li><li><a href="tomahawk_ns.Sprite.html">Sprite</a></li><li><a href="tomahawk_ns.Sprite3D.html">Sprite3D</a></li><li><a href="tomahawk_ns.Stage.html">Stage</a></li><li><a href="tomahawk_ns.TextField.html">TextField</a></li><li><a href="tomahawk_ns.TextFormat.html">TextFormat</a></li><li><a href="tomahawk_ns.Texture.html">Texture</a></li><li><a href="tomahawk_ns.TextureAtlas.html">TextureAtlas</a></li><li><a href="tomahawk_ns.Vector3D.html">Vector3D</a></li><li><a href="tomahawk_ns.Word.html">Word</a></li></ul><h3>Namespaces</h3><ul><li><a href="tomahawk_ns.html">tomahawk_ns</a></li></ul>
-			</nav>
-
-			<br clear="both">
-			
 		</div>
 		
         <div id="footer">

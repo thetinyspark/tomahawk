@@ -32,7 +32,8 @@
 	/**
 	* @class Bitmap
 	* @memberOf tomahawk_ns
-	* @param {tomahawk_ns.Texture} [texture=undefined] the drawing texture.
+	* @description The Bitmap class represents display objects that represent bitmap images. 
+	* @param {tomahawk_ns.Texture} [texture=undefined] the bitmap drawing texture.
 	* @augments tomahawk_ns.DisplayObject
 	* @constructor
 	*/

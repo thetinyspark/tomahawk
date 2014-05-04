@@ -31,7 +31,7 @@
 /**
  * @class AssetsLoader
  * @memberOf tomahawk_ns
- * @description ...
+ * @description The AssetsLoader class is a basic Image mass loader.
  * @constructor
  * @augments tomahawk_ns.EventDispatcher
  **/
@@ -46,6 +46,12 @@ Tomahawk.extend("AssetsLoader", "EventDispatcher" );
 // singleton
 AssetsLoader._instance = null;
 
+/**
+* @description Returns a unique instance of AssetsLoader, singleton implementation.
+* @method getInstance
+* @memberOf tomahawk_ns.AssetsLoader
+* @returns {tomahawk_ns.AssetsLoader} returns a number
+**/
 AssetsLoader.getInstance = function()
 {
 	if( tomahawk_ns.AssetsLoader._instance == null )
@@ -59,17 +65,34 @@ AssetsLoader.prototype._loadingList = null;
 AssetsLoader.prototype._data = null;
 AssetsLoader.prototype._numFiles = 0;
 
-
+/**
+* @description Returns a key indexed object which contains the loaded data.
+* @method getData
+* @memberOf tomahawk_ns.AssetsLoader.prototype
+* @returns {Object} a key indexed object
+**/
 AssetsLoader.prototype.getData = function()
 {
 	return this._data;
 };
 
+/**
+* @description Cleans the internal loaded data object, call it before another loading task in order to save memory.
+* @method clean
+* @memberOf tomahawk_ns.AssetsLoader.prototype
+**/
 AssetsLoader.prototype.clean = function()
 {
 	this._data = new Object();
 };
 
+/**
+* @description Adds an image to the loading list, with the url specified by the "fileURL" parameter and an alias specified by the "fileAlias" parameter.
+* @method load
+* @param {String] fileURL the url of the image.
+* @param {String] fileAlias The alias of the image used as a key within the object returned by the "getData()" method.
+* @memberOf tomahawk_ns.AssetsLoader.prototype
+**/
 AssetsLoader.prototype.addFile = function(fileURL, fileAlias)
 {
 	// on réinitialise les data
@@ -81,6 +104,11 @@ AssetsLoader.prototype.addFile = function(fileURL, fileAlias)
 	this._numFiles++;
 };
 
+/**
+* @description Starts the loading process.
+* @method load
+* @memberOf tomahawk_ns.AssetsLoader.prototype
+**/
 AssetsLoader.prototype.load = function()
 {
 	if( this._loadingList.length == 0 )
@@ -113,6 +141,18 @@ AssetsLoader.prototype.load = function()
 	}
 };
 
+/**
+* @description Returns the loading progression ( between 0.0 and 1.0 )
+* @method getProgression
+* @memberOf tomahawk_ns.AssetsLoader.prototype
+* @returns {Number}
+**/
+AssetsLoader.prototype.getProgression = function()
+{
+	var progression = ( this._numFiles - this._loadingList.length ) / this._numFiles;
+	return progression;
+};
+
 AssetsLoader.prototype._progressHandler = function(image,alias)
 {
 	this._data[alias] = image;
@@ -124,12 +164,6 @@ AssetsLoader.prototype._errorHandler = function()
 {
 	this.load();
 	this.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.IO_ERROR, true, true) );
-};
-
-AssetsLoader.prototype.getProgression = function()
-{
-	var progression = ( this._numFiles - this._loadingList.length ) / this._numFiles;
-	return progression;
 };
 
 tomahawk_ns.AssetsLoader = AssetsLoader;

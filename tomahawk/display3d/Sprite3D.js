@@ -32,7 +32,7 @@
 	/**
 	 * @class Sprite3D
 	 * @memberOf tomahawk_ns
-	 * @description ...
+	 * @description The Sprite3d class is a basic display list building block, a display list node that can contain children on which pseudo3D effects can be applied.
 	 * @constructor
 	 * @augments tomahawk_ns.Sprite
 	 **/
@@ -42,6 +42,84 @@
 		this.matrix3D = new tomahawk_ns.Matrix4x4();
 	}
 	
+	/**
+	* @member matrix3D
+	* @memberOf tomahawk_ns.Sprite3D.prototype
+	* @type {Matrix4x4}
+	* @description The transformation matrix (3d) of the Sprite3D
+	* @default null
+	**/
+	Sprite3D.prototype.matrix3D = null;
+	
+	/**
+	* @member scaleZ
+	* @memberOf tomahawk_ns.Sprite3D.prototype
+	* @type {Number}
+	* @default 1
+	* @description Indicates the depth scale (percentage) of the object as applied from the registration point.
+	**/
+	Sprite3D.prototype.scaleZ = 1;
+	
+	/**
+	* @member z
+	* @memberOf tomahawk_ns.Sprite3D.prototype
+	* @type {Number}
+	* @default 0
+	* @description Indicates the z coordinate of the Sprite3D instance relative to the local coordinates of the parent DisplayObjectContainer.
+	**/
+	Sprite3D.prototype.z = 0;
+	
+	/**
+	* @member pivotZ
+	* @memberOf tomahawk_ns.Sprite3D.prototype
+	* @type {Number}
+	* @default 0
+	* @description Indicates the z coordinate of the Sprite3D instance registration point
+	**/
+	Sprite3D.prototype.pivotZ = 0;
+	
+	/**
+	* @member rotationX
+	* @memberOf tomahawk_ns.Sprite3D.prototype
+	* @type {Number}
+	* @default 0
+	* @description Indicates the rotation on the x axis of the Sprite3D instance, in degrees, from its original orientation.
+	**/
+	Sprite3D.prototype.rotationX = 0;
+	
+	/**
+	* @member rotationY
+	* @memberOf tomahawk_ns.Sprite3D.prototype
+	* @type {Number}
+	* @default 0
+	* @description Indicates the rotation on the y axis of the Sprite3D instance, in degrees, from its original orientation.
+	**/
+	Sprite3D.prototype.rotationY = 0;
+	
+	/**
+	* @member rotationZ
+	* @memberOf tomahawk_ns.Sprite3D.prototype
+	* @type {Number}
+	* @default 0
+	* @description Indicates the rotation on the z axis of the Sprite3D instance, in degrees, from its original orientation.
+	**/
+	Sprite3D.prototype.rotationZ = 0;
+	
+	/**
+	* @member useReal3D
+	* @memberOf tomahawk_ns.Sprite3D.prototype
+	* @type {Boolean}
+	* @default false
+	* @description Indicates wether the Sprite3D instance will convert his parent's transformation matrixes in 3d matrixes before rendering. If true it will results in a better 3d transformation.
+	**/
+	Sprite3D.prototype.useReal3D = false;
+	
+	/**
+	* @description Returns a vector that represents the normale of the Sprite3D instance.
+	* @method getNormalVector
+	* @memberOf tomahawk_ns.Sprite3D.prototype
+	* @returns {tomahawk_ns.Vector3D} returns a Vector3D object
+	**/
 	Sprite3D.prototype.getNormalVector = function()
 	{
 		var mat = tomahawk_ns.Matrix4x4.toMatrix2D(this.getConcatenedMatrix3D(true));
@@ -55,6 +133,55 @@
 
 		return vec1;
 	};
+	
+	/**
+	* @description Returns the combined 3d and 2d transformation matrixes of the Sprite3D instance and all of its parent objects, back to the stage level. If one of the parents of the Sprite3D instance is classical 2d display object, his matrix is converted into a Matrix4x4.
+	* @method getConcatenedMatrix3D
+	* @memberOf tomahawk_ns.Sprite3D.prototype
+	* @returns {tomahawk_ns.Matrix4x4} returns a Matrix4x4 object
+	**/
+	Sprite3D.prototype.getConcatenedMatrix3D = function()
+	{
+		this.updateNextFrame = true;
+		this.updateMatrix();
+		var current = this.parent;
+		var mat3D = this.matrix3D.clone();
+		
+		while( current != null )
+		{
+			current.updateNextFrame = true;
+			current.updateMatrix();
+			
+			if( current.matrix3D && current.matrix3D != null )
+			{
+				mat3D.prependMatrix( current.matrix3D );
+			}
+			else
+			{
+				mat3D.prependMatrix( tomahawk_ns.Matrix4x4.toMatrix4x4(current.matrix) );
+			}
+			current = current.parent;
+		}
+		
+		return mat3D;
+	};
+	
+	/**
+	* @method localToGlobal3D
+	* @memberOf tomahawk_ns.Sprite3D.prototype
+	* @param {string} {param} myparam
+	* @returns {Number} returns a number
+	* @description Converts the point object specified by x,y,z parameters from the DisplayObject's (local) coordinates to the Stage (global) coordinates.
+	**/
+	Sprite3D.prototype.localToGlobal3D = function(x,y,z)
+	{
+		var mat = this.getConcatenedMatrix3D();
+		var pt = new tomahawk_ns.Point3D(x,y,z);
+		mat.transformPoint3D(pt);
+		return pt;
+	};
+
+	
 	
 	Sprite3D.prototype.updateMatrix = function()
 	{
@@ -83,32 +210,6 @@
 		this.updateNextFrame = false;
 	};
 	
-	Sprite3D.prototype.getConcatenedMatrix3D = function()
-	{
-		this.updateNextFrame = true;
-		this.updateMatrix();
-		var current = this.parent;
-		var mat3D = this.matrix3D.clone();
-		
-		while( current != null )
-		{
-			current.updateNextFrame = true;
-			current.updateMatrix();
-			
-			if( current.matrix3D && current.matrix3D != null )
-			{
-				mat3D.prependMatrix( current.matrix3D );
-			}
-			else
-			{
-				mat3D.prependMatrix( tomahawk_ns.Matrix4x4.toMatrix4x4(current.matrix) );
-			}
-			current = current.parent;
-		}
-		
-		return mat3D;
-	};
-	
 	Sprite3D.prototype.draw = function(context)
 	{
 		context.save();
@@ -123,25 +224,6 @@
 		context.restore();
 	};
 	
-	Sprite3D.prototype.localToGlobal3D = function(x,y,z)
-	{
-		var mat = this.getConcatenedMatrix3D();
-		var pt = new tomahawk_ns.Point3D(x,y,z);
-		mat.transformPoint3D(pt);
-		return pt;
-	};
-	
-	Sprite3D.prototype.matrix3D = null;
-	
-	Sprite3D.prototype.scaleZ = 1;
-	Sprite3D.prototype.z = 0;
-	Sprite3D.prototype.pivotZ = 0;
-	
-	Sprite3D.prototype.rotationX = 0;
-	Sprite3D.prototype.rotationY = 0;
-	Sprite3D.prototype.rotationZ = 0;
-	
-	Sprite3D.prototype.useReal3D = false;
 	
 	Tomahawk.registerClass( Sprite3D, "Sprite3D" );
 	Tomahawk.extend( "Sprite3D", "Sprite" );

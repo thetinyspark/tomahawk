@@ -32,18 +32,48 @@
 	/**
 	 * @class Mouse
 	 * @memberOf tomahawk_ns
-	 * @description ...
+	 * @description The methods of the Mouse class are used to set the pointer to a specific style. The Mouse class is a top-level class whose properties and methods you can access without using a constructor.
 	 * @constructor
 	 **/
 	function Mouse(){}
 
 	Tomahawk.registerClass( Mouse, "Mouse" );
 	
+	/**
+	* @property {String} RESIZE
+	* @memberOf tomahawk_ns.Mouse
+	* @default "se-resize"
+	**/
 	Mouse.RESIZE = "se-resize";
+	
+	/**
+	* @property {String} MOVE
+	* @memberOf tomahawk_ns.Mouse
+	* @default "move"
+	**/
 	Mouse.MOVE = "move";
+	
+	/**
+	* @property {String} POINTER
+	* @memberOf tomahawk_ns.Mouse
+	* @default "pointer"
+	**/
 	Mouse.POINTER = "pointer";
+
+	/**
+	* @property {String} DEFAULT
+	* @memberOf tomahawk_ns.Mouse
+	* @default "default"
+	**/
 	Mouse.DEFAULT = "default";
 
+	/**
+	* @member setCursor
+	* @memberOf tomahawk_ns.Mouse
+	* @param {String} value the cursor style value.
+	* @param {DOMElement} domElement the domElement on which the cursor style is applied.
+	* @description Sets the cursor style for the DOMElement specified by the "domElement" parameter.
+	**/
 	Mouse.setCursor = function(value,domElement)
 	{
 		domElement.style.cursor = value;

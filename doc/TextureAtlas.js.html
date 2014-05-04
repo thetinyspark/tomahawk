@@ -45,8 +45,7 @@
 		<![endif]-->
 		<link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
 		<link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
-
-       
+			
         <script type="text/javascript">
 
             function gaq(cat, action, optValue) {
@@ -98,7 +97,7 @@
         </script>
     </head>
 	
-	<body class="tomahawk colour">
+	<body class="tomahawk colour documentationJS">
     <div class="contentBig">
 
         <div id="header">
@@ -122,16 +121,19 @@
 		</div>        
 		
 		</div>
+		
+		<div id="doc_nav">
+			<nav>
+				<h2><a href="index.html">Index</a></h2><ul class="toplist"><li><h3>Classes</h3><ul><li><a href="Tomahawk.html">Tomahawk</a></li><li><a href="tomahawk_ns.AssetsLoader.html">AssetsLoader</a></li><li><a href="tomahawk_ns.AssetsManager.html">AssetsManager</a></li><li><a href="tomahawk_ns.Bitmap.html">Bitmap</a></li><li><a href="tomahawk_ns.BitmapMesh.html">BitmapMesh</a></li><li><a href="tomahawk_ns.BrightnessFilter.html">BrightnessFilter</a></li><li><a href="tomahawk_ns.ContrastFilter.html">ContrastFilter</a></li><li><a href="tomahawk_ns.DisplayObject.html">DisplayObject</a></li><li><a href="tomahawk_ns.DisplayObjectContainer.html">DisplayObjectContainer</a></li><li><a href="tomahawk_ns.Event.html">Event</a></li><li><a href="tomahawk_ns.EventDispatcher.html">EventDispatcher</a></li><li><a href="tomahawk_ns.Font.html">Font</a></li><li><a href="tomahawk_ns.GrayScaleFilter.html">GrayScaleFilter</a></li><li><a href="tomahawk_ns.InputTextField.html">InputTextField</a></li><li><a href="tomahawk_ns.Keyboard.html">Keyboard</a></li><li><a href="tomahawk_ns.KeyEvent.html">KeyEvent</a></li><li><a href="tomahawk_ns.Letter.html">Letter</a></li><li><a href="tomahawk_ns.Matrix2D.html">Matrix2D</a></li><li><a href="tomahawk_ns.Matrix4x4.html">Matrix4x4</a></li><li><a href="tomahawk_ns.Mouse.html">Mouse</a></li><li><a href="tomahawk_ns.MouseEvent.html">MouseEvent</a></li><li><a href="tomahawk_ns.MovieClip.html">MovieClip</a></li><li><a href="tomahawk_ns.PixelFilter.html">PixelFilter</a></li><li><a href="tomahawk_ns.Point.html">Point</a></li><li><a href="tomahawk_ns.Point3D.html">Point3D</a></li><li><a href="tomahawk_ns.QuadTreeContainer.html">QuadTreeContainer</a></li><li><a href="tomahawk_ns.QuadTreeNode.html">QuadTreeNode</a></li><li><a href="tomahawk_ns.Rectangle.html">Rectangle</a></li><li><a href="tomahawk_ns.Screen.html">Screen</a></li><li><a href="tomahawk_ns.SelectableTextField.html">SelectableTextField</a></li><li><a href="tomahawk_ns.ShadowBlurFilter.html">ShadowBlurFilter</a></li><li><a href="tomahawk_ns.Shape.html">Shape</a></li><li><a href="tomahawk_ns.Sprite.html">Sprite</a></li><li><a href="tomahawk_ns.Sprite3D.html">Sprite3D</a></li><li><a href="tomahawk_ns.Stage.html">Stage</a></li><li><a href="tomahawk_ns.TextField.html">TextField</a></li><li><a href="tomahawk_ns.TextFormat.html">TextFormat</a></li><li><a href="tomahawk_ns.Texture.html">Texture</a></li><li><a href="tomahawk_ns.TextureAtlas.html">TextureAtlas</a></li><li><a href="tomahawk_ns.Vector3D.html">Vector3D</a></li><li><a href="tomahawk_ns.Word.html">Word</a></li></ul></li><li><h3>Namespaces</h3><ul><li><a href="tomahawk_ns.html">tomahawk_ns</a></li></ul></li></ul>
+			</nav>
+		</div>
 
         <div id="main_content">
-
-
-
+		
 			<div id="main">
-
-				<h1 class="page-title">Source: texture/TextureAtlas.js</h1>
-
-				
+				<div class="left-content">
+					<h1 class="page-title">Source: texture/TextureAtlas.js</h1>
+					
 
 
     
@@ -171,7 +173,7 @@
 	/**
 	 * @class TextureAtlas
 	 * @memberOf tomahawk_ns
-	 * @description ...
+	 * @description A texture atlas is a collection of many smaller textures in one big image. This class is used to access and create textures from such an atlas.
 	 * @constructor
 	 **/
 	function TextureAtlas()
@@ -182,9 +184,36 @@
 	Tomahawk.registerClass( TextureAtlas, "TextureAtlas" );
 
 	TextureAtlas.prototype._textures = null;
+	
+	/**
+	* @description The rendering data itself, it can be an HTMLImageElement || HTMLCanvasElement || HTMLVideoElement
+	* @member data
+	* @memberOf tomahawk_ns.TextureAtlas.prototype
+	* @type {Object}
+	* @default null
+	**/
 	TextureAtlas.prototype.data = null;
+	
+	/**
+	* @member name
+	* @memberOf tomahawk_ns.Texture.prototype
+	* @type {String}
+	* @description The name of the texture atlas
+	* @default null
+	**/
 	TextureAtlas.prototype.name = null;
 
+	/**
+	* @method createTexture
+	* @memberOf tomahawk_ns.TextureAtlas.prototype
+	* @param {string} name
+	* @param {Number} startX
+	* @param {Number} startY
+	* @param {Number} endX
+	* @param {Number} endY
+	* @description creates a new sub texture from the atlas which will render the region of the atlas data specified
+	  by the startX, startY, endX, endY parameters with the name specified by the "name" parameter. The newly created texture is automatically stored within the atlas, it means that you can retrieve it with the "getTextureByName" method.
+	**/
 	TextureAtlas.prototype.createTexture = function( name, startX, startY, endX, endY )
 	{
 		var texture = new tomahawk_ns.Texture();
@@ -194,7 +223,14 @@
 		
 		this._textures.push(texture);
 	};
-
+	
+	/**
+	* @method getTextureByName
+	* @memberOf tomahawk_ns.TextureAtlas.prototype
+	* @param {string} name
+	* @returns {tomahawk_ns.Texture}
+	* @description Returns the internal sub texture which matches the name specified by the "name" parameter.
+	**/
 	TextureAtlas.prototype.getTextureByName = function( name )
 	{
 		var i = this._textures.length;
@@ -208,7 +244,13 @@
 		
 		return null;
 	};
-
+	
+	/**
+	* @method removeTexture
+	* @memberOf tomahawk_ns.TextureAtlas.prototype
+	* @param {string} name
+	* @description Removes the internal sub texture which matches the name specified by the "name" parameter.
+	**/
 	TextureAtlas.prototype.removeTexture = function( name )
 	{
 		var texture = this.getTextureByName(name);
@@ -219,7 +261,6 @@
 		var index = this._textures.indexOf(texture);
 		this._textures.splice(index,1);
 	};
-
 
 	tomahawk_ns.TextureAtlas = TextureAtlas;
 
@@ -232,14 +273,32 @@
 
 
 
+				</div>
+				
+				<div class="rigth-ad">
+					<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+					<!-- Skyscraper 120 x 600 -->
+					<ins class="adsbygoogle"
+						 style="display:inline-block;width:120px;height:600px"
+						 data-ad-client="ca-pub-8931349961961991"
+						 data-ad-slot="7816447068"></ins>
+					<script>
+					(adsbygoogle = window.adsbygoogle || []).push({});
+					</script>
+				</div>
+			</div>
+			
+			<div class="footer-ad" style="text-align:center">
+				<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+				<ins class="adsbygoogle"
+					 style="display:inline-block;width:728px;height:90px"
+					 data-ad-client="ca-pub-8931349961961991"
+					 data-ad-slot="3381404260"></ins>
+				<script>
+				(adsbygoogle = window.adsbygoogle || []).push({});
+				</script>
 			</div>
 
-			<nav>
-				<h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="Tomahawk.html">Tomahawk</a></li><li><a href="tomahawk_ns.AssetsLoader.html">AssetsLoader</a></li><li><a href="tomahawk_ns.AssetsManager.html">AssetsManager</a></li><li><a href="tomahawk_ns.Bitmap.html">Bitmap</a></li><li><a href="tomahawk_ns.BitmapMesh.html">BitmapMesh</a></li><li><a href="tomahawk_ns.BrightnessFilter.html">BrightnessFilter</a></li><li><a href="tomahawk_ns.ContrastFilter.html">ContrastFilter</a></li><li><a href="tomahawk_ns.DisplayObject.html">DisplayObject</a></li><li><a href="tomahawk_ns.DisplayObjectContainer.html">DisplayObjectContainer</a></li><li><a href="tomahawk_ns.Event.html">Event</a></li><li><a href="tomahawk_ns.EventDispatcher.html">EventDispatcher</a></li><li><a href="tomahawk_ns.Font.html">Font</a></li><li><a href="tomahawk_ns.GrayScaleFilter.html">GrayScaleFilter</a></li><li><a href="tomahawk_ns.InputTextField.html">InputTextField</a></li><li><a href="tomahawk_ns.Keyboard.html">Keyboard</a></li><li><a href="tomahawk_ns.KeyEvent.html">KeyEvent</a></li><li><a href="tomahawk_ns.Letter.html">Letter</a></li><li><a href="tomahawk_ns.Matrix2D.html">Matrix2D</a></li><li><a href="tomahawk_ns.Matrix4x4.html">Matrix4x4</a></li><li><a href="tomahawk_ns.Mouse.html">Mouse</a></li><li><a href="tomahawk_ns.MouseEvent.html">MouseEvent</a></li><li><a href="tomahawk_ns.MovieClip.html">MovieClip</a></li><li><a href="tomahawk_ns.PixelFilter.html">PixelFilter</a></li><li><a href="tomahawk_ns.Point.html">Point</a></li><li><a href="tomahawk_ns.Point3D.html">Point3D</a></li><li><a href="tomahawk_ns.QuadTreeContainer.html">QuadTreeContainer</a></li><li><a href="tomahawk_ns.QuadTreeNode.html">QuadTreeNode</a></li><li><a href="tomahawk_ns.Rectangle.html">Rectangle</a></li><li><a href="tomahawk_ns.Screen.html">Screen</a></li><li><a href="tomahawk_ns.SelectableTextField.html">SelectableTextField</a></li><li><a href="tomahawk_ns.ShadowBlurFilter.html">ShadowBlurFilter</a></li><li><a href="tomahawk_ns.Shape.html">Shape</a></li><li><a href="tomahawk_ns.Sprite.html">Sprite</a></li><li><a href="tomahawk_ns.Sprite3D.html">Sprite3D</a></li><li><a href="tomahawk_ns.Stage.html">Stage</a></li><li><a href="tomahawk_ns.TextField.html">TextField</a></li><li><a href="tomahawk_ns.TextFormat.html">TextFormat</a></li><li><a href="tomahawk_ns.Texture.html">Texture</a></li><li><a href="tomahawk_ns.TextureAtlas.html">TextureAtlas</a></li><li><a href="tomahawk_ns.Vector3D.html">Vector3D</a></li><li><a href="tomahawk_ns.Word.html">Word</a></li></ul><h3>Namespaces</h3><ul><li><a href="tomahawk_ns.html">tomahawk_ns</a></li></ul>
-			</nav>
-
-			<br clear="both">
-			
 		</div>
 		
         <div id="footer">

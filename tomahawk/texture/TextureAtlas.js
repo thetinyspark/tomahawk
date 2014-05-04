@@ -32,7 +32,7 @@
 	/**
 	 * @class TextureAtlas
 	 * @memberOf tomahawk_ns
-	 * @description ...
+	 * @description A texture atlas is a collection of many smaller textures in one big image. This class is used to access and create textures from such an atlas.
 	 * @constructor
 	 **/
 	function TextureAtlas()
@@ -43,9 +43,36 @@
 	Tomahawk.registerClass( TextureAtlas, "TextureAtlas" );
 
 	TextureAtlas.prototype._textures = null;
+	
+	/**
+	* @description The rendering data itself, it can be an HTMLImageElement || HTMLCanvasElement || HTMLVideoElement
+	* @member data
+	* @memberOf tomahawk_ns.TextureAtlas.prototype
+	* @type {Object}
+	* @default null
+	**/
 	TextureAtlas.prototype.data = null;
+	
+	/**
+	* @member name
+	* @memberOf tomahawk_ns.Texture.prototype
+	* @type {String}
+	* @description The name of the texture atlas
+	* @default null
+	**/
 	TextureAtlas.prototype.name = null;
 
+	/**
+	* @method createTexture
+	* @memberOf tomahawk_ns.TextureAtlas.prototype
+	* @param {string} name
+	* @param {Number} startX
+	* @param {Number} startY
+	* @param {Number} endX
+	* @param {Number} endY
+	* @description creates a new sub texture from the atlas which will render the region of the atlas data specified
+	  by the startX, startY, endX, endY parameters with the name specified by the "name" parameter. The newly created texture is automatically stored within the atlas, it means that you can retrieve it with the "getTextureByName" method.
+	**/
 	TextureAtlas.prototype.createTexture = function( name, startX, startY, endX, endY )
 	{
 		var texture = new tomahawk_ns.Texture();
@@ -55,7 +82,14 @@
 		
 		this._textures.push(texture);
 	};
-
+	
+	/**
+	* @method getTextureByName
+	* @memberOf tomahawk_ns.TextureAtlas.prototype
+	* @param {string} name
+	* @returns {tomahawk_ns.Texture}
+	* @description Returns the internal sub texture which matches the name specified by the "name" parameter.
+	**/
 	TextureAtlas.prototype.getTextureByName = function( name )
 	{
 		var i = this._textures.length;
@@ -69,7 +103,13 @@
 		
 		return null;
 	};
-
+	
+	/**
+	* @method removeTexture
+	* @memberOf tomahawk_ns.TextureAtlas.prototype
+	* @param {string} name
+	* @description Removes the internal sub texture which matches the name specified by the "name" parameter.
+	**/
 	TextureAtlas.prototype.removeTexture = function( name )
 	{
 		var texture = this.getTextureByName(name);
@@ -80,7 +120,6 @@
 		var index = this._textures.indexOf(texture);
 		this._textures.splice(index,1);
 	};
-
 
 	tomahawk_ns.TextureAtlas = TextureAtlas;
 

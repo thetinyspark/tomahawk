@@ -99,7 +99,7 @@
 	* @memberOf tomahawk_ns.PixelFilter.prototype
 	* @description apply the filter on the canvas passed in param
 	* @param {HTMLCanvasElement} canvas the canvas used by the current filter.
-	* @param {Canvas2DRenderingContext} context the context used by the current filter.
+	* @param {CanvasRenderingContext2D} context the context used by the current filter.
 	* @param {tomahawk_ns.DisplayObject} object the DisplayObject on which the filter will be applied to
 	**/
 	PixelFilter.prototype.apply = function(canvas, context, object)

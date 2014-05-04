@@ -32,15 +32,37 @@
 	/**
 	 * @class Texture
 	 * @memberOf tomahawk_ns
-	 * @description ....
+	 * @description The Texture class represents a 2-dimensional texture which will be used in a Bitmap instance. Defines a 2D texture for use during rendering.
 	 * @constructor
 	 **/
 	function Texture(){}
 
 	Tomahawk.registerClass( Texture, "Texture" );
 
+	/**
+	* @description The rendering data itself, it can be an HTMLImageElement || HTMLCanvasElement || HTMLVideoElement
+	* @member data
+	* @memberOf tomahawk_ns.Texture.prototype
+	* @type {Object}
+	* @default null
+	**/
 	Texture.prototype.data = null;
+	
+	/**
+	* @member name
+	* @memberOf tomahawk_ns.Texture.prototype
+	* @type {String}
+	* @description The name of the texture
+	* @default null
+	**/
 	Texture.prototype.name = null;
+	
+	/**
+	* @member rect
+	* @memberOf tomahawk_ns.Texture.prototype
+	* @type {Array}
+	* @description An array representating the portion of the rendering data used for the rendering. Example: [0,0,10,10] the top-left 10x10 pixels square of the data will be rendered but not the rest.
+	**/
 	Texture.prototype.rect = null;
 
 	tomahawk_ns.Texture = Texture;

@@ -32,7 +32,8 @@
 	/**
 	 * @class MovieClip
 	 * @memberOf tomahawk_ns
-	 * @description ...
+	 * @description This class is undocumented because she will change very soon
+	 * @note The MovieClip class inherits from the following classes: Bitmap, DisplayObject, and EventDispatcher. Unlike the Sprite object, a MovieClip object has a timeline.
 	 * @constructor
 	 * @augments tomahawk_ns.Bitmap
 	 **/

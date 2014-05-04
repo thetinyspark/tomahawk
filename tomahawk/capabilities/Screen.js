@@ -31,28 +31,54 @@
 	/**
 	 * @class Screen
 	 * @memberOf tomahawk_ns
-	 * @description ...
+	 * @description The Screen class is used to get information about the screen or the canvas sizes.
 	 * @constructor
 	 **/
 	function Screen(){}
 
 	Tomahawk.registerClass(Screen,"Screen");
 	
+	/**
+	* @description Returns the width of the HTMLCanvasElement's DOM parent node associated to the stage instance specified by the "stage" parameter.
+	* @method getInnerWidth
+	* @memberOf tomahawk_ns.Screen
+	* @param {tomahawk_ns.Stage} stage an instance stage of .
+	* @returns {Number} 
+	**/
 	Screen.getInnerWidth = function(stage)
 	{
 		return stage.getCanvas().parentNode.offsetWidth;
 	};
-
+	
+	/**
+	* @description Returns the height of the HTMLCanvasElement's DOM parent node associated to the stage instance specified by the "stage" parameter.
+	* @method getInnerHeight
+	* @memberOf tomahawk_ns.Screen
+	* @param {tomahawk_ns.Stage} stage an instance stage of .
+	* @returns {Number} 
+	**/
 	Screen.getInnerHeight = function(stage)
 	{
 		return stage.getCanvas().parentNode.offsetHeight;
 	};
 
+	/**
+	* @description Returns the current window width.
+	* @method getWindowWidth
+	* @memberOf tomahawk_ns.Screen
+	* @returns {Number} 
+	**/
 	Screen.getWindowWidth = function()
 	{
 		return window.innerWidth;
 	};
-
+	
+	/**
+	* @description Returns the current window height.
+	* @method getWindowHeight
+	* @memberOf tomahawk_ns.Screen
+	* @returns {Number} 
+	**/
 	Screen.getWindowHeight = function()
 	{
 		return window.innerHeight;

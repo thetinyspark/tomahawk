@@ -162,6 +162,7 @@
 	* @memberOf tomahawk_ns.DisplayObject.prototype
 	* @type {Number}
 	* @description Indicates the rotation of the DisplayObject instance, in degrees, from its original orientation.
+	* @default 0
 	**/
 	DisplayObject.prototype.rotation 			= 0;
 	
@@ -268,7 +269,7 @@
 	* @member autoUpdate
 	* @memberOf tomahawk_ns.DisplayObject.prototype
 	* @type {Boolean}
-	* @description If set to true, the matrix of the DisplayObject will be computed at every frame
+	* @description If set to true, the matrix of the DisplayObject will be computed every frame, if not, the matrix will not change.
 	* @default true
 	**/
 	DisplayObject.prototype.autoUpdate			= true;
@@ -462,7 +463,7 @@
 	* @method drawComposite
 	* @description Draw the DisplayObject instance into the specified context with mask and filters.
 	* @memberOf tomahawk_ns.DisplayObject.prototype
-	* @param {Canvas2DRenderingContext} drawContext the Canvas2DRenderingContext context on which you want to draw.
+	* @param {CanvasRenderingContext2D} drawContext the CanvasRenderingContext2D context on which you want to draw.
 	**/
 	DisplayObject.prototype.drawComposite = function(drawContext)
 	{
@@ -513,7 +514,7 @@
 	* @method draw
 	* @description Draws the DisplayObject instance into the specified context
 	* @memberOf tomahawk_ns.DisplayObject.prototype
-	* @param {Canvas2DRenderingContext} drawContext the Canvas2DRenderingContext context on which you want to draw.
+	* @param {CanvasRenderingContext2D} drawContext the CanvasRenderingContext2D context on which you want to draw.
 	**/
 	DisplayObject.prototype.draw = function(context)
 	{
@@ -551,7 +552,7 @@
 	* @param {Number} x
 	* @param {Number} y
 	* @returns {tomahawk_ns.Point}
-	* @description Converts the point object from the DisplayObject's (local) coordinates to the Stage (global) coordinates.
+	* @description Converts the point object specified by x,y parameters from the DisplayObject's (local) coordinates to the Stage (global) coordinates.
 	**/
 	DisplayObject.prototype.localToGlobal = function(x,y)
 	{
@@ -566,7 +567,7 @@
 	* @param {Number} x
 	* @param {Number} y
 	* @returns {tomahawk_ns.Point}
-	* @description Converts the point object from the Stage (global) coordinates to the DisplayObject's (local) coordinates.
+	* @description Converts the point object specified by x,y parameters from the Stage (global) coordinates to the DisplayObject's (local) coordinates.
 	**/
 	DisplayObject.prototype.globalToLocal = function(x,y)
 	{

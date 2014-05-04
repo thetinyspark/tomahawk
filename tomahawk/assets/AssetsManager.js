@@ -31,7 +31,7 @@
 	/**
 	 * @class AssetsManager
 	 * @memberOf tomahawk_ns
-	 * @description ...
+	 * @description The AssetsManager class is used to stores and restitutes assets objects like Textures, TextureAtlases, Images.
 	 * @constructor
 	 **/
 	function AssetsManager()
@@ -45,6 +45,13 @@
 
 	// singleton
 	AssetsManager._instance = null;
+	
+	/**
+	* @description Returns a unique instance of AssetsManager, singleton implementation.
+	* @method getInstance
+	* @memberOf tomahawk_ns.AssetsManager
+	* @returns {tomahawk_ns.AssetsManager}
+	**/
 	AssetsManager.getInstance = function()
 	{
 		if( tomahawk_ns.AssetsManager._instance == null )
@@ -59,11 +66,24 @@
 
 
 	// images
+	
+	/**
+	* @description Returns a key indexed objects with all the HTMLImageElement stored within the manager
+	* @method getImages
+	* @memberOf tomahawk_ns.AssetsManager.prototype
+	* @returns {Object} a key indexed objects
+	**/
 	AssetsManager.prototype.getImages = function()
 	{
 		return this._images;
 	};
-
+	
+	/**
+	* @description returns an HTMLImageElement that matches with the "alias" parameter
+	* @method getImageByAlias
+	* @memberOf tomahawk_ns.AssetsManager.prototype
+	* @returns {DOMImageElement} an HTMLImageElement object
+	**/
 	AssetsManager.prototype.getImageByAlias = function(alias)
 	{
 		if( this._images[alias] )
@@ -72,22 +92,48 @@
 		return null;
 	};
 
+	/**
+	* @description Adds an HTMLImageElement object to the manager and register it with the alias specified by the "alias" parameter. This alias will be reused with the "getImageByAlias" method.
+	* @method addImage
+	* @memberOf tomahawk_ns.AssetsManager.prototype
+	* @param {HTMLImageElement} image an HTMLImageElement object
+	* @param {String} alias
+	**/
 	AssetsManager.prototype.addImage = function(image, alias)
 	{
 		this._images[alias] = image;
 	};
 
 	//atlases
+	
+	/**
+	* @description Adds a TextureAtlas object to the manager and register it with the alias specified by the "alias" parameter. This alias will be reused with the "getAtlasByAlias" method.
+	* @method addAtlas
+	* @memberOf tomahawk_ns.AssetsManager.prototype
+	* @param {tomahawk_ns.TextureAtlas} atlas a TextureAtlas object
+	* @param {String} alias
+	**/
 	AssetsManager.prototype.addAtlas = function(atlas, alias)
 	{
 		this._atlases[alias] = atlas;
 	};
-
+	
+	/**
+	* @method getAtlases
+	* @memberOf tomahawk_ns.AssetsManager.prototype
+	* @returns {Object} returns a key indexed objects with all the atlases stored within the manager
+	**/
 	AssetsManager.prototype.getAtlases = function()
 	{
 		return this._atlases;
 	};
-
+	
+	/**
+	* @description returns an TextureAtlas instance that matches with the "alias" parameter
+	* @method getAtlasByAlias
+	* @memberOf tomahawk_ns.AssetsManager.prototype
+	* @returns {tomahawk_ns.TextureAtlas} a TextureAtlas object
+	**/
 	AssetsManager.prototype.getAtlasByAlias = function(alias)
 	{
 		if( this._atlases[alias] )
@@ -97,16 +143,34 @@
 	};
 
 	//textures
+	/**
+	* @description Adds a Texture object to the manager and register it with the alias specified by the "alias" parameter. This alias will be reused with the "getTextureByAlias" method.
+	* @method addAtlas
+	* @memberOf tomahawk_ns.AssetsManager.prototype
+	* @param {tomahawk_ns.Texture} texture a Texture object
+	* @param {String} alias
+	**/
 	AssetsManager.prototype.addTexture = function(texture, alias)
 	{
 		this._textures[alias] = texture;
 	};
 
+	/**
+	* @method getTextures
+	* @memberOf tomahawk_ns.AssetsManager.prototype
+	* @returns {Object} returns a key indexed objects with all the textures stored within the manager
+	**/
 	AssetsManager.prototype.getTextures = function()
 	{
 		return this._textures;
 	};
-
+	
+	/**
+	* @description returns an Texture instance that matches with the "alias" parameter
+	* @method getTextureByAlias
+	* @memberOf tomahawk_ns.AssetsManager.prototype
+	* @returns {tomahawk_ns.Texture} a Texture object
+	**/
 	AssetsManager.prototype.getTextureByAlias = function(alias)
 	{
 		if( this._textures[alias] )

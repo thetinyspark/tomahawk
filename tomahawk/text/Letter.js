@@ -154,7 +154,7 @@
 	* @method draws the DisplayObject on the stage
 	* @memberOf tomahawk_ns.Letter.prototype
 	* @description Draws the display object into the specified context
-	* @param {Canvas2DRenderingContext} the context of the canvas on which you want to draw the DisplayObject
+	* @param {CanvasRenderingContext2D} the context of the canvas on which you want to draw the DisplayObject
 	**/
 	Letter.prototype.draw = function(context)
 	{

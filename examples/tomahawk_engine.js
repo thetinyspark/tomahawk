@@ -174,7 +174,7 @@ Tomahawk._extends = new Array();
 /**
  * @class AssetsLoader
  * @memberOf tomahawk_ns
- * @description ...
+ * @description The AssetsLoader class is a basic Image mass loader.
  * @constructor
  * @augments tomahawk_ns.EventDispatcher
  **/
@@ -189,6 +189,12 @@ Tomahawk.extend("AssetsLoader", "EventDispatcher" );
 // singleton
 AssetsLoader._instance = null;
 
+/**
+* @description Returns a unique instance of AssetsLoader, singleton implementation.
+* @method getInstance
+* @memberOf tomahawk_ns.AssetsLoader
+* @returns {tomahawk_ns.AssetsLoader} returns a number
+**/
 AssetsLoader.getInstance = function()
 {
 	if( tomahawk_ns.AssetsLoader._instance == null )
@@ -202,17 +208,34 @@ AssetsLoader.prototype._loadingList = null;
 AssetsLoader.prototype._data = null;
 AssetsLoader.prototype._numFiles = 0;
 
-
+/**
+* @description Returns a key indexed object which contains the loaded data.
+* @method getData
+* @memberOf tomahawk_ns.AssetsLoader.prototype
+* @returns {Object} a key indexed object
+**/
 AssetsLoader.prototype.getData = function()
 {
 	return this._data;
 };
 
+/**
+* @description Cleans the internal loaded data object, call it before another loading task in order to save memory.
+* @method clean
+* @memberOf tomahawk_ns.AssetsLoader.prototype
+**/
 AssetsLoader.prototype.clean = function()
 {
 	this._data = new Object();
 };
 
+/**
+* @description Adds an image to the loading list, with the url specified by the "fileURL" parameter and an alias specified by the "fileAlias" parameter.
+* @method load
+* @param {String] fileURL the url of the image.
+* @param {String] fileAlias The alias of the image used as a key within the object returned by the "getData()" method.
+* @memberOf tomahawk_ns.AssetsLoader.prototype
+**/
 AssetsLoader.prototype.addFile = function(fileURL, fileAlias)
 {
 	// on réinitialise les data
@@ -224,6 +247,11 @@ AssetsLoader.prototype.addFile = function(fileURL, fileAlias)
 	this._numFiles++;
 };
 
+/**
+* @description Starts the loading process.
+* @method load
+* @memberOf tomahawk_ns.AssetsLoader.prototype
+**/
 AssetsLoader.prototype.load = function()
 {
 	if( this._loadingList.length == 0 )
@@ -256,6 +284,18 @@ AssetsLoader.prototype.load = function()
 	}
 };
 
+/**
+* @description Returns the loading progression ( between 0.0 and 1.0 )
+* @method getProgression
+* @memberOf tomahawk_ns.AssetsLoader.prototype
+* @returns {Number}
+**/
+AssetsLoader.prototype.getProgression = function()
+{
+	var progression = ( this._numFiles - this._loadingList.length ) / this._numFiles;
+	return progression;
+};
+
 AssetsLoader.prototype._progressHandler = function(image,alias)
 {
 	this._data[alias] = image;
@@ -267,12 +307,6 @@ AssetsLoader.prototype._errorHandler = function()
 {
 	this.load();
 	this.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.IO_ERROR, true, true) );
-};
-
-AssetsLoader.prototype.getProgression = function()
-{
-	var progression = ( this._numFiles - this._loadingList.length ) / this._numFiles;
-	return progression;
 };
 
 tomahawk_ns.AssetsLoader = AssetsLoader;
@@ -314,7 +348,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	/**
 	 * @class AssetsManager
 	 * @memberOf tomahawk_ns
-	 * @description ...
+	 * @description The AssetsManager class is used to stores and restitutes assets objects like Textures, TextureAtlases, Images.
 	 * @constructor
 	 **/
 	function AssetsManager()
@@ -328,6 +362,13 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 	// singleton
 	AssetsManager._instance = null;
+	
+	/**
+	* @description Returns a unique instance of AssetsManager, singleton implementation.
+	* @method getInstance
+	* @memberOf tomahawk_ns.AssetsManager
+	* @returns {tomahawk_ns.AssetsManager}
+	**/
 	AssetsManager.getInstance = function()
 	{
 		if( tomahawk_ns.AssetsManager._instance == null )
@@ -342,11 +383,24 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 
 	// images
+	
+	/**
+	* @description Returns a key indexed objects with all the HTMLImageElement stored within the manager
+	* @method getImages
+	* @memberOf tomahawk_ns.AssetsManager.prototype
+	* @returns {Object} a key indexed objects
+	**/
 	AssetsManager.prototype.getImages = function()
 	{
 		return this._images;
 	};
-
+	
+	/**
+	* @description returns an HTMLImageElement that matches with the "alias" parameter
+	* @method getImageByAlias
+	* @memberOf tomahawk_ns.AssetsManager.prototype
+	* @returns {DOMImageElement} an HTMLImageElement object
+	**/
 	AssetsManager.prototype.getImageByAlias = function(alias)
 	{
 		if( this._images[alias] )
@@ -355,22 +409,48 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		return null;
 	};
 
+	/**
+	* @description Adds an HTMLImageElement object to the manager and register it with the alias specified by the "alias" parameter. This alias will be reused with the "getImageByAlias" method.
+	* @method addImage
+	* @memberOf tomahawk_ns.AssetsManager.prototype
+	* @param {HTMLImageElement} image an HTMLImageElement object
+	* @param {String} alias
+	**/
 	AssetsManager.prototype.addImage = function(image, alias)
 	{
 		this._images[alias] = image;
 	};
 
 	//atlases
+	
+	/**
+	* @description Adds a TextureAtlas object to the manager and register it with the alias specified by the "alias" parameter. This alias will be reused with the "getAtlasByAlias" method.
+	* @method addAtlas
+	* @memberOf tomahawk_ns.AssetsManager.prototype
+	* @param {tomahawk_ns.TextureAtlas} atlas a TextureAtlas object
+	* @param {String} alias
+	**/
 	AssetsManager.prototype.addAtlas = function(atlas, alias)
 	{
 		this._atlases[alias] = atlas;
 	};
-
+	
+	/**
+	* @method getAtlases
+	* @memberOf tomahawk_ns.AssetsManager.prototype
+	* @returns {Object} returns a key indexed objects with all the atlases stored within the manager
+	**/
 	AssetsManager.prototype.getAtlases = function()
 	{
 		return this._atlases;
 	};
-
+	
+	/**
+	* @description returns an TextureAtlas instance that matches with the "alias" parameter
+	* @method getAtlasByAlias
+	* @memberOf tomahawk_ns.AssetsManager.prototype
+	* @returns {tomahawk_ns.TextureAtlas} a TextureAtlas object
+	**/
 	AssetsManager.prototype.getAtlasByAlias = function(alias)
 	{
 		if( this._atlases[alias] )
@@ -380,16 +460,34 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	};
 
 	//textures
+	/**
+	* @description Adds a Texture object to the manager and register it with the alias specified by the "alias" parameter. This alias will be reused with the "getTextureByAlias" method.
+	* @method addAtlas
+	* @memberOf tomahawk_ns.AssetsManager.prototype
+	* @param {tomahawk_ns.Texture} texture a Texture object
+	* @param {String} alias
+	**/
 	AssetsManager.prototype.addTexture = function(texture, alias)
 	{
 		this._textures[alias] = texture;
 	};
 
+	/**
+	* @method getTextures
+	* @memberOf tomahawk_ns.AssetsManager.prototype
+	* @returns {Object} returns a key indexed objects with all the textures stored within the manager
+	**/
 	AssetsManager.prototype.getTextures = function()
 	{
 		return this._textures;
 	};
-
+	
+	/**
+	* @description returns an Texture instance that matches with the "alias" parameter
+	* @method getTextureByAlias
+	* @memberOf tomahawk_ns.AssetsManager.prototype
+	* @returns {tomahawk_ns.Texture} a Texture object
+	**/
 	AssetsManager.prototype.getTextureByAlias = function(alias)
 	{
 		if( this._textures[alias] )
@@ -439,7 +537,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	/**
 	 * @class Keyboard
 	 * @memberOf tomahawk_ns
-	 * @description ...
+	 * @description The Keyboard class is used to build an interface that can be controlled by a user with a standard keyboard.
 	 * @constructor
 	 * @augments tomahawk_ns.EventDispatcher
 	 **/
@@ -458,14 +556,6 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	Tomahawk.registerClass( Keyboard, "Keyboard" );
 	Tomahawk.extend( "Keyboard", "EventDispatcher" );
 	
-	Keyboard.getInstance = function()
-	{
-		if( tomahawk_ns.Keyboard._instance == null )
-			tomahawk_ns.Keyboard._instance = new tomahawk_ns.Keyboard();
-			
-		return tomahawk_ns.Keyboard._instance;
-	};
-	
 	Keyboard.prototype._keyboardHandler = function(event)
 	{	
 		if( event.type == "keyup" )
@@ -483,6 +573,31 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		}
 	};
 	
+	
+	/**
+	* @description Returns the unique instance of the Keyboard class, singleton design pattern.
+	* @method getInstance
+	* @memberOf tomahawk_ns.Keyboard
+	* @returns {tomahawk_ns.Keyboard} An Keyboard object
+	**/
+	Keyboard.getInstance = function()
+	{
+		if( tomahawk_ns.Keyboard._instance == null )
+			tomahawk_ns.Keyboard._instance = new tomahawk_ns.Keyboard();
+			
+		return tomahawk_ns.Keyboard._instance;
+	};
+	
+	/**
+	* @description Returns the character which corresponds to the value passed in parameters.
+	* @method keyCodeToChar
+	* @memberOf tomahawk_ns.Keyboard
+	* @param {Number} keyCode the keycode of the character
+	* @param {Boolean} shiftKey indicates wether the shift key is pressed
+	* @param {Boolean} ctrlKey indicates wether the ctrl key is pressed
+	* @param {Boolean} altKey indicates wether the alt key is pressed
+	* @returns {String} A character corresponding to the keycode.
+	**/
 	Keyboard.keyCodeToChar = function(keyCode, shiftKey, ctrlKey, altKey)
 	{
 		var obj = Keyboard.MAP[keyCode];
@@ -499,15 +614,19 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 			
 		return obj.normal;
 	};
-
-	Keyboard.isChar = function(keyCode)
+	
+	/**
+	* @description Returns a Boolean value that indicates if the keycode specified by the "keycode" parameter is mapped by the Keyboard class.
+	* @method isMapped
+	* @memberOf tomahawk_ns.Keyboard
+	* @param {Number} keyCode the keycode of the character
+	* @returns {Boolean} true if the keycode is mapped, false if not.
+	**/
+	Keyboard.isMapped = function(keyCode)
 	{
-		if( Keyboard.MAP[keyCode] )
-			return true;
-			
-		return false;
+		return Keyboard.MAP[keyCode] != undefined;
 	};
-
+	
 	Keyboard.toggleShift = function(keyCode)
 	{
 		if( keyCode == Keyboard.CAPSLOCK )
@@ -516,124 +635,583 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 	Keyboard._majActive = false;
 
+	/**
+	* @constant {Number} BACKSPACE
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.BACKSPACE = 8;
+	
+	/**
+	* @constant {Number} TAB
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.TAB = 9;
+	
+	/**
+	* @constant {Number} ENTER
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.ENTER = 13;
+	
+	/**
+	* @constant {Number} SHIFT
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.SHIFT = 16;
+	
+	/**
+	* @constant {Number} CTRL
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.CTRL = 17;
+	
+	/**
+	* @constant {Number} ALT
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.ALT = 18;
+	
+	/**
+	* @constant {Number} CAPSLOCK
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.CAPSLOCK = 20;
+	
+	/**
+	* @constant {Number} SPACE
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.SPACE = 32;
+	
+	/**
+	* @constant {Number} END
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.END = 35;
+	
+	/**
+	* @constant {Number} START
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.START = 36;
+	
+	/**
+	* @constant {Number} LEFT
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.LEFT = 37;
+	
+	/**
+	* @constant {Number} UP
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.UP = 38;
+	
+	/**
+	* @constant {Number} RIGHT
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.RIGHT = 39;
+	
+	/**
+	* @constant {Number} DOWN
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.DOWN = 40;
+	
+	/**
+	* @constant {Number} SUPPR
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.SUPPR = 46;
 
 
 	// > 47
+	
+	/**
+	* @constant {Number} TOUCH_0
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.TOUCH_0 = 48;
+	
+	/**
+	* @constant {Number} TOUCH_1
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.TOUCH_1 = 49;
+	
+	/**
+	* @constant {Number} TOUCH_2
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.TOUCH_2 = 50;
+	
+	/**
+	* @constant {Number} TOUCH_3
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.TOUCH_3 = 51;
+	
+	/**
+	* @constant {Number} TOUCH_4
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.TOUCH_4 = 52;
+	
+	/**
+	* @constant {Number} TOUCH_5
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.TOUCH_5 = 53;
+	
+	/**
+	* @constant {Number} TOUCH_6
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.TOUCH_6 = 54;
+	
+	/**
+	* @constant {Number} TOUCH_7
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.TOUCH_7 = 55;
+	
+	/**
+	* @constant {Number} TOUCH_8
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.TOUCH_8 = 56;
+	
+	/**
+	* @constant {Number} TOUCH_9
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.TOUCH_9 = 57;
 	// < 58
 
 	// > 64
+	/**
+	* @constant {Number} A
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.A = 65;
+	
+	/**
+	* @constant {Number} B
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.B = 66;
+	
+	/**
+	* @constant {Number} C
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.C = 67;
+	
+	/**
+	* @constant {Number} D
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.D = 68;
+	
+	/**
+	* @constant {Number} E
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.E = 69;
+	
+	/**
+	* @constant {Number} F
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.F = 70;
+	
+	/**
+	* @constant {Number} G
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.G = 71;
+	
+	/**
+	* @constant {Number} H
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.H = 72;
+	
+	/**
+	* @constant {Number} I
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.I = 73;
+	
+	/**
+	* @constant {Number} J
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.J = 74;
+	
+	/**
+	* @constant {Number} K
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.K = 75;
+	
+	/**
+	* @constant {Number} L
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.L = 76;
+	
+	/**
+	* @constant {Number} M
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.M = 77;
+	
+	/**
+	* @constant {Number} N
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.N = 78;
+	
+	/**
+	* @constant {Number} O
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.O = 79;
+	
+	/**
+	* @constant {Number} P
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.P = 80;
+	
+	/**
+	* @constant {Number} Q
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.Q = 81;
+	
+	/**
+	* @constant {Number} R
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.R = 82;
+	
+	/**
+	* @constant {Number} S
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.S = 83;
+	
+	/**
+	* @constant {Number} T
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.T = 84;
+	
+	/**
+	* @constant {Number} U
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.U = 85;
+	
+	/**
+	* @constant {Number} V
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.V = 86;
+	
+	/**
+	* @constant {Number} W
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.W = 87;
+	
+	/**
+	* @constant {Number} X
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.X = 88;
+	
+	/**
+	* @constant {Number} Y
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.Y = 89;
+	
+	/**
+	* @constant {Number} Z
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.Z = 90;
 	// < 91
 
 
-
+	/**
+	* @constant {Number} WINDOWS
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.WINDOWS = 91;
+	
+	/**
+	* @constant {Number} SELECT
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.SELECT = 93;
 
 	// > 95
+	
+	/**
+	* @constant {Number} NUMPAD_0
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.NUMPAD_0 = 96;
+	
+	/**
+	* @constant {Number} NUMPAD_1
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.NUMPAD_1 = 97;
+	
+	/**
+	* @constant {Number} NUMPAD_2
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.NUMPAD_2 = 98;
+	
+	/**
+	* @constant {Number} NUMPAD_3
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.NUMPAD_3 = 99;
+	
+	/**
+	* @constant {Number} NUMPAD_4
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.NUMPAD_4 = 100;
+	
+	/**
+	* @constant {Number} NUMPAD_5
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.NUMPAD_5 = 101;
+	
+	/**
+	* @constant {Number} NUMPAD_6
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.NUMPAD_6 = 102;
+	
+	/**
+	* @constant {Number} NUMPAD_7
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.NUMPAD_7 = 103;
+	
+	/**
+	* @constant {Number} NUMPAD_8
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.NUMPAD_8 = 104;
+	
+	/**
+	* @constant {Number} NUMPAD_9
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.NUMPAD_9 = 105;
+	
+	/**
+	* @constant {Number} NUMPAD_MULTIPLY
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.NUMPAD_MULTIPLY = 106;
+	
+	/**
+	* @constant {Number} NUMPAD_PLUS
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.NUMPAD_PLUS = 107;
+	
+	/**
+	* @constant {Number} NUMPAD_MINUS
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.NUMPAD_MINUS = 109;
+	
+	/**
+	* @constant {Number} NUMPAD_DOT
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.NUMPAD_DOT = 110;
+	
+	/**
+	* @constant {Number} NUMPAD_SLASH
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.NUMPAD_SLASH = 111;
 	// < 112
 
 	// > 111
+	
+	/**
+	* @constant {Number} F1
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.F1 = 112;
+	
+	/**
+	* @constant {Number} F2
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.F2 = 113;
+	
+	/**
+	* @constant {Number} F3
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.F3 = 114;
+	
+	/**
+	* @constant {Number} F4
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.F4 = 115;
+	
+	/**
+	* @constant {Number} F5
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.F5 = 116;
+	
+	/**
+	* @constant {Number} F6
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.F6 = 117;
+	
+	/**
+	* @constant {Number} F7
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.F7 = 118;
+	
+	/**
+	* @constant {Number} F8
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.F8 = 119;
+	
+	/**
+	* @constant {Number} F9
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.F9 = 120;
+	
+	/**
+	* @constant {Number} F10
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.F10 = 121;
+	
+	/**
+	* @constant {Number} F11
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.F11 = 122;
+	
+	/**
+	* @constant {Number} F12
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.F12 = 123;
 	// < 124
-
+	
+	/**
+	* @constant {Number} VERR_NUM
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.VERR_NUM = 144;
 
 	// > 185
+	
+	/**
+	* @constant {Number} DOLLAR
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.DOLLAR = 186;
+	
+	/**
+	* @constant {Number} EQUAL
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.EQUAL = 187;
+	
+	/**
+	* @constant {Number} QUESTION
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.QUESTION = 188;
-	Keyboard.DOT = 190;
+	
+	/**
+	* @constant {Number} DOT
+	* @memberOf tomahawk_ns.Keyboard
+	**/
+	Keyboard.DOT = 190
+	
+	/**
+	* @constant {Number} SLASH
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.SLASH = 191;
+	
+	/**
+	* @constant {Number} PERCENT
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.PERCENT = 192;
+	
+	/**
+	* @constant {Number} RIGHT_PARENT
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.RIGHT_PARENT = 219;
+	
+	/**
+	* @constant {Number} MICRO
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.MICRO = 220;
+	
+	/**
+	* @constant {Number} TREMA
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.TREMA = 221;
+	
+	/**
+	* @constant {Number} POWER_TWO
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.POWER_TWO = 222;
+	
+	/**
+	* @constant {Number} EXCLAMATION
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.EXCLAMATION = 223;
+	
 	// < 224
 
-
-
+	/**
+	* @description a map that contains and associates all the Keyboard constants to a specific character.
+	* @constant {Number} MAP
+	* @memberOf tomahawk_ns.Keyboard
+	**/
 	Keyboard.MAP = new Array();
 
-
+	//undocumented
 	Keyboard.MAP[Keyboard.TOUCH_0]={normal:"à",shift:"0",altgr:"@"};
 	Keyboard.MAP[Keyboard.TOUCH_1]={normal:"&",shift:"1",altgr:""};
 	Keyboard.MAP[Keyboard.TOUCH_2]={normal:"é",shift:"2",altgr:"~"};
@@ -706,13 +1284,6 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	Keyboard.MAP[Keyboard.SPACE]			=	{normal:" ",shift:" ",altgr:" "};
 	Keyboard.MAP[Keyboard.ENTER]			=	{normal:"¤",shift:"¤",altgr:"¤"};
 
-
-	Keyboard.isMapped = function(keyCode)
-	{
-		return Keyboard.MAP[keyCode] != undefined;
-	};
-	
-	
 	tomahawk_ns.Keyboard = Keyboard;
 })();
 
@@ -753,18 +1324,48 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	/**
 	 * @class Mouse
 	 * @memberOf tomahawk_ns
-	 * @description ...
+	 * @description The methods of the Mouse class are used to set the pointer to a specific style. The Mouse class is a top-level class whose properties and methods you can access without using a constructor.
 	 * @constructor
 	 **/
 	function Mouse(){}
 
 	Tomahawk.registerClass( Mouse, "Mouse" );
 	
+	/**
+	* @property {String} RESIZE
+	* @memberOf tomahawk_ns.Mouse
+	* @default "se-resize"
+	**/
 	Mouse.RESIZE = "se-resize";
+	
+	/**
+	* @property {String} MOVE
+	* @memberOf tomahawk_ns.Mouse
+	* @default "move"
+	**/
 	Mouse.MOVE = "move";
+	
+	/**
+	* @property {String} POINTER
+	* @memberOf tomahawk_ns.Mouse
+	* @default "pointer"
+	**/
 	Mouse.POINTER = "pointer";
+
+	/**
+	* @property {String} DEFAULT
+	* @memberOf tomahawk_ns.Mouse
+	* @default "default"
+	**/
 	Mouse.DEFAULT = "default";
 
+	/**
+	* @member setCursor
+	* @memberOf tomahawk_ns.Mouse
+	* @param {String} value the cursor style value.
+	* @param {DOMElement} domElement the domElement on which the cursor style is applied.
+	* @description Sets the cursor style for the DOMElement specified by the "domElement" parameter.
+	**/
 	Mouse.setCursor = function(value,domElement)
 	{
 		domElement.style.cursor = value;
@@ -808,28 +1409,54 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	/**
 	 * @class Screen
 	 * @memberOf tomahawk_ns
-	 * @description ...
+	 * @description The Screen class is used to get information about the screen or the canvas sizes.
 	 * @constructor
 	 **/
 	function Screen(){}
 
 	Tomahawk.registerClass(Screen,"Screen");
 	
+	/**
+	* @description Returns the width of the HTMLCanvasElement's DOM parent node associated to the stage instance specified by the "stage" parameter.
+	* @method getInnerWidth
+	* @memberOf tomahawk_ns.Screen
+	* @param {tomahawk_ns.Stage} stage an instance stage of .
+	* @returns {Number} 
+	**/
 	Screen.getInnerWidth = function(stage)
 	{
 		return stage.getCanvas().parentNode.offsetWidth;
 	};
-
+	
+	/**
+	* @description Returns the height of the HTMLCanvasElement's DOM parent node associated to the stage instance specified by the "stage" parameter.
+	* @method getInnerHeight
+	* @memberOf tomahawk_ns.Screen
+	* @param {tomahawk_ns.Stage} stage an instance stage of .
+	* @returns {Number} 
+	**/
 	Screen.getInnerHeight = function(stage)
 	{
 		return stage.getCanvas().parentNode.offsetHeight;
 	};
 
+	/**
+	* @description Returns the current window width.
+	* @method getWindowWidth
+	* @memberOf tomahawk_ns.Screen
+	* @returns {Number} 
+	**/
 	Screen.getWindowWidth = function()
 	{
 		return window.innerWidth;
 	};
-
+	
+	/**
+	* @description Returns the current window height.
+	* @method getWindowHeight
+	* @memberOf tomahawk_ns.Screen
+	* @returns {Number} 
+	**/
 	Screen.getWindowHeight = function()
 	{
 		return window.innerHeight;
@@ -874,7 +1501,8 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	/**
 	* @class Bitmap
 	* @memberOf tomahawk_ns
-	* @param {tomahawk_ns.Texture} [texture=undefined] the drawing texture.
+	* @description The Bitmap class represents display objects that represent bitmap images. 
+	* @param {tomahawk_ns.Texture} [texture=undefined] the bitmap drawing texture.
 	* @augments tomahawk_ns.DisplayObject
 	* @constructor
 	*/
@@ -964,7 +1592,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	/**
 	 * @class BitmapMesh
 	 * @memberOf tomahawk_ns
-	 * @description ...
+	 * @description The BitmapMesh class represents display objects that represent bitmap images. The main difference between a BitmapMesh and a Bitmap instance is that you can deform the current texture with the vertices, uvs and indices properties which defines triangles.
 	 * @constructor
 	 * @augments tomahawk_ns.Bitmap
 	 **/
@@ -977,9 +1605,36 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	Tomahawk.registerClass( BitmapMesh, "BitmapMesh" );
 	Tomahawk.extend( "BitmapMesh", "Bitmap" );
 	
+	/**
+	* @member vertices
+	* @memberOf tomahawk_ns.BitmapMesh.prototype
+	* @type {Array}
+	* @description An Array of vertices, used with indices, they defines a sets of triangles.
+	**/
 	BitmapMesh.prototype.vertices = null;
+	
+	/**
+	* @member uvs
+	* @memberOf tomahawk_ns.BitmapMesh.prototype
+	* @type {Array}
+	* @description The Array of UV coordinates attached to each vertex.
+	**/
 	BitmapMesh.prototype.uvs = null;
+	
+	/**
+	* @member indices
+	* @memberOf tomahawk_ns.BitmapMesh.prototype
+	* @type {Array}
+	* @description An Array of indices, used with vertices, they defines a sets of triangles.
+	**/
 	BitmapMesh.prototype.indices = null;
+	
+	/**
+	* @member showLines
+	* @memberOf tomahawk_ns.BitmapMesh.prototype
+	* @type {Boolean}
+	* @description Indicates wether the BitmapMesh instance will display the triangle's lines.
+	**/
 	BitmapMesh.prototype.showLines = false;
 	
 	BitmapMesh.prototype.setTexture = function(texture)
@@ -1267,6 +1922,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	* @memberOf tomahawk_ns.DisplayObject.prototype
 	* @type {Number}
 	* @description Indicates the rotation of the DisplayObject instance, in degrees, from its original orientation.
+	* @default 0
 	**/
 	DisplayObject.prototype.rotation 			= 0;
 	
@@ -1373,7 +2029,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	* @member autoUpdate
 	* @memberOf tomahawk_ns.DisplayObject.prototype
 	* @type {Boolean}
-	* @description If set to true, the matrix of the DisplayObject will be computed at every frame
+	* @description If set to true, the matrix of the DisplayObject will be computed every frame, if not, the matrix will not change.
 	* @default true
 	**/
 	DisplayObject.prototype.autoUpdate			= true;
@@ -1567,7 +2223,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	* @method drawComposite
 	* @description Draw the DisplayObject instance into the specified context with mask and filters.
 	* @memberOf tomahawk_ns.DisplayObject.prototype
-	* @param {Canvas2DRenderingContext} drawContext the Canvas2DRenderingContext context on which you want to draw.
+	* @param {CanvasRenderingContext2D} drawContext the CanvasRenderingContext2D context on which you want to draw.
 	**/
 	DisplayObject.prototype.drawComposite = function(drawContext)
 	{
@@ -1618,7 +2274,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	* @method draw
 	* @description Draws the DisplayObject instance into the specified context
 	* @memberOf tomahawk_ns.DisplayObject.prototype
-	* @param {Canvas2DRenderingContext} drawContext the Canvas2DRenderingContext context on which you want to draw.
+	* @param {CanvasRenderingContext2D} drawContext the CanvasRenderingContext2D context on which you want to draw.
 	**/
 	DisplayObject.prototype.draw = function(context)
 	{
@@ -1656,7 +2312,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	* @param {Number} x
 	* @param {Number} y
 	* @returns {tomahawk_ns.Point}
-	* @description Converts the point object from the DisplayObject's (local) coordinates to the Stage (global) coordinates.
+	* @description Converts the point object specified by x,y parameters from the DisplayObject's (local) coordinates to the Stage (global) coordinates.
 	**/
 	DisplayObject.prototype.localToGlobal = function(x,y)
 	{
@@ -1671,7 +2327,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	* @param {Number} x
 	* @param {Number} y
 	* @returns {tomahawk_ns.Point}
-	* @description Converts the point object from the Stage (global) coordinates to the DisplayObject's (local) coordinates.
+	* @description Converts the point object specified by x,y parameters from the Stage (global) coordinates to the DisplayObject's (local) coordinates.
 	**/
 	DisplayObject.prototype.globalToLocal = function(x,y)
 	{
@@ -2287,7 +2943,8 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	/**
 	 * @class MovieClip
 	 * @memberOf tomahawk_ns
-	 * @description ...
+	 * @description This class is undocumented because she will change very soon
+	 * @note The MovieClip class inherits from the following classes: Bitmap, DisplayObject, and EventDispatcher. Unlike the Sprite object, a MovieClip object has a timeline.
 	 * @constructor
 	 * @augments tomahawk_ns.Bitmap
 	 **/
@@ -2389,7 +3046,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	/**
 	 * @class Shape
 	 * @memberOf tomahawk_ns
-	 * @description ...
+	 * @description This class is used to create lightweight shapes using the CanvasRenderingContext2D vectorial drawing API.
 	 * @constructor
 	 * @augments tomahawk_ns.DisplayObject
 	 **/
@@ -2412,126 +3069,299 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		return this._commands;
 	};
 
+	/**
+	* @method clear
+	* @memberOf tomahawk_ns.Shape.prototype
+	* @description Cleans the current Shape.
+	**/
 	Shape.prototype.clear = function()
 	{
 		this._commands = new Array();
 	};
 
+	/**
+	* @method stroke
+	* @memberOf tomahawk_ns.Shape.prototype
+	* @description Strokes the subpaths with the current stroke style.
+	**/
 	Shape.prototype.stroke = function()
 	{
 		this._getCommands().push( [1,"stroke",null] ); 
 	};
 
+	/**
+	* @method fill
+	* @memberOf tomahawk_ns.Shape.prototype
+	* @description Fills the subpaths with the current fill style.
+	**/
 	Shape.prototype.fill = function()
 	{
 		this._getCommands().push( [1,"fill",null] ); 
 	};
 
+	/**
+	* @method beginPath
+	* @memberOf tomahawk_ns.Shape.prototype
+	* @description Starts a new path by resetting the list of sub-paths. Call this method when you want to create a new path.
+	**/
 	Shape.prototype.beginPath = function()
 	{
 		this._getCommands().push( [1,"beginPath",null] ); 
 	};
-
+	
+	/**
+	* @method closePath
+	* @memberOf tomahawk_ns.Shape.prototype
+	* @description Tries to draw a straight line from the current point to the start. If the shape has already been closed or has only one point, this function does nothing.
+	**/
 	Shape.prototype.closePath = function()
 	{
 		this._getCommands().push( [1,"closePath",null] );
 	};
 
+	/**
+	* @method rect
+	* @memberOf tomahawk_ns.Shape.prototype
+	* @description Adds a new closed subpath to the path, representing the given rectangle.
+	* @param {Number} x
+	* @param {Number} y
+	* @param {Number} width
+	* @param {Number} height
+	**/
 	Shape.prototype.rect = function(x, y, width, height)
 	{
 		this._getCommands().push( [1,"rect",[x, y, width, height]] );
 	};
 
+	/**
+	* @method fillRect
+	* @memberOf tomahawk_ns.Shape.prototype
+	* @param {Number} x
+	* @param {Number} y
+	* @param {Number} width
+	* @param {Number} height
+	* @description Draws a filled rectangle at (x, y) position whose size is determined by width and height.
+	**/
 	Shape.prototype.fillRect = function(x, y, width, height)
 	{
 		this._getCommands().push( [1,"fillRect",[x, y, width, height]] );
 	};
-
+	
+	/**
+	* @method clearRect
+	* @memberOf tomahawk_ns.Shape.prototype
+	* @param {Number} x
+	* @param {Number} y
+	* @param {Number} width
+	* @param {Number} height
+	* @description Sets all pixels in the rectangle defined by starting point (x, y) and size (width, height) to transparent black.
+	**/
 	Shape.prototype.clearRect = function(x, y, width, height)
 	{
 		this._getCommands().push( [1,"clearRect",[x, y, width, height]] );
 	};
-
+	
+	/**
+	* @method strokeRect
+	* @memberOf tomahawk_ns.Shape.prototype
+	* @param {Number} x
+	* @param {Number} y
+	* @param {Number} width
+	* @param {Number} height
+	* @description Paints a rectangle which has a starting point at (x, y) and has a w width and an h height onto the canvas, using the current stroke style.
+	**/
 	Shape.prototype.strokeRect = function(x, y, width, height)
 	{
 		this._getCommands().push( [1,"strokeRect",[x, y, width, height]] );
 	};
 
+	/**
+	* @method moveTo
+	* @memberOf tomahawk_ns.Shape.prototype
+	* @param {Number} x
+	* @param {Number} y
+	* @description Moves the starting point of a new subpath to the (x, y) coordinates.
+	**/
 	Shape.prototype.moveTo = function(x,y)
 	{
 		this._getCommands().push( [1,"moveTo",[x,y]] );
 	};
-
+	
+	/**
+	* @method lineTo
+	* @memberOf tomahawk_ns.Shape.prototype
+	* @param {Number} x
+	* @param {Number} y
+	* @description Connects the last point in the subpath to the x, y coordinates with a straight line.
+	**/
 	Shape.prototype.lineTo = function(x,y)
 	{
 		this._getCommands().push( [1,"lineTo",[x,y]] );
 	};
-
+	
+	/**
+	* @method arc
+	* @memberOf tomahawk_ns.Shape.prototype
+	* @param {Number} x
+	* @param {Number} y
+	* @param {Number} radius
+	* @param {Number} startAngle
+	* @param {Number} endAngle
+	* @param {Boolean} antiClockwise
+	* @description Adds an arc to the path which is centered at (x, y) position with radius r starting at startAngle and ending at endAngle going in the given direction by anticlockwise (defaulting to clockwise).
+	**/
 	Shape.prototype.arc = function(x, y, radius, startAngle, endAngle, antiClockwise)
 	{
 		this._getCommands().push( [1,"arc",[x, y, radius, startAngle, endAngle, antiClockwise]] );
 	};
-
+	
+	/**
+	* @method arcTo
+	* @memberOf tomahawk_ns.Shape.prototype
+	* @param {Number} controlX
+	* @param {Number} controlY
+	* @param {Number} endX
+	* @param {Number} endY
+	* @param {Number} radius
+	* @description Adds an arc to the path with the given control points and radius, connected to the previous point by a straight line
+	**/
 	Shape.prototype.arcTo = function(controlX,controlY,endX,endY,radius)
 	{
 		this._getCommands().push( [1,"arcTo",[controlX,controlY,endX,endY,radius]] );
 	};
-
+	
+	/**
+	* @method quadraticCurveTo
+	* @memberOf tomahawk_ns.Shape.prototype
+	* @param {Number} controlX
+	* @param {Number} controlY
+	* @param {Number} endX
+	* @param {Number} endY
+	* @description Adds the given point to the current subpath, connected to the previous one by a quadratic Bézier curve with the given control point.
+	**/
 	Shape.prototype.quadraticCurveTo = function(controlX, controlY, endX, endY)
 	{
 		this._getCommands().push( [1,"quadraticCurveTo",[controlX, controlY, endX, endY]] );
 	};
-
+	
+	/**
+	* @method bezierCurveTo
+	* @memberOf tomahawk_ns.Shape.prototype
+	* @param {Number} controlX1
+	* @param {Number} controlY1
+	* @param {Number} controlX2
+	* @param {Number} controlY2
+	* @param {Number} endX
+	* @param {Number} endY
+	* @description Adds the given point to the current subpath, connected to the previous one by a cubic Bézier curve with the given control points.
+	**/
 	Shape.prototype.bezierCurveTo = function(controlX1, controlY1, controlX2, controlY2, endX, endY)
 	{
 		this._getCommands().push( [1,"bezierCurveTo",[controlX1, controlY1, controlX2, controlY2, endX, endY]] );
 	};
-
+	
+	/**
+	* @method fillWithCurrentGradient
+	* @memberOf tomahawk_ns.Shape.prototype
+	* @description Sets the current gradient as the current fillStyle
+	**/
 	Shape.prototype.fillWithCurrentGradient = function()
 	{
 		this._getCommands().push( [1,"fillWithCurrentGradient",null] );
 	};
 	
+	/**
+	* @method addColorStop
+	* @memberOf tomahawk_ns.Shape.prototype
+	* @param {Number} offset
+	* @param {String} color
+	* @description Adds a color stop with the given color to the gradient at the given offset. 0.0 is the offset at one end of the gradient, 1.0 is the offset at the other end.
+	**/
 	Shape.prototype.addColorStop = function(offset, color)
 	{
 		this._getCommands().push( [1,"addColorStop",[offset, color]] );
 	};
-
+	
+	/**
+	* @method createLinearGradient
+	* @memberOf tomahawk_ns.Shape.prototype
+	* @param {Number} startX
+	* @param {Number} startY
+	* @param {Number} endX
+	* @param {Number} endY
+	* @description Creates a gradient along the line given by the coordinates represented by the parameters.
+	**/
 	Shape.prototype.createLinearGradient = function(startX, startY, endX, endY)
 	{
 		this._getCommands().push( [1,"createLinearGradient",[startX, startY, endX, endY]] );
 	};
-
+	
+	/**
+	* @method createRadialGradient
+	* @memberOf tomahawk_ns.Shape.prototype
+	* @param {Number} startX
+	* @param {Number} startY
+	* @param {Number} startRadius
+	* @param {Number} endX
+	* @param {Number} endY
+	* @param {Number} endRadius
+	* @description Creates a CanvasGradient object that represents a radial gradient that paints along the cone given by the circles represented by the arguments. If either of the radii are negative, throws an IndexSizeError exception.
+	**/
 	Shape.prototype.createRadialGradient = function(startX, startY, startRadius, endX, endY, endRadius)
 	{
 		this._getCommands().push( [1,"createRadialGradient",[startX, startY, startRadius, endX, endY, endRadius]] );
 	};
 	
+	/**
+	* @description Sets width of lines, default 1.0
+	* @method lineWidth
+	* @memberOf tomahawk_ns.Shape.prototype
+	* @param {Number} value the new line width.
+	**/
 	Shape.prototype.lineWidth = function(value)
 	{
 		this._getCommands().push( [0,"lineWidth",value] );
 	};
-
-	Shape.prototype.lineColor = function(value)
-	{
-		this._getCommands().push( [0,"lineColor",value] );
-	};
-
+	
+	/**
+	* @description Defines the type of endings on the end of lines. Possible values: butt (default), round, square
+	* @method lineCap
+	* @memberOf tomahawk_ns.Shape.prototype
+	* @param {String} value 
+	**/
 	Shape.prototype.lineCap = function(value)
 	{
 		this._getCommands().push( [0,"lineCap",value] );
 	};
 
+	/**
+	* @description Defines the type of corners where two lines meet. Possible values: round, bevel, miter (default)
+	* @method strokeStyle
+	* @memberOf tomahawk_ns.Shape.prototype
+	* @param {String} value 
+	**/
 	Shape.prototype.lineJoin = function(value)
 	{
 		this._getCommands().push( [0,"lineJoin",value] );
 	};
-
+	
+	/**
+	* @description Defines the style used for stroking shapes. It can be either a string containing a CSS color, or a CanvasGradient or CanvasPattern object. Invalid values are ignored.
+	* @method strokeStyle
+	* @memberOf tomahawk_ns.Shape.prototype
+	* @param {Object} value 
+	**/
 	Shape.prototype.strokeStyle = function(value)
 	{
 		this._getCommands().push( [0,"strokeStyle",value] );
 	};
-
+	
+	/**
+	* @description Defines the style used for filling shapes. It can be either a string containing a CSS color, or a CanvasGradient or CanvasPattern object. Invalid values are ignored.
+	* @method fillStyle
+	* @memberOf tomahawk_ns.Shape.prototype
+	* @param {Object} value 
+	**/
 	Shape.prototype.fillStyle = function(value)
 	{
 		this._getCommands().push( [0,"fillStyle",value] );
@@ -2637,7 +3467,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	/**
 	 * @class Sprite
 	 * @memberOf tomahawk_ns
-	 * @description ...
+	 * @description The Sprite class is a basic display list building block: a display list node that can contain children.
 	 * @constructor
 	 * @augments tomahawk_ns.DisplayObjectContainer
 	 **/
@@ -2700,6 +3530,12 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		this.___getDragDropMovement___(event);
 	};
 	
+	/**
+	* @method enableDragAndDrop
+	* @memberOf tomahawk_ns.Sprite.prototype
+	* @param {Boolean} value Indicates if the drag and drop feature is enabled or not. 
+	* @description Enables or Disables the drag and drop feature.
+	**/
 	Sprite.prototype.enableDragAndDrop 				= function(value)
 	{
 		this.stopDrag();
@@ -2716,6 +3552,11 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		this.mouseEnabled = true;
 	};
 	
+	/**
+	* @method startDrag
+	* @memberOf tomahawk_ns.Sprite.prototype
+	* @description Start the dragging operation.
+	**/
 	Sprite.prototype.startDrag 						= function()
 	{
 		this.stopDrag();
@@ -2723,6 +3564,11 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		this.mouseEnabled = true;
 	};
 	
+	/**
+	* @method stopDrag
+	* @memberOf tomahawk_ns.Sprite.prototype
+	* @description Stop the dragging operation.
+	**/
 	Sprite.prototype.stopDrag 						= function()
 	{
 		this.removeEventListener(tomahawk_ns.MouseEvent.MOUSE_MOVE, this, this.___dragDropHandler___, true );
@@ -2768,7 +3614,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	/**
 	 * @class Stage
 	 * @memberOf tomahawk_ns
-	 * @description ...
+	 * @description The Stage class represents the main drawing area, it is the top of the display list.
 	 * @constructor
 	 * @augments tomahawk_ns.DisplayObjectContainer
 	 **/
@@ -2785,6 +3631,12 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 	Stage._instances = new Object();
 	
+	/**
+	* @method getInstance
+	* @memberOf tomahawk_ns.Stage
+	* @param {string} stageName 
+	* @returns {tomahawk_ns.Stage} returns a Stage object that matches the "stageName" parameter. If none of the Stage instances corresponds to the "stageName" parameter, one is automatically created and returned. It is a (Multiton || Factory) implementation of the Stage class.
+	**/
 	Stage.getInstance = function(stageName)
 	{
 		stageName = stageName || "defaultStage";
@@ -2795,6 +3647,39 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		return tomahawk_ns.Stage._instances[stageName];
 	};
 
+	/**
+	* @member mouseX
+	* @memberOf tomahawk_ns.Stage.prototype
+	* @type {Number}
+	* @description the x mouse coordinates on the stage.
+	**/
+	Stage.prototype.mouseX = 0;
+	
+	/**
+	* @member mouseY
+	* @memberOf tomahawk_ns.Stage.prototype
+	* @type {Number}
+	* @description the y mouse coordinates on the stage.
+	**/
+	Stage.prototype.mouseY = 0;
+	
+	/**
+	* @member background
+	* @memberOf tomahawk_ns.Stage.prototype
+	* @type {Boolean}
+	* @default false
+	* @description Specifies whether the stage has a background fill. If true, the stage has a background fill. If false, stage has no background fill. Use the backgroundColor property to set the background color of the stage instance.
+	**/
+	Stage.prototype.background = false;
+	
+	/**
+	* @member backgroundColor
+	* @memberOf tomahawk_ns.Stage.prototype
+	* @type {string}
+	* @description The color of the stage background.
+	* @default "#0080C0"
+	**/
+	Stage.prototype.backgroundColor = "#0080C0";
 	
 	Stage.prototype._lastTime = 0;
 	Stage.prototype._frameCount = 0;
@@ -2802,20 +3687,17 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	Stage.prototype._canvas = null;
 	Stage.prototype._context = null;
 	Stage.prototype._lastActiveChild = null;
-	Stage.prototype.mouseX = 0;
-	Stage.prototype.mouseY = 0;
 	Stage.prototype._focused = false;
 	Stage.prototype._focusedElement = null;
 	Stage.prototype._cache = null;
-	Stage.prototype.background = false;
-	Stage.prototype.backgroundColor = "#0080C0";
 	Stage.prototype._stop = false;
 
-	Stage.prototype._getContext  = function()
-	{
-		return this._canvas.getContext("2d");
-	};
-
+	/**
+	* @description  Associates the canvas element specified by the "canvas" parameter  to this stage and runs the rendering loop.
+	* @method init
+	* @memberOf tomahawk_ns.Stage.prototype
+	* @param {HTMLCanvasElement} canvas the HTMLCanvasElement element associated to this stage object.
+	**/
 	Stage.prototype.init = function(canvas)
 	{
 		var callback = this._mouseHandler.bind(this);
@@ -2838,6 +3720,149 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		this.enterFrame();		
 	};
 	
+	/**
+	* @description Returns a point object which determines the movement on x and y axises since the last frame ( in local stage coordinates system ).
+	* @method getMovement
+	* @memberOf tomahawk_ns.Stage.prototype
+	* @returns {tomahawk_ns.Point} a Point object
+	**/
+	Stage.prototype.getMovement = function()
+	{
+		var pt = new Object();
+		pt.x = this.mouseX - this._lastMouseX;
+		pt.y = this.mouseY - this._lastMouseY;
+		
+		return pt;
+	};
+
+	/**
+	* @description The main rendering loop, automatically called at each frame.
+	* @method enterFrame
+	* @memberOf tomahawk_ns.Stage.prototype
+	**/
+	Stage.prototype.enterFrame = function()
+	{
+		var curTime = new Date().getTime();
+		var scope = this;
+		var context = this._context;
+		var canvas = this._canvas;
+		
+		this.width = this._canvas.width;
+		this.height = this._canvas.height;
+		
+		this._frameCount++;
+		
+		if( curTime - this._lastTime > 1000 )
+		{
+			this._fps = this._frameCount;
+			this._frameCount = 0;
+			this._lastTime = curTime;
+		}
+		
+		if( this.background == true )
+		{
+			context.save();
+			context.beginPath();
+			context.fillStyle = this.backgroundColor;
+			context.fillRect( 0, 0, canvas.width, canvas.height );
+			context.fill();
+			context.restore();
+		}
+		else
+		{
+			context.clearRect(0,0,canvas.width,canvas.height);
+		}
+		
+		context.save();
+		this.draw(context);
+		context.restore();
+		
+		this.dispatchEvent(new tomahawk_ns.Event(tomahawk_ns.Event.ENTER_FRAME,true,true));
+		window.requestAnimationFrame(this._enterFrame);
+	};
+
+	/**
+	* @description Sets the current fps but only if the browser doesn't have a valid implementation of window.requestAnimationFrame or equivalent. If there's one, it will be used instead even if you specify another fps value.
+	* @method setFPS
+	* @memberOf tomahawk_ns.Stage.prototype
+	* @param {Number} value the new current fps
+	**/
+	Stage.prototype.setFPS = function(value)
+	{
+		this._fps = value;
+		
+		window.requestAnimationFrame = (function()
+		{
+			
+			return  window.requestAnimationFrame       ||  //Chromium 
+					window.webkitRequestAnimationFrame ||  //Webkit
+					window.mozRequestAnimationFrame    || //Mozilla Geko
+					window.oRequestAnimationFrame      || //Opera Presto
+					window.msRequestAnimationFrame     || //IE Trident?
+					function(callback, element){ //Fallback function
+						window.setTimeout(callback, parseInt(1000/value));                
+					}
+			 
+		})();
+	};
+
+	/**
+	* @method drawFPS
+	* @memberOf tomahawk_ns.Stage.prototype
+	* @description Draws the current fps on the top left corner of the stage.
+	**/
+	Stage.prototype.drawFPS = function()
+	{
+		this._context.save();
+		this._context.beginPath();
+		this._context.fillStyle = "black";
+		this._context.fillRect(0,0,50,15);
+		this._context.fill();
+		this._context.fillStyle = "red";
+		this._context.font = '10pt Arial';
+		this._context.fillText("fps: "+this._fps, 0,15);
+		this._context.restore();
+	};
+
+	/**
+	* @method getCanvas
+	* @memberOf tomahawk_ns.Stage.prototype
+	* @returns {HTMLCanvasElement} An HTMLCanvasElement DOM object
+	* @description Returns the HTMLCanvasElement associated to this stage.
+	**/
+	Stage.prototype.getCanvas = function()
+	{
+		return this._canvas;
+	};
+	
+	/**
+	* @method getContext
+	* @memberOf tomahawk_ns.Stage.prototype
+	* @returns {CanvasRenderingContext2D} A CanvasRenderingContext2D object
+	* @description Returns the CanvasRenderingContext2D associated to this stage's canvas.
+	**/
+	Stage.prototype.getContext = function()
+	{
+		return this._context;
+	};
+
+	/**
+	* @member getFPS
+	* @memberOf tomahawk_ns.Stage.prototype
+	* @description Returns the current fps.
+	* @returns {Number} the current fps
+	**/
+	Stage.prototype.getFPS = function()
+	{
+		return this._fps;
+	};
+
+	
+	Stage.prototype._getContext  = function()
+	{
+		return this._canvas.getContext("2d");
+	};
+
 	Stage.prototype._mouseHandler = function(event)
 	{
 		var bounds = this._canvas.getBoundingClientRect();
@@ -2958,15 +3983,6 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		}
 	};
 
-	Stage.prototype.getMovement = function()
-	{
-		var pt = new Object();
-		pt.x = this.mouseX - this._lastMouseX;
-		pt.y = this.mouseY - this._lastMouseY;
-		
-		return pt;
-	};
-
 	Stage.prototype._eventHandler = function(event)
 	{
 		var list = null;
@@ -3007,94 +4023,6 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 				
 				break;
 		}
-	};
-
-	Stage.prototype.enterFrame = function()
-	{
-		var curTime = new Date().getTime();
-		var scope = this;
-		var context = this._context;
-		var canvas = this._canvas;
-		
-		this.width = this._canvas.width;
-		this.height = this._canvas.height;
-		
-		this._frameCount++;
-		
-		if( curTime - this._lastTime > 1000 )
-		{
-			this._fps = this._frameCount;
-			this._frameCount = 0;
-			this._lastTime = curTime;
-		}
-		
-		if( this.background == true )
-		{
-			context.save();
-			context.beginPath();
-			context.fillStyle = this.backgroundColor;
-			context.fillRect( 0, 0, canvas.width, canvas.height );
-			context.fill();
-			context.restore();
-		}
-		else
-		{
-			context.clearRect(0,0,canvas.width,canvas.height);
-		}
-		
-		context.save();
-		this.draw(context);
-		context.restore();
-		
-		this.dispatchEvent(new tomahawk_ns.Event(tomahawk_ns.Event.ENTER_FRAME,true,true));
-		window.requestAnimationFrame(this._enterFrame);
-	};
-
-	Stage.prototype.setFPS = function(value)
-	{
-		this._fps = value;
-		
-		window.requestAnimationFrame = (function()
-		{
-			
-			return  window.requestAnimationFrame       ||  //Chromium 
-					window.webkitRequestAnimationFrame ||  //Webkit
-					window.mozRequestAnimationFrame    || //Mozilla Geko
-					window.oRequestAnimationFrame      || //Opera Presto
-					window.msRequestAnimationFrame     || //IE Trident?
-					function(callback, element){ //Fallback function
-						window.setTimeout(callback, parseInt(1000/value));                
-					}
-			 
-		})();
-	};
-
-	Stage.prototype.drawFPS = function()
-	{
-		this._context.save();
-		this._context.beginPath();
-		this._context.fillStyle = "black";
-		this._context.fillRect(0,0,50,15);
-		this._context.fill();
-		this._context.fillStyle = "red";
-		this._context.font = '10pt Arial';
-		this._context.fillText("fps: "+this._fps, 0,15);
-		this._context.restore();
-	};
-
-	Stage.prototype.getCanvas = function()
-	{
-		return this._canvas;
-	};
-
-	Stage.prototype.getContext = function()
-	{
-		return this._context;
-	};
-
-	Stage.prototype.getFPS = function()
-	{
-		return this._fps;
 	};
 
 
@@ -3141,7 +4069,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	/**
 	 * @class QuadTreeContainer
 	 * @memberOf tomahawk_ns
-	 * @description ...
+	 * @description The QuadTreeContainer class is a basic display list building block: a display list node that can contain children. The only difference with the basic Sprite class is that QuadTreeContainer orders his children in an internal quadtree structure. Each child which needs to be updated ( updateNextFrame || autoUpdate to true ) will be removed and added to the quadtree every frame. It means that the QuadTreeContainer is a very good container for a large subset of statics objects, so you can set the children autoUpdate property to false. It will results to a large gain of performances. Elsewhere, you can put a little subset of children with the autoUpdate property to true depending of the performances of the targeted devices.
 	 * @constructor
 	 * @augments tomahawk_ns.Sprite
 	 **/
@@ -3164,34 +4092,12 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	
 	QuadTreeContainer.prototype._root = null;
 
-	QuadTreeContainer.prototype.addChild = function(child)
-	{
-		child.updateNextFrame = true;
-		this._root.add(child);
-		return tomahawk_ns.Sprite.prototype.addChild.apply(this,[child]);
-	};
-
-	QuadTreeContainer.prototype.addChildAt = function(child, index)
-	{
-		child.updateNextFrame = true;
-		this._root.add(child);
-		return tomahawk_ns.Sprite.prototype.addChildAt.apply(this,[child,index]);
-	};
-
-	QuadTreeContainer.prototype.removeChildAt = function(child, index)
-	{
-		child.updateNextFrame = true;
-		this._root.remove(child);
-		return tomahawk_ns.Sprite.prototype.removeChildAt.apply(this,[child,index]);
-	};
-	
-	QuadTreeContainer.prototype.removeChild = function(child)
-	{
-		child.updateNextFrame = true;
-		this._root.remove(child);
-		return tomahawk_ns.Sprite.prototype.removeChild.apply(this,[child]);
-	};
-	
+	/**
+	* @description Returns all the children of the QuadTreeContainer that are visibles on the canvas area.
+	* @method getVisiblesChildren
+	* @memberOf tomahawk_ns.QuadTreeContainer.prototype
+	* @returns {Array} an array of DisplayObject instances.
+	**/
 	QuadTreeContainer.prototype.getVisiblesChildren = function()
 	{
 		var i = this.children.length;
@@ -3227,11 +4133,46 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		return visibles;
 	};
 	
+	/**
+	* @description Returns the top node of the internal quadtree structure.
+	* @method getRoot
+	* @memberOf tomahawk_ns.QuadTreeContainer.prototype
+	* @returns {tomahawk_ns.QuadTreeNode} the root node of the internal quadtree structure
+	**/
 	QuadTreeContainer.prototype.getRoot = function()
 	{
 		return this._root;
 	};
 
+	
+	QuadTreeContainer.prototype.addChild = function(child)
+	{
+		child.updateNextFrame = true;
+		this._root.add(child);
+		return tomahawk_ns.Sprite.prototype.addChild.apply(this,[child]);
+	};
+
+	QuadTreeContainer.prototype.addChildAt = function(child, index)
+	{
+		child.updateNextFrame = true;
+		this._root.add(child);
+		return tomahawk_ns.Sprite.prototype.addChildAt.apply(this,[child,index]);
+	};
+
+	QuadTreeContainer.prototype.removeChildAt = function(child, index)
+	{
+		child.updateNextFrame = true;
+		this._root.remove(child);
+		return tomahawk_ns.Sprite.prototype.removeChildAt.apply(this,[child,index]);
+	};
+	
+	QuadTreeContainer.prototype.removeChild = function(child)
+	{
+		child.updateNextFrame = true;
+		this._root.remove(child);
+		return tomahawk_ns.Sprite.prototype.removeChild.apply(this,[child]);
+	};
+	
 	QuadTreeContainer.prototype._sortVisiblesChildren = function(a,b)
 	{
 		return ( a.__index__ < b.__index__ ) ? -1 : 1;
@@ -3349,7 +4290,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	/**
 	 * @class QuadTreeNode
 	 * @memberOf tomahawk_ns
-	 * @description ...
+	 * @description A QuadTreeNode Object defines a leaf of a quadtree structure. Quadtrees are a derived implementation of binary trees which are very efficient in 2d plans.
 	 * @constructor	
 	 **/
 	function QuadTreeNode(left,right,top,bottom, depth, maxChildren, maxDepth)
@@ -3376,6 +4317,12 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	
 	// iterative  methods
 	
+	/**
+	* @description Adds a display object to the tree node
+	* @method add
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @param {tomahawk_ns.DisplayObject} element the display object you want to add to the tree node
+	**/
 	QuadTreeNode.prototype.add = function(element)
 	{
 		this.remove(element);
@@ -3427,6 +4374,12 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		}
 	};
 	
+	/**
+	* @description Removes a display object from the tree node
+	* @method remove
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @param {tomahawk_ns.DisplayObject} element the display object you want to remove from the tree node
+	**/
 	QuadTreeNode.prototype.remove = function( element )
 	{
 		var index = -1;
@@ -3454,6 +4407,16 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		}
 	};
 	
+	/**
+	* @description Returns an Array of DisplayObjects that are visible in the area defined by the left,right,top,bottom parameters.
+	* @method get
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @param {Number} left 
+	* @param {Number} right 
+	* @param {Number} top 
+	* @param {Number} bottom 
+	* @returns {Array} An array of DisplayObject
+	**/
 	QuadTreeNode.prototype.get = function( left, right, top, bottom )
 	{
 		var tick = tomahawk_ns.QuadTreeNode._tick + 1;
@@ -3512,6 +4475,11 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		return result;
 	};
 	
+	/**
+	* @description Splits the current node into four child nodes. The children of the node will be redispatched throught those new four nodes.
+	* @method split
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	**/
 	QuadTreeNode.prototype.split = function()
 	{
 		var child = null;
@@ -3536,19 +4504,122 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		this.full = true;
 	};
 	
-	
+	/**
+	* @member full
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {Boolean}
+	* @default false
+	* @description Indicates wether the node is full.
+	**/
 	QuadTreeNode.prototype.full = false;
+	
+	/**
+	* @default 0
+	* @member left
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {Number}
+	* @description The x coordinate of the top-left corner of the node's area.
+	**/
 	QuadTreeNode.prototype.left = 0;
+	
+	/**
+	* @default 0
+	* @member right
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {Number}
+	* @description The x coordinate of the bottom-right corner of the node's area.
+	**/
 	QuadTreeNode.prototype.right = 0;
+	
+	/**
+	* @default 0
+	* @member top
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {Number}
+	* @description The y coordinate of the top-left corner of the node's area.
+	**/
 	QuadTreeNode.prototype.top = 0;
+	
+	
+	/**
+	* @default 0
+	* @member bottom
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {Number}
+	* @description The y coordinate of the bottom-right corner of the node's area.
+	**/
 	QuadTreeNode.prototype.bottom = 0;
+	
+	/**
+	* @default 20
+	* @member maxChildren
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {Number}
+	* @description Indicates the maximum amount of children of that node can stores before splitting itself.
+	**/
 	QuadTreeNode.prototype.maxChildren = 20;
+	
+	/**
+	* @default 0
+	* @member depth
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {Number}
+	* @description Indicates the depth of the node within the quadtree structure
+	**/
 	QuadTreeNode.prototype.depth = 0;
+	
+	/**
+	* @default null
+	* @member node1
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {tomahawk_ns.QuadTreeNode}
+	* @description Indicates the top-left child node of the node.
+	**/
 	QuadTreeNode.prototype.node1 = null;
+	
+	/**
+	* @default null
+	* @member node2
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {tomahawk_ns.QuadTreeNode}
+	* @description Indicates the bottom-left child node of the node.
+	**/
 	QuadTreeNode.prototype.node2 = null;
+	
+	/**
+	* @default null
+	* @member node3
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {tomahawk_ns.QuadTreeNode}
+	* @description Indicates the top-right child node of the node.
+	**/
 	QuadTreeNode.prototype.node3 = null;
+	
+	/**
+	* @default null
+	* @member node4
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {tomahawk_ns.QuadTreeNode}
+	* @description Indicates the bottom-right child node of the node.
+	**/
 	QuadTreeNode.prototype.node4 = null;
+	
+	/**
+	* @default 0
+	* @member limitX
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {tomahawk_ns.QuadTreeNode}
+	* @description Indicates the x coordinate of the splitting boundary within this node.
+	**/
 	QuadTreeNode.prototype.limitX = 0;
+	
+	/**
+	* @default 0
+	* @member limitY
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {tomahawk_ns.QuadTreeNode}
+	* @description Indicates the y coordinate of the splitting boundary within this node.
+	**/
 	QuadTreeNode.prototype.limitY = 0;
 	
 	
@@ -3592,7 +4663,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	/**
 	 * @class Sprite3D
 	 * @memberOf tomahawk_ns
-	 * @description ...
+	 * @description The Sprite3d class is a basic display list building block, a display list node that can contain children on which pseudo3D effects can be applied.
 	 * @constructor
 	 * @augments tomahawk_ns.Sprite
 	 **/
@@ -3602,6 +4673,84 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		this.matrix3D = new tomahawk_ns.Matrix4x4();
 	}
 	
+	/**
+	* @member matrix3D
+	* @memberOf tomahawk_ns.Sprite3D.prototype
+	* @type {Matrix4x4}
+	* @description The transformation matrix (3d) of the Sprite3D
+	* @default null
+	**/
+	Sprite3D.prototype.matrix3D = null;
+	
+	/**
+	* @member scaleZ
+	* @memberOf tomahawk_ns.Sprite3D.prototype
+	* @type {Number}
+	* @default 1
+	* @description Indicates the depth scale (percentage) of the object as applied from the registration point.
+	**/
+	Sprite3D.prototype.scaleZ = 1;
+	
+	/**
+	* @member z
+	* @memberOf tomahawk_ns.Sprite3D.prototype
+	* @type {Number}
+	* @default 0
+	* @description Indicates the z coordinate of the Sprite3D instance relative to the local coordinates of the parent DisplayObjectContainer.
+	**/
+	Sprite3D.prototype.z = 0;
+	
+	/**
+	* @member pivotZ
+	* @memberOf tomahawk_ns.Sprite3D.prototype
+	* @type {Number}
+	* @default 0
+	* @description Indicates the z coordinate of the Sprite3D instance registration point
+	**/
+	Sprite3D.prototype.pivotZ = 0;
+	
+	/**
+	* @member rotationX
+	* @memberOf tomahawk_ns.Sprite3D.prototype
+	* @type {Number}
+	* @default 0
+	* @description Indicates the rotation on the x axis of the Sprite3D instance, in degrees, from its original orientation.
+	**/
+	Sprite3D.prototype.rotationX = 0;
+	
+	/**
+	* @member rotationY
+	* @memberOf tomahawk_ns.Sprite3D.prototype
+	* @type {Number}
+	* @default 0
+	* @description Indicates the rotation on the y axis of the Sprite3D instance, in degrees, from its original orientation.
+	**/
+	Sprite3D.prototype.rotationY = 0;
+	
+	/**
+	* @member rotationZ
+	* @memberOf tomahawk_ns.Sprite3D.prototype
+	* @type {Number}
+	* @default 0
+	* @description Indicates the rotation on the z axis of the Sprite3D instance, in degrees, from its original orientation.
+	**/
+	Sprite3D.prototype.rotationZ = 0;
+	
+	/**
+	* @member useReal3D
+	* @memberOf tomahawk_ns.Sprite3D.prototype
+	* @type {Boolean}
+	* @default false
+	* @description Indicates wether the Sprite3D instance will convert his parent's transformation matrixes in 3d matrixes before rendering. If true it will results in a better 3d transformation.
+	**/
+	Sprite3D.prototype.useReal3D = false;
+	
+	/**
+	* @description Returns a vector that represents the normale of the Sprite3D instance.
+	* @method getNormalVector
+	* @memberOf tomahawk_ns.Sprite3D.prototype
+	* @returns {tomahawk_ns.Vector3D} returns a Vector3D object
+	**/
 	Sprite3D.prototype.getNormalVector = function()
 	{
 		var mat = tomahawk_ns.Matrix4x4.toMatrix2D(this.getConcatenedMatrix3D(true));
@@ -3615,6 +4764,55 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 		return vec1;
 	};
+	
+	/**
+	* @description Returns the combined 3d and 2d transformation matrixes of the Sprite3D instance and all of its parent objects, back to the stage level. If one of the parents of the Sprite3D instance is classical 2d display object, his matrix is converted into a Matrix4x4.
+	* @method getConcatenedMatrix3D
+	* @memberOf tomahawk_ns.Sprite3D.prototype
+	* @returns {tomahawk_ns.Matrix4x4} returns a Matrix4x4 object
+	**/
+	Sprite3D.prototype.getConcatenedMatrix3D = function()
+	{
+		this.updateNextFrame = true;
+		this.updateMatrix();
+		var current = this.parent;
+		var mat3D = this.matrix3D.clone();
+		
+		while( current != null )
+		{
+			current.updateNextFrame = true;
+			current.updateMatrix();
+			
+			if( current.matrix3D && current.matrix3D != null )
+			{
+				mat3D.prependMatrix( current.matrix3D );
+			}
+			else
+			{
+				mat3D.prependMatrix( tomahawk_ns.Matrix4x4.toMatrix4x4(current.matrix) );
+			}
+			current = current.parent;
+		}
+		
+		return mat3D;
+	};
+	
+	/**
+	* @method localToGlobal3D
+	* @memberOf tomahawk_ns.Sprite3D.prototype
+	* @param {string} {param} myparam
+	* @returns {Number} returns a number
+	* @description Converts the point object specified by x,y,z parameters from the DisplayObject's (local) coordinates to the Stage (global) coordinates.
+	**/
+	Sprite3D.prototype.localToGlobal3D = function(x,y,z)
+	{
+		var mat = this.getConcatenedMatrix3D();
+		var pt = new tomahawk_ns.Point3D(x,y,z);
+		mat.transformPoint3D(pt);
+		return pt;
+	};
+
+	
 	
 	Sprite3D.prototype.updateMatrix = function()
 	{
@@ -3643,32 +4841,6 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		this.updateNextFrame = false;
 	};
 	
-	Sprite3D.prototype.getConcatenedMatrix3D = function()
-	{
-		this.updateNextFrame = true;
-		this.updateMatrix();
-		var current = this.parent;
-		var mat3D = this.matrix3D.clone();
-		
-		while( current != null )
-		{
-			current.updateNextFrame = true;
-			current.updateMatrix();
-			
-			if( current.matrix3D && current.matrix3D != null )
-			{
-				mat3D.prependMatrix( current.matrix3D );
-			}
-			else
-			{
-				mat3D.prependMatrix( tomahawk_ns.Matrix4x4.toMatrix4x4(current.matrix) );
-			}
-			current = current.parent;
-		}
-		
-		return mat3D;
-	};
-	
 	Sprite3D.prototype.draw = function(context)
 	{
 		context.save();
@@ -3683,25 +4855,6 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		context.restore();
 	};
 	
-	Sprite3D.prototype.localToGlobal3D = function(x,y,z)
-	{
-		var mat = this.getConcatenedMatrix3D();
-		var pt = new tomahawk_ns.Point3D(x,y,z);
-		mat.transformPoint3D(pt);
-		return pt;
-	};
-	
-	Sprite3D.prototype.matrix3D = null;
-	
-	Sprite3D.prototype.scaleZ = 1;
-	Sprite3D.prototype.z = 0;
-	Sprite3D.prototype.pivotZ = 0;
-	
-	Sprite3D.prototype.rotationX = 0;
-	Sprite3D.prototype.rotationY = 0;
-	Sprite3D.prototype.rotationZ = 0;
-	
-	Sprite3D.prototype.useReal3D = false;
 	
 	Tomahawk.registerClass( Sprite3D, "Sprite3D" );
 	Tomahawk.extend( "Sprite3D", "Sprite" );
@@ -4700,7 +5853,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	* @memberOf tomahawk_ns.PixelFilter.prototype
 	* @description apply the filter on the canvas passed in param
 	* @param {HTMLCanvasElement} canvas the canvas used by the current filter.
-	* @param {Canvas2DRenderingContext} context the context used by the current filter.
+	* @param {CanvasRenderingContext2D} context the context used by the current filter.
 	* @param {tomahawk_ns.DisplayObject} object the DisplayObject on which the filter will be applied to
 	**/
 	PixelFilter.prototype.apply = function(canvas, context, object)
@@ -7050,7 +8203,7 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	* @method draws the DisplayObject on the stage
 	* @memberOf tomahawk_ns.Letter.prototype
 	* @description Draws the display object into the specified context
-	* @param {Canvas2DRenderingContext} the context of the canvas on which you want to draw the DisplayObject
+	* @param {CanvasRenderingContext2D} the context of the canvas on which you want to draw the DisplayObject
 	**/
 	Letter.prototype.draw = function(context)
 	{
@@ -8726,15 +9879,37 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	/**
 	 * @class Texture
 	 * @memberOf tomahawk_ns
-	 * @description ....
+	 * @description The Texture class represents a 2-dimensional texture which will be used in a Bitmap instance. Defines a 2D texture for use during rendering.
 	 * @constructor
 	 **/
 	function Texture(){}
 
 	Tomahawk.registerClass( Texture, "Texture" );
 
+	/**
+	* @description The rendering data itself, it can be an HTMLImageElement || HTMLCanvasElement || HTMLVideoElement
+	* @member data
+	* @memberOf tomahawk_ns.Texture.prototype
+	* @type {Object}
+	* @default null
+	**/
 	Texture.prototype.data = null;
+	
+	/**
+	* @member name
+	* @memberOf tomahawk_ns.Texture.prototype
+	* @type {String}
+	* @description The name of the texture
+	* @default null
+	**/
 	Texture.prototype.name = null;
+	
+	/**
+	* @member rect
+	* @memberOf tomahawk_ns.Texture.prototype
+	* @type {Array}
+	* @description An array representating the portion of the rendering data used for the rendering. Example: [0,0,10,10] the top-left 10x10 pixels square of the data will be rendered but not the rest.
+	**/
 	Texture.prototype.rect = null;
 
 	tomahawk_ns.Texture = Texture;
@@ -8782,7 +9957,7 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	/**
 	 * @class TextureAtlas
 	 * @memberOf tomahawk_ns
-	 * @description ...
+	 * @description A texture atlas is a collection of many smaller textures in one big image. This class is used to access and create textures from such an atlas.
 	 * @constructor
 	 **/
 	function TextureAtlas()
@@ -8793,9 +9968,36 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	Tomahawk.registerClass( TextureAtlas, "TextureAtlas" );
 
 	TextureAtlas.prototype._textures = null;
+	
+	/**
+	* @description The rendering data itself, it can be an HTMLImageElement || HTMLCanvasElement || HTMLVideoElement
+	* @member data
+	* @memberOf tomahawk_ns.TextureAtlas.prototype
+	* @type {Object}
+	* @default null
+	**/
 	TextureAtlas.prototype.data = null;
+	
+	/**
+	* @member name
+	* @memberOf tomahawk_ns.Texture.prototype
+	* @type {String}
+	* @description The name of the texture atlas
+	* @default null
+	**/
 	TextureAtlas.prototype.name = null;
 
+	/**
+	* @method createTexture
+	* @memberOf tomahawk_ns.TextureAtlas.prototype
+	* @param {string} name
+	* @param {Number} startX
+	* @param {Number} startY
+	* @param {Number} endX
+	* @param {Number} endY
+	* @description creates a new sub texture from the atlas which will render the region of the atlas data specified
+	  by the startX, startY, endX, endY parameters with the name specified by the "name" parameter. The newly created texture is automatically stored within the atlas, it means that you can retrieve it with the "getTextureByName" method.
+	**/
 	TextureAtlas.prototype.createTexture = function( name, startX, startY, endX, endY )
 	{
 		var texture = new tomahawk_ns.Texture();
@@ -8805,7 +10007,14 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		
 		this._textures.push(texture);
 	};
-
+	
+	/**
+	* @method getTextureByName
+	* @memberOf tomahawk_ns.TextureAtlas.prototype
+	* @param {string} name
+	* @returns {tomahawk_ns.Texture}
+	* @description Returns the internal sub texture which matches the name specified by the "name" parameter.
+	**/
 	TextureAtlas.prototype.getTextureByName = function( name )
 	{
 		var i = this._textures.length;
@@ -8819,7 +10028,13 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		
 		return null;
 	};
-
+	
+	/**
+	* @method removeTexture
+	* @memberOf tomahawk_ns.TextureAtlas.prototype
+	* @param {string} name
+	* @description Removes the internal sub texture which matches the name specified by the "name" parameter.
+	**/
 	TextureAtlas.prototype.removeTexture = function( name )
 	{
 		var texture = this.getTextureByName(name);
@@ -8830,7 +10045,6 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		var index = this._textures.indexOf(texture);
 		this._textures.splice(index,1);
 	};
-
 
 	tomahawk_ns.TextureAtlas = TextureAtlas;
 

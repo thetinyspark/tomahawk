@@ -32,7 +32,7 @@
 	/**
 	 * @class QuadTreeContainer
 	 * @memberOf tomahawk_ns
-	 * @description ...
+	 * @description The QuadTreeContainer class is a basic display list building block: a display list node that can contain children. The only difference with the basic Sprite class is that QuadTreeContainer orders his children in an internal quadtree structure. Each child which needs to be updated ( updateNextFrame || autoUpdate to true ) will be removed and added to the quadtree every frame. It means that the QuadTreeContainer is a very good container for a large subset of statics objects, so you can set the children autoUpdate property to false. It will results to a large gain of performances. Elsewhere, you can put a little subset of children with the autoUpdate property to true depending of the performances of the targeted devices.
 	 * @constructor
 	 * @augments tomahawk_ns.Sprite
 	 **/
@@ -55,34 +55,12 @@
 	
 	QuadTreeContainer.prototype._root = null;
 
-	QuadTreeContainer.prototype.addChild = function(child)
-	{
-		child.updateNextFrame = true;
-		this._root.add(child);
-		return tomahawk_ns.Sprite.prototype.addChild.apply(this,[child]);
-	};
-
-	QuadTreeContainer.prototype.addChildAt = function(child, index)
-	{
-		child.updateNextFrame = true;
-		this._root.add(child);
-		return tomahawk_ns.Sprite.prototype.addChildAt.apply(this,[child,index]);
-	};
-
-	QuadTreeContainer.prototype.removeChildAt = function(child, index)
-	{
-		child.updateNextFrame = true;
-		this._root.remove(child);
-		return tomahawk_ns.Sprite.prototype.removeChildAt.apply(this,[child,index]);
-	};
-	
-	QuadTreeContainer.prototype.removeChild = function(child)
-	{
-		child.updateNextFrame = true;
-		this._root.remove(child);
-		return tomahawk_ns.Sprite.prototype.removeChild.apply(this,[child]);
-	};
-	
+	/**
+	* @description Returns all the children of the QuadTreeContainer that are visibles on the canvas area.
+	* @method getVisiblesChildren
+	* @memberOf tomahawk_ns.QuadTreeContainer.prototype
+	* @returns {Array} an array of DisplayObject instances.
+	**/
 	QuadTreeContainer.prototype.getVisiblesChildren = function()
 	{
 		var i = this.children.length;
@@ -118,11 +96,46 @@
 		return visibles;
 	};
 	
+	/**
+	* @description Returns the top node of the internal quadtree structure.
+	* @method getRoot
+	* @memberOf tomahawk_ns.QuadTreeContainer.prototype
+	* @returns {tomahawk_ns.QuadTreeNode} the root node of the internal quadtree structure
+	**/
 	QuadTreeContainer.prototype.getRoot = function()
 	{
 		return this._root;
 	};
 
+	
+	QuadTreeContainer.prototype.addChild = function(child)
+	{
+		child.updateNextFrame = true;
+		this._root.add(child);
+		return tomahawk_ns.Sprite.prototype.addChild.apply(this,[child]);
+	};
+
+	QuadTreeContainer.prototype.addChildAt = function(child, index)
+	{
+		child.updateNextFrame = true;
+		this._root.add(child);
+		return tomahawk_ns.Sprite.prototype.addChildAt.apply(this,[child,index]);
+	};
+
+	QuadTreeContainer.prototype.removeChildAt = function(child, index)
+	{
+		child.updateNextFrame = true;
+		this._root.remove(child);
+		return tomahawk_ns.Sprite.prototype.removeChildAt.apply(this,[child,index]);
+	};
+	
+	QuadTreeContainer.prototype.removeChild = function(child)
+	{
+		child.updateNextFrame = true;
+		this._root.remove(child);
+		return tomahawk_ns.Sprite.prototype.removeChild.apply(this,[child]);
+	};
+	
 	QuadTreeContainer.prototype._sortVisiblesChildren = function(a,b)
 	{
 		return ( a.__index__ < b.__index__ ) ? -1 : 1;
