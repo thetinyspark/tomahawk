@@ -68,10 +68,14 @@
 	padding: 10px;
 	box-shadow: 0px 4px 10px rgba(0,0,0,.2);
 }
+#doc_nav nav ul.toplist > li ul li{
+	float:left;width:33%;text-align:left;
+}
 
 /*hover*/
 #doc_nav nav ul.toplist > li ul{
 	display:block;opacity:0;height:0;overflow:hidden;
+	width:600px;
 	-webkit-transition: all 550ms ease-out;
 	-moz-transition: all 550ms ease-out;
 	-o-transition: all 550ms ease-out;
@@ -80,14 +84,16 @@
 }
 
 #doc_nav nav ul.toplist > li:hover ul{
-	display:block;opacity:1;height:auto;
+	display:block;opacity:1;height:auto;max-height:500px;
 }
 #doc_nav nav li {
     margin-top: 6px;
 }
 
 #doc_nav nav li li a {
-    color: #5C5954;
+	color: #5C5954;
+	font-size: 0.8em;
+	line-height: normal;
 }
 
 
@@ -123,12 +129,30 @@
 }
 
 #main_content .en_EN{
-	display: none;
+	display: block;
 }
 
 #main_content .fr_FR{
 	display: block;
 }
+
+#main_content .intro{
+	background: #fafafa;
+	color: #666666;
+	font-style: italic;
+	font-size: 0.8em;
+	padding: 5px;
+	margin: 5px;
+	border: 1px solid #dadada;
+}
+
+#main_content .intro strong{
+	font-weight: normal;
+	color: #333333;
+}
+
+
+
 
 #main_content .class-description {
     font-style: italic;
@@ -165,6 +189,7 @@
 
 /*adsssss*/
 #main_content .left-content{float:left;width:78%}
+#main_content .left-content h2{text-indent:20px;padding:20px 0;}
 #main_content .rigth-ad{float:right;width:20%;min-width:130px;text-align:center;padding-top:20px;}
 
 #main_content footer {
@@ -183,16 +208,16 @@
     margin: 6px 0 9px 0;
 }
 
-#main_content h1.page-title{
+h1.page-title{
 	background: url('http://the-tiny-spark.com/assets/images/icons/spark.png') no-repeat 0 0 transparent;
 	font-size: 1.7em;
 	line-height: 1em;
 	color: #191919;
 	padding: 10px 0px 20px 50px;
 	text-transform: uppercase;
-	width: 70%;
+	width: 90%;
 	text-align: left;
-	margin: 20px 0 5px 0;
+	margin: 20px auto;
 }
 
 #main_content h2 {
@@ -209,6 +234,7 @@
     letter-spacing: -0.01em;
     margin-top: 16px;
     margin: 6px 0 3px 0;
+	text-indent:20px;
 }
 
 #main_content h4
@@ -414,7 +440,7 @@
 	#doc_nav {width: 100%;overflow:hidden;height:auto;}
 	#doc_nav nav h2{display:block;width:100%;text-align:center;cursor: pointer;font-size: 16px;color: black;float:none;background:none;}
 	#doc_nav nav ul.toplist {margin: 0 auto 30px auto;float: none;display:block;width:90%;background:white;}
-	#doc_nav nav ul.toplist > li{display:block;color:black;float:none;background:none;}
+	#doc_nav nav ul.toplist > li{display:block;color:black;float:none;background:none;width:93%;margin:auto;}
 	#doc_nav nav ul.toplist > li ul {
 		position: static;
 		padding: 10px;
@@ -425,7 +451,9 @@
 		opacity: 1;
 		height: auto;
 		overflow: hidden;
-	}	
+		width:100%
+	}
+	#doc_nav nav ul.toplist > li ul li{width:50%;text-align:left;}
 	#doc_nav nav ul.toplist > li:hover {
 		background: none;
 	}
@@ -438,9 +466,4 @@
 	}
 	.footer-ad{display:none;}
 	
-}
-
-/*mini*/
-@media (min-width: 800px) and (max-width: 999px) {
-
 }
