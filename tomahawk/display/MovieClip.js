@@ -32,55 +32,121 @@
 	/**
 	 * @class MovieClip
 	 * @memberOf tomahawk_ns
-	 * @description This class is undocumented because she will change very soon
-	 * @note The MovieClip class inherits from the following classes: Bitmap, DisplayObject, and EventDispatcher. Unlike the Sprite object, a MovieClip object has a timeline.
+	 * @description The MovieClip class inherits from the following classes: Sprite,DisplayObjectContainer, DisplayObject, and EventDispatcher. Unlike the Sprite object, a MovieClip object has a timeline.
 	 * @constructor
-	 * @augments tomahawk_ns.Bitmap
+	 * @augments tomahawk_ns.Sprite
 	 **/
-	function MovieClip(texture)
+	function MovieClip()
 	{
-		tomahawk_ns.Bitmap.apply(this, [texture]);
-		this._frames = new Array();
+		tomahawk_ns.Sprite.apply(this);
+		this._timeline = new tomahawk_ns.Timeline();
 	}
 
 	Tomahawk.registerClass( MovieClip, "MovieClip" );
-	Tomahawk.extend( "MovieClip", "Bitmap" );
-
-	MovieClip.prototype._frames = null;
-	MovieClip.prototype.currentFrame = 0;
-	MovieClip.prototype._enterFrameHandler = null;
+	Tomahawk.extend( "MovieClip", "Sprite" );
+	
+	
 	MovieClip.prototype.fps = 1;
+	MovieClip.prototype.isMovieClip = true;
 	MovieClip.prototype._timer = 0;
-
-	MovieClip.prototype._enterFrameHandler = function(event)
+	MovieClip.prototype._lastFrame = null;
+	MovieClip.prototype.reverse = false;
+	
+	MovieClip.prototype._refresh = function()
 	{
-		this.currentFrame++;
+		var i = 0
+		var frame = null;
+		var tween = null;
+		var currentChild = null;
+		var currentFrame = this._timeline.getCurrentFrameIndex();
 		
-		if( this.currentFrame >= this._frames.length )
-			this.currentFrame = 0;
-			
-		if( this._frames[this.currentFrame] )
-		{
-			this.texture = this._frames[this.currentFrame];
+		frame = this._timeline.getFrameAt(currentFrame);
+		
+		if(  frame != null )
+		{		
+			if( this._lastFrame != frame )
+			{
+				this._lastFrame = frame;
+				this.removeChildren();
+				i = frame.children.length;
+				
+				while( --i > -1 )
+				{
+					currentChild = frame.children[i];
+					this.addChildAt(currentChild,0);
+				
+					if( currentChild.isMovieClip == true )
+					{
+						currentChild.gotoAndStop(currentFrame - frame.index);
+					}
+				}
+				
+				frame.runScript(this);
+			}
 		}
-		
-		this._timer = setTimeout(this._enterFrameHandler.bind(this), 1000 / this.fps );
+	};
+	
+	MovieClip.prototype.gotoLabelAndStop = function(label)
+	{
+		this.stop();
+		this._timeline.goToLabel(label);
+		this._refresh();
+	};
+	
+	MovieClip.prototype.gotoAndStop = function(index)
+	{
+		this.stop();
+		this._timeline.setPosition(index);
+		this._refresh();
+	};
+	
+	MovieClip.prototype.gotoLabelAndPlay = function(label)
+	{
+		this.stop();
+		this._timeline.goToLabel(label);
+		this._refresh();
+		this.play();
+	};	
+	
+	MovieClip.prototype.gotoAndPlay = function(index)
+	{
+		this.stop();
+		this._timeline.setPosition(index);
+		this._refresh();
+		this.play();
 	};
 
-	MovieClip.prototype.setFrame = function( frameIndex, texture )
+	MovieClip.prototype.nextFrame = function()
 	{
-		if( this.texture == null)
-		{
-			this.setTexture(texture);
-		}
-		
-		this._frames[frameIndex] = texture;
+		this._timeline.setPosition(this._timeline.getCurrentFrameIndex()+1);
+		this._refresh();
 	};
-
+	
+	MovieClip.prototype.prevFrame = function()
+	{
+		this._timeline.setPosition(this._timeline.getCurrentFrameIndex()-1);
+		this._refresh();
+	};
+	
+	MovieClip.prototype.getTimeline = function()
+	{
+		return this._timeline;
+	};
+	
 	MovieClip.prototype.play = function()
 	{
 		this.stop();
-		this._enterFrameHandler();
+		
+		if( this.reverse == true )
+		{
+			this.prevFrame();
+		}
+		else
+		{
+			this.nextFrame();
+		}
+		
+		this._timer = setTimeout(this.play.bind(this), 1000 / this.fps );
 	};
 
 	MovieClip.prototype.stop = function()
@@ -91,9 +157,11 @@
 	MovieClip.prototype.destroy = function()
 	{
 		this.stop();
-		tomahawk_ns.Bitmap.prototype.destroy.apply(this);
+		this._timeline.destroy();
+		tomahawk_ns.Sprite.prototype.destroy.apply(this);
 	};
 
+	
 	tomahawk_ns.MovieClip = MovieClip;
 
 })();

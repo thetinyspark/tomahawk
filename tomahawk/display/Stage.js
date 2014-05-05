@@ -422,7 +422,16 @@
 			case tomahawk_ns.Event.ADDED: 
 			case tomahawk_ns.Event.REMOVED: 
 				
-				list = event.target.getNestedChildren();
+				
+				if( event.target.isContainer == true )
+				{
+					list = event.target.getNestedChildren();
+				}
+				else
+				{
+					list = new Array();
+				}
+				
 				list.push(event.target);
 				max = list.length;
 				

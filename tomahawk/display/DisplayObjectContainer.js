@@ -83,7 +83,10 @@
 	* @description Adds a child DisplayObject instance to this DisplayObjectContainer instance. The child is added to the front (top) of all other children in this DisplayObjectContainer instance. (To add a child to a specific index position, use the addChildAt() method.) If you add a child object that already has a different display object container as a parent, the object is removed from the child list of the other display object container.
 	**/
 	DisplayObjectContainer.prototype.addChild = function(child)
-	{
+	{		
+		if( child.parent == this )
+			return child;
+			
 		if( child.parent )
 		{
 			child.parent.removeChild(child);
@@ -92,6 +95,7 @@
 		child.parent = this;
 		this.children.push(child);
 		child.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.ADDED, true, true) );
+		return child;
 	};
 
 	/**
@@ -130,12 +134,16 @@
 	/**
 	* @method addChildAt
 	* @memberOf tomahawk_ns.DisplayObjectContainer.prototype
+	* @returns {tomahawk_ns.DisplayObject} The DisplayObject instance that you pass in the child parameter.
 	* @param {tomahawk_ns.DisplayObject} child The DisplayObject instance to add as a child of this DisplayObjectContainer instance.
 	* @param {Number} index The index position to which the child is added. If you specify a currently occupied index position, the child object that exists at that position and all higher positions are moved up one position in the child list.
 	* @description Adds a child DisplayObject instance to this DisplayObjectContainer instance. The child is added at the index position specified. An index of 0 represents the back (bottom) of the display list for this DisplayObjectContainer object.
 	**/
 	DisplayObjectContainer.prototype.addChildAt = function(child, index)
 	{
+		if( child.parent == this )
+			return child;
+			
 		if( child.parent != null )
 		{
 			child.parent.removeChild(child);
@@ -147,6 +155,8 @@
 		
 		child.parent = this;
 		child.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.ADDED, true, true) );
+		
+		return child;
 	};
 	
 	/**

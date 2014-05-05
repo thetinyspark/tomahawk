@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="fr-FR">
+    <head>
+        <meta charset="utf-8"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+        <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0"/>
+
+        <!-- ref -->
+        <meta name="robots" content="Index,Follow"/>
+        <meta name="description" content="Découvrez Tomahawk, un moteur 2D HTML5 avec la balise canvas."/>
+        <meta name="keywords" content="HTML5, iOS, canvas, games, android, javascript, php, jeux, css"/>
+        <meta name="publisher" content="Nicolas Legrand"/>
+
+        <!--[if IE]>
+        <meta http-equiv="imagetoolbar" content="no" />
+        <![endif]-->
+
+        <!--  social sharing -->
+        <meta name="identifier-url" content="http://the-tiny-spark.com/" />
+        <meta name="revisit-after" content="7 days" />
+
+        <meta property="fb:admins" content="TheTinySpark"/>
+        <meta property="og:type" content="website"/>
+        <meta property="og:locale" content="fr_FR"/>
+        <meta property="og:title" content="Tomahawk, moteur 2D"/>
+        <meta property="og:description" content="Documentation du moteur d'affichage 2D : Tomahawk"/>
+        <meta property="og:url" content="http://the-tiny-spark.com/tomahawk/documentation/index.html"/>
+        <meta property="og:site_name" content="The Tiny Spark"/>
+        <meta property='og:image' content='http://the-tiny-spark.com/tomahawk/assets/images/tomahawk.jpg'/>
+        <meta property='og:image' content='http://the-tiny-spark.com/tomahawk/assets/images/ground.png'/>
+        <meta property='og:image' content='http://the-tiny-spark.com/tomahawk/assets/images/hero.png'/>
+        <meta property='og:image' content='http://the-tiny-spark.com/social/connect.jpg'/>
+
+        <title>Tomahawk Engine: Source: tween/easing/Expo.js</title>
+		
+		<link rel="stylesheet" media="screen" href="http://the-tiny-spark.com/assets/css/font-awesome.min.css" type="text/css"/>
+        <link rel="stylesheet" media="screen" href="http://the-tiny-spark.com/assets/css/studio.css" type="text/css"/>
+        <link rel="shortcut icon" href="http://the-tiny-spark.com/favicon.ico">
+
+		<script src="scripts/prettify/prettify.js"> </script>
+		<script src="scripts/prettify/lang-css.js"> </script>
+		<!--[if lt IE 9]>
+		  <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+		<link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+		<link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+			
+        <script type="text/javascript">
+
+            function gaq(cat, action, optValue) {
+                _gaq.push(['_trackEvent', cat, action, optValue]);
+            }
+
+            function openMenu(event) {
+
+                if (event.type == 'click') {
+                    var menu = document.getElementById("menuList");
+
+                    if (menu.style.display == 'none' || menu.style.display == '')
+                        menu.style.display = 'block';
+                    else
+                        menu.style.display = 'none';
+
+                }
+            }
+
+            (function(i, s, o, g, r, a, m) {
+                i['GoogleAnalyticsObject'] = r;
+                i[r] = i[r] || function() {
+                    (i[r].q = i[r].q || []).push(arguments)
+                }, i[r].l = 1 * new Date();
+                a = s.createElement(o),
+                        m = s.getElementsByTagName(o)[0];
+                a.async = 1;
+                a.src = g;
+                m.parentNode.insertBefore(a, m)
+            })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+            ga('create', 'UA-45878258-1', 'the-tiny-spark.com');
+            ga('send', 'pageview');
+
+            ///////-----------------------------------------------------------------------------////////
+            var _gaq = _gaq || [];
+            _gaq.push(['_setAccount', 'UA-45878258-1']);
+            _gaq.push(['_trackPageview']);
+
+            (function() {
+                var ga = document.createElement('script');
+                ga.type = 'text/javascript';
+                ga.async = true;
+                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                var s = document.getElementsByTagName('script')[0];
+                s.parentNode.insertBefore(ga, s);
+            })();
+
+        </script>
+    </head>
+	
+	<body class="tomahawk colour documentationJS">
+    <div class="contentBig">
+
+        <div id="header">
+		
+		<div class="content">
+			<h1>
+				<a href="http://the-tiny-spark.com/" onclick="gaq('home', 'click', 'returnto');">
+					The Tiny Spark
+				</a>
+			</h1>
+			
+			<ul id="menuList" class="pc">
+				<li><a href="http://the-tiny-spark.com/about.php" onclick="gaq('toplink', 'click', 'about');" class="">A propos</a></li>
+				<li><a href="http://the-tiny-spark.com/competences.php" onclick="gaq('toplink', 'click', 'competences');" class="">Comp&eacute;tences</a></li>
+				<li><a href="http://the-tiny-spark.com/work.php" onclick="gaq('toplink', 'click', 'references');" class="">R&eacute;alisations</a></li>
+				<li><a href="http://the-tiny-spark.com/labs.php" onclick="gaq('toplink', 'click', 'labs');" class="current">Labs</a></li>
+				<li><a href="http://the-tiny-spark.com/tools/index.php" onclick="gaq('toplink', 'click', 'tools');" class="">Outils</a></li>
+			</ul>
+			
+			<p class="mobile floatR menuMobile"><a href="javascript:;" id="menuDisplay" onclick="openMenu(event);return false;"><i class="icon-align-justify"></i></a></p>
+		</div>        
+		
+		</div>
+		
+		<h1 class="page-title">Tomahawk, moteur d'affichage 2D</h1>
+		<div class="buttonsSide">
+            <a href="javascript:history.back();" class="buttons"><i class="icon-1x icon-caret-left"></i> Retour</a>
+        </div>
+		
+		<div id="doc_nav">
+			<nav>
+				<h2><a href="index.html">Index</a></h2><ul class="toplist"><li><h3>Classes</h3><ul><li><a href="Tomahawk.html">Tomahawk</a></li><li><a href="tomahawk_ns.AssetsLoader.html">AssetsLoader</a></li><li><a href="tomahawk_ns.AssetsManager.html">AssetsManager</a></li><li><a href="tomahawk_ns.Back.html">Back</a></li><li><a href="tomahawk_ns.Bitmap.html">Bitmap</a></li><li><a href="tomahawk_ns.BitmapMesh.html">BitmapMesh</a></li><li><a href="tomahawk_ns.Bounce.html">Bounce</a></li><li><a href="tomahawk_ns.BrightnessFilter.html">BrightnessFilter</a></li><li><a href="tomahawk_ns.Circ.html">Circ</a></li><li><a href="tomahawk_ns.ContrastFilter.html">ContrastFilter</a></li><li><a href="tomahawk_ns.Cubic.html">Cubic</a></li><li><a href="tomahawk_ns.DisplayObject.html">DisplayObject</a></li><li><a href="tomahawk_ns.DisplayObjectContainer.html">DisplayObjectContainer</a></li><li><a href="tomahawk_ns.Elastic.html">Elastic</a></li><li><a href="tomahawk_ns.Event.html">Event</a></li><li><a href="tomahawk_ns.EventDispatcher.html">EventDispatcher</a></li><li><a href="tomahawk_ns.Expo.html">Expo</a></li><li><a href="tomahawk_ns.Font.html">Font</a></li><li><a href="tomahawk_ns.Frame.html">Frame</a></li><li><a href="tomahawk_ns.GrayScaleFilter.html">GrayScaleFilter</a></li><li><a href="tomahawk_ns.InputTextField.html">InputTextField</a></li><li><a href="tomahawk_ns.Keyboard.html">Keyboard</a></li><li><a href="tomahawk_ns.KeyEvent.html">KeyEvent</a></li><li><a href="tomahawk_ns.Letter.html">Letter</a></li><li><a href="tomahawk_ns.Linear.html">Linear</a></li><li><a href="tomahawk_ns.Matrix2D.html">Matrix2D</a></li><li><a href="tomahawk_ns.Matrix4x4.html">Matrix4x4</a></li><li><a href="tomahawk_ns.Mouse.html">Mouse</a></li><li><a href="tomahawk_ns.MouseEvent.html">MouseEvent</a></li><li><a href="tomahawk_ns.MovieClip.html">MovieClip</a></li><li><a href="tomahawk_ns.PixelFilter.html">PixelFilter</a></li><li><a href="tomahawk_ns.Point.html">Point</a></li><li><a href="tomahawk_ns.Point3D.html">Point3D</a></li><li><a href="tomahawk_ns.Quad.html">Quad</a></li><li><a href="tomahawk_ns.QuadTreeContainer.html">QuadTreeContainer</a></li><li><a href="tomahawk_ns.QuadTreeNode.html">QuadTreeNode</a></li><li><a href="tomahawk_ns.Quart.html">Quart</a></li><li><a href="tomahawk_ns.Quint.html">Quint</a></li><li><a href="tomahawk_ns.Rectangle.html">Rectangle</a></li><li><a href="tomahawk_ns.Screen.html">Screen</a></li><li><a href="tomahawk_ns.SelectableTextField.html">SelectableTextField</a></li><li><a href="tomahawk_ns.ShadowBlurFilter.html">ShadowBlurFilter</a></li><li><a href="tomahawk_ns.Shape.html">Shape</a></li><li><a href="tomahawk_ns.Sine.html">Sine</a></li><li><a href="tomahawk_ns.Sprite.html">Sprite</a></li><li><a href="tomahawk_ns.Sprite3D.html">Sprite3D</a></li><li><a href="tomahawk_ns.Stage.html">Stage</a></li><li><a href="tomahawk_ns.Strong.html">Strong</a></li><li><a href="tomahawk_ns.TextField.html">TextField</a></li><li><a href="tomahawk_ns.TextFormat.html">TextFormat</a></li><li><a href="tomahawk_ns.Texture.html">Texture</a></li><li><a href="tomahawk_ns.TextureAtlas.html">TextureAtlas</a></li><li><a href="tomahawk_ns.Timeline.html">Timeline</a></li><li><a href="tomahawk_ns.Tween.html">Tween</a></li><li><a href="tomahawk_ns.Vector3D.html">Vector3D</a></li><li><a href="tomahawk_ns.Word.html">Word</a></li></ul></li><li><h3>Namespaces</h3><ul><li><a href="tomahawk_ns.html">tomahawk_ns</a></li></ul></li><li><h3><a href="http://the-tiny-spark.com/tomahawk/example/perfs.php" title="demos">Demos</a></h3></li><li><h3><a target="_github" href="https://github.com/thetinyspark/tomahawk/" title="download">Download</a></h3></li></ul>
+			</nav>
+		</div>
+
+        <div id="main_content">
+		
+			<div id="main">
+				<div class="left-content">
+					<h2>Source: tween/easing/Expo.js</h2>
+					
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>﻿/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+(function() {
+		
+	/**
+	 * @class Expo
+	 * @memberOf tomahawk_ns
+	 * @description an expo easing class effect
+	 * @constructor
+	 **/
+	function Expo (){}
+
+	Expo.easeIn = function(t, b, c, d) 
+	{
+		return (t==0) ? b : c * Math.pow(2, 10 * (t/d - 1)) + b - c * 0.001;
+	};
+
+	Expo.easeOut = function(t, b, c, d) 
+	{
+		return (t==d) ? b+c : c * (-Math.pow(2, -10 * t/d) + 1) + b;
+	};
+
+	Expo.easeInOut = function(t, b, c, d) 
+	{
+		if (t==0) return b;
+		if (t==d) return b+c;
+		if ((t/=d*0.5) &lt; 1) return c*0.5 * Math.pow(2, 10 * (t - 1)) + b;
+		return c*0.5 * (-Math.pow(2, -10 * --t) + 2) + b;
+	};
+	
+	tomahawk_ns.Expo = Expo;
+
+})();</code></pre>
+        </article>
+    </section>
+
+
+
+
+				</div>
+				
+				<div class="rigth-ad">
+					<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+					<!-- Skyscraper 120 x 600 -->
+					<ins class="adsbygoogle"
+						 style="display:inline-block;width:120px;height:600px"
+						 data-ad-client="ca-pub-8931349961961991"
+						 data-ad-slot="7816447068"></ins>
+					<script>
+					(adsbygoogle = window.adsbygoogle || []).push({});
+					</script>
+				</div>
+			</div>
+			
+			<div class="footer-ad" style="text-align:center">
+				<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+				<ins class="adsbygoogle"
+					 style="display:inline-block;width:728px;height:90px"
+					 data-ad-client="ca-pub-8931349961961991"
+					 data-ad-slot="3381404260"></ins>
+				<script>
+				(adsbygoogle = window.adsbygoogle || []).push({});
+				</script>
+			</div>
+
+		</div>
+		
+        <div id="footer">
+            <div class="contact">
+				<div class="section">
+					<p>
+						Vous avez un projet ? Contactez-nous, nous serons ravis de faire votre connaissance ! 
+						<a href="http://the-tiny-spark.com/contact.php" class="buttons" onclick="gaq('footerlink', 'click', 'contact');">CONTACT</a>
+					</p>
+				</div>
+			</div>
+
+			<div class="middle">
+				<div class="content overflow">
+					<div class="w35 floatL">
+						<h3>The Tiny Spark</h3>
+						<p>Collectif d'ind&eacute;pendants proche de Paris.</p>
+						<p>The Tiny Spark, sous ce nom se cachent des passionn&eacute;s du web qui mettent tous leurs talents &agrave; votre service.</p>
+					</div>
+
+					<div class="w60 overflow floatR">
+						<div class="sectionFooter floatL">
+							<h4>A propos</h4>
+							<ul>
+								<li><a href="http://the-tiny-spark.com/about.php" onclick="gaq('footerlink', 'click', 'about');">Pr&eacute;sentation</a></li>
+								<li><a href="http://the-tiny-spark.com/contact.php" onclick="gaq('footerlink', 'click', 'contact');">Contact</a></li>
+							</ul>
+						</div>
+						<div class="sectionFooter floatL">
+							<h4>Comp&eacute;tences</h4>
+							<ul>
+								<li><a href="http://the-tiny-spark.com/about.php#conseil" onclick="gaq('footerlink', 'click', 'about');">Conseil</a></li>
+								<li><a href="http://the-tiny-spark.com/projects/applications.php" onclick="gaq('footerlink', 'click', 'prj_us');">R&eacute;alisation</a></li>
+								<li><a href="http://the-tiny-spark.com/competences.php" onclick="gaq('footerlink', 'click', 'competences');">Offre</a></li>
+							</ul>
+						</div>
+						<div class="sectionFooter floatL">
+							<h4>R&eacute;alisations</h4>
+							<ul>
+								<li><a href="http://the-tiny-spark.com/projects/applications.php" onclick="gaq('footerlink', 'click', 'prj_us');">Notre travail</a></li>
+								<li><a href="http://the-tiny-spark.com/projects/pitch.php" onclick="gaq('footerlink', 'click', 'prj_pitch');">Magic Park</a></li>
+								<li><a href="http://the-tiny-spark.com/projects/ogos.php" onclick="gaq('footerlink', 'click', 'prj_ogos');">Ogos</a></li>
+								<li><a href="http://the-tiny-spark.com/projects/everlife.php" onclick="gaq('footerlink', 'click', 'prj_everlife');">Everlife</a></li>
+							</ul>
+						</div>
+						<div class="sectionFooter floatL">
+							<h4>Labs</h4>
+							<ul>
+								<li><a href="http://www.totem.the-tiny-spark.com/" onclick="gaq('footerlink', 'click', 'TOTEM');">Totem</a></li>
+								<li><a href="http://the-tiny-spark.com/tomahawk/index.php" onclick="gaq('footerlink', 'click', 'TOMAHAWK');">Tomahawk</a></li>
+								<li><a href="https://docs.google.com/document/d/1Ye1Ow72rHtskR3Lf_FdOPl4MsqWAl-rEsnt0K3QO05M/edit#" onclick="gaq('footerlink', 'click', 'book');">Cr&eacute;er un moteur d'affichage, <em>Livre blanc</em></a></li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="lastLayer overflow">
+				<p class="floatL">The Tiny Spark &COPY; 2014</p>
+				<ul class="social floatR">
+					<li>
+						<a href="https://www.facebook.com/TheTinySpark" target="_blank" title="Facebook" onclick="gaq('footerlink', 'click', 'facebook');">
+							<i class="icon-facebook"></i>
+						</a>
+					</li>                    
+					<li>
+						<a href="http://www.pinterest.com/tinylittlespark/" target="_blank" title="Pinterest" onclick="gaq('footerlink', 'click', 'pinterest');">
+							<i class="icon-pinterest"></i>
+						</a>
+					</li>
+					<li>
+						<a href="http://the-tiny-spark.com/mentions.php" title="Mentions L&eacute;gales" onclick="gaq('footerlink', 'click', 'mentions');" class="">
+							<i class="icon-bookmark"></i>
+						</a>
+					</li>
+					<li>
+						<a href="http://www.totem.the-tiny-spark.com" title="Totem" target="_blank" onclick="gaq('footerlink', 'click', 'totem');">
+							<i class="icon-gamepad"></i>
+						</a>
+					</li>
+				</ul>
+			</div>        
+		</div>
+
+	</div>
+	<script> prettyPrint(); </script>
+	<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

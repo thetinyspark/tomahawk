@@ -31,7 +31,7 @@
 *@namespace 
 **/
 var tomahawk_ns = new Object();
-tomahawk_ns.version = 1.0;
+tomahawk_ns.version = "0.9.1";
 
 /**
 * @class Tomahawk

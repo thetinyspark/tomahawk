@@ -33,7 +33,7 @@
 *@namespace 
 **/
 var tomahawk_ns = new Object();
-tomahawk_ns.version = 1.0;
+tomahawk_ns.version = "0.9.1";
 
 /**
 * @class Tomahawk
@@ -2567,7 +2567,10 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	* @description Adds a child DisplayObject instance to this DisplayObjectContainer instance. The child is added to the front (top) of all other children in this DisplayObjectContainer instance. (To add a child to a specific index position, use the addChildAt() method.) If you add a child object that already has a different display object container as a parent, the object is removed from the child list of the other display object container.
 	**/
 	DisplayObjectContainer.prototype.addChild = function(child)
-	{
+	{		
+		if( child.parent == this )
+			return child;
+			
 		if( child.parent )
 		{
 			child.parent.removeChild(child);
@@ -2576,6 +2579,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		child.parent = this;
 		this.children.push(child);
 		child.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.ADDED, true, true) );
+		return child;
 	};
 
 	/**
@@ -2614,12 +2618,16 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	/**
 	* @method addChildAt
 	* @memberOf tomahawk_ns.DisplayObjectContainer.prototype
+	* @returns {tomahawk_ns.DisplayObject} The DisplayObject instance that you pass in the child parameter.
 	* @param {tomahawk_ns.DisplayObject} child The DisplayObject instance to add as a child of this DisplayObjectContainer instance.
 	* @param {Number} index The index position to which the child is added. If you specify a currently occupied index position, the child object that exists at that position and all higher positions are moved up one position in the child list.
 	* @description Adds a child DisplayObject instance to this DisplayObjectContainer instance. The child is added at the index position specified. An index of 0 represents the back (bottom) of the display list for this DisplayObjectContainer object.
 	**/
 	DisplayObjectContainer.prototype.addChildAt = function(child, index)
 	{
+		if( child.parent == this )
+			return child;
+			
 		if( child.parent != null )
 		{
 			child.parent.removeChild(child);
@@ -2631,6 +2639,8 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		
 		child.parent = this;
 		child.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.ADDED, true, true) );
+		
+		return child;
 	};
 	
 	/**
@@ -2941,57 +2951,303 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 (function() {
 	
 	/**
+	 * @class Frame
+	 * @memberOf tomahawk_ns
+	 * @description A Frame Object that represents a frame of a MovieClip Object
+	 * @constructor
+	 **/
+	function Frame(label)
+	{
+		this.label = label || null;
+		this.children = new Array();
+		this._tweens = new Array();
+	}
+
+	Tomahawk.registerClass( Frame, "Frame" );
+
+	
+	Frame.prototype.index 			= 0;
+	Frame.prototype.label 			= null;
+	Frame.prototype.script 			= null;
+	Frame.prototype.children 		= null;
+	
+	Frame.prototype.runScript = function(scope)
+	{
+		if( this.script != null )
+		{
+			this.script.apply(scope);
+		}
+	};
+	
+	Frame.prototype.setChildIndex = function(child,index)
+	{
+		this.addChildAt(child,index);
+	};
+	
+	Frame.prototype.addChild = function(child)
+	{		
+		if( this.contains(child) == true )
+			return child;
+			
+		this.children.push(child);	
+		return child;
+	};
+	
+	Frame.prototype.contains = function(child)
+	{
+		return (this.children.indexOf(child) > -1);
+	};
+
+	Frame.prototype.getChildAt = function (index)
+	{
+		return this.children[index];
+	};
+
+	Frame.prototype.getChildByName = function(name)
+	{
+		var children = this.children;
+		var i = children.length;
+		
+		while( --i > -1 )
+		{
+			if( children[i].name == name )
+				return children[i];
+		}
+		
+		return null;
+	};
+
+	Frame.prototype.addChildAt = function(child, index)
+	{
+		if( this.contains(child) == true )
+			return child;
+			
+		var children = this.children;
+		var tab1 = this.children.slice(0,index);
+		var tab2 = this.children.slice(index);
+		this.children = tab1.concat([child]).concat(tab2);
+		
+		return child;
+	};
+	
+	Frame.prototype.getChildIndex = function(child)
+	{
+		return this.children.indexOf(child);
+	};
+
+	Frame.prototype.removeChildAt = function(index)
+	{
+		var child = this.children[index];
+		if( child == undefined )
+			return null;
+			
+		this.children.splice(index,1);
+		return child;
+	};
+
+	Frame.prototype.removeChildren = function()
+	{
+		while( this.children.length > 0 )
+		{
+			this.removeChildAt(0);
+		}
+	};
+	
+	Frame.prototype.removeChild = function(child)
+	{
+		var index = this.children.indexOf(child);
+		var child = null;
+		
+		if( index > -1 )
+		{
+			child = this.children[index];
+			this.children.splice(index,1);
+		}
+		
+		return child;
+	};
+	
+	Frame.prototype.clone = function()
+	{
+		var frame = new tomahawk_ns.Frame(this.label);
+		var max = this.children.length;
+		var i = 0; 
+		
+		frame.index = this.index;
+		frame.script = ( this.script == null ) ? null : this.script.bind({});
+		
+		for( i = 0; i < max; i++ )
+		{
+			frame.children.push(this.children[i]);
+		}
+		
+		return frame;
+	};
+	
+	Frame.prototype.destroy = function()
+	{
+		this.script = null;
+		this.label = null;
+		this.index = null;
+		this.children = null;
+	};
+
+	tomahawk_ns.Frame = Frame;
+
+})();
+
+
+
+
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+ 
+(function() {
+	
+	/**
 	 * @class MovieClip
 	 * @memberOf tomahawk_ns
-	 * @description This class is undocumented because she will change very soon
-	 * @note The MovieClip class inherits from the following classes: Bitmap, DisplayObject, and EventDispatcher. Unlike the Sprite object, a MovieClip object has a timeline.
+	 * @description The MovieClip class inherits from the following classes: Sprite,DisplayObjectContainer, DisplayObject, and EventDispatcher. Unlike the Sprite object, a MovieClip object has a timeline.
 	 * @constructor
-	 * @augments tomahawk_ns.Bitmap
+	 * @augments tomahawk_ns.Sprite
 	 **/
-	function MovieClip(texture)
+	function MovieClip()
 	{
-		tomahawk_ns.Bitmap.apply(this, [texture]);
-		this._frames = new Array();
+		tomahawk_ns.Sprite.apply(this);
+		this._timeline = new tomahawk_ns.Timeline();
 	}
 
 	Tomahawk.registerClass( MovieClip, "MovieClip" );
-	Tomahawk.extend( "MovieClip", "Bitmap" );
-
-	MovieClip.prototype._frames = null;
-	MovieClip.prototype.currentFrame = 0;
-	MovieClip.prototype._enterFrameHandler = null;
+	Tomahawk.extend( "MovieClip", "Sprite" );
+	
+	
 	MovieClip.prototype.fps = 1;
+	MovieClip.prototype.isMovieClip = true;
 	MovieClip.prototype._timer = 0;
-
-	MovieClip.prototype._enterFrameHandler = function(event)
+	MovieClip.prototype._lastFrame = null;
+	MovieClip.prototype.reverse = false;
+	
+	MovieClip.prototype._refresh = function()
 	{
-		this.currentFrame++;
+		var i = 0
+		var frame = null;
+		var tween = null;
+		var currentChild = null;
+		var currentFrame = this._timeline.getCurrentFrameIndex();
 		
-		if( this.currentFrame >= this._frames.length )
-			this.currentFrame = 0;
-			
-		if( this._frames[this.currentFrame] )
-		{
-			this.texture = this._frames[this.currentFrame];
+		frame = this._timeline.getFrameAt(currentFrame);
+		
+		if(  frame != null )
+		{		
+			if( this._lastFrame != frame )
+			{
+				this._lastFrame = frame;
+				this.removeChildren();
+				i = frame.children.length;
+				
+				while( --i > -1 )
+				{
+					currentChild = frame.children[i];
+					this.addChildAt(currentChild,0);
+				
+					if( currentChild.isMovieClip == true )
+					{
+						currentChild.gotoAndStop(currentFrame - frame.index);
+					}
+				}
+				
+				frame.runScript(this);
+			}
 		}
-		
-		this._timer = setTimeout(this._enterFrameHandler.bind(this), 1000 / this.fps );
+	};
+	
+	MovieClip.prototype.gotoLabelAndStop = function(label)
+	{
+		this.stop();
+		this._timeline.goToLabel(label);
+		this._refresh();
+	};
+	
+	MovieClip.prototype.gotoAndStop = function(index)
+	{
+		this.stop();
+		this._timeline.setPosition(index);
+		this._refresh();
+	};
+	
+	MovieClip.prototype.gotoLabelAndPlay = function(label)
+	{
+		this.stop();
+		this._timeline.goToLabel(label);
+		this._refresh();
+		this.play();
+	};	
+	
+	MovieClip.prototype.gotoAndPlay = function(index)
+	{
+		this.stop();
+		this._timeline.setPosition(index);
+		this._refresh();
+		this.play();
 	};
 
-	MovieClip.prototype.setFrame = function( frameIndex, texture )
+	MovieClip.prototype.nextFrame = function()
 	{
-		if( this.texture == null)
-		{
-			this.setTexture(texture);
-		}
-		
-		this._frames[frameIndex] = texture;
+		this._timeline.setPosition(this._timeline.getCurrentFrameIndex()+1);
+		this._refresh();
 	};
-
+	
+	MovieClip.prototype.prevFrame = function()
+	{
+		this._timeline.setPosition(this._timeline.getCurrentFrameIndex()-1);
+		this._refresh();
+	};
+	
+	MovieClip.prototype.getTimeline = function()
+	{
+		return this._timeline;
+	};
+	
 	MovieClip.prototype.play = function()
 	{
 		this.stop();
-		this._enterFrameHandler();
+		
+		if( this.reverse == true )
+		{
+			this.prevFrame();
+		}
+		else
+		{
+			this.nextFrame();
+		}
+		
+		this._timer = setTimeout(this.play.bind(this), 1000 / this.fps );
 	};
 
 	MovieClip.prototype.stop = function()
@@ -3002,9 +3258,11 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	MovieClip.prototype.destroy = function()
 	{
 		this.stop();
-		tomahawk_ns.Bitmap.prototype.destroy.apply(this);
+		this._timeline.destroy();
+		tomahawk_ns.Sprite.prototype.destroy.apply(this);
 	};
 
+	
 	tomahawk_ns.MovieClip = MovieClip;
 
 })();
@@ -4005,7 +4263,16 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 			case tomahawk_ns.Event.ADDED: 
 			case tomahawk_ns.Event.REMOVED: 
 				
-				list = event.target.getNestedChildren();
+				
+				if( event.target.isContainer == true )
+				{
+					list = event.target.getNestedChildren();
+				}
+				else
+				{
+					list = new Array();
+				}
+				
 				list.push(event.target);
 				max = list.length;
 				
@@ -4031,6 +4298,220 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 })();
 
 
+
+
+
+
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+ 
+(function() {
+	
+	/**
+	 * @class Timeline
+	 * @memberOf tomahawk_ns
+	 * @description A basic Timeline class
+	 * @constructor
+	 * @augments tomahawk_ns.EventDispatcher
+	 **/
+	function Timeline()
+	{
+		this._frames = new Array();
+		this._tweens = new Array();
+		tomahawk_ns.EventDispatcher.apply(this);
+	}
+
+	Tomahawk.registerClass( Timeline, "Timeline" );
+	Tomahawk.extend( "Timeline", "EventDispatcher" );
+	
+	Timeline.prototype._currentFrame = 0;
+	Timeline.prototype._frames = null;
+	Timeline.prototype._tweens = null;
+	Timeline.prototype.totalFrames = 0;
+
+	Timeline.prototype.setPosition = function(index)
+	{
+		var i = 0;
+		var max = this._tweens.length;
+		var tween = null;
+		var lastTween = this._tweens[this._tweens.length-1];
+		var totalFrames = lastTween.delay + lastTween.duration + 1;
+		
+		totalFrames = ( totalFrames < this._frames.length ) ? this._frames.length : totalFrames;
+		
+		this.totalFrames = totalFrames;
+		this._currentFrame = index;
+		
+		if( this._currentFrame >= this.totalFrames )
+			this._currentFrame = 0;
+			
+		if( this._currentFrame < 0 )
+			this._currentFrame = this.totalFrames;
+		
+		for( i = 0; i < max; i++ )
+		{
+			tween = this._tweens[i];
+			tween.update(this._currentFrame);
+		}
+	};
+	
+	Timeline.prototype.nextFrame = function()
+	{
+		this.setPosition(this._currentFrame + 1);
+	};
+	
+	Timeline.prototype.prevFrame = function()
+	{
+		this.setPosition(this._currentFrame - 1);
+	};
+	
+	Timeline.prototype.goToLabel = function(label)
+	{
+		var frame = this.getFrameByLabel(label);
+		
+		if( frame != null )
+			this.setPosition(frame.index);
+	};
+	
+	
+	Timeline.prototype.getCurrentFrameLabel = function()
+	{
+		return this.getFrameAt(this._currentFrame).label;
+	};
+	
+	Timeline.prototype.getCurrentFrameIndex = function()
+	{
+		return this._currentFrame;
+	};
+
+	Timeline.prototype.getFrameByLabel = function(label)
+	{
+		var i = this._frames.length;
+		while( --i > -1 )
+		{
+			if( this._frames[i] != undefined && this._frames[i].label == label )
+			{
+				return this._frames[i];
+			}
+		}
+		
+		return null;
+	};
+	
+	Timeline.prototype.addFrameAt = function(frame,index)
+	{
+		frame.index = index;
+		this._frames[index] = frame;
+	};
+	
+	Timeline.prototype.addFrame = function(frame)
+	{
+		frame.index = this._frames.length;
+		this._frames.push(frame);
+	};
+	
+	Timeline.prototype.getFrameAt = function(index)
+	{
+		var currentIndex = index;
+		var frame = null;
+		
+		while( currentIndex > -1 )
+		{
+			frame = this._frames[currentIndex];
+			
+			if( frame != undefined && frame != null )
+				return frame;
+				
+			currentIndex--;
+		}
+			
+		return null;
+	};
+		
+	Timeline.prototype.removeFrameAt = function(index)
+	{
+		var frame = this.getFrameAt(index);
+		
+		if( frame == null )
+			return;
+			
+		if( index > -1 )
+		{
+			frame.destroy();
+			this._frames[index] = null;
+		}
+	};
+	
+	
+	Timeline.prototype.getTweens = function()
+	{
+		return this._tweens;
+	};
+	
+	Timeline.prototype.addTween = function(tween)
+	{
+		this._tweens.push( tween );
+		this._tweens.sort(this._sortTweens);
+	};
+	
+	Timeline.prototype.removeTween = function(tween)
+	{
+		var index = this._tweens.indexOf(tween);
+		if( index > -1 )
+		{
+			this._tweens.splice(index,1);
+		}
+		this._tweens.sort(this._sortTweens);
+	};
+	
+	Timeline.prototype.destroy = function()
+	{
+		this.stop();
+		tomahawk_ns.Sprite.prototype.destroy.apply(this);
+	};
+
+	Timeline.prototype._sortTweens = function(a,b)
+	{
+		if( a.delay == b.delay )
+		{
+			return ( a.duration < b.duration ) ? -1 : 1;
+		}
+		else
+		{
+			return ( a.delay < b.delay ) ? -1 : 1;
+		}
+	};
+	
+	
+	tomahawk_ns.Timeline = Timeline;
+
+})();
 
 
 
@@ -10051,4 +10532,890 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 })();
 
 
+
+
+
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+(function() {
+	
+	/**
+	 * @class Tween
+	 * @memberOf tomahawk_ns
+	 * @description a basic Tween Object used to update object properties with custom easing functions
+	 * @constructor
+	**/
+	function Tween(target,duration,from,to,easing,delay)
+	{
+		this.target = target || null;
+		this.delay = delay || 0;
+		this.duration = duration || 0;
+		this.easing = easing || tomahaw_ns.Linear.easeIn;
+		this.from = from || {};
+		this.to = to || {};
+	}
+	
+	Tomahawk.registerClass(Tween,"Tween");
+	
+	Tween.prototype.name = null;
+	Tween.prototype.target = null;
+	Tween.prototype.delay = 0;
+	Tween.prototype.from = null;
+	Tween.prototype.to = null;
+	Tween.prototype.duration = 0;
+	Tween.prototype.easing = null
+	
+	
+	Tween.prototype.update = function(time)
+	{
+		var prop = null;
+		var ratio = 1;
+		
+		if( this.target == null || time < this.delay )
+		{
+			return;
+		}
+			
+		// instant tween
+		if( this.duration == 0 || time > this.delay + this.duration )
+		{
+			for( prop in this.to )
+			{
+				this.target[prop] = this.to[prop];
+			}
+		}
+		else
+		{
+			ratio = this.easing(time-this.delay,0,1,this.duration);
+			for( prop in this.from )
+			{
+				this.target[prop] = this.from[prop] + ( this.to[prop] - this.from[prop] ) * ratio;
+			}
+		}
+	};
+	
+	Tween.prototype.destroy = function()
+	{
+		this.name = null;
+		this.target = null;
+		this.delay = null;
+		this.from = null;
+		this.to = null;
+		this.duration = null;
+		this.easing = null;
+	};
+	
+	tomahawk_ns.Tween = Tween;
+
+})();
+	
+
+	
+	
+
+
+
+
+
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+(function() {
+
+	/**
+	 * @class Back
+	 * @memberOf tomahawk_ns
+	 * @description a back easing class effect
+	 * @constructor
+	 **/
+	function Back() {}
+
+	Back.easeIn = function ( p_t , p_b, p_c , p_d )
+	{
+		return p_c * ( p_t /= p_d ) * p_t * ( 2.70158 * p_t - 1.70158 ) + p_b;
+	};
+
+	Back.easeOut = function (p_t, p_b, p_c, p_d)
+	{
+		return p_c * ( ( p_t = p_t / p_d - 1) * p_t * ( 2.70158 * p_t + 1.70158) + 1 ) + p_b;
+	};
+
+	Back.easeInOut = function( p_t, p_b, p_c, p_d ) 
+	{
+		if ( ( p_t /= p_d * 0.5 ) < 1 )
+		{
+			return p_c * 0.5 * ( p_t * p_t * ( ( 1.70158 * 1.525 + 1 ) * p_t - 1.70158 ) ) + p_b;
+		}
+		else
+		{
+			return p_c / 2 * ( ( ( p_t -= 2 ) * p_t * ( 1.70158 * 1.525 + 1 ) * p_t + 1.70158 ) + 2 ) + p_b;
+		}
+		
+	};
+
+	tomahawk_ns.Back = Back;
+
+})();
+
+
+
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+(function() {
+		
+	/**
+	 * @class Bounce
+	 * @memberOf tomahawk_ns
+	 * @description a bounce easing class effect
+	 * @constructor
+	 **/
+	function Bounce() {}
+
+	Bounce.easeIn = function ( t , b, c , d )
+	{
+		return c - easeOut(d-t, 0, c, d) + b;
+	};
+
+	Bounce.easeOut = function (t, b, c, d)
+	{
+		if ((t/=d) < (1/2.75)) 
+		{
+			return c*(7.5625*t*t) + b;
+		} 
+		else if (t < (2/2.75)) 
+		{
+			return c*(7.5625*(t-=(1.5/2.75))*t + .75) + b;
+		} 
+		else if (t < (2.5/2.75)) 
+		{
+			return c*(7.5625*(t-=(2.25/2.75))*t + .9375) + b;
+		} 
+		else 
+		{
+			return c*(7.5625*(t-=(2.625/2.75))*t + .984375) + b;
+		}
+	};
+
+	Bounce.easeInOut = function( t, b, c, d ) 
+	{
+		if (t < d*0.5) 
+		{
+			return Bounce.easeIn (t*2, 0, c, d) * .5 + b;
+		}
+		else 
+		{
+			return Bounce.easeOut (t*2-d, 0, c, d) * .5 + c*.5 + b;
+		}	
+	};
+
+	tomahawk_ns.Bounce = Bounce;
+
+})();
+
+
+
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+(function() {
+		
+	/**
+	 * @class Circ
+	 * @memberOf tomahawk_ns
+	 * @description a circ easing class effect
+	 * @constructor
+	 **/
+	function Circ(){}
+
+		
+	Circ.easeIn = function(t, b, c, d) 
+	{
+		return -c * (Math.sqrt(1 - (t/=d)*t) - 1) + b;
+	};
+
+	Circ.easeOut = function(t, b, c, d) 
+	{
+		return c * Math.sqrt(1 - (t=t/d-1)*t) + b;
+	};
+
+	Circ.easeInOut = function(t, b, c, d) 
+	{
+		if ((t/=d*0.5) < 1) return -c*0.5 * (Math.sqrt(1 - t*t) - 1) + b;
+		return c*0.5 * (Math.sqrt(1 - (t-=2)*t) + 1) + b;
+	};
+
+	tomahawk_ns.Circ = Circ;
+
+})();
+
+
+
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+(function() {
+		
+	/**
+	 * @class Cubic
+	 * @memberOf tomahawk_ns
+	 * @description a cubic easing class effect
+	 * @constructor
+	 **/
+	function Cubic() {}
+		
+	Cubic.easeIn = function(t, b, c, d) 
+	{
+		return c*(t/=d)*t*t + b;
+	};
+
+	Cubic.easeOut = function(t, b, c, d) 
+	{
+		return c*((t=t/d-1)*t*t + 1) + b;
+	};
+
+	Cubic.easeInOut = function(t, b, c, d) 
+	{
+		if ((t/=d*0.5) < 1) return c*0.5*t*t*t + b;
+		return c*0.5*((t-=2)*t*t + 2) + b;
+	};
+
+
+	tomahawk_ns.Cubic = Cubic;
+
+})();
+
+
+
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+(function() {
+		
+	/**
+	 * @class Elastic
+	 * @memberOf tomahawk_ns
+	 * @description an elastic easing class effect
+	 * @constructor
+	 **/
+	function Elastic() {}
+
+	Elastic._2PI = Math.PI * 2;
+		
+	Elastic.easeIn = function(t, b, c, d, a, p) 
+	{
+
+		var s;
+		a = a || 0;
+		p = p || 0;
+		if (t==0) return b;  if ((t/=d)==1) return b+c;  if (!p) p=d*.3;
+		if (!a || (c > 0 && a < c) || (c < 0 && a < -c)) { a=c; s = p/4; }
+		else s = p/Elastic._2PI * Math.asin (c/a);
+		return -(a*Math.pow(2,10*(t-=1)) * Math.sin( (t*d-s)*Elastic._2PI/p )) + b;
+	};
+
+	Elastic.easeOut  = function(t, b, c, d, a, p ) 
+	{
+		var s;
+		a = a || 0;
+		p = p || 0;
+		if (t==0) return b;  if ((t/=d)==1) return b+c;  if (!p) p=d*.3;
+		if (!a || (c > 0 && a < c) || (c < 0 && a < -c)) { a=c; s = p/4; }
+		else s = p/Elastic._2PI * Math.asin (c/a);
+		return (a*Math.pow(2,-10*t) * Math.sin( (t*d-s)*Elastic._2PI/p ) + c + b);
+	};
+
+	Elastic.easeInOut = function (t, b, c, d, a, p) 
+	{
+		var s;
+		a = a || 0;
+		p = p || 0;
+		if (t==0) return b;  if ((t/=d*0.5)==2) return b+c;  if (!p) p=d*(.3*1.5);
+		if (!a || (c > 0 && a < c) || (c < 0 && a < -c)) { a=c; s = p/4; }
+		else s = p/Elastic._2PI * Math.asin (c/a);
+		if (t < 1) return -.5*(a*Math.pow(2,10*(t-=1)) * Math.sin( (t*d-s)*Elastic._2PI/p )) + b;
+		return a*Math.pow(2,-10*(t-=1)) * Math.sin( (t*d-s)*Elastic._2PI/p )*.5 + c + b;
+	};
+	
+	tomahawk_ns.Elastic = Elastic;
+
+})();
+
+
+
+﻿/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+(function() {
+		
+	/**
+	 * @class Expo
+	 * @memberOf tomahawk_ns
+	 * @description an expo easing class effect
+	 * @constructor
+	 **/
+	function Expo (){}
+
+	Expo.easeIn = function(t, b, c, d) 
+	{
+		return (t==0) ? b : c * Math.pow(2, 10 * (t/d - 1)) + b - c * 0.001;
+	};
+
+	Expo.easeOut = function(t, b, c, d) 
+	{
+		return (t==d) ? b+c : c * (-Math.pow(2, -10 * t/d) + 1) + b;
+	};
+
+	Expo.easeInOut = function(t, b, c, d) 
+	{
+		if (t==0) return b;
+		if (t==d) return b+c;
+		if ((t/=d*0.5) < 1) return c*0.5 * Math.pow(2, 10 * (t - 1)) + b;
+		return c*0.5 * (-Math.pow(2, -10 * --t) + 2) + b;
+	};
+	
+	tomahawk_ns.Expo = Expo;
+
+})();
+
+
+
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+(function() {
+	
+	/**
+	 * @class Linear
+	 * @memberOf tomahawk_ns
+	 * @description a linear class effect
+	 * @constructor
+	 **/
+	function Linear() {}
+
+	Linear.power = 0;
+	Linear.easeNone = function(t, b, c, d)
+	{
+		return c*t/d + b;
+	};
+
+	Linear.easeIn = function(t, b, c, d)
+	{
+		return c*t/d + b;
+	};
+
+	Linear.easeOut = function(t, b, c, d)
+	{
+		return c*t/d + b;
+	};
+
+	Linear.easeInOut = function(t, b, c, d)
+	{
+		return c*t/d + b;
+	};
+	
+	tomahawk_ns.Linear = Linear;
+
+})();
+
+
+
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+(function() {
+	
+	/**
+	 * @class Quad
+	 * @memberOf tomahawk_ns
+	 * @description a Quad class effect
+	 * @constructor
+	 **/
+	function Quad(){}
+			
+	Quad.easeIn = function(t, b, c, d) 
+	{
+		return c*(t/=d)*t + b;
+	};
+
+	Quad.easeOut = function(t, b, c, d) 
+	{
+		return -c *(t/=d)*(t-2) + b;
+	};
+
+	Quad.easeInOut = function( t, b, c, d) 
+	{
+		if ((t/=d*0.5) < 1) return c*0.5*t*t + b;
+		return -c*0.5 * ((--t)*(t-2) - 1) + b;
+	};
+
+	tomahawk_ns.Quad = Quad;
+
+})();
+
+
+
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+(function() {
+	
+	/**
+	 * @class Quart
+	 * @memberOf tomahawk_ns
+	 * @description a Quart class effect
+	 * @constructor
+	**/
+	function Quart(){}
+		
+		
+	Quart.easeIn = function(t, b, c, d) 
+	{
+		return c*(t/=d)*t*t*t + b;
+	};
+
+	Quart.easeOut = function(t, b, c, d) 
+	{
+		return -c * ((t=t/d-1)*t*t*t - 1) + b;
+	};
+
+	Quart.easeInOut = function(t, b, c, d) 
+	{
+		if ((t/=d*0.5) < 1) return c*0.5*t*t*t*t + b;
+		return -c*0.5 * ((t-=2)*t*t*t - 2) + b;
+	};
+	
+	tomahawk_ns.Quart = Quart;
+
+})();
+
+
+
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+(function() {
+	
+	/**
+	 * @class Quint
+	 * @memberOf tomahawk_ns
+	 * @description a Quint class effect
+	 * @constructor
+	 **/
+	function Quint() {}
+		
+	Quint.easeIn  = function(t, b, c, d) 
+	{
+		return c*(t/=d)*t*t*t*t + b;
+	};
+
+	Quint.easeOut  = function(t, b, c, d) 
+	{
+		return c*((t=t/d-1)*t*t*t*t + 1) + b;
+	};
+
+	Quint.easeInOut  = function(t, b, c, d) 
+	{
+		if ((t/=d*0.5) < 1) return c*0.5*t*t*t*t*t + b;
+		return c*0.5*((t-=2)*t*t*t*t + 2) + b;
+	};
+	tomahawk_ns.Quint = Quint;
+
+})();
+
+
+
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+(function() {
+	
+	/**
+	 * @class Sine
+	 * @memberOf tomahawk_ns
+	 * @description a Sine class effect
+	 * @constructor
+	**/
+	function Sine(){}
+
+	Sine._HALF_PI = Math.PI * 0.5;
+
+	Sine.easeIn  = function(t, b, c, d) 
+	{
+		return -c * Math.cos(t/d * _HALF_PI) + c + b;
+	};
+
+	Sine.easeOut  = function(t, b, c, d) 
+	{
+		return c * Math.sin(t/d * _HALF_PI) + b;
+	};
+
+	Sine.easeInOut  = function(t, b, c, d) 
+	{
+		return -c*0.5 * (Math.cos(Math.PI*t/d) - 1) + b;
+	};
+	
+	tomahawk_ns.Sine = Sine;
+
+})();
+
+
+
+﻿/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+(function() {
+	
+	/**
+	 * @class Strong
+	 * @memberOf tomahawk_ns
+	 * @description a Strong class effect
+	 * @constructor
+	**/
+	function Strong() {}
+
+	Strong.easeIn  = function(t, b, c, d) 
+	{
+		return c*(t/=d)*t*t*t*t + b;
+	};
+
+	Strong.easeOut  = function(t, b, c, d) 
+	{
+		return c*((t=t/d-1)*t*t*t*t + 1) + b;
+	};
+
+	Strong.easeInOut  = function(t, b, c, d) 
+	{
+		if ((t/=d*0.5) < 1) return c*0.5*t*t*t*t*t + b;
+		return c*0.5*((t-=2)*t*t*t*t + 2) + b;
+	};
+	tomahawk_ns.Strong = Strong;
+
+})();
 
