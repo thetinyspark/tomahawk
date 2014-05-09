@@ -46,15 +46,62 @@
 	
 	Tomahawk.registerClass(Tween,"Tween");
 	
+	/**
+	* @member name
+	* @memberOf tomahawk_ns.Tween.prototype
+	* @type {String}
+	* @description The name of the Tween instance.
+	**/
 	Tween.prototype.name = null;
+	/**
+	* @member name
+	* @memberOf tomahawk_ns.Tween.prototype
+	* @type {String}
+	* @description The name of the Tween instance.
+	**/
 	Tween.prototype.target = null;
+	/**
+	* @member name
+	* @memberOf tomahawk_ns.Tween.prototype
+	* @type {String}
+	* @description The name of the Tween instance.
+	**/
 	Tween.prototype.delay = 0;
+	/**
+	* @member name
+	* @memberOf tomahawk_ns.Tween.prototype
+	* @type {String}
+	* @description The name of the Tween instance.
+	**/
 	Tween.prototype.from = null;
+	/**
+	* @member name
+	* @memberOf tomahawk_ns.Tween.prototype
+	* @type {String}
+	* @description The name of the Tween instance.
+	**/
 	Tween.prototype.to = null;
+	/**
+	* @member name
+	* @memberOf tomahawk_ns.Tween.prototype
+	* @type {String}
+	* @description The name of the Tween instance.
+	**/
 	Tween.prototype.duration = 0;
+	/**
+	* @member name
+	* @memberOf tomahawk_ns.Tween.prototype
+	* @type {String}
+	* @description The name of the Tween instance.
+	**/
 	Tween.prototype.easing = null
 	
-	
+	/**
+	* @member name
+	* @memberOf tomahawk_ns.Tween.prototype
+	* @type {String}
+	* @description The name of the Tween instance.
+	**/
 	Tween.prototype.update = function(time)
 	{
 		var prop = null;
@@ -83,6 +130,12 @@
 		}
 	};
 	
+	/**
+	* @member name
+	* @memberOf tomahawk_ns.Tween.prototype
+	* @type {String}
+	* @description The name of the Tween instance.
+	**/
 	Tween.prototype.destroy = function()
 	{
 		this.name = null;

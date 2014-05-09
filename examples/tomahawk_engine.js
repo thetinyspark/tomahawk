@@ -119,22 +119,22 @@ Tomahawk._extends = new Array();
 		ancestor = Tomahawk._classes[obj["ancestor"]];
 		obj.done = true;
 		
-		var func = new Object();
+		var obj = new Object();
 	
 		if( child != null && ancestor != null )
 		{	
 			for( var prop in ancestor.prototype )
 			{
-				func[prop] = ancestor.prototype[prop];
+				obj[prop] = ancestor.prototype[prop];
 			}
 			
 			for( var prop in child.prototype )
 			{
-				func[prop] = child.prototype[prop];
+				obj[prop] = child.prototype[prop];
 			}
 		}
 		
-		child.prototype = func;
+		child.prototype = obj;
 	};
 
 
@@ -10583,15 +10583,62 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	
 	Tomahawk.registerClass(Tween,"Tween");
 	
+	/**
+	* @member name
+	* @memberOf tomahawk_ns.Tween.prototype
+	* @type {String}
+	* @description The name of the Tween instance.
+	**/
 	Tween.prototype.name = null;
+	/**
+	* @member name
+	* @memberOf tomahawk_ns.Tween.prototype
+	* @type {String}
+	* @description The name of the Tween instance.
+	**/
 	Tween.prototype.target = null;
+	/**
+	* @member name
+	* @memberOf tomahawk_ns.Tween.prototype
+	* @type {String}
+	* @description The name of the Tween instance.
+	**/
 	Tween.prototype.delay = 0;
+	/**
+	* @member name
+	* @memberOf tomahawk_ns.Tween.prototype
+	* @type {String}
+	* @description The name of the Tween instance.
+	**/
 	Tween.prototype.from = null;
+	/**
+	* @member name
+	* @memberOf tomahawk_ns.Tween.prototype
+	* @type {String}
+	* @description The name of the Tween instance.
+	**/
 	Tween.prototype.to = null;
+	/**
+	* @member name
+	* @memberOf tomahawk_ns.Tween.prototype
+	* @type {String}
+	* @description The name of the Tween instance.
+	**/
 	Tween.prototype.duration = 0;
+	/**
+	* @member name
+	* @memberOf tomahawk_ns.Tween.prototype
+	* @type {String}
+	* @description The name of the Tween instance.
+	**/
 	Tween.prototype.easing = null
 	
-	
+	/**
+	* @member name
+	* @memberOf tomahawk_ns.Tween.prototype
+	* @type {String}
+	* @description The name of the Tween instance.
+	**/
 	Tween.prototype.update = function(time)
 	{
 		var prop = null;
@@ -10620,6 +10667,12 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		}
 	};
 	
+	/**
+	* @member name
+	* @memberOf tomahawk_ns.Tween.prototype
+	* @type {String}
+	* @description The name of the Tween instance.
+	**/
 	Tween.prototype.destroy = function()
 	{
 		this.name = null;
