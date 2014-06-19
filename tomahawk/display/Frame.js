@@ -44,12 +44,43 @@
 
 	Tomahawk.registerClass( Frame, "Frame" );
 
-	
+	/**
+	* @member index
+	* @memberOf tomahawk_ns.Frame.prototype
+	* @type {Number}
+	* @description The frame index 
+	**/
 	Frame.prototype.index 			= 0;
+	
+	/**
+	* @member label
+	* @memberOf tomahawk_ns.Frame.prototype
+	* @type {String}
+	* @description The frame label 
+	**/
 	Frame.prototype.label 			= null;
+	
+	/**
+	* @member script
+	* @memberOf tomahawk_ns.Frame.prototype
+	* @type {Function}
+	* @description A block of script which will be executed when the frame will be played.
+	**/
 	Frame.prototype.script 			= null;
+	
+	/**
+	* @member chilren
+	* @memberOf tomahawk_ns.Frame.prototype
+	* @type {Array}
+	* @description The frame's displaylist.
+	**/
 	Frame.prototype.children 		= null;
 	
+	/**
+	* @method runScript
+	* @memberOf tomahawk_ns.Frame.prototype
+	* @param {Object} scope An object that represents the script execution context
+	**/
 	Frame.prototype.runScript = function(scope)
 	{
 		if( this.script != null )

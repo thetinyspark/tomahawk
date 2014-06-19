@@ -32,10 +32,18 @@
 	/**
 	 * @class Texture
 	 * @memberOf tomahawk_ns
+	 * @param {Object} data The rendering data itself, it can be an HTMLImageElement || HTMLCanvasElement || HTMLVideoElement.
+	 * @param {Array} rect The portion of the rendering data used for the rendering. Example: [0,0,10,10].
+	 * @param {String} name The texture's name.
 	 * @description The Texture class represents a 2-dimensional texture which will be used in a Bitmap instance. Defines a 2D texture for use during rendering.
 	 * @constructor
 	 **/
-	function Texture(){}
+	function Texture(data,rect,name)
+	{
+		this.data = data || null;
+		this.rect = rect || null;
+		this.name = name || null;
+	}
 
 	Tomahawk.registerClass( Texture, "Texture" );
 

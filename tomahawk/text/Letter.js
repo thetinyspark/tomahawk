@@ -117,7 +117,6 @@
 	**/
 	Letter.prototype.updateMetrics = function()
 	{
-		
 		var context = Letter._metricsContext;
 		var font = tomahawk_ns.Font.getFont( this.format.font );
 		var measure = font.measureText(this.value, this.format.size);
@@ -167,6 +166,8 @@
 			context.fill();
 			context.restore();
 		}
+				
+		this.format.updateContext(context);
 		
 		if( this.format.textBorder == true )
 		{
@@ -175,10 +176,6 @@
 			context.strokeText(this.value,this.format.textBorderOffsetX,this.format.textBorderOffsetY);
 			context.closePath();
 		}
-		
-	
-		this.format.updateContext(context);
-		
 		
 		context.beginPath();
 		context.fillText(this.value,0,0);

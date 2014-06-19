@@ -117,21 +117,21 @@ Tomahawk._extends = new Array();
 		ancestor = Tomahawk._classes[obj["ancestor"]];
 		obj.done = true;
 		
-		var func = new Object();
+		var obj = new Object();
 	
 		if( child != null && ancestor != null )
 		{	
 			for( var prop in ancestor.prototype )
 			{
-				func[prop] = ancestor.prototype[prop];
+				obj[prop] = ancestor.prototype[prop];
 			}
 			
 			for( var prop in child.prototype )
 			{
-				func[prop] = child.prototype[prop];
+				obj[prop] = child.prototype[prop];
 			}
 		}
 		
-		child.prototype = func;
+		child.prototype = obj;
 	};
 

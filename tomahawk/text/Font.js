@@ -149,6 +149,7 @@
 		if( this.sizes[text] == undefined )
 		{	
 			div.style.position = 'absolute';
+			div.style.padding = '0';
 			div.style.top = '100px';
 			div.style.left = '-1000px';
 			div.style.width = 'auto';
@@ -160,7 +161,7 @@
 			if( !div.parentNode )
 				document.body.appendChild(div);
 		
-			div.innerHTML = text;
+			div.innerHTML = ( text == "\n" ) ? "<br />" : text;
 			
 			width = div.offsetWidth;
 			height = div.offsetHeight;
@@ -170,14 +171,14 @@
 			
 			document.body.removeChild(div);
 		
-			obj.width = parseInt(width);
-			obj.height = parseInt(height);
+			obj.width = width;
+			obj.height = height;
 			
 			this.sizes[text] = obj;
 		}
 			
-		result.width = parseInt(this.sizes[text].width * ratio);
-		result.height = parseInt(this.sizes[text].height * ratio);
+		result.width = this.sizes[text].width * ratio;
+		result.height = this.sizes[text].height * ratio;
 		
 		return result;
 	};

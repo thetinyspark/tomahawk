@@ -1462,6 +1462,28 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		return window.innerHeight;
 	};
 	
+	/**
+	* @description Returns the current client width.
+	* @method getClientWidth
+	* @memberOf tomahawk_ns.Screen
+	* @returns {Number} 
+	**/
+	Screen.getClientWidth = function()
+	{
+		return document.body.clientWidth;
+	};
+	
+	/**
+	* @description Returns the current client height.
+	* @method getClientHeight
+	* @memberOf tomahawk_ns.Screen
+	* @returns {Number} 
+	**/
+	Screen.getClientHeight = function()
+	{
+		return document.body.clientHeight;
+	};
+	
 	tomahawk_ns.Screen = Screen;
 })();
 
@@ -1810,6 +1832,60 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	Tomahawk.extend( "DisplayObject", "EventDispatcher" );
 
 	/**
+	* @member shadow
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Boolean}
+	* @description Indicates wether the DisplayObject has a shadow.
+	* @default null
+	**/
+	DisplayObject.prototype.shadow = false;
+	
+	/**
+	* @member shadowBlur
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Number}
+	* @description Indicates the shadowBlur of the DisplayObject.
+	* @default null
+	**/
+	DisplayObject.prototype.shadowBlur = 5;
+	
+	/**
+	* @member shadowOffsetY
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Number}
+	* @description Indicates the shadowOffsetY of the DisplayObject.
+	* @default null
+	**/
+	DisplayObject.prototype.shadowOffsetY = 0;
+	
+	/**
+	* @member shadowOffsetX
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Number}
+	* @description Indicates the shadowOffsetX of the DisplayObject.
+	* @default null
+	**/
+	DisplayObject.prototype.shadowOffsetX = 0;
+	
+	/**
+	* @member shadowColor
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {String}
+	* @description Indicates the shadowColor of the DisplayObject.
+	* @default null
+	**/
+	DisplayObject.prototype.shadowColor = "black";
+
+	/**
+	* @member globalCompositeOperation
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {String}
+	* @description Indicates the globalCompositeOperation used to draw the DisplayObject.
+	* @default null
+	**/
+	DisplayObject.prototype.globalCompositeOperation = null;
+	
+	/**
 	* @member name
 	* @memberOf tomahawk_ns.DisplayObject.prototype
 	* @type {String}
@@ -2045,6 +2121,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	
 	DisplayObject.prototype._concatenedMatrix 	= null;
 	DisplayObject.prototype._cache 				= null;
+	DisplayObject.prototype._buffer 			= null;
 	DisplayObject.prototype._cacheOffsetX 		= 0;
 	DisplayObject.prototype._cacheOffsetY 		= 0;
 	
@@ -2152,10 +2229,11 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		var offY = 0;
 		var bounds = this.getBoundingRectIn(this);
 		var cacheAsBitmap = this.cacheAsBitmap;
+		var filterBounds = null;
 		
 		if( this._cache == null )
 		{
-			buffer = document.createElement("canvas");
+			buffer = this._buffer || document.createElement("canvas");
 		}
 		else
 		{
@@ -2175,20 +2253,16 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		// before drawing filters
 		if( filters != null )
 		{		
-			//i = filters.length;
-			//
-			//while( --i > -1 )
-			//{
-				//buffer.width += filters[i].getOffsetX();
-				//buffer.height += filters[i].getOffsetY();
-			//}
-			
 			i = filters.length;
 			
 			while( --i > -1 )
 			{
-				if( filters[i].type == tomahawk_ns.PixelFilter.BEFORE_DRAWING_FILTER )
-					filters[i].apply(buffer,context,this);
+				filterBounds = filters[i].getOffsetBounds();
+				
+				buffer.width += filterBounds.width;
+				buffer.height += filterBounds.height;
+				offX += filterBounds.x;
+				offY += filterBounds.y;
 			}
 		}
 		
@@ -2208,8 +2282,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 			
 			while( --i > -1 )
 			{
-				if( filters[i].type == tomahawk_ns.PixelFilter.AFTER_DRAWING_FILTER )
-					filters[i].apply(buffer,context,this);
+				filters[i].apply(buffer,context,this);
 			}
 		}
 		
@@ -2238,7 +2311,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		
 		if( mask != null )
 		{
-			buffer = document.createElement("canvas");
+			buffer = this._buffer || document.createElement("canvas");
 			buffer.width = this._cache.width;
 			buffer.height = this._cache.height;
 			
@@ -2278,6 +2351,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	**/
 	DisplayObject.prototype.draw = function(context)
 	{
+		
 	};
 	
 	/**
@@ -2625,10 +2699,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	**/
 	DisplayObjectContainer.prototype.addChildAt = function(child, index)
 	{
-		if( child.parent == this )
-			return child;
-			
-		if( child.parent != null )
+		if( child.parent != null && child.parent != this)
 		{
 			child.parent.removeChild(child);
 		}
@@ -2803,6 +2874,19 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 			context.globalAlpha *= child.alpha;
 			context.transform(mat.a,mat.b,mat.c,mat.d,mat.tx,mat.ty);
 			
+			if( child.shadow == true )
+			{
+				context.shadowColor = child.shadowColor;
+				context.shadowBlur = child.shadowBlur;
+				context.shadowOffsetX = child.shadowOffsetX;
+				context.shadowOffsetY = child.shadowOffsetY;
+			}
+			
+			if( child.globalCompositeOperation != null )
+			{
+				context.globalCompositeOperation = child.globalCompositeOperation;
+			}
+			
 			if( child.cacheAsBitmap == true || child.mask != null || child.filters != null )
 			{
 				child.drawComposite(context);
@@ -2965,12 +3049,43 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 	Tomahawk.registerClass( Frame, "Frame" );
 
-	
+	/**
+	* @member index
+	* @memberOf tomahawk_ns.Frame.prototype
+	* @type {Number}
+	* @description The frame index 
+	**/
 	Frame.prototype.index 			= 0;
+	
+	/**
+	* @member label
+	* @memberOf tomahawk_ns.Frame.prototype
+	* @type {String}
+	* @description The frame label 
+	**/
 	Frame.prototype.label 			= null;
+	
+	/**
+	* @member script
+	* @memberOf tomahawk_ns.Frame.prototype
+	* @type {Function}
+	* @description A block of script which will be executed when the frame will be played.
+	**/
 	Frame.prototype.script 			= null;
+	
+	/**
+	* @member chilren
+	* @memberOf tomahawk_ns.Frame.prototype
+	* @type {Array}
+	* @description The frame's displaylist.
+	**/
 	Frame.prototype.children 		= null;
 	
+	/**
+	* @method runScript
+	* @memberOf tomahawk_ns.Frame.prototype
+	* @param {Object} scope An object that represents the script execution context
+	**/
 	Frame.prototype.runScript = function(scope)
 	{
 		if( this.script != null )
@@ -3880,7 +3995,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	{
 		tomahawk_ns.DisplayObject._collide = 0;
 		tomahawk_ns.DisplayObjectContainer.apply(this);
-		this.setFPS(1000);
+		this.setFPS(60);
 		this.stage = this;
 	}
 
@@ -4028,7 +4143,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		}
 		else
 		{
-			context.clearRect(0,0,canvas.width,canvas.height);
+			canvas.width = canvas.width;
 		}
 		
 		context.save();
@@ -5739,7 +5854,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	}
 
 	Tomahawk.registerClass( KeyEvent, "KeyEvent" );
-	Tomahawk.extend( "Keyboard", "Event" );
+	Tomahawk.extend( "KeyEvent", "Event" );
 
 	/**
 	* @member {String} value the value of the event
@@ -5796,9 +5911,11 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	* @param {String} type The event type.
 	* @param {Boolean} bubbles Indicates whether the event will bubble through the display list.
 	* @param {Boolean} cancelable Indicates whether the default behaviour of this event can be cancelled.
+	* @param {Boolean} isCharacter Indicates if the touch pressed corresponds to a character.
+	* @param {String} value the corresponding character value 
 	* @returns {tomahawk_ns.KeyEvent}
 	**/
-	KeyEvent.fromNativeEvent = function(event,bubbles,cancelable)
+	KeyEvent.fromNativeEvent = function(event,bubbles,cancelable,isCharacter,value )
 	{
 		var type = "";
 		var newEvent = null;
@@ -5818,9 +5935,8 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		newEvent.ctrlKey = event.ctrlKey;
 		newEvent.shiftKey = event.shiftKey;
 		newEvent.altKey = event.altKey;
-		//newEvent.value = ( event.type == "keypress" ) ? String.fromCharCode(charCode) : tomahawk_ns.Keyboard.keyCodeToChar(event.keyCode);
-		newEvent.value = tomahawk_ns.Keyboard.keyCodeToChar(event.keyCode);
-		newEvent.isCharacter = tomahawk_ns.Keyboard.isMapped(event.keyCode);
+		newEvent.value = value;
+		newEvent.isCharacter = ( isCharacter == true );
 		newEvent.which = event.which;
 		return newEvent;
 		
@@ -6273,23 +6389,10 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	function PixelFilter(){}
 	
 	Tomahawk.registerClass( PixelFilter, "PixelFilter" );
-
-	/**
-	* @property {Number} BEFORE_DRAWING_FILTER 0
-	* @memberOf tomahawk_ns.PixelFilter
-	**/
-	PixelFilter.BEFORE_DRAWING_FILTER = 0;
-	
-	/**
-	* @property {Number} BEFORE_DRAWING_FILTER 0
-	* @memberOf tomahawk_ns.PixelFilter
-	**/
-	PixelFilter.AFTER_DRAWING_FILTER = 1;
 	
 	PixelFilter.prototype._canvas = null;
 	PixelFilter.prototype._context = null;
 	PixelFilter.prototype._object = null;
-	PixelFilter.prototype.type = 1;
 	
 	/**
 	* @method getPixels
@@ -6346,20 +6449,16 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	};
 
 	/**
-	* @method getOffsetX
+	* @method getOffsetBounds
 	* @memberOf tomahawk_ns.PixelFilter.prototype
-	* @description returns the extra pixels generated by the filter on the x axis
+	* @description returns a rectangle that represents the extra pixels generated by the filter
 	* @returns {Number}
 	**/
-	PixelFilter.prototype.getOffsetX = function(){ return 0};
-	
-	/**
-	* @method getOffsetY
-	* @memberOf tomahawk_ns.PixelFilter.prototype
-	* @description returns the extra pixels generated by the filter on the y axis
-	* @returns {Number}
-	**/
-	PixelFilter.prototype.getOffsetY = function(){ return 0};
+	PixelFilter.prototype.getOffsetBounds = function()
+	{ 
+		var rect = new tomahawk_ns.Rectangle(0,0,0,0);
+		return rect;
+	};
 	
 	tomahawk_ns.PixelFilter = PixelFilter;
 
@@ -6394,6 +6493,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 * OTHER DEALINGS IN THE SOFTWARE.
 
 * @author The Tiny Spark
+* @deprecated
 */
 
 
@@ -6409,11 +6509,12 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	function ShadowBlurFilter()
 	{
 		tomahawk_ns.PixelFilter.apply(this);
-		this.type = tomahawk_ns.PixelFilter.BEFORE_DRAWING_FILTER;
 	}
 	
 	Tomahawk.registerClass( ShadowBlurFilter, "ShadowBlurFilter" );
 	Tomahawk.extend( "ShadowBlurFilter", "PixelFilter" );
+	
+	ShadowBlurFilter.prototype._extraBounds = null;
 	
 	/**
 	* @member {Number} shadowOffsetX shadow offset on the x axis.
@@ -6434,7 +6535,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	* @member {Number} shadowColor the color of the shadow.
 	* @memberOf tomahawk_ns.ShadowBlurFilter.prototype
 	**/
-	ShadowBlurFilter.prototype.shadowColor 	= "white";
+	ShadowBlurFilter.prototype.shadowColor 	= "black";
 	
 	/**
 	* @method process
@@ -6450,6 +6551,22 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		context.shadowColor = this.shadowColor;
 		context.shadowOffsetX = this.shadowOffsetX;
 		context.shadowOffsetY = this.shadowOffsetY;
+	};
+	
+	ShadowBlurFilter.prototype.getOffsetBounds = function()
+	{ 
+		var width = this.shadowBlur;
+		var mid = width >> 1;
+		
+		this._extraBounds = this._extraBounds || new tomahawk_ns.Rectangle();
+		this._extraBounds.x = this.shadowOffsetX - mid;
+		this._extraBounds.y = this.shadowOffsetY - mid;
+		this._extraBounds.width = Math.abs(this.shadowOffsetX) + width;
+		this._extraBounds.height = Math.abs(this.shadowOffsetY) + width;
+		this._extraBounds.x = ( this._extraBounds.x > 0 ) ? 0 : this._extraBounds.x;
+		this._extraBounds.y = ( this._extraBounds.y > 0 ) ? 0 : this._extraBounds.y;
+		
+		return this._extraBounds;
 	};
 
 	tomahawk_ns.ShadowBlurFilter = ShadowBlurFilter;
@@ -8039,10 +8156,24 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	/**
 	 * @class Rectangle
 	 * @memberOf tomahawk_ns
+	 * @param {Number} x
+	 * @param {Number} y
+	 * @param {Number} width
+	 * @param {Number} height
 	 * @description Represents a rectangle
 	 * @constructor
 	 **/
-	function Rectangle(){}
+	function Rectangle(x,y,width,height)
+	{
+		this.x = x || 0;
+		this.y = y || 0;
+		this.width = width || 0;
+		this.height = height || 0;
+		this.left = this.x;
+		this.top = this.y;
+		this.right = this.x + this.width;
+		this.bottom = this.y + this.height;
+	}
 	
 	Tomahawk.registerClass(Rectangle,"Rectangle");
 
@@ -8371,6 +8502,7 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		if( this.sizes[text] == undefined )
 		{	
 			div.style.position = 'absolute';
+			div.style.padding = '0';
 			div.style.top = '100px';
 			div.style.left = '-1000px';
 			div.style.width = 'auto';
@@ -8382,7 +8514,7 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 			if( !div.parentNode )
 				document.body.appendChild(div);
 		
-			div.innerHTML = text;
+			div.innerHTML = ( text == "\n" ) ? "<br />" : text;
 			
 			width = div.offsetWidth;
 			height = div.offsetHeight;
@@ -8392,14 +8524,14 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 			
 			document.body.removeChild(div);
 		
-			obj.width = parseInt(width);
-			obj.height = parseInt(height);
+			obj.width = width;
+			obj.height = height;
 			
 			this.sizes[text] = obj;
 		}
 			
-		result.width = parseInt(this.sizes[text].width * ratio);
-		result.height = parseInt(this.sizes[text].height * ratio);
+		result.width = this.sizes[text].width * ratio;
+		result.height = this.sizes[text].height * ratio;
 		
 		return result;
 	};
@@ -8647,7 +8779,6 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	**/
 	Letter.prototype.updateMetrics = function()
 	{
-		
 		var context = Letter._metricsContext;
 		var font = tomahawk_ns.Font.getFont( this.format.font );
 		var measure = font.measureText(this.value, this.format.size);
@@ -8697,6 +8828,8 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 			context.fill();
 			context.restore();
 		}
+				
+		this.format.updateContext(context);
 		
 		if( this.format.textBorder == true )
 		{
@@ -8705,10 +8838,6 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 			context.strokeText(this.value,this.format.textBorderOffsetX,this.format.textBorderOffsetY);
 			context.closePath();
 		}
-		
-	
-		this.format.updateContext(context);
-		
 		
 		context.beginPath();
 		context.fillText(this.value,0,0);
@@ -9333,7 +9462,7 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	**/
 	TextField.prototype.setCurrentIndex = function(index)
 	{
-		if( this.currentIndex == index )
+		if( this.currentIndex == index || index > this._letters.length)
 			return;
 			
 		this.currentIndex = index;
@@ -9637,7 +9766,6 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	};
 	
 	
-	
 	TextField.prototype.getBoundingRectIn = function(spaceCoordinates)
 	{
 		var width = this.width;
@@ -9682,7 +9810,7 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		var bounds = null;
 		var time = null;
 		
-		if( this._lastWidth != this.width || this._refreshNextFrame == true )
+		if( this._lastWidth != this.width || this._refreshNextFrame == true || this.forceRefresh == true )
 		{
 			this._refresh();	
 			this._lastWidth = this.width;
@@ -10360,10 +10488,18 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	/**
 	 * @class Texture
 	 * @memberOf tomahawk_ns
+	 * @param {Object} data The rendering data itself, it can be an HTMLImageElement || HTMLCanvasElement || HTMLVideoElement.
+	 * @param {Array} rect The portion of the rendering data used for the rendering. Example: [0,0,10,10].
+	 * @param {String} name The texture's name.
 	 * @description The Texture class represents a 2-dimensional texture which will be used in a Bitmap instance. Defines a 2D texture for use during rendering.
 	 * @constructor
 	 **/
-	function Texture(){}
+	function Texture(data,rect,name)
+	{
+		this.data = data || null;
+		this.rect = rect || null;
+		this.name = name || null;
+	}
 
 	Tomahawk.registerClass( Texture, "Texture" );
 
@@ -10591,53 +10727,53 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	**/
 	Tween.prototype.name = null;
 	/**
-	* @member name
+	* @member target
 	* @memberOf tomahawk_ns.Tween.prototype
-	* @type {String}
-	* @description The name of the Tween instance.
+	* @type {Object}
+	* @description The target object on which the tween is applied.
 	**/
 	Tween.prototype.target = null;
 	/**
-	* @member name
+	* @member delay
 	* @memberOf tomahawk_ns.Tween.prototype
-	* @type {String}
-	* @description The name of the Tween instance.
+	* @type {Number}
+	* @description The amount of time before the tween effect is applied.
 	**/
 	Tween.prototype.delay = 0;
 	/**
-	* @member name
+	* @member from
 	* @memberOf tomahawk_ns.Tween.prototype
-	* @type {String}
-	* @description The name of the Tween instance.
+	* @type {Object}
+	* @description Defines the starting values of the target properties.
 	**/
 	Tween.prototype.from = null;
 	/**
-	* @member name
+	* @member to
 	* @memberOf tomahawk_ns.Tween.prototype
-	* @type {String}
-	* @description The name of the Tween instance.
+	* @type {Object}
+	* @description Defines the ending values of the target properties.
 	**/
 	Tween.prototype.to = null;
 	/**
-	* @member name
+	* @member duration
 	* @memberOf tomahawk_ns.Tween.prototype
-	* @type {String}
-	* @description The name of the Tween instance.
+	* @type {Number}
+	* @description The duration of the tween ( in frames ).
 	**/
 	Tween.prototype.duration = 0;
 	/**
-	* @member name
+	* @member easing
 	* @memberOf tomahawk_ns.Tween.prototype
-	* @type {String}
-	* @description The name of the Tween instance.
+	* @type {Function}
+	* @description The easing function used to interpolate the values during the tween process.
 	**/
 	Tween.prototype.easing = null
 	
 	/**
-	* @member name
+	* @method update
+	* @description Updates the target values according to the time ( in frame ) passed in parameter.
 	* @memberOf tomahawk_ns.Tween.prototype
-	* @type {String}
-	* @description The name of the Tween instance.
+	* @param {Number} time The current tween time ( in frame )
 	**/
 	Tween.prototype.update = function(time)
 	{
@@ -10668,10 +10804,9 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	};
 	
 	/**
-	* @member name
+	* @method destroy
+	* @description Stops and kill the tween properly.
 	* @memberOf tomahawk_ns.Tween.prototype
-	* @type {String}
-	* @description The name of the Tween instance.
 	**/
 	Tween.prototype.destroy = function()
 	{
@@ -10734,16 +10869,43 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	 **/
 	function Back() {}
 
+	/**
+	* @method easeIn
+	* @memberOf tomahawk_ns.Back
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Back.easeIn = function ( p_t , p_b, p_c , p_d )
 	{
 		return p_c * ( p_t /= p_d ) * p_t * ( 2.70158 * p_t - 1.70158 ) + p_b;
 	};
-
+	
+	/**
+	* @method easeOut
+	* @memberOf tomahawk_ns.Back
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Back.easeOut = function (p_t, p_b, p_c, p_d)
 	{
 		return p_c * ( ( p_t = p_t / p_d - 1) * p_t * ( 2.70158 * p_t + 1.70158) + 1 ) + p_b;
 	};
-
+	
+	/**
+	* @method easeInOut
+	* @memberOf tomahawk_ns.Back
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Back.easeInOut = function( p_t, p_b, p_c, p_d ) 
 	{
 		if ( ( p_t /= p_d * 0.5 ) < 1 )
@@ -10800,12 +10962,30 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	 * @constructor
 	 **/
 	function Bounce() {}
-
+	
+	/**
+	* @method easeIn
+	* @memberOf tomahawk_ns.Bounce
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Bounce.easeIn = function ( t , b, c , d )
 	{
 		return c - easeOut(d-t, 0, c, d) + b;
 	};
-
+	
+	/**
+	* @method easeOut
+	* @memberOf tomahawk_ns.Bounce
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Bounce.easeOut = function (t, b, c, d)
 	{
 		if ((t/=d) < (1/2.75)) 
@@ -10825,7 +11005,16 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 			return c*(7.5625*(t-=(2.625/2.75))*t + .984375) + b;
 		}
 	};
-
+	
+	/**
+	* @method easeInOut
+	* @memberOf tomahawk_ns.Bounce
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Bounce.easeInOut = function( t, b, c, d ) 
 	{
 		if (t < d*0.5) 
@@ -10882,17 +11071,43 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	 **/
 	function Circ(){}
 
-		
+	/**
+	* @method easeIn
+	* @memberOf tomahawk_ns.Circ
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Circ.easeIn = function(t, b, c, d) 
 	{
 		return -c * (Math.sqrt(1 - (t/=d)*t) - 1) + b;
 	};
-
+	
+	/**
+	* @method easeOut
+	* @memberOf tomahawk_ns.Circ
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Circ.easeOut = function(t, b, c, d) 
 	{
 		return c * Math.sqrt(1 - (t=t/d-1)*t) + b;
 	};
-
+	
+	/**
+	* @method easeInOut
+	* @memberOf tomahawk_ns.Circ
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Circ.easeInOut = function(t, b, c, d) 
 	{
 		if ((t/=d*0.5) < 1) return -c*0.5 * (Math.sqrt(1 - t*t) - 1) + b;
@@ -10942,17 +11157,44 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	 * @constructor
 	 **/
 	function Cubic() {}
-		
+	
+	/**
+	* @method easeIn
+	* @memberOf tomahawk_ns.Cubic
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Cubic.easeIn = function(t, b, c, d) 
 	{
 		return c*(t/=d)*t*t + b;
 	};
-
+	
+	/**
+	* @method easeOut
+	* @memberOf tomahawk_ns.Cubic
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Cubic.easeOut = function(t, b, c, d) 
 	{
 		return c*((t=t/d-1)*t*t + 1) + b;
 	};
-
+	
+	/**
+	* @method easeInOut
+	* @memberOf tomahawk_ns.Cubic
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Cubic.easeInOut = function(t, b, c, d) 
 	{
 		if ((t/=d*0.5) < 1) return c*0.5*t*t*t + b;
@@ -11005,7 +11247,18 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	function Elastic() {}
 
 	Elastic._2PI = Math.PI * 2;
-		
+	
+	/**
+	* @method easeIn
+	* @memberOf tomahawk_ns.Elastic
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @param {Number} a
+	* @param {Number} p
+	* @returns {Number} returns a number
+	**/
 	Elastic.easeIn = function(t, b, c, d, a, p) 
 	{
 
@@ -11017,7 +11270,18 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		else s = p/Elastic._2PI * Math.asin (c/a);
 		return -(a*Math.pow(2,10*(t-=1)) * Math.sin( (t*d-s)*Elastic._2PI/p )) + b;
 	};
-
+	
+	/**
+	* @method easeOut
+	* @memberOf tomahawk_ns.Elastic
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @param {Number} a
+	* @param {Number} p
+	* @returns {Number} returns a number
+	**/
 	Elastic.easeOut  = function(t, b, c, d, a, p ) 
 	{
 		var s;
@@ -11028,7 +11292,18 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		else s = p/Elastic._2PI * Math.asin (c/a);
 		return (a*Math.pow(2,-10*t) * Math.sin( (t*d-s)*Elastic._2PI/p ) + c + b);
 	};
-
+	
+	/**
+	* @method easeInOut
+	* @memberOf tomahawk_ns.Elastic
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @param {Number} a
+	* @param {Number} p
+	* @returns {Number} returns a number
+	**/
 	Elastic.easeInOut = function (t, b, c, d, a, p) 
 	{
 		var s;
@@ -11084,17 +11359,44 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	 * @constructor
 	 **/
 	function Expo (){}
-
+	
+	/**
+	* @method easeIn
+	* @memberOf tomahawk_ns.Expo
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Expo.easeIn = function(t, b, c, d) 
 	{
 		return (t==0) ? b : c * Math.pow(2, 10 * (t/d - 1)) + b - c * 0.001;
 	};
-
+	
+	/**
+	* @method easeOut
+	* @memberOf tomahawk_ns.Expo
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Expo.easeOut = function(t, b, c, d) 
 	{
 		return (t==d) ? b+c : c * (-Math.pow(2, -10 * t/d) + 1) + b;
 	};
-
+	
+	/**
+	* @method easeInOut
+	* @memberOf tomahawk_ns.Expo
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Expo.easeInOut = function(t, b, c, d) 
 	{
 		if (t==0) return b;
@@ -11148,21 +11450,58 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	function Linear() {}
 
 	Linear.power = 0;
+	
+	/**
+	* @method easeNone
+	* @memberOf tomahawk_ns.Linear
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Linear.easeNone = function(t, b, c, d)
 	{
 		return c*t/d + b;
 	};
-
+	
+	/**
+	* @method easeIn
+	* @memberOf tomahawk_ns.Linear
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Linear.easeIn = function(t, b, c, d)
 	{
 		return c*t/d + b;
 	};
-
+	
+	/**
+	* @method easeOut
+	* @memberOf tomahawk_ns.Linear
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Linear.easeOut = function(t, b, c, d)
 	{
 		return c*t/d + b;
 	};
-
+	
+	/**
+	* @method easeInOut
+	* @memberOf tomahawk_ns.Linear
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Linear.easeInOut = function(t, b, c, d)
 	{
 		return c*t/d + b;
@@ -11211,17 +11550,44 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	 * @constructor
 	 **/
 	function Quad(){}
-			
+	
+	/**
+	* @method easeIn
+	* @memberOf tomahawk_ns.Quad
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Quad.easeIn = function(t, b, c, d) 
 	{
 		return c*(t/=d)*t + b;
 	};
-
+	
+	/**
+	* @method easeOut
+	* @memberOf tomahawk_ns.Quad
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Quad.easeOut = function(t, b, c, d) 
 	{
 		return -c *(t/=d)*(t-2) + b;
 	};
-
+	
+	/**
+	* @method easeInOut
+	* @memberOf tomahawk_ns.Quad
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Quad.easeInOut = function( t, b, c, d) 
 	{
 		if ((t/=d*0.5) < 1) return c*0.5*t*t + b;
@@ -11272,17 +11638,43 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	**/
 	function Quart(){}
 		
-		
+	/**
+	* @method easeIn
+	* @memberOf tomahawk_ns.Quart
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Quart.easeIn = function(t, b, c, d) 
 	{
 		return c*(t/=d)*t*t*t + b;
 	};
-
+	
+	/**
+	* @method easeOut
+	* @memberOf tomahawk_ns.Quart
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Quart.easeOut = function(t, b, c, d) 
 	{
 		return -c * ((t=t/d-1)*t*t*t - 1) + b;
 	};
-
+	
+	/**
+	* @method easeInOut
+	* @memberOf tomahawk_ns.Quart
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Quart.easeInOut = function(t, b, c, d) 
 	{
 		if ((t/=d*0.5) < 1) return c*0.5*t*t*t*t + b;
@@ -11332,17 +11724,44 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	 * @constructor
 	 **/
 	function Quint() {}
-		
+	
+	/**
+	* @method easeIn
+	* @memberOf tomahawk_ns.Quint
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Quint.easeIn  = function(t, b, c, d) 
 	{
 		return c*(t/=d)*t*t*t*t + b;
 	};
-
+	
+	/**
+	* @method easeOut
+	* @memberOf tomahawk_ns.Quint
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Quint.easeOut  = function(t, b, c, d) 
 	{
 		return c*((t=t/d-1)*t*t*t*t + 1) + b;
 	};
-
+	
+	/**
+	* @method easeInOut
+	* @memberOf tomahawk_ns.Quint
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Quint.easeInOut  = function(t, b, c, d) 
 	{
 		if ((t/=d*0.5) < 1) return c*0.5*t*t*t*t*t + b;
@@ -11393,17 +11812,44 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	function Sine(){}
 
 	Sine._HALF_PI = Math.PI * 0.5;
-
+	
+	/**
+	* @method easeIn
+	* @memberOf tomahawk_ns.Sine
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Sine.easeIn  = function(t, b, c, d) 
 	{
 		return -c * Math.cos(t/d * _HALF_PI) + c + b;
 	};
-
+	
+	/**
+	* @method easeOut
+	* @memberOf tomahawk_ns.Sine
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Sine.easeOut  = function(t, b, c, d) 
 	{
 		return c * Math.sin(t/d * _HALF_PI) + b;
 	};
-
+	
+	/**
+	* @method easeInOut
+	* @memberOf tomahawk_ns.Sine
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Sine.easeInOut  = function(t, b, c, d) 
 	{
 		return -c*0.5 * (Math.cos(Math.PI*t/d) - 1) + b;
@@ -11452,22 +11898,50 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	 * @constructor
 	**/
 	function Strong() {}
-
+	
+	/**
+	* @method easeIn
+	* @memberOf tomahawk_ns.Strong
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Strong.easeIn  = function(t, b, c, d) 
 	{
 		return c*(t/=d)*t*t*t*t + b;
 	};
-
+	
+	/**
+	* @method easeOut
+	* @memberOf tomahawk_ns.Strong
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Strong.easeOut  = function(t, b, c, d) 
 	{
 		return c*((t=t/d-1)*t*t*t*t + 1) + b;
 	};
-
+	
+	/**
+	* @method easeInOut
+	* @memberOf tomahawk_ns.Strong
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Strong.easeInOut  = function(t, b, c, d) 
 	{
 		if ((t/=d*0.5) < 1) return c*0.5*t*t*t*t*t + b;
 		return c*0.5*((t-=2)*t*t*t*t + 2) + b;
 	};
+	
 	tomahawk_ns.Strong = Strong;
 
 })();

@@ -39,7 +39,7 @@
 	{
 		tomahawk_ns.DisplayObject._collide = 0;
 		tomahawk_ns.DisplayObjectContainer.apply(this);
-		this.setFPS(1000);
+		this.setFPS(60);
 		this.stage = this;
 	}
 
@@ -187,7 +187,7 @@
 		}
 		else
 		{
-			context.clearRect(0,0,canvas.width,canvas.height);
+			canvas.width = canvas.width;
 		}
 		
 		context.save();

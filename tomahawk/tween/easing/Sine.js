@@ -37,17 +37,44 @@
 	function Sine(){}
 
 	Sine._HALF_PI = Math.PI * 0.5;
-
+	
+	/**
+	* @method easeIn
+	* @memberOf tomahawk_ns.Sine
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Sine.easeIn  = function(t, b, c, d) 
 	{
 		return -c * Math.cos(t/d * _HALF_PI) + c + b;
 	};
-
+	
+	/**
+	* @method easeOut
+	* @memberOf tomahawk_ns.Sine
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Sine.easeOut  = function(t, b, c, d) 
 	{
 		return c * Math.sin(t/d * _HALF_PI) + b;
 	};
-
+	
+	/**
+	* @method easeInOut
+	* @memberOf tomahawk_ns.Sine
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Sine.easeInOut  = function(t, b, c, d) 
 	{
 		return -c*0.5 * (Math.cos(Math.PI*t/d) - 1) + b;

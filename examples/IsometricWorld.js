@@ -4,8 +4,7 @@
 
 function Main(){}
 
-Main.prototype._direction = 0;
-Main.prototype._counter = 0;
+
 Main.prototype._down = false;
 
 Main.prototype.isoToScreen = function(  p_row, p_col, p_cellW, p_cellH )
@@ -49,17 +48,20 @@ Main.prototype.complete = function()
 	var coords = null;
 	var container = new tomahawk_ns.Sprite();
 	var cloudsContainer = new tomahawk_ns.Sprite();
-	var numRows = 40;
-	var numCols = 40;
+	var numRows = 20;
+	var numCols = 20;
 	var sky = new tomahawk_ns.Shape();
 	
 	
+	sky.width = sky.height = 800;
 	sky.beginPath();
 	sky.createLinearGradient(0,0,0,100);
 	sky.addColorStop(0,"white");
 	sky.addColorStop(1,"#73D3F9");
 	sky.fillWithCurrentGradient();
 	sky.fillRect(0,0,800,800);
+	sky.fill();
+	sky.cacheAsBitmap = true;
 	
 	
 	if( tomahawk_ns.Screen.getWindowWidth() < 800 )
@@ -89,13 +91,13 @@ Main.prototype.complete = function()
 			bmp.x = coords.x;
 			bmp.y = coords.y;
 			bmp.name = "bmp_"+i+'_'+j;
-			bmp.autoUpdate = false;
+			bmp.autoUpdate = true;
 			
 			container.addChildAt(bmp,0);
 		}
 	}
 	
-	
+	container.getChildByName("bmp_5_5").alpha = 0.1;
 	i = 5;
 	
 	texture = new tomahawk_ns.Texture();
@@ -113,8 +115,6 @@ Main.prototype.complete = function()
 	}
 	
 	cloudsContainer.mouseEnabled = false;
-	
-	
 	coords = this.isoToScreen(5,5,64,32);
 	
 	texture = new tomahawk_ns.Texture();
@@ -127,8 +127,7 @@ Main.prototype.complete = function()
 	bmp.x = coords.x;
 	bmp.y = coords.y;
 	
-	bmp.pivotX =  bmp.width >> 1;
-	bmp.pivotY = bmp.height >> 1;
+	bmp.pivotY = bmp.height - 42 ;
 	
 	container.addChild(bmp);
 	
@@ -142,44 +141,25 @@ Main.prototype.complete = function()
 	tomahawk_ns.Stage.getInstance().addChild(cloudsContainer);
 	tomahawk_ns.Stage.getInstance().addEventListener(tomahawk_ns.Event.ENTER_FRAME, this, this.onFrame);
 	
-	container.addEventListener(tomahawk_ns.MouseEvent.MOUSE_MOVE, this, this._mouseHandler );
-	container.addEventListener(tomahawk_ns.MouseEvent.MOUSE_DOWN, this, this._mouseHandler );
-	container.addEventListener(tomahawk_ns.MouseEvent.MOUSE_UP, this, this._mouseHandler );
+	
+	container.enableDragAndDrop(true);
 };
 
-Main.prototype._mouseHandler = function(event)
-{
-	var container = event.currentTarget;
-	var stage = container.stage;
-	var cloudsContainer = stage.getChildByName("clouds");
-	
-	if( event.type == tomahawk_ns.MouseEvent.MOUSE_UP )
-		this._down = false;
-		
-	if( event.type == tomahawk_ns.MouseEvent.MOUSE_DOWN )
-		this._down = true;
-		
-	if( event.type == tomahawk_ns.MouseEvent.MOUSE_MOVE && this._down == true )
-	{
-		var pt = stage.getMovement();
-		container.x += pt.x;
-		container.y += pt.y;
-		cloudsContainer.x += pt.x * 0.5;
-		cloudsContainer.y += pt.y * 0.5;
-	}
-};
 
 Main.prototype.onFrame = function()
 {
 	tomahawk_ns.Stage.getInstance().drawFPS();
 	
 	var cloudsContainer = tomahawk_ns.Stage.getInstance().getChildByName("clouds");
+	
+	if( cloudsContainer == null )
+		return;
+	
 	var i = cloudsContainer.children.length;
 	while( --i > -1 )
 	{
 		cloudsContainer.getChildAt(i).x -= 0.1;
 	}
-	
 };
 
 window.onload = function()

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="assets/style.css"/>
+	<script type="text/javascript" src="tomahawk_engine.js"></script>
+	<script type="text/javascript">
+	
+		var lastTime = 0; 
+		var counter = 0;
+		var stepX = 2;
+		var fps = 0;
+		
+		function clickHandler()
+		{
+			var stage = tomahawk_ns.Stage.getInstance("stress");
+			var image = document.getElementById("perso");
+			var container = stage.getChildByName("container");
+			var texture = new tomahawk_ns.Texture();
+			var i = 100;
+			var bmp = null;
+			
+			texture.rect = [0,0,image.naturalWidth,image.naturalHeight];
+			texture.data = image;
+			texture.name = "perso";
+			
+			while( --i > -1 )
+			{
+				bmp = new tomahawk_ns.Bitmap(texture);
+				bmp.width = image.naturalWidth;
+				bmp.height = image.naturalHeight;
+				bmp.x = parseInt(Math.random() * 800);
+				bmp.y = parseInt(Math.random() * 600);
+				container.addChild(bmp);
+			}
+		}
+		
+		function init()
+		{
+			Tomahawk.run();
+			var stage = tomahawk_ns.Stage.getInstance("stress");
+			var container = new tomahawk_ns.Sprite();
+			var button = document.getElementById("add");
+			
+			button.addEventListener("click", clickHandler);
+			container.name = "container";
+			
+			stage.init(document.getElementById("tomahawk"));
+			stage.addChild(container);
+			stage.addEventListener(tomahawk_ns.Event.ENTER_FRAME, this, this.onFrame);
+		}
+		
+		function onFrame()
+		{
+			counter++;
+			var stage = tomahawk_ns.Stage.getInstance("stress");
+			var container = stage.getChildByName("container");
+			var numChildren = container.children.length;
+			var context = stage.getContext();
+			var time = new Date().getTime();
+			
+			if( time - lastTime> 1000 )
+			{
+				lastTime = time;
+				fps = counter;
+				counter = 0;
+			}
+			
+			container.x += stepX;
+			stepX = ( container.x > 100 ) ? -stepX : stepX;
+			stepX = ( container.x < -100 ) ? -stepX : stepX;
+			
+			context.save();
+			context.beginPath();
+			context.fillStyle = "black";
+			context.fillRect(0,0,100,30);
+			context.fill();
+			context.fillStyle = "red";
+			context.textBaseline = "top";
+			context.fillText("children: "+numChildren+", "+ fps + " fps",0,0);
+			context.restore();
+		}
+	
+		window.onload = init;
+		
+	</script>
+</head>
+<body>
+	<button id="add">Add 100 Bitmap</button>
+	<canvas id="tomahawk" width="800" height="600"></canvas>
+	<img src="assets/perso1.png" id="perso" style="display: none;" />
+</body>
+</html>

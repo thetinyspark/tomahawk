@@ -37,21 +37,58 @@
 	function Linear() {}
 
 	Linear.power = 0;
+	
+	/**
+	* @method easeNone
+	* @memberOf tomahawk_ns.Linear
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Linear.easeNone = function(t, b, c, d)
 	{
 		return c*t/d + b;
 	};
-
+	
+	/**
+	* @method easeIn
+	* @memberOf tomahawk_ns.Linear
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Linear.easeIn = function(t, b, c, d)
 	{
 		return c*t/d + b;
 	};
-
+	
+	/**
+	* @method easeOut
+	* @memberOf tomahawk_ns.Linear
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Linear.easeOut = function(t, b, c, d)
 	{
 		return c*t/d + b;
 	};
-
+	
+	/**
+	* @method easeInOut
+	* @memberOf tomahawk_ns.Linear
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Linear.easeInOut = function(t, b, c, d)
 	{
 		return c*t/d + b;

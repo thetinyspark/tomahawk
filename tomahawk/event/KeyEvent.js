@@ -45,7 +45,7 @@
 	}
 
 	Tomahawk.registerClass( KeyEvent, "KeyEvent" );
-	Tomahawk.extend( "Keyboard", "Event" );
+	Tomahawk.extend( "KeyEvent", "Event" );
 
 	/**
 	* @member {String} value the value of the event
@@ -102,9 +102,11 @@
 	* @param {String} type The event type.
 	* @param {Boolean} bubbles Indicates whether the event will bubble through the display list.
 	* @param {Boolean} cancelable Indicates whether the default behaviour of this event can be cancelled.
+	* @param {Boolean} isCharacter Indicates if the touch pressed corresponds to a character.
+	* @param {String} value the corresponding character value 
 	* @returns {tomahawk_ns.KeyEvent}
 	**/
-	KeyEvent.fromNativeEvent = function(event,bubbles,cancelable)
+	KeyEvent.fromNativeEvent = function(event,bubbles,cancelable,isCharacter,value )
 	{
 		var type = "";
 		var newEvent = null;
@@ -124,9 +126,8 @@
 		newEvent.ctrlKey = event.ctrlKey;
 		newEvent.shiftKey = event.shiftKey;
 		newEvent.altKey = event.altKey;
-		//newEvent.value = ( event.type == "keypress" ) ? String.fromCharCode(charCode) : tomahawk_ns.Keyboard.keyCodeToChar(event.keyCode);
-		newEvent.value = tomahawk_ns.Keyboard.keyCodeToChar(event.keyCode);
-		newEvent.isCharacter = tomahawk_ns.Keyboard.isMapped(event.keyCode);
+		newEvent.value = value;
+		newEvent.isCharacter = ( isCharacter == true );
 		newEvent.which = event.which;
 		return newEvent;
 		

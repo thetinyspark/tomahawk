@@ -37,7 +37,18 @@
 	function Elastic() {}
 
 	Elastic._2PI = Math.PI * 2;
-		
+	
+	/**
+	* @method easeIn
+	* @memberOf tomahawk_ns.Elastic
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @param {Number} a
+	* @param {Number} p
+	* @returns {Number} returns a number
+	**/
 	Elastic.easeIn = function(t, b, c, d, a, p) 
 	{
 
@@ -49,7 +60,18 @@
 		else s = p/Elastic._2PI * Math.asin (c/a);
 		return -(a*Math.pow(2,10*(t-=1)) * Math.sin( (t*d-s)*Elastic._2PI/p )) + b;
 	};
-
+	
+	/**
+	* @method easeOut
+	* @memberOf tomahawk_ns.Elastic
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @param {Number} a
+	* @param {Number} p
+	* @returns {Number} returns a number
+	**/
 	Elastic.easeOut  = function(t, b, c, d, a, p ) 
 	{
 		var s;
@@ -60,7 +82,18 @@
 		else s = p/Elastic._2PI * Math.asin (c/a);
 		return (a*Math.pow(2,-10*t) * Math.sin( (t*d-s)*Elastic._2PI/p ) + c + b);
 	};
-
+	
+	/**
+	* @method easeInOut
+	* @memberOf tomahawk_ns.Elastic
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @param {Number} a
+	* @param {Number} p
+	* @returns {Number} returns a number
+	**/
 	Elastic.easeInOut = function (t, b, c, d, a, p) 
 	{
 		var s;

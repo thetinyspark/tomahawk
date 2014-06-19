@@ -35,17 +35,44 @@
 	 * @constructor
 	 **/
 	function Expo (){}
-
+	
+	/**
+	* @method easeIn
+	* @memberOf tomahawk_ns.Expo
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Expo.easeIn = function(t, b, c, d) 
 	{
 		return (t==0) ? b : c * Math.pow(2, 10 * (t/d - 1)) + b - c * 0.001;
 	};
-
+	
+	/**
+	* @method easeOut
+	* @memberOf tomahawk_ns.Expo
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Expo.easeOut = function(t, b, c, d) 
 	{
 		return (t==d) ? b+c : c * (-Math.pow(2, -10 * t/d) + 1) + b;
 	};
-
+	
+	/**
+	* @method easeInOut
+	* @memberOf tomahawk_ns.Expo
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Expo.easeInOut = function(t, b, c, d) 
 	{
 		if (t==0) return b;

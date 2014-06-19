@@ -35,17 +35,44 @@
 	 * @constructor
 	 **/
 	function Quint() {}
-		
+	
+	/**
+	* @method easeIn
+	* @memberOf tomahawk_ns.Quint
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Quint.easeIn  = function(t, b, c, d) 
 	{
 		return c*(t/=d)*t*t*t*t + b;
 	};
-
+	
+	/**
+	* @method easeOut
+	* @memberOf tomahawk_ns.Quint
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Quint.easeOut  = function(t, b, c, d) 
 	{
 		return c*((t=t/d-1)*t*t*t*t + 1) + b;
 	};
-
+	
+	/**
+	* @method easeInOut
+	* @memberOf tomahawk_ns.Quint
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Quint.easeInOut  = function(t, b, c, d) 
 	{
 		if ((t/=d*0.5) < 1) return c*0.5*t*t*t*t*t + b;

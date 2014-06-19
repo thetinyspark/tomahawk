@@ -141,10 +141,7 @@
 	**/
 	DisplayObjectContainer.prototype.addChildAt = function(child, index)
 	{
-		if( child.parent == this )
-			return child;
-			
-		if( child.parent != null )
+		if( child.parent != null && child.parent != this)
 		{
 			child.parent.removeChild(child);
 		}
@@ -318,6 +315,19 @@
 			context.save();
 			context.globalAlpha *= child.alpha;
 			context.transform(mat.a,mat.b,mat.c,mat.d,mat.tx,mat.ty);
+			
+			if( child.shadow == true )
+			{
+				context.shadowColor = child.shadowColor;
+				context.shadowBlur = child.shadowBlur;
+				context.shadowOffsetX = child.shadowOffsetX;
+				context.shadowOffsetY = child.shadowOffsetY;
+			}
+			
+			if( child.globalCompositeOperation != null )
+			{
+				context.globalCompositeOperation = child.globalCompositeOperation;
+			}
 			
 			if( child.cacheAsBitmap == true || child.mask != null || child.filters != null )
 			{

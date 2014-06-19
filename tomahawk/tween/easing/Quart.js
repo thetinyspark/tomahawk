@@ -36,17 +36,43 @@
 	**/
 	function Quart(){}
 		
-		
+	/**
+	* @method easeIn
+	* @memberOf tomahawk_ns.Quart
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Quart.easeIn = function(t, b, c, d) 
 	{
 		return c*(t/=d)*t*t*t + b;
 	};
-
+	
+	/**
+	* @method easeOut
+	* @memberOf tomahawk_ns.Quart
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Quart.easeOut = function(t, b, c, d) 
 	{
 		return -c * ((t=t/d-1)*t*t*t - 1) + b;
 	};
-
+	
+	/**
+	* @method easeInOut
+	* @memberOf tomahawk_ns.Quart
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Quart.easeInOut = function(t, b, c, d) 
 	{
 		if ((t/=d*0.5) < 1) return c*0.5*t*t*t*t + b;

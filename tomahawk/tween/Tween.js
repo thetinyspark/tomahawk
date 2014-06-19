@@ -54,53 +54,53 @@
 	**/
 	Tween.prototype.name = null;
 	/**
-	* @member name
+	* @member target
 	* @memberOf tomahawk_ns.Tween.prototype
-	* @type {String}
-	* @description The name of the Tween instance.
+	* @type {Object}
+	* @description The target object on which the tween is applied.
 	**/
 	Tween.prototype.target = null;
 	/**
-	* @member name
+	* @member delay
 	* @memberOf tomahawk_ns.Tween.prototype
-	* @type {String}
-	* @description The name of the Tween instance.
+	* @type {Number}
+	* @description The amount of time before the tween effect is applied.
 	**/
 	Tween.prototype.delay = 0;
 	/**
-	* @member name
+	* @member from
 	* @memberOf tomahawk_ns.Tween.prototype
-	* @type {String}
-	* @description The name of the Tween instance.
+	* @type {Object}
+	* @description Defines the starting values of the target properties.
 	**/
 	Tween.prototype.from = null;
 	/**
-	* @member name
+	* @member to
 	* @memberOf tomahawk_ns.Tween.prototype
-	* @type {String}
-	* @description The name of the Tween instance.
+	* @type {Object}
+	* @description Defines the ending values of the target properties.
 	**/
 	Tween.prototype.to = null;
 	/**
-	* @member name
+	* @member duration
 	* @memberOf tomahawk_ns.Tween.prototype
-	* @type {String}
-	* @description The name of the Tween instance.
+	* @type {Number}
+	* @description The duration of the tween ( in frames ).
 	**/
 	Tween.prototype.duration = 0;
 	/**
-	* @member name
+	* @member easing
 	* @memberOf tomahawk_ns.Tween.prototype
-	* @type {String}
-	* @description The name of the Tween instance.
+	* @type {Function}
+	* @description The easing function used to interpolate the values during the tween process.
 	**/
 	Tween.prototype.easing = null
 	
 	/**
-	* @member name
+	* @method update
+	* @description Updates the target values according to the time ( in frame ) passed in parameter.
 	* @memberOf tomahawk_ns.Tween.prototype
-	* @type {String}
-	* @description The name of the Tween instance.
+	* @param {Number} time The current tween time ( in frame )
 	**/
 	Tween.prototype.update = function(time)
 	{
@@ -131,10 +131,9 @@
 	};
 	
 	/**
-	* @member name
+	* @method destroy
+	* @description Stops and kill the tween properly.
 	* @memberOf tomahawk_ns.Tween.prototype
-	* @type {String}
-	* @description The name of the Tween instance.
 	**/
 	Tween.prototype.destroy = function()
 	{

@@ -36,17 +36,43 @@
 	 **/
 	function Circ(){}
 
-		
+	/**
+	* @method easeIn
+	* @memberOf tomahawk_ns.Circ
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Circ.easeIn = function(t, b, c, d) 
 	{
 		return -c * (Math.sqrt(1 - (t/=d)*t) - 1) + b;
 	};
-
+	
+	/**
+	* @method easeOut
+	* @memberOf tomahawk_ns.Circ
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Circ.easeOut = function(t, b, c, d) 
 	{
 		return c * Math.sqrt(1 - (t=t/d-1)*t) + b;
 	};
-
+	
+	/**
+	* @method easeInOut
+	* @memberOf tomahawk_ns.Circ
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Circ.easeInOut = function(t, b, c, d) 
 	{
 		if ((t/=d*0.5) < 1) return -c*0.5 * (Math.sqrt(1 - t*t) - 1) + b;

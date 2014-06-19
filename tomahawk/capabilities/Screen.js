@@ -84,5 +84,27 @@
 		return window.innerHeight;
 	};
 	
+	/**
+	* @description Returns the current client width.
+	* @method getClientWidth
+	* @memberOf tomahawk_ns.Screen
+	* @returns {Number} 
+	**/
+	Screen.getClientWidth = function()
+	{
+		return document.body.clientWidth;
+	};
+	
+	/**
+	* @description Returns the current client height.
+	* @method getClientHeight
+	* @memberOf tomahawk_ns.Screen
+	* @returns {Number} 
+	**/
+	Screen.getClientHeight = function()
+	{
+		return document.body.clientHeight;
+	};
+	
 	tomahawk_ns.Screen = Screen;
 })();

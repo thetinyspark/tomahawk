@@ -35,17 +35,44 @@
 	 * @constructor
 	 **/
 	function Quad(){}
-			
+	
+	/**
+	* @method easeIn
+	* @memberOf tomahawk_ns.Quad
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Quad.easeIn = function(t, b, c, d) 
 	{
 		return c*(t/=d)*t + b;
 	};
-
+	
+	/**
+	* @method easeOut
+	* @memberOf tomahawk_ns.Quad
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Quad.easeOut = function(t, b, c, d) 
 	{
 		return -c *(t/=d)*(t-2) + b;
 	};
-
+	
+	/**
+	* @method easeInOut
+	* @memberOf tomahawk_ns.Quad
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Quad.easeInOut = function( t, b, c, d) 
 	{
 		if ((t/=d*0.5) < 1) return c*0.5*t*t + b;

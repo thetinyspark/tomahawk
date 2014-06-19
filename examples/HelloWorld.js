@@ -8,7 +8,6 @@ function Main(){}
 Main.prototype.getLoremIpsum = function()
 {
 	var lorem = "Higitus figitus zombadaboum !";
-	
 	return lorem;
 }
 

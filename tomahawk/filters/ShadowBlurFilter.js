@@ -25,6 +25,7 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 
 * @author The Tiny Spark
+* @deprecated
 */
 
 
@@ -40,11 +41,12 @@
 	function ShadowBlurFilter()
 	{
 		tomahawk_ns.PixelFilter.apply(this);
-		this.type = tomahawk_ns.PixelFilter.BEFORE_DRAWING_FILTER;
 	}
 	
 	Tomahawk.registerClass( ShadowBlurFilter, "ShadowBlurFilter" );
 	Tomahawk.extend( "ShadowBlurFilter", "PixelFilter" );
+	
+	ShadowBlurFilter.prototype._extraBounds = null;
 	
 	/**
 	* @member {Number} shadowOffsetX shadow offset on the x axis.
@@ -65,7 +67,7 @@
 	* @member {Number} shadowColor the color of the shadow.
 	* @memberOf tomahawk_ns.ShadowBlurFilter.prototype
 	**/
-	ShadowBlurFilter.prototype.shadowColor 	= "white";
+	ShadowBlurFilter.prototype.shadowColor 	= "black";
 	
 	/**
 	* @method process
@@ -81,6 +83,22 @@
 		context.shadowColor = this.shadowColor;
 		context.shadowOffsetX = this.shadowOffsetX;
 		context.shadowOffsetY = this.shadowOffsetY;
+	};
+	
+	ShadowBlurFilter.prototype.getOffsetBounds = function()
+	{ 
+		var width = this.shadowBlur;
+		var mid = width >> 1;
+		
+		this._extraBounds = this._extraBounds || new tomahawk_ns.Rectangle();
+		this._extraBounds.x = this.shadowOffsetX - mid;
+		this._extraBounds.y = this.shadowOffsetY - mid;
+		this._extraBounds.width = Math.abs(this.shadowOffsetX) + width;
+		this._extraBounds.height = Math.abs(this.shadowOffsetY) + width;
+		this._extraBounds.x = ( this._extraBounds.x > 0 ) ? 0 : this._extraBounds.x;
+		this._extraBounds.y = ( this._extraBounds.y > 0 ) ? 0 : this._extraBounds.y;
+		
+		return this._extraBounds;
 	};
 
 	tomahawk_ns.ShadowBlurFilter = ShadowBlurFilter;

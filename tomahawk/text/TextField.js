@@ -215,7 +215,7 @@
 	**/
 	TextField.prototype.setCurrentIndex = function(index)
 	{
-		if( this.currentIndex == index )
+		if( this.currentIndex == index || index > this._letters.length)
 			return;
 			
 		this.currentIndex = index;
@@ -519,7 +519,6 @@
 	};
 	
 	
-	
 	TextField.prototype.getBoundingRectIn = function(spaceCoordinates)
 	{
 		var width = this.width;
@@ -564,7 +563,7 @@
 		var bounds = null;
 		var time = null;
 		
-		if( this._lastWidth != this.width || this._refreshNextFrame == true )
+		if( this._lastWidth != this.width || this._refreshNextFrame == true || this.forceRefresh == true )
 		{
 			this._refresh();	
 			this._lastWidth = this.width;

@@ -35,12 +35,30 @@
 	 * @constructor
 	 **/
 	function Bounce() {}
-
+	
+	/**
+	* @method easeIn
+	* @memberOf tomahawk_ns.Bounce
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Bounce.easeIn = function ( t , b, c , d )
 	{
 		return c - easeOut(d-t, 0, c, d) + b;
 	};
-
+	
+	/**
+	* @method easeOut
+	* @memberOf tomahawk_ns.Bounce
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Bounce.easeOut = function (t, b, c, d)
 	{
 		if ((t/=d) < (1/2.75)) 
@@ -60,7 +78,16 @@
 			return c*(7.5625*(t-=(2.625/2.75))*t + .984375) + b;
 		}
 	};
-
+	
+	/**
+	* @method easeInOut
+	* @memberOf tomahawk_ns.Bounce
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Bounce.easeInOut = function( t, b, c, d ) 
 	{
 		if (t < d*0.5) 

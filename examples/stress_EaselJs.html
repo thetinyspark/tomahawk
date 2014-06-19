@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="assets/style.css"/>
+	<script type="text/javascript" src="vendors/easeljs-0.7.1.min.js"></script>
+	<script type="text/javascript">
+	
+		var stage;
+		var lastTime = 0;
+		var counter = 0;
+		var container = null;
+		var stepX = 2;
+		var context = null;
+		var fps = 0;
+		
+		// do not use native easeljs fps because tomahawk uses window.requestAnimationFrame
+		window.requestAnimationFrame = (function()
+		{
+			
+			return  window.requestAnimationFrame       ||  //Chromium 
+					window.webkitRequestAnimationFrame ||  //Webkit
+					window.mozRequestAnimationFrame    || //Mozilla Geko
+					window.oRequestAnimationFrame      || //Opera Presto
+					window.msRequestAnimationFrame     || //IE Trident?
+					function(callback, element){ //Fallback function
+						window.setTimeout(callback, 10);                
+					}
+			 
+		})();
+		
+		function clickHandler()
+		{
+			var i = 100;
+			var image = document.getElementById("perso");
+			var container = stage.getChildByName("container");
+			var bmp = null;
+			
+			
+			while( --i > -1 )
+			{
+				bmp = new createjs.Bitmap(image);
+				bmp.width = image.naturalWidth;
+				bmp.height = image.naturalHeight;
+				bmp.x = parseInt(Math.random() * 800);
+				bmp.y = parseInt(Math.random() * 600);
+				container.addChild(bmp);
+			}
+		}
+		
+		function init()
+		{
+			var container = new createjs.Container();
+			var button = document.getElementById("add");
+			var canvas = document.getElementById("tomahawk");
+			
+			context = canvas.getContext("2d");
+			button.addEventListener("click", clickHandler);
+			stage = new createjs.Stage(canvas);
+			container.name = "container";
+			
+			stage.addChild(container);
+
+            // start the tick and point it at the window so we can do some work before updating the stage:
+           // createjs.Ticker.addEventListener("tick", tick);
+           // createjs.Ticker.setFPS(100);
+		   tick();
+		}
+		
+		function tick()
+		{
+			counter++;
+			var container = stage.getChildByName("container");
+			var time = new Date().getTime();
+			var scope = this;
+			var numChildren = container.children.length;
+			
+			if( time - lastTime> 1000 )
+			{
+				lastTime = time;
+				fps = counter;
+				counter = 0;
+			}
+			
+			container.x +=  stepX;
+			stepX = ( container.x > 100 ) ? -stepX : stepX;
+			stepX = ( container.x < -100 ) ? -stepX : stepX;
+			stage.update();
+			
+			
+			context.save();
+			context.beginPath();
+			context.fillStyle = "black";
+			context.fillRect(0,0,100,30);
+			context.fill();
+			context.fillStyle = "red";
+			context.textBaseline = "top";
+			context.fillText("children: "+numChildren+", "+ fps + " fps",0,0);
+			context.restore();
+			
+			window.requestAnimationFrame(
+				function()
+				{
+					scope.tick();
+				}
+			);
+		}
+	
+		window.onload = init;
+	</script>
+</head>
+<body>
+	<button id="add">Add 100 Bitmap</button>
+	<canvas id="tomahawk" width="800" height="600"></canvas>
+	<img src="assets/perso1.png" id="perso" style="display: none;" />
+</body>
+</html>

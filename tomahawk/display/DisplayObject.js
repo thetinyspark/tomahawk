@@ -50,6 +50,60 @@
 	Tomahawk.extend( "DisplayObject", "EventDispatcher" );
 
 	/**
+	* @member shadow
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Boolean}
+	* @description Indicates wether the DisplayObject has a shadow.
+	* @default null
+	**/
+	DisplayObject.prototype.shadow = false;
+	
+	/**
+	* @member shadowBlur
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Number}
+	* @description Indicates the shadowBlur of the DisplayObject.
+	* @default null
+	**/
+	DisplayObject.prototype.shadowBlur = 5;
+	
+	/**
+	* @member shadowOffsetY
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Number}
+	* @description Indicates the shadowOffsetY of the DisplayObject.
+	* @default null
+	**/
+	DisplayObject.prototype.shadowOffsetY = 0;
+	
+	/**
+	* @member shadowOffsetX
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Number}
+	* @description Indicates the shadowOffsetX of the DisplayObject.
+	* @default null
+	**/
+	DisplayObject.prototype.shadowOffsetX = 0;
+	
+	/**
+	* @member shadowColor
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {String}
+	* @description Indicates the shadowColor of the DisplayObject.
+	* @default null
+	**/
+	DisplayObject.prototype.shadowColor = "black";
+
+	/**
+	* @member globalCompositeOperation
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {String}
+	* @description Indicates the globalCompositeOperation used to draw the DisplayObject.
+	* @default null
+	**/
+	DisplayObject.prototype.globalCompositeOperation = null;
+	
+	/**
 	* @member name
 	* @memberOf tomahawk_ns.DisplayObject.prototype
 	* @type {String}
@@ -285,6 +339,7 @@
 	
 	DisplayObject.prototype._concatenedMatrix 	= null;
 	DisplayObject.prototype._cache 				= null;
+	DisplayObject.prototype._buffer 			= null;
 	DisplayObject.prototype._cacheOffsetX 		= 0;
 	DisplayObject.prototype._cacheOffsetY 		= 0;
 	
@@ -392,10 +447,11 @@
 		var offY = 0;
 		var bounds = this.getBoundingRectIn(this);
 		var cacheAsBitmap = this.cacheAsBitmap;
+		var filterBounds = null;
 		
 		if( this._cache == null )
 		{
-			buffer = document.createElement("canvas");
+			buffer = this._buffer || document.createElement("canvas");
 		}
 		else
 		{
@@ -415,20 +471,16 @@
 		// before drawing filters
 		if( filters != null )
 		{		
-			//i = filters.length;
-			//
-			//while( --i > -1 )
-			//{
-				//buffer.width += filters[i].getOffsetX();
-				//buffer.height += filters[i].getOffsetY();
-			//}
-			
 			i = filters.length;
 			
 			while( --i > -1 )
 			{
-				if( filters[i].type == tomahawk_ns.PixelFilter.BEFORE_DRAWING_FILTER )
-					filters[i].apply(buffer,context,this);
+				filterBounds = filters[i].getOffsetBounds();
+				
+				buffer.width += filterBounds.width;
+				buffer.height += filterBounds.height;
+				offX += filterBounds.x;
+				offY += filterBounds.y;
 			}
 		}
 		
@@ -448,8 +500,7 @@
 			
 			while( --i > -1 )
 			{
-				if( filters[i].type == tomahawk_ns.PixelFilter.AFTER_DRAWING_FILTER )
-					filters[i].apply(buffer,context,this);
+				filters[i].apply(buffer,context,this);
 			}
 		}
 		
@@ -478,7 +529,7 @@
 		
 		if( mask != null )
 		{
-			buffer = document.createElement("canvas");
+			buffer = this._buffer || document.createElement("canvas");
 			buffer.width = this._cache.width;
 			buffer.height = this._cache.height;
 			
@@ -518,6 +569,7 @@
 	**/
 	DisplayObject.prototype.draw = function(context)
 	{
+		
 	};
 	
 	/**

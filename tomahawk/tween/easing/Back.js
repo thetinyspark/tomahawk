@@ -36,16 +36,43 @@
 	 **/
 	function Back() {}
 
+	/**
+	* @method easeIn
+	* @memberOf tomahawk_ns.Back
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Back.easeIn = function ( p_t , p_b, p_c , p_d )
 	{
 		return p_c * ( p_t /= p_d ) * p_t * ( 2.70158 * p_t - 1.70158 ) + p_b;
 	};
-
+	
+	/**
+	* @method easeOut
+	* @memberOf tomahawk_ns.Back
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Back.easeOut = function (p_t, p_b, p_c, p_d)
 	{
 		return p_c * ( ( p_t = p_t / p_d - 1) * p_t * ( 2.70158 * p_t + 1.70158) + 1 ) + p_b;
 	};
-
+	
+	/**
+	* @method easeInOut
+	* @memberOf tomahawk_ns.Back
+	* @param {Number} t
+	* @param {Number} b
+	* @param {Number} c
+	* @param {Number} d
+	* @returns {Number} returns a number
+	**/
 	Back.easeInOut = function( p_t, p_b, p_c, p_d ) 
 	{
 		if ( ( p_t /= p_d * 0.5 ) < 1 )
