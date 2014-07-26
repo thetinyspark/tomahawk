@@ -33,7 +33,7 @@
 *@namespace 
 **/
 var tomahawk_ns = new Object();
-tomahawk_ns.version = "0.9.1";
+tomahawk_ns.version = "0.9.2";
 
 /**
 * @class Tomahawk
@@ -541,6 +541,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	 * @constructor
 	 * @augments tomahawk_ns.EventDispatcher
 	 **/
+	
 	function Keyboard()
 	{
 		var callbackKey = this._keyboardHandler.bind(this);
@@ -561,16 +562,42 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		if( event.type == "keyup" )
 			tomahawk_ns.Keyboard.toggleShift(event.keyCode);
 			
-		var keyboardEvent = tomahawk_ns.KeyEvent.fromNativeEvent(event, true, true);
+		var type = "";
+		var newEvent = null;
+		var charCode = event.which || event.keyCode;
+		var character = tomahawk_ns.Keyboard.keyCodeToChar(	event.keyCode, 
+															event.shiftKey, 
+															event.ctrlKey, 
+															event.altKey);
 		
-		this.dispatchEvent(keyboardEvent);
+		switch( event.type )
+		{
+			case "keyup"	: type = tomahawk_ns.KeyboardEvent.KEY_UP	; break;
+			case "keypress"	: type = tomahawk_ns.KeyboardEvent.KEY_PRESS; break;
+			case "keydown"	: type = tomahawk_ns.KeyboardEvent.KEY_DOWN	; break;
+		}
 		
-		if( keyboardEvent.keyCode == tomahawk_ns.Keyboard.BACKSPACE ||
-		keyboardEvent.keyCode == tomahawk_ns.Keyboard.SPACE)
+		newEvent = new tomahawk_ns.KeyboardEvent(type,true,false);
+		newEvent.nativeEvent = event;
+		newEvent.keyCode = event.keyCode;
+		newEvent.charCode = event.charCode;
+		newEvent.ctrlKey = event.ctrlKey;
+		newEvent.shiftKey = event.shiftKey;
+		newEvent.altKey = event.altKey;
+		newEvent.value = character;
+		newEvent.isCharacter = tomahawk_ns.Keyboard.isMapped(newEvent.keyCode);
+		newEvent.which = event.which;
+	
+		if( event.keyCode == tomahawk_ns.Keyboard.BACKSPACE ||
+			event.keyCode == tomahawk_ns.Keyboard.SPACE 
+		)
 		{
 			event.preventDefault();
+			event.stopImmediatePropagation();
 			event.stopPropagation();
 		}
+		
+		this.dispatchEvent(newEvent);
 	};
 	
 	
@@ -2117,13 +2144,33 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	* @default true
 	* @description If set to true, the transformation matrix will be update at next frame.
 	**/
-	DisplayObject.prototype.updateNextFrame		= true;
+	DisplayObject.prototype.updateNextFrame		= true;	
+	
+	/**
+	* @member pixelPerfect
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Boolean}
+	* @default false
+	* @description If set to true, the hitTest call will check the alpha channel of the pixel beneath the mouse coordinates.
+	* If the pixel alpha channel is > pixelAlphaLimit, the pixel is considered non transparent
+	**/
+	DisplayObject.prototype.pixelPerfect		= false;
+	
+	/**
+	* @member pixelAlphaLimit
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Number}
+	* @default 0
+	* @description The alpha channel limit under which a pixel is considered transparent while calling the hitTest method.
+	**/
+	DisplayObject.prototype.pixelAlphaLimit		= 0;
 	
 	DisplayObject.prototype._concatenedMatrix 	= null;
 	DisplayObject.prototype._cache 				= null;
-	DisplayObject.prototype._buffer 			= null;
+	DisplayObject.prototype._maskBuffer 		= null;
 	DisplayObject.prototype._cacheOffsetX 		= 0;
 	DisplayObject.prototype._cacheOffsetY 		= 0;
+	DisplayObject._pixelBuffer 					= null;
 	
 	/**
 	* @method updateBounds
@@ -2200,8 +2247,8 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		mat.b = mat.c = mat.tx = mat.ty = 0;
 		
 		
-		mat.appendTransform(	this.x, 
-								this.y, 
+		mat.appendTransform(	this.x + this.pivotX, 
+								this.y + this.pivotY, 
 								this.scaleX, 
 								this.scaleY, 
 								this.rotation, 
@@ -2231,26 +2278,20 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		var cacheAsBitmap = this.cacheAsBitmap;
 		var filterBounds = null;
 		
-		if( this._cache == null )
-		{
-			buffer = this._buffer || document.createElement("canvas");
-		}
-		else
-		{
-			buffer = this._cache;
-		}
 		
+		this._cache = this._cache || document.createElement("canvas");
+		
+		buffer = this._cache;
 		buffer.width = ( bounds.width < 1 ) ? 1 : bounds.width ;
 		buffer.height = ( bounds.height < 1 ) ? 1 : bounds.height ;
 
-		
 		offX = bounds.left;
 		offY = bounds.top;
 		
 		context = buffer.getContext("2d");
 		
 		
-		// before drawing filters
+		// increase the buffer size considering the filters
 		if( filters != null )
 		{		
 			i = filters.length;
@@ -2266,13 +2307,12 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 			}
 		}
 		
-		
 		context.save();
-			context.globalAlpha = this.alpha;
-			context.translate( -offX, -offY );
-			this.cacheAsBitmap = false;
-			this.draw(context);
-			this.cacheAsBitmap = cacheAsBitmap;
+		context.globalAlpha = this.alpha;
+		context.translate( -offX, -offY );
+		this.cacheAsBitmap = false;
+		this.draw(context);
+		this.cacheAsBitmap = cacheAsBitmap;
 		context.restore();
 		
 		// after drawing filters
@@ -2298,48 +2338,50 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	* @memberOf tomahawk_ns.DisplayObject.prototype
 	* @param {CanvasRenderingContext2D} drawContext the CanvasRenderingContext2D context on which you want to draw.
 	**/
-	DisplayObject.prototype.drawComposite = function(drawContext)
+	DisplayObject.prototype.drawComposite = function(context)
 	{
 		if( this._cache == null || this.cacheAsBitmap == false )
 			this.updateCache();
 			
-		var buffer = this._cache;
-		var context = null;
+		var maskBuffer = null;
+		var maskContext = null;
+		var mask = this.mask;
 		var mat = null;
 		var i = 0;
-		var mask = this.mask;
 		
 		if( mask != null )
 		{
-			buffer = this._buffer || document.createElement("canvas");
-			buffer.width = this._cache.width;
-			buffer.height = this._cache.height;
+			maskBuffer = this._maskBuffer || document.createElement("canvas");
+			maskBuffer.width = this._cache.width;
+			maskBuffer.height = this._cache.height;
+			maskContext = maskBuffer.getContext("2d");
 			
-			context = buffer.getContext("2d");
 			mat = mask.getConcatenedMatrix().prependMatrix( this.getConcatenedMatrix().invert() );
 			
-			context.save();
-				context.globalAlpha = mask.alpha;
-				context.setTransform(	mat.a,
-										mat.b,
-										mat.c,
-										mat.d,
-										mat.tx,
-										mat.ty);
-					
-				mask.draw(context);
-			context.restore();
+			maskContext.save();
+			maskContext.globalAlpha = mask.alpha;
+			maskContext.setTransform(mat.a,mat.b,mat.c,mat.d,mat.tx,mat.ty);
+			mask.draw(maskContext);
+			maskContext.restore();
 			
-			context.save();
-				context.globalCompositeOperation = "source-in";
-				context.drawImage(	this._cache, this._cacheOffsetX , this._cacheOffsetY , this._cache.width , this._cache.height );
-			context.restore();
+			maskContext.save();
+			maskContext.globalCompositeOperation = "source-in";
+			maskContext.drawImage(	this._cache, 
+									this._cacheOffsetX , 
+									this._cacheOffsetY , 
+									this._cache.width , 
+									this._cache.height );
+			maskContext.restore();
 			
-			drawContext.drawImage(buffer,0, 0, buffer.width, buffer.height );
+			context.drawImage(maskBuffer,0, 0, maskBuffer.width, maskBuffer.height );
 		}
 		else
 		{
-			drawContext.drawImage(	buffer, this._cacheOffsetX, this._cacheOffsetY, buffer.width, buffer.height);	
+			context.drawImage(	this._cache, 
+								this._cacheOffsetX, 
+								this._cacheOffsetY, 
+								this._cache.width, 
+								this._cache.height);	
 		}
 	};
 
@@ -2421,11 +2463,29 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	DisplayObject.prototype.hitTest = function(x,y)
 	{		
 		var pt1 = this.globalToLocal(x,y);
+		var buffer = null;
+		var context = null;
+		var mat = this.matrix;
+		var pixels = null;
 		
 		if( pt1.x < 0 || pt1.x > this.width || pt1.y < 0 || pt1.y > this.height )
 			return false;
-		else
+		
+		if( this.pixelPerfect == false )
 			return true;
+			
+		DisplayObject._pixelBuffer = DisplayObject._pixelBuffer || document.createElement("canvas");
+		buffer = DisplayObject._pixelBuffer;
+		buffer.width = buffer.height = 1;
+		
+		context = buffer.getContext("2d");
+		context.save();
+		context.translate(-pt1.x,-pt1.y);
+		this.draw(context);
+		context.restore();
+		
+		pixels = context.getImageData(0,0,1,1).data;
+		return ( pixels[3] > this.pixelAlphaLimit );
 	};
 
 	/**
@@ -2536,6 +2596,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	DisplayObject.prototype.destroy = function()
 	{
 		this._cache = null;
+		this._maskBuffer = null;
 		this.setMask(null);
 		
 		if( this.parent != null )
@@ -5678,6 +5739,8 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	{
 		this._listeners = this._listeners || new Array();
 		var obj = new Object();
+		
+		useCapture = (useCapture == true);
 		obj.type = type;
 		obj.scope = scope;
 		obj.callback = callback;
@@ -5705,6 +5768,8 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 			if( obj.type == type )
 				return true;
 		}
+		
+		return false;
 	};
 
 	/**
@@ -5768,12 +5833,20 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		var obj = new Object();
 		var i = this._listeners.length;
 		var arr = new Array();
+		
+		useCapture = (useCapture == true);
 			
 		while( --i > -1 )
 		{
 			obj = this._listeners[i];
-			if( obj.type != type || obj.scope != scope || obj.callback != callback || obj.useCapture != useCapture )
+			if( obj.type != type || 
+				obj.scope != scope || 
+				obj.callback != callback || 
+				obj.useCapture != useCapture 
+			)
+			{
 				arr.push(obj);
+			}
 		}
 			
 		this._listeners = arr;
@@ -5798,6 +5871,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	{
 		this.removeEventListeners();
 		this.parent = null;
+		this._listeners = null;
 	};
 	
 	tomahawk_ns.EventDispatcher = EventDispatcher;
@@ -5839,130 +5913,90 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 (function() {	
 
 	/**
-	 * @class KeyEvent
+	 * @class KeyboardEvent
 	 * @memberOf tomahawk_ns
 	 * @param {String} type The event type.
 	 * @param {Boolean} bubbles Indicates whether the event will bubble through the display list.
 	 * @param {Boolean} cancelable Indicates whether the default behaviour of this event can be cancelled.
 	 * @constructor
 	 **/
-	function KeyEvent(type, bubbles, cancelable)
+	function KeyboardEvent(type, bubbles, cancelable)
 	{
 		this.type = type;
 		this.cancelable = cancelable;
 		this.bubbles = bubbles;
 	}
 
-	Tomahawk.registerClass( KeyEvent, "KeyEvent" );
-	Tomahawk.extend( "KeyEvent", "Event" );
+	Tomahawk.registerClass( KeyboardEvent, "KeyboardEvent" );
+	Tomahawk.extend( "KeyboardEvent", "Event" );
 
 	/**
 	* @member {String} value the value of the event
-	* @memberOf tomahawk_ns.KeyEvent.prototype
+	* @memberOf tomahawk_ns.KeyboardEvent.prototype
 	**/
-	KeyEvent.prototype.value = "";
+	KeyboardEvent.prototype.value = "";
 	
 	/**
 	* @member {Number} keyCode the keyCode of the event
-	* @memberOf tomahawk_ns.KeyEvent.prototype
+	* @memberOf tomahawk_ns.KeyboardEvent.prototype
 	**/
-	KeyEvent.prototype.keyCode = 0;
+	KeyboardEvent.prototype.keyCode = 0;
 	
 	/**
 	* @member {Boolean} isCharacter Indicates if the touch pressed corresponds to a character
-	* @memberOf tomahawk_ns.KeyEvent.prototype
+	* @memberOf tomahawk_ns.KeyboardEvent.prototype
 	**/
-	KeyEvent.prototype.isCharacter = false;
+	KeyboardEvent.prototype.isCharacter = false;
 	
 	/**
 	* @member {Number} charCode the charCode of the event
-	* @memberOf tomahawk_ns.KeyEvent.prototype
+	* @memberOf tomahawk_ns.KeyboardEvent.prototype
 	**/
-	KeyEvent.prototype.charCode = 0;
+	KeyboardEvent.prototype.charCode = 0;
 	
 	/**
 	* @member {Boolean} ctrlKey Indicates weither the ctrlKey is pressed or not
-	* @memberOf tomahawk_ns.KeyEvent.prototype
+	* @memberOf tomahawk_ns.KeyboardEvent.prototype
 	**/
-	KeyEvent.prototype.crtlKey = false;
+	KeyboardEvent.prototype.crtlKey = false;
 	
 	/**
 	* @member {Boolean} shiftKey Indicates weither the shiftKey is pressed or not
-	* @memberOf tomahawk_ns.KeyEvent.prototype
+	* @memberOf tomahawk_ns.KeyboardEvent.prototype
 	**/
-	KeyEvent.prototype.shiftKey = false;
+	KeyboardEvent.prototype.shiftKey = false;
 	
 	/**
 	* @member {Boolean} altKey Indicates weither the altKey is pressed or not
-	* @memberOf tomahawk_ns.KeyEvent.prototype
+	* @memberOf tomahawk_ns.KeyboardEvent.prototype
 	**/
-	KeyEvent.prototype.altKey = false;
+	KeyboardEvent.prototype.altKey = false;
 	
 	/**
 	* @member {KeyboardEvent} nativeEvent the native javascript event
-	* @memberOf tomahawk_ns.KeyEvent.prototype
+	* @memberOf tomahawk_ns.KeyboardEvent.prototype
 	**/
-	KeyEvent.prototype.nativeEvent = null;
-
-	/**
-	* @method fromNativeEvent
-	* @memberOf tomahawk_ns.KeyEvent
-	* @description converts the native javascript event to a regular tomahawk_ns.KeyEvent one.
-	* @param {String} type The event type.
-	* @param {Boolean} bubbles Indicates whether the event will bubble through the display list.
-	* @param {Boolean} cancelable Indicates whether the default behaviour of this event can be cancelled.
-	* @param {Boolean} isCharacter Indicates if the touch pressed corresponds to a character.
-	* @param {String} value the corresponding character value 
-	* @returns {tomahawk_ns.KeyEvent}
-	**/
-	KeyEvent.fromNativeEvent = function(event,bubbles,cancelable,isCharacter,value )
-	{
-		var type = "";
-		var newEvent = null;
-		var charCode = event.which || event.keyCode;
-		
-		switch( event.type )
-		{
-			case "keyup": type = KeyEvent.KEY_UP; break;
-			case "keypress": type = KeyEvent.KEY_PRESS; break;
-			case "keydown": type = KeyEvent.KEY_DOWN; break;
-		}
-		
-		newEvent = new KeyEvent(type,bubbles,cancelable);
-		newEvent.nativeEvent = event;
-		newEvent.keyCode = event.keyCode;
-		newEvent.charCode = event.charCode;
-		newEvent.ctrlKey = event.ctrlKey;
-		newEvent.shiftKey = event.shiftKey;
-		newEvent.altKey = event.altKey;
-		newEvent.value = value;
-		newEvent.isCharacter = ( isCharacter == true );
-		newEvent.which = event.which;
-		return newEvent;
-		
-		//tomahawk_ns.Keyboard.keyCodeToChar(event.keyCode, event.shiftKey, event.ctrlKey, event.altKey);
-	};
-
+	KeyboardEvent.prototype.nativeEvent = null;
 
 	/**
 	* @property {String} KEY_UP "keyup"
-	* @memberOf tomahawk_ns.KeyEvent
+	* @memberOf tomahawk_ns.KeyboardEvent
 	**/
-	KeyEvent.KEY_UP = "keyup";
+	KeyboardEvent.KEY_UP = "keyup";
 	
 	/**
 	* @property {String} KEY_DOWN "keydown"
-	* @memberOf tomahawk_ns.KeyEvent
+	* @memberOf tomahawk_ns.KeyboardEvent
 	**/
-	KeyEvent.KEY_DOWN = "keydown";
+	KeyboardEvent.KEY_DOWN = "keydown";
 	
 	/**
 	* @property {String} KEY_PRESS "keypress"
-	* @memberOf tomahawk_ns.KeyEvent
+	* @memberOf tomahawk_ns.KeyboardEvent
 	**/
-	KeyEvent.KEY_PRESS = "keypress";
+	KeyboardEvent.KEY_PRESS = "keypress";
 
-	tomahawk_ns.KeyEvent = KeyEvent;
+	tomahawk_ns.KeyboardEvent = KeyboardEvent;
 
 })();
 
@@ -8586,7 +8620,9 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	function InputTextField()
 	{
 		tomahawk_ns.SelectableTextField.apply(this);
-		tomahawk_ns.Keyboard.getInstance().addEventListener( tomahawk_ns.KeyEvent.KEY_UP, this, this._keyHandler );
+		tomahawk_ns.Keyboard.getInstance().addEventListener( 	tomahawk_ns.KeyboardEvent.KEY_UP, 
+																this, 
+																this._keyHandler );
 	}
 
 	Tomahawk.registerClass(InputTextField,"InputTextField");
@@ -8602,13 +8638,16 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		if( this.getFocus() == false )
 			return;
 		
-		event.nativeEvent.preventDefault();
-		event.nativeEvent.stopImmediatePropagation();
-		event.nativeEvent.stopPropagation();
-		
 		var range = this.getSelectionRange();
 			
-		if( this.isSelected() == true && event.keyCode != tomahawk_ns.Keyboard.LEFT && event.keyCode != tomahawk_ns.Keyboard.RIGHT )
+		if( 	this.isSelected() == true && 
+				event.keyCode != tomahawk_ns.Keyboard.LEFT && 
+				event.keyCode != tomahawk_ns.Keyboard.RIGHT && 
+				event.keyCode != tomahawk_ns.Keyboard.CTRL && 
+				event.keyCode != tomahawk_ns.Keyboard.ALT && 
+				event.keyCode != tomahawk_ns.Keyboard.SHIFT && 
+				event.keyCode != tomahawk_ns.Keyboard.TAB 
+		)
 		{
 			this.removeTextBetween( range.start, range.end );
 		}
@@ -8628,6 +8667,7 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		}
 		else if( event.isCharacter == true )
 		{
+			
 			var newline = false;
 			 //special select all
 			if( event.keyCode == tomahawk_ns.Keyboard.A && event.ctrlKey )
@@ -10802,6 +10842,10 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 			}
 		}
 	};
+	
+	
+	
+	
 	
 	/**
 	* @method destroy

@@ -35,6 +35,7 @@
 	 * @constructor
 	 * @augments tomahawk_ns.EventDispatcher
 	 **/
+	
 	function Keyboard()
 	{
 		var callbackKey = this._keyboardHandler.bind(this);
@@ -55,16 +56,42 @@
 		if( event.type == "keyup" )
 			tomahawk_ns.Keyboard.toggleShift(event.keyCode);
 			
-		var keyboardEvent = tomahawk_ns.KeyEvent.fromNativeEvent(event, true, true);
+		var type = "";
+		var newEvent = null;
+		var charCode = event.which || event.keyCode;
+		var character = tomahawk_ns.Keyboard.keyCodeToChar(	event.keyCode, 
+															event.shiftKey, 
+															event.ctrlKey, 
+															event.altKey);
 		
-		this.dispatchEvent(keyboardEvent);
+		switch( event.type )
+		{
+			case "keyup"	: type = tomahawk_ns.KeyboardEvent.KEY_UP	; break;
+			case "keypress"	: type = tomahawk_ns.KeyboardEvent.KEY_PRESS; break;
+			case "keydown"	: type = tomahawk_ns.KeyboardEvent.KEY_DOWN	; break;
+		}
 		
-		if( keyboardEvent.keyCode == tomahawk_ns.Keyboard.BACKSPACE ||
-		keyboardEvent.keyCode == tomahawk_ns.Keyboard.SPACE)
+		newEvent = new tomahawk_ns.KeyboardEvent(type,true,false);
+		newEvent.nativeEvent = event;
+		newEvent.keyCode = event.keyCode;
+		newEvent.charCode = event.charCode;
+		newEvent.ctrlKey = event.ctrlKey;
+		newEvent.shiftKey = event.shiftKey;
+		newEvent.altKey = event.altKey;
+		newEvent.value = character;
+		newEvent.isCharacter = tomahawk_ns.Keyboard.isMapped(newEvent.keyCode);
+		newEvent.which = event.which;
+	
+		if( event.keyCode == tomahawk_ns.Keyboard.BACKSPACE ||
+			event.keyCode == tomahawk_ns.Keyboard.SPACE 
+		)
 		{
 			event.preventDefault();
+			event.stopImmediatePropagation();
 			event.stopPropagation();
 		}
+		
+		this.dispatchEvent(newEvent);
 	};
 	
 	

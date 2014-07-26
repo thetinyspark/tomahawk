@@ -335,13 +335,33 @@
 	* @default true
 	* @description If set to true, the transformation matrix will be update at next frame.
 	**/
-	DisplayObject.prototype.updateNextFrame		= true;
+	DisplayObject.prototype.updateNextFrame		= true;	
+	
+	/**
+	* @member pixelPerfect
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Boolean}
+	* @default false
+	* @description If set to true, the hitTest call will check the alpha channel of the pixel beneath the mouse coordinates.
+	* If the pixel alpha channel is > pixelAlphaLimit, the pixel is considered non transparent
+	**/
+	DisplayObject.prototype.pixelPerfect		= false;
+	
+	/**
+	* @member pixelAlphaLimit
+	* @memberOf tomahawk_ns.DisplayObject.prototype
+	* @type {Number}
+	* @default 0
+	* @description The alpha channel limit under which a pixel is considered transparent while calling the hitTest method.
+	**/
+	DisplayObject.prototype.pixelAlphaLimit		= 0;
 	
 	DisplayObject.prototype._concatenedMatrix 	= null;
 	DisplayObject.prototype._cache 				= null;
-	DisplayObject.prototype._buffer 			= null;
+	DisplayObject.prototype._maskBuffer 		= null;
 	DisplayObject.prototype._cacheOffsetX 		= 0;
 	DisplayObject.prototype._cacheOffsetY 		= 0;
+	DisplayObject._pixelBuffer 					= null;
 	
 	/**
 	* @method updateBounds
@@ -418,8 +438,8 @@
 		mat.b = mat.c = mat.tx = mat.ty = 0;
 		
 		
-		mat.appendTransform(	this.x, 
-								this.y, 
+		mat.appendTransform(	this.x + this.pivotX, 
+								this.y + this.pivotY, 
 								this.scaleX, 
 								this.scaleY, 
 								this.rotation, 
@@ -449,26 +469,20 @@
 		var cacheAsBitmap = this.cacheAsBitmap;
 		var filterBounds = null;
 		
-		if( this._cache == null )
-		{
-			buffer = this._buffer || document.createElement("canvas");
-		}
-		else
-		{
-			buffer = this._cache;
-		}
 		
+		this._cache = this._cache || document.createElement("canvas");
+		
+		buffer = this._cache;
 		buffer.width = ( bounds.width < 1 ) ? 1 : bounds.width ;
 		buffer.height = ( bounds.height < 1 ) ? 1 : bounds.height ;
 
-		
 		offX = bounds.left;
 		offY = bounds.top;
 		
 		context = buffer.getContext("2d");
 		
 		
-		// before drawing filters
+		// increase the buffer size considering the filters
 		if( filters != null )
 		{		
 			i = filters.length;
@@ -484,13 +498,12 @@
 			}
 		}
 		
-		
 		context.save();
-			context.globalAlpha = this.alpha;
-			context.translate( -offX, -offY );
-			this.cacheAsBitmap = false;
-			this.draw(context);
-			this.cacheAsBitmap = cacheAsBitmap;
+		context.globalAlpha = this.alpha;
+		context.translate( -offX, -offY );
+		this.cacheAsBitmap = false;
+		this.draw(context);
+		this.cacheAsBitmap = cacheAsBitmap;
 		context.restore();
 		
 		// after drawing filters
@@ -516,48 +529,50 @@
 	* @memberOf tomahawk_ns.DisplayObject.prototype
 	* @param {CanvasRenderingContext2D} drawContext the CanvasRenderingContext2D context on which you want to draw.
 	**/
-	DisplayObject.prototype.drawComposite = function(drawContext)
+	DisplayObject.prototype.drawComposite = function(context)
 	{
 		if( this._cache == null || this.cacheAsBitmap == false )
 			this.updateCache();
 			
-		var buffer = this._cache;
-		var context = null;
+		var maskBuffer = null;
+		var maskContext = null;
+		var mask = this.mask;
 		var mat = null;
 		var i = 0;
-		var mask = this.mask;
 		
 		if( mask != null )
 		{
-			buffer = this._buffer || document.createElement("canvas");
-			buffer.width = this._cache.width;
-			buffer.height = this._cache.height;
+			maskBuffer = this._maskBuffer || document.createElement("canvas");
+			maskBuffer.width = this._cache.width;
+			maskBuffer.height = this._cache.height;
+			maskContext = maskBuffer.getContext("2d");
 			
-			context = buffer.getContext("2d");
 			mat = mask.getConcatenedMatrix().prependMatrix( this.getConcatenedMatrix().invert() );
 			
-			context.save();
-				context.globalAlpha = mask.alpha;
-				context.setTransform(	mat.a,
-										mat.b,
-										mat.c,
-										mat.d,
-										mat.tx,
-										mat.ty);
-					
-				mask.draw(context);
-			context.restore();
+			maskContext.save();
+			maskContext.globalAlpha = mask.alpha;
+			maskContext.setTransform(mat.a,mat.b,mat.c,mat.d,mat.tx,mat.ty);
+			mask.draw(maskContext);
+			maskContext.restore();
 			
-			context.save();
-				context.globalCompositeOperation = "source-in";
-				context.drawImage(	this._cache, this._cacheOffsetX , this._cacheOffsetY , this._cache.width , this._cache.height );
-			context.restore();
+			maskContext.save();
+			maskContext.globalCompositeOperation = "source-in";
+			maskContext.drawImage(	this._cache, 
+									this._cacheOffsetX , 
+									this._cacheOffsetY , 
+									this._cache.width , 
+									this._cache.height );
+			maskContext.restore();
 			
-			drawContext.drawImage(buffer,0, 0, buffer.width, buffer.height );
+			context.drawImage(maskBuffer,0, 0, maskBuffer.width, maskBuffer.height );
 		}
 		else
 		{
-			drawContext.drawImage(	buffer, this._cacheOffsetX, this._cacheOffsetY, buffer.width, buffer.height);	
+			context.drawImage(	this._cache, 
+								this._cacheOffsetX, 
+								this._cacheOffsetY, 
+								this._cache.width, 
+								this._cache.height);	
 		}
 	};
 
@@ -639,11 +654,29 @@
 	DisplayObject.prototype.hitTest = function(x,y)
 	{		
 		var pt1 = this.globalToLocal(x,y);
+		var buffer = null;
+		var context = null;
+		var mat = this.matrix;
+		var pixels = null;
 		
 		if( pt1.x < 0 || pt1.x > this.width || pt1.y < 0 || pt1.y > this.height )
 			return false;
-		else
+		
+		if( this.pixelPerfect == false )
 			return true;
+			
+		DisplayObject._pixelBuffer = DisplayObject._pixelBuffer || document.createElement("canvas");
+		buffer = DisplayObject._pixelBuffer;
+		buffer.width = buffer.height = 1;
+		
+		context = buffer.getContext("2d");
+		context.save();
+		context.translate(-pt1.x,-pt1.y);
+		this.draw(context);
+		context.restore();
+		
+		pixels = context.getImageData(0,0,1,1).data;
+		return ( pixels[3] > this.pixelAlphaLimit );
 	};
 
 	/**
@@ -754,6 +787,7 @@
 	DisplayObject.prototype.destroy = function()
 	{
 		this._cache = null;
+		this._maskBuffer = null;
 		this.setMask(null);
 		
 		if( this.parent != null )

@@ -32,7 +32,7 @@
         <meta property='og:image' content='http://the-tiny-spark.com/tomahawk/assets/images/hero.png'/>
         <meta property='og:image' content='http://the-tiny-spark.com/social/connect.jpg'/>
 
-        <title>Tomahawk Engine: Source: texture/TextureAtlas.js</title>
+        <title>Tomahawk Engine: Source: event/KeyboardEvent.js</title>
 		
 		<link rel="stylesheet" media="screen" href="http://the-tiny-spark.com/assets/css/font-awesome.min.css" type="text/css"/>
         <link rel="stylesheet" media="screen" href="http://the-tiny-spark.com/assets/css/studio.css" type="text/css"/>
@@ -137,7 +137,7 @@
 		
 			<div id="main">
 				<div class="left-content">
-					<h2>Source: texture/TextureAtlas.js</h2>
+					<h2>Source: event/KeyboardEvent.js</h2>
 					
 
 
@@ -173,103 +173,101 @@
 * @author The Tiny Spark
 */
 
-(function() {
-	
+(function() {	
+
 	/**
-	 * @class TextureAtlas
+	 * @class KeyboardEvent
 	 * @memberOf tomahawk_ns
-	 * @description A texture atlas is a collection of many smaller textures in one big image. This class is used to access and create textures from such an atlas.
+	 * @param {String} type The event type.
+	 * @param {Boolean} bubbles Indicates whether the event will bubble through the display list.
+	 * @param {Boolean} cancelable Indicates whether the default behaviour of this event can be cancelled.
 	 * @constructor
 	 **/
-	function TextureAtlas()
+	function KeyboardEvent(type, bubbles, cancelable)
 	{
-		this._textures = new Array();
+		this.type = type;
+		this.cancelable = cancelable;
+		this.bubbles = bubbles;
 	}
 
-	Tomahawk.registerClass( TextureAtlas, "TextureAtlas" );
-
-	TextureAtlas.prototype._textures = null;
-	
-	/**
-	* @description The rendering data itself, it can be an HTMLImageElement || HTMLCanvasElement || HTMLVideoElement
-	* @member data
-	* @memberOf tomahawk_ns.TextureAtlas.prototype
-	* @type {Object}
-	* @default null
-	**/
-	TextureAtlas.prototype.data = null;
-	
-	/**
-	* @member name
-	* @memberOf tomahawk_ns.Texture.prototype
-	* @type {String}
-	* @description The name of the texture atlas
-	* @default null
-	**/
-	TextureAtlas.prototype.name = null;
+	Tomahawk.registerClass( KeyboardEvent, "KeyboardEvent" );
+	Tomahawk.extend( "KeyboardEvent", "Event" );
 
 	/**
-	* @method createTexture
-	* @memberOf tomahawk_ns.TextureAtlas.prototype
-	* @param {string} name
-	* @param {Number} startX
-	* @param {Number} startY
-	* @param {Number} endX
-	* @param {Number} endY
-	* @description creates a new sub texture from the atlas which will render the region of the atlas data specified
-	  by the startX, startY, endX, endY parameters with the name specified by the "name" parameter. The newly created texture is automatically stored within the atlas, it means that you can retrieve it with the "getTextureByName" method.
+	* @member {String} value the value of the event
+	* @memberOf tomahawk_ns.KeyboardEvent.prototype
 	**/
-	TextureAtlas.prototype.createTexture = function( name, startX, startY, endX, endY )
-	{
-		var texture = new tomahawk_ns.Texture();
-		texture.name = name;
-		texture.data = this.data;
-		texture.rect = [startX, startY, endX, endY];
-		
-		this._textures.push(texture);
-	};
+	KeyboardEvent.prototype.value = "";
 	
 	/**
-	* @method getTextureByName
-	* @memberOf tomahawk_ns.TextureAtlas.prototype
-	* @param {string} name
-	* @returns {tomahawk_ns.Texture}
-	* @description Returns the internal sub texture which matches the name specified by the "name" parameter.
+	* @member {Number} keyCode the keyCode of the event
+	* @memberOf tomahawk_ns.KeyboardEvent.prototype
 	**/
-	TextureAtlas.prototype.getTextureByName = function( name )
-	{
-		var i = this._textures.length;
-		var currentTexture = null;
-		while( --i > -1 )
-		{
-			currentTexture = this._textures[i];
-			if( currentTexture.name == name )
-				return currentTexture;
-		}
-		
-		return null;
-	};
+	KeyboardEvent.prototype.keyCode = 0;
 	
 	/**
-	* @method removeTexture
-	* @memberOf tomahawk_ns.TextureAtlas.prototype
-	* @param {string} name
-	* @description Removes the internal sub texture which matches the name specified by the "name" parameter.
+	* @member {Boolean} isCharacter Indicates if the touch pressed corresponds to a character
+	* @memberOf tomahawk_ns.KeyboardEvent.prototype
 	**/
-	TextureAtlas.prototype.removeTexture = function( name )
-	{
-		var texture = this.getTextureByName(name);
-		
-		if( texture == null )
-			return;
-			
-		var index = this._textures.indexOf(texture);
-		this._textures.splice(index,1);
-	};
+	KeyboardEvent.prototype.isCharacter = false;
+	
+	/**
+	* @member {Number} charCode the charCode of the event
+	* @memberOf tomahawk_ns.KeyboardEvent.prototype
+	**/
+	KeyboardEvent.prototype.charCode = 0;
+	
+	/**
+	* @member {Boolean} ctrlKey Indicates weither the ctrlKey is pressed or not
+	* @memberOf tomahawk_ns.KeyboardEvent.prototype
+	**/
+	KeyboardEvent.prototype.crtlKey = false;
+	
+	/**
+	* @member {Boolean} shiftKey Indicates weither the shiftKey is pressed or not
+	* @memberOf tomahawk_ns.KeyboardEvent.prototype
+	**/
+	KeyboardEvent.prototype.shiftKey = false;
+	
+	/**
+	* @member {Boolean} altKey Indicates weither the altKey is pressed or not
+	* @memberOf tomahawk_ns.KeyboardEvent.prototype
+	**/
+	KeyboardEvent.prototype.altKey = false;
+	
+	/**
+	* @member {KeyboardEvent} nativeEvent the native javascript event
+	* @memberOf tomahawk_ns.KeyboardEvent.prototype
+	**/
+	KeyboardEvent.prototype.nativeEvent = null;
 
-	tomahawk_ns.TextureAtlas = TextureAtlas;
+	/**
+	* @property {String} KEY_UP "keyup"
+	* @memberOf tomahawk_ns.KeyboardEvent
+	**/
+	KeyboardEvent.KEY_UP = "keyup";
+	
+	/**
+	* @property {String} KEY_DOWN "keydown"
+	* @memberOf tomahawk_ns.KeyboardEvent
+	**/
+	KeyboardEvent.KEY_DOWN = "keydown";
+	
+	/**
+	* @property {String} KEY_PRESS "keypress"
+	* @memberOf tomahawk_ns.KeyboardEvent
+	**/
+	KeyboardEvent.KEY_PRESS = "keypress";
+
+	tomahawk_ns.KeyboardEvent = KeyboardEvent;
 
 })();
+
+
+
+
+
+
 
 </code></pre>
         </article>

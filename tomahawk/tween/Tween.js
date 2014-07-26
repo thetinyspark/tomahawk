@@ -130,6 +130,10 @@
 		}
 	};
 	
+	
+	
+	
+	
 	/**
 	* @method destroy
 	* @description Stops and kill the tween properly.

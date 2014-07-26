@@ -39,7 +39,9 @@
 	function InputTextField()
 	{
 		tomahawk_ns.SelectableTextField.apply(this);
-		tomahawk_ns.Keyboard.getInstance().addEventListener( tomahawk_ns.KeyEvent.KEY_UP, this, this._keyHandler );
+		tomahawk_ns.Keyboard.getInstance().addEventListener( 	tomahawk_ns.KeyboardEvent.KEY_UP, 
+																this, 
+																this._keyHandler );
 	}
 
 	Tomahawk.registerClass(InputTextField,"InputTextField");
@@ -55,13 +57,16 @@
 		if( this.getFocus() == false )
 			return;
 		
-		event.nativeEvent.preventDefault();
-		event.nativeEvent.stopImmediatePropagation();
-		event.nativeEvent.stopPropagation();
-		
 		var range = this.getSelectionRange();
 			
-		if( this.isSelected() == true && event.keyCode != tomahawk_ns.Keyboard.LEFT && event.keyCode != tomahawk_ns.Keyboard.RIGHT )
+		if( 	this.isSelected() == true && 
+				event.keyCode != tomahawk_ns.Keyboard.LEFT && 
+				event.keyCode != tomahawk_ns.Keyboard.RIGHT && 
+				event.keyCode != tomahawk_ns.Keyboard.CTRL && 
+				event.keyCode != tomahawk_ns.Keyboard.ALT && 
+				event.keyCode != tomahawk_ns.Keyboard.SHIFT && 
+				event.keyCode != tomahawk_ns.Keyboard.TAB 
+		)
 		{
 			this.removeTextBetween( range.start, range.end );
 		}
@@ -81,6 +86,7 @@
 		}
 		else if( event.isCharacter == true )
 		{
+			
 			var newline = false;
 			 //special select all
 			if( event.keyCode == tomahawk_ns.Keyboard.A && event.ctrlKey )

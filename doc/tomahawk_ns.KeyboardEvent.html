@@ -32,7 +32,7 @@
         <meta property='og:image' content='http://the-tiny-spark.com/tomahawk/assets/images/hero.png'/>
         <meta property='og:image' content='http://the-tiny-spark.com/social/connect.jpg'/>
 
-        <title>Tomahawk Engine: Source: texture/TextureAtlas.js</title>
+        <title>Tomahawk Engine: Class: KeyboardEvent</title>
 		
 		<link rel="stylesheet" media="screen" href="http://the-tiny-spark.com/assets/css/font-awesome.min.css" type="text/css"/>
         <link rel="stylesheet" media="screen" href="http://the-tiny-spark.com/assets/css/studio.css" type="text/css"/>
@@ -137,143 +137,1055 @@
 		
 			<div id="main">
 				<div class="left-content">
-					<h2>Source: texture/TextureAtlas.js</h2>
+					<h2>Class: KeyboardEvent</h2>
 					
 
 
+
+<section>
+
+<header>
+    <h2>
+        <span class="ancestors"><a href="tomahawk_ns.html">tomahawk_ns</a>.</span>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>/*
-* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
-*
-* Copyright (c) 2014 the-tiny-spark.com, inc.
-*
-* Permission is hereby granted, free of charge, to any person
-* obtaining a copy of this software and associated documentation
-* files (the "Software"), to deal in the Software without
-* restriction, including without limitation the rights to use,
-* copy, modify, merge, publish, distribute, sublicense, and/or sell
-* copies of the Software, and to permit persons to whom the
-* Software is furnished to do so, subject to the following
-* conditions:
-*
-* The above copyright notice and this permission notice shall be
-* included in all copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-* OTHER DEALINGS IN THE SOFTWARE.
+    KeyboardEvent
+    </h2>
+    
+        <div class="class-description">KeyboardEvent</div>
+    
+</header>
 
-* @author The Tiny Spark
-*/
+<article>
+    <div class="container-overview">
+    
 
-(function() {
-	
-	/**
-	 * @class TextureAtlas
-	 * @memberOf tomahawk_ns
-	 * @description A texture atlas is a collection of many smaller textures in one big image. This class is used to access and create textures from such an atlas.
-	 * @constructor
-	 **/
-	function TextureAtlas()
-	{
-		this._textures = new Array();
-	}
+    
+        
+<dt>
+    <h4 class="name" id="KeyboardEvent"><span class="type-signature"></span>new KeyboardEvent<span class="signature">(type, bubbles, cancelable)</span><span class="type-signature"></span></h4>
 
-	Tomahawk.registerClass( TextureAtlas, "TextureAtlas" );
+    
+</dt>
+<dd>
 
-	TextureAtlas.prototype._textures = null;
-	
-	/**
-	* @description The rendering data itself, it can be an HTMLImageElement || HTMLCanvasElement || HTMLVideoElement
-	* @member data
-	* @memberOf tomahawk_ns.TextureAtlas.prototype
-	* @type {Object}
-	* @default null
-	**/
-	TextureAtlas.prototype.data = null;
-	
-	/**
-	* @member name
-	* @memberOf tomahawk_ns.Texture.prototype
-	* @type {String}
-	* @description The name of the texture atlas
-	* @default null
-	**/
-	TextureAtlas.prototype.name = null;
+    
 
-	/**
-	* @method createTexture
-	* @memberOf tomahawk_ns.TextureAtlas.prototype
-	* @param {string} name
-	* @param {Number} startX
-	* @param {Number} startY
-	* @param {Number} endX
-	* @param {Number} endY
-	* @description creates a new sub texture from the atlas which will render the region of the atlas data specified
-	  by the startX, startY, endX, endY parameters with the name specified by the "name" parameter. The newly created texture is automatically stored within the atlas, it means that you can retrieve it with the "getTextureByName" method.
-	**/
-	TextureAtlas.prototype.createTexture = function( name, startX, startY, endX, endY )
-	{
-		var texture = new tomahawk_ns.Texture();
-		texture.name = name;
-		texture.data = this.data;
-		texture.rect = [startX, startY, endX, endY];
-		
-		this._textures.push(texture);
-	};
-	
-	/**
-	* @method getTextureByName
-	* @memberOf tomahawk_ns.TextureAtlas.prototype
-	* @param {string} name
-	* @returns {tomahawk_ns.Texture}
-	* @description Returns the internal sub texture which matches the name specified by the "name" parameter.
-	**/
-	TextureAtlas.prototype.getTextureByName = function( name )
-	{
-		var i = this._textures.length;
-		var currentTexture = null;
-		while( --i > -1 )
-		{
-			currentTexture = this._textures[i];
-			if( currentTexture.name == name )
-				return currentTexture;
-		}
-		
-		return null;
-	};
-	
-	/**
-	* @method removeTexture
-	* @memberOf tomahawk_ns.TextureAtlas.prototype
-	* @param {string} name
-	* @description Removes the internal sub texture which matches the name specified by the "name" parameter.
-	**/
-	TextureAtlas.prototype.removeTexture = function( name )
-	{
-		var texture = this.getTextureByName(name);
-		
-		if( texture == null )
-			return;
-			
-		var index = this._textures.indexOf(texture);
-		this._textures.splice(index,1);
-	};
+    
 
-	tomahawk_ns.TextureAtlas = TextureAtlas;
+    
 
-})();
+    
+        <h5>Parameters:</h5>
+        
 
-</code></pre>
-        </article>
-    </section>
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>type</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The event type.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>bubbles</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Indicates whether the event will bubble through the display list.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>cancelable</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Indicates whether the default behaviour of this event can be cancelled.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+    
+
+    
+<dl class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="KeyboardEvent.js.html">event/KeyboardEvent.js</a>, <a href="KeyboardEvent.js.html#line40">line 40</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        <dl>
+            
+<dt>
+    <h4 class="name" id="KeyboardEvent.KEY_DOWN"><span class="type-signature">(static) </span>KeyboardEvent.KEY_DOWN<span class="type-signature"></span></h4>
+
+    
+</dt>
+<dd>
+    
+
+    
+
+    
+<dl class="details">
+    
+
+        <h5 class="subsection-title">Properties:</h5>
+
+        <dl>
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>KEY_DOWN</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">"keydown"</td>
+        </tr>
+
+    
+    </tbody>
+</table></dl>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="KeyboardEvent.js.html">event/KeyboardEvent.js</a>, <a href="KeyboardEvent.js.html#line108">line 108</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="KeyboardEvent.KEY_PRESS"><span class="type-signature">(static) </span>KeyboardEvent.KEY_PRESS<span class="type-signature"></span></h4>
+
+    
+</dt>
+<dd>
+    
+
+    
+
+    
+<dl class="details">
+    
+
+        <h5 class="subsection-title">Properties:</h5>
+
+        <dl>
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>KEY_PRESS</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">"keypress"</td>
+        </tr>
+
+    
+    </tbody>
+</table></dl>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="KeyboardEvent.js.html">event/KeyboardEvent.js</a>, <a href="KeyboardEvent.js.html#line114">line 114</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="KeyboardEvent.KEY_UP"><span class="type-signature">(static) </span>KeyboardEvent.KEY_UP<span class="type-signature"></span></h4>
+
+    
+</dt>
+<dd>
+    
+
+    
+
+    
+<dl class="details">
+    
+
+        <h5 class="subsection-title">Properties:</h5>
+
+        <dl>
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>KEY_UP</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">"keyup"</td>
+        </tr>
+
+    
+    </tbody>
+</table></dl>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="KeyboardEvent.js.html">event/KeyboardEvent.js</a>, <a href="KeyboardEvent.js.html#line102">line 102</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="altKey"><span class="type-signature"></span>altKey<span class="type-signature"> :Boolean</span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        Indicates weither the altKey is pressed or not
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Boolean</span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="KeyboardEvent.js.html">event/KeyboardEvent.js</a>, <a href="KeyboardEvent.js.html#line86">line 86</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="charCode"><span class="type-signature"></span>charCode<span class="type-signature"> :Number</span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        the charCode of the event
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Number</span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="KeyboardEvent.js.html">event/KeyboardEvent.js</a>, <a href="KeyboardEvent.js.html#line68">line 68</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="ctrlKey"><span class="type-signature"></span>ctrlKey<span class="type-signature"> :Boolean</span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        Indicates weither the ctrlKey is pressed or not
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Boolean</span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="KeyboardEvent.js.html">event/KeyboardEvent.js</a>, <a href="KeyboardEvent.js.html#line74">line 74</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="isCharacter"><span class="type-signature"></span>isCharacter<span class="type-signature"> :Boolean</span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        Indicates if the touch pressed corresponds to a character
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Boolean</span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="KeyboardEvent.js.html">event/KeyboardEvent.js</a>, <a href="KeyboardEvent.js.html#line62">line 62</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="keyCode"><span class="type-signature"></span>keyCode<span class="type-signature"> :Number</span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        the keyCode of the event
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Number</span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="KeyboardEvent.js.html">event/KeyboardEvent.js</a>, <a href="KeyboardEvent.js.html#line56">line 56</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="nativeEvent"><span class="type-signature"></span>nativeEvent<span class="type-signature"> :KeyboardEvent</span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        the native javascript event
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">KeyboardEvent</span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="KeyboardEvent.js.html">event/KeyboardEvent.js</a>, <a href="KeyboardEvent.js.html#line92">line 92</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="shiftKey"><span class="type-signature"></span>shiftKey<span class="type-signature"> :Boolean</span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        Indicates weither the shiftKey is pressed or not
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Boolean</span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="KeyboardEvent.js.html">event/KeyboardEvent.js</a>, <a href="KeyboardEvent.js.html#line80">line 80</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="value"><span class="type-signature"></span>value<span class="type-signature"> :String</span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        the value of the event
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">String</span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="KeyboardEvent.js.html">event/KeyboardEvent.js</a>, <a href="KeyboardEvent.js.html#line50">line 50</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        </dl>
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 

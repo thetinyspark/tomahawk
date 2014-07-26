@@ -60,6 +60,8 @@
 	{
 		this._listeners = this._listeners || new Array();
 		var obj = new Object();
+		
+		useCapture = (useCapture == true);
 		obj.type = type;
 		obj.scope = scope;
 		obj.callback = callback;
@@ -87,6 +89,8 @@
 			if( obj.type == type )
 				return true;
 		}
+		
+		return false;
 	};
 
 	/**
@@ -150,12 +154,20 @@
 		var obj = new Object();
 		var i = this._listeners.length;
 		var arr = new Array();
+		
+		useCapture = (useCapture == true);
 			
 		while( --i > -1 )
 		{
 			obj = this._listeners[i];
-			if( obj.type != type || obj.scope != scope || obj.callback != callback || obj.useCapture != useCapture )
+			if( obj.type != type || 
+				obj.scope != scope || 
+				obj.callback != callback || 
+				obj.useCapture != useCapture 
+			)
+			{
 				arr.push(obj);
+			}
 		}
 			
 		this._listeners = arr;
@@ -180,6 +192,7 @@
 	{
 		this.removeEventListeners();
 		this.parent = null;
+		this._listeners = null;
 	};
 	
 	tomahawk_ns.EventDispatcher = EventDispatcher;

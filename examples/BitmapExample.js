@@ -16,13 +16,11 @@ Main.prototype.init = function()
 	// creates a new bitmap instance
 	var bmp = new tomahawk_ns.Bitmap(texture);
 	
-	bmp.shadow = true;
-	bmp.shadowBlur = 100;
-	bmp.shadowColor = "red";
-	bmp.shadowOffsetX = 10;
-	bmp.shadowOffsetY = 10;
-	
 	bmp.x = bmp.y = 50; // sets the bitmap coordinates
+	bmp.pivotX = bmp.width >> 1;
+	bmp.pivotY = bmp.height >> 1;
+	bmp.scaleX = 2;
+	bmp.scaleY = 2;
 
 	stage.init(canvas); // initialize the stage
 	stage.addChild( bmp ); // add a child to the stage
