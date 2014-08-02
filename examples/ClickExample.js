@@ -17,12 +17,16 @@ Main.prototype.init = function()
 	var texture = new tomahawk_ns.Texture(textureData,[0,0,textureData.naturalWidth,textureData.naturalHeight],"mytexture");
 	// creates a new bitmap instance
 	var bmp = new tomahawk_ns.Bitmap(texture);
+	// container
+	var container = new tomahawk_ns.Sprite();
 	
 	stage.init(canvas); // initialize the stage
-	stage.addChild( bmp ); // add a child to the stage
+	stage.addChild( container ); // add a child to the stage
+	
+	container.addChild(bmp);
 	bmp.x = bmp.y = 50; // sets the bitmap coordinates
 	bmp.pixelPerfect = true;
-	bmp.pixelAlphaLimit = 0;
+	bmp.pixelAlphaLimit = 100;
 	
 	// add an event listener 
 	bmp.addEventListener(tomahawk_ns.MouseEvent.CLICK, this, this._mouseHandler);

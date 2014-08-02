@@ -9,4 +9,5 @@ todo:
 	- add "live" tweening method
 	
 note: 
+	add test folder with some pure javascript ( no framework ) unit tests.
 	the ebook has moved to: http://the-tiny-spark.com/book_engine.php 
