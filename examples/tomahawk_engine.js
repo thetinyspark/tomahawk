@@ -171,369 +171,6 @@ Tomahawk._extends = new Array();
  
  (function() {
 	
-/**
- * @class AssetsLoader
- * @memberOf tomahawk_ns
- * @description The AssetsLoader class is a basic Image mass loader.
- * @constructor
- * @augments tomahawk_ns.EventDispatcher
- **/
-function AssetsLoader()
-{
-	this._loadingList = new Array();
-};
-
-Tomahawk.registerClass( AssetsLoader, "AssetsLoader" );
-Tomahawk.extend("AssetsLoader", "EventDispatcher" );
-
-// singleton
-AssetsLoader._instance = null;
-
-/**
-* @description Returns a unique instance of AssetsLoader, singleton implementation.
-* @method getInstance
-* @memberOf tomahawk_ns.AssetsLoader
-* @returns {tomahawk_ns.AssetsLoader} returns a number
-**/
-AssetsLoader.getInstance = function()
-{
-	if( tomahawk_ns.AssetsLoader._instance == null )
-		tomahawk_ns.AssetsLoader._instance = new tomahawk_ns.AssetsLoader();
-		
-	return tomahawk_ns.AssetsLoader._instance;
-};
-
-AssetsLoader.prototype.onComplete = null;
-AssetsLoader.prototype._loadingList = null;
-AssetsLoader.prototype._data = null;
-AssetsLoader.prototype._numFiles = 0;
-
-/**
-* @description Returns a key indexed object which contains the loaded data.
-* @method getData
-* @memberOf tomahawk_ns.AssetsLoader.prototype
-* @returns {Object} a key indexed object
-**/
-AssetsLoader.prototype.getData = function()
-{
-	return this._data;
-};
-
-/**
-* @description Cleans the internal loaded data object, call it before another loading task in order to save memory.
-* @method clean
-* @memberOf tomahawk_ns.AssetsLoader.prototype
-**/
-AssetsLoader.prototype.clean = function()
-{
-	this._data = new Object();
-};
-
-/**
-* @description Adds an image to the loading list, with the url specified by the "fileURL" parameter and an alias specified by the "fileAlias" parameter.
-* @method load
-* @param {String] fileURL the url of the image.
-* @param {String] fileAlias The alias of the image used as a key within the object returned by the "getData()" method.
-* @memberOf tomahawk_ns.AssetsLoader.prototype
-**/
-AssetsLoader.prototype.addFile = function(fileURL, fileAlias)
-{
-	// on réinitialise les data
-	this.clean();
-	
-	// on stocke un objet contenant l"url et l'alias du fichier que l'on
-	// utilisera pour le retrouver
-	this._loadingList.push({url:fileURL,alias:fileAlias});
-	this._numFiles++;
-};
-
-/**
-* @description Starts the loading process.
-* @method load
-* @memberOf tomahawk_ns.AssetsLoader.prototype
-**/
-AssetsLoader.prototype.load = function()
-{
-	if( this._loadingList.length == 0 )
-	{
-		if( this.onComplete != null )
-		{
-			this.onComplete();
-		}
-		
-		this.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.COMPLETE, true, true) );
-		this._numFiles = 0;
-	}
-	else
-	{
-		var obj = this._loadingList.shift();
-		var scope = this;
-		var image = new Image();
-		
-		image.onerror = function()
-		{
-			scope._errorHandler();
-		};
-		
-		image.onload = function()
-		{
-			scope._progressHandler(image, obj.alias);
-		};
-		
-		image.src = obj.url;
-	}
-};
-
-/**
-* @description Returns the loading progression ( between 0.0 and 1.0 )
-* @method getProgression
-* @memberOf tomahawk_ns.AssetsLoader.prototype
-* @returns {Number}
-**/
-AssetsLoader.prototype.getProgression = function()
-{
-	var progression = ( this._numFiles - this._loadingList.length ) / this._numFiles;
-	return progression;
-};
-
-AssetsLoader.prototype._progressHandler = function(image,alias)
-{
-	this._data[alias] = image;
-	this.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.PROGRESS, true, true) );
-	this.load();
-};
-
-AssetsLoader.prototype._errorHandler = function()
-{
-	this.load();
-	this.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.IO_ERROR, true, true) );
-};
-
-tomahawk_ns.AssetsLoader = AssetsLoader;
-})();
-
-
-
-
-/*
-* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
-*
-* Copyright (c) 2014 the-tiny-spark.com, inc.
-*
-* Permission is hereby granted, free of charge, to any person
-* obtaining a copy of this software and associated documentation
-* files (the "Software"), to deal in the Software without
-* restriction, including without limitation the rights to use,
-* copy, modify, merge, publish, distribute, sublicense, and/or sell
-* copies of the Software, and to permit persons to whom the
-* Software is furnished to do so, subject to the following
-* conditions:
-*
-* The above copyright notice and this permission notice shall be
-* included in all copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-* OTHER DEALINGS IN THE SOFTWARE.
-* @author The Tiny Spark
-*/
-
-(function() {
-	
-	/**
-	 * @class AssetsManager
-	 * @memberOf tomahawk_ns
-	 * @description The AssetsManager class is used to stores and restitutes assets objects like Textures, TextureAtlases, Images.
-	 * @constructor
-	 **/
-	function AssetsManager()
-	{
-		this._images = new Object();
-		this._atlases = new Object();
-		this._textures = new Object();
-	};
-
-	Tomahawk.registerClass( AssetsManager, "AssetsManager" );
-
-	// singleton
-	AssetsManager._instance = null;
-	
-	/**
-	* @description Returns a unique instance of AssetsManager, singleton implementation.
-	* @method getInstance
-	* @memberOf tomahawk_ns.AssetsManager
-	* @returns {tomahawk_ns.AssetsManager}
-	**/
-	AssetsManager.getInstance = function()
-	{
-		if( tomahawk_ns.AssetsManager._instance == null )
-			tomahawk_ns.AssetsManager._instance = new tomahawk_ns.AssetsManager();
-			
-		return tomahawk_ns.AssetsManager._instance;
-	};
-
-	AssetsManager.prototype._images = null;
-	AssetsManager.prototype._atlases = null;
-	AssetsManager.prototype._textures = null;
-
-
-	// images
-	
-	/**
-	* @description Returns a key indexed objects with all the HTMLImageElement stored within the manager
-	* @method getImages
-	* @memberOf tomahawk_ns.AssetsManager.prototype
-	* @returns {Object} a key indexed objects
-	**/
-	AssetsManager.prototype.getImages = function()
-	{
-		return this._images;
-	};
-	
-	/**
-	* @description returns an HTMLImageElement that matches with the "alias" parameter
-	* @method getImageByAlias
-	* @memberOf tomahawk_ns.AssetsManager.prototype
-	* @returns {DOMImageElement} an HTMLImageElement object
-	**/
-	AssetsManager.prototype.getImageByAlias = function(alias)
-	{
-		if( this._images[alias] )
-			return this._images[alias];
-			
-		return null;
-	};
-
-	/**
-	* @description Adds an HTMLImageElement object to the manager and register it with the alias specified by the "alias" parameter. This alias will be reused with the "getImageByAlias" method.
-	* @method addImage
-	* @memberOf tomahawk_ns.AssetsManager.prototype
-	* @param {HTMLImageElement} image an HTMLImageElement object
-	* @param {String} alias
-	**/
-	AssetsManager.prototype.addImage = function(image, alias)
-	{
-		this._images[alias] = image;
-	};
-
-	//atlases
-	
-	/**
-	* @description Adds a TextureAtlas object to the manager and register it with the alias specified by the "alias" parameter. This alias will be reused with the "getAtlasByAlias" method.
-	* @method addAtlas
-	* @memberOf tomahawk_ns.AssetsManager.prototype
-	* @param {tomahawk_ns.TextureAtlas} atlas a TextureAtlas object
-	* @param {String} alias
-	**/
-	AssetsManager.prototype.addAtlas = function(atlas, alias)
-	{
-		this._atlases[alias] = atlas;
-	};
-	
-	/**
-	* @method getAtlases
-	* @memberOf tomahawk_ns.AssetsManager.prototype
-	* @returns {Object} returns a key indexed objects with all the atlases stored within the manager
-	**/
-	AssetsManager.prototype.getAtlases = function()
-	{
-		return this._atlases;
-	};
-	
-	/**
-	* @description returns an TextureAtlas instance that matches with the "alias" parameter
-	* @method getAtlasByAlias
-	* @memberOf tomahawk_ns.AssetsManager.prototype
-	* @returns {tomahawk_ns.TextureAtlas} a TextureAtlas object
-	**/
-	AssetsManager.prototype.getAtlasByAlias = function(alias)
-	{
-		if( this._atlases[alias] )
-			return this._atlases[alias];
-			
-		return null;
-	};
-
-	//textures
-	/**
-	* @description Adds a Texture object to the manager and register it with the alias specified by the "alias" parameter. This alias will be reused with the "getTextureByAlias" method.
-	* @method addAtlas
-	* @memberOf tomahawk_ns.AssetsManager.prototype
-	* @param {tomahawk_ns.Texture} texture a Texture object
-	* @param {String} alias
-	**/
-	AssetsManager.prototype.addTexture = function(texture, alias)
-	{
-		this._textures[alias] = texture;
-	};
-
-	/**
-	* @method getTextures
-	* @memberOf tomahawk_ns.AssetsManager.prototype
-	* @returns {Object} returns a key indexed objects with all the textures stored within the manager
-	**/
-	AssetsManager.prototype.getTextures = function()
-	{
-		return this._textures;
-	};
-	
-	/**
-	* @description returns an Texture instance that matches with the "alias" parameter
-	* @method getTextureByAlias
-	* @memberOf tomahawk_ns.AssetsManager.prototype
-	* @returns {tomahawk_ns.Texture} a Texture object
-	**/
-	AssetsManager.prototype.getTextureByAlias = function(alias)
-	{
-		if( this._textures[alias] )
-			return this._textures[alias];
-			
-		return null;
-	};
-
-
-	tomahawk_ns.AssetsManager = AssetsManager;
-})();
-
-
-
-
-
-/*
-* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
-*
-* Copyright (c) 2014 the-tiny-spark.com, inc.
-*
-* Permission is hereby granted, free of charge, to any person
-* obtaining a copy of this software and associated documentation
-* files (the "Software"), to deal in the Software without
-* restriction, including without limitation the rights to use,
-* copy, modify, merge, publish, distribute, sublicense, and/or sell
-* copies of the Software, and to permit persons to whom the
-* Software is furnished to do so, subject to the following
-* conditions:
-*
-* The above copyright notice and this permission notice shall be
-* included in all copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-* OTHER DEALINGS IN THE SOFTWARE.
-* @author The Tiny Spark
-*/
- 
- (function() {
-	
 	/**
 	 * @class Keyboard
 	 * @memberOf tomahawk_ns
@@ -544,6 +181,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	
 	function Keyboard()
 	{
+		tomahawk_ns.EventDispatcher.apply(this);
 		var callbackKey = this._keyboardHandler.bind(this);
 		window.removeEventListener("keyup",callbackKey);
 		window.removeEventListener("keydown",callbackKey);
@@ -1548,6 +1186,600 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 (function() {
 	
 	/**
+	 * @class QuadTreeContainer
+	 * @memberOf tomahawk_ns
+	 * @description The QuadTreeContainer class is a basic display list building block: a display list node that can contain children. The only difference with the basic Sprite class is that QuadTreeContainer orders his children in an internal quadtree structure. Each child which needs to be updated ( updateNextFrame || autoUpdate to true ) will be removed and added to the quadtree every frame. It means that the QuadTreeContainer is a very good container for a large subset of statics objects, so you can set the children autoUpdate property to false. It will results to a large gain of performances. Elsewhere, you can put a little subset of children with the autoUpdate property to true depending of the performances of the targeted devices.
+	 * @constructor
+	 * @augments tomahawk_ns.Sprite
+	 **/
+	function QuadTreeContainer(left,right,top,bottom,childrenPerNode, maxDepth)
+	{
+		tomahawk_ns.Sprite.apply(this);
+		
+		left = left || -2147483648;
+		right = right || 2147483648;
+		top = top || -2147483648;
+		bottom = bottom || 2147483648;
+		maxDepth = maxDepth || 24;
+		childrenPerNode = childrenPerNode || 100;
+		
+		this._root = new tomahawk_ns.QuadTreeNode(left,right,top,bottom,0,childrenPerNode,maxDepth);
+	}
+
+	Tomahawk.registerClass( QuadTreeContainer, "QuadTreeContainer" );
+	Tomahawk.extend( "QuadTreeContainer", "Sprite" );
+	
+	QuadTreeContainer.prototype._root = null;
+
+	/**
+	* @description Returns all the children of the QuadTreeContainer that are visibles on the canvas area.
+	* @method getVisiblesChildren
+	* @memberOf tomahawk_ns.QuadTreeContainer.prototype
+	* @returns {Array} an array of DisplayObject instances.
+	**/
+	QuadTreeContainer.prototype.getVisiblesChildren = function()
+	{
+		var i = this.children.length;
+		var child = null;
+		var visibles = null;
+		
+		if( this.stage == null )
+			return new Array();
+			
+		while( --i > -1 )
+		{
+			child = this.children[i];
+			child.__index__ = i;
+			
+			if( child.updateNextFrame == true || child.autoUpdate == true )
+			{
+				this._root.add(child);
+			}
+		}
+		
+		var width = this.stage.getCanvas().width;
+		var height = this.stage.getCanvas().height;
+		var pt1 = this.globalToLocal(0,0);
+		var pt2 = this.globalToLocal(width,height);
+		var left = pt1.x;
+		var right = pt2.x;
+		var top = pt1.y;
+		var bottom = pt2.y;
+		
+		visibles = this._root.get(left, right, top, bottom);
+		visibles.sort(this._sortVisiblesChildren);
+		
+		return visibles;
+	};
+	
+	/**
+	* @description Returns the top node of the internal quadtree structure.
+	* @method getRoot
+	* @memberOf tomahawk_ns.QuadTreeContainer.prototype
+	* @returns {tomahawk_ns.QuadTreeNode} the root node of the internal quadtree structure
+	**/
+	QuadTreeContainer.prototype.getRoot = function()
+	{
+		return this._root;
+	};
+
+	
+	QuadTreeContainer.prototype.addChild = function(child)
+	{
+		child.updateNextFrame = true;
+		this._root.add(child);
+		return tomahawk_ns.Sprite.prototype.addChild.apply(this,[child]);
+	};
+
+	QuadTreeContainer.prototype.addChildAt = function(child, index)
+	{
+		child.updateNextFrame = true;
+		this._root.add(child);
+		return tomahawk_ns.Sprite.prototype.addChildAt.apply(this,[child,index]);
+	};
+
+	QuadTreeContainer.prototype.removeChildAt = function(child, index)
+	{
+		child.updateNextFrame = true;
+		this._root.remove(child);
+		return tomahawk_ns.Sprite.prototype.removeChildAt.apply(this,[child,index]);
+	};
+	
+	QuadTreeContainer.prototype.removeChild = function(child)
+	{
+		child.updateNextFrame = true;
+		this._root.remove(child);
+		return tomahawk_ns.Sprite.prototype.removeChild.apply(this,[child]);
+	};
+	
+	QuadTreeContainer.prototype._sortVisiblesChildren = function(a,b)
+	{
+		return ( a.__index__ < b.__index__ ) ? -1 : 1;
+	};
+	
+	QuadTreeContainer.prototype.draw = function(context)
+	{
+		var all = this.children;
+		this.children = this.getVisiblesChildren();
+		tomahawk_ns.Sprite.prototype.draw.apply(this,[context]);
+		this.children = all;
+	};
+
+	QuadTreeContainer.prototype.hitTest = function(x,y)
+	{
+		var pt1 = this.globalToLocal(x,y);
+		var pt2 = this.globalToLocal(x + 5,y  + 5);
+		var left = pt1.x;
+		var right = pt1.x + 1;
+		var top = pt1.y;
+		var bottom = pt1.y + 1;
+		var child = null;
+		var children = this._root.get(left,right,top,bottom);
+		var i = children.length;
+		children.sort(this._sortVisiblesChildren);
+		
+		while( --i > -1 )
+		{
+			child = children[i];
+			
+			if( child.hitTest(x,y) )
+				return true;
+		}
+		
+		return false;
+	};
+	
+	QuadTreeContainer.prototype.getObjectUnder = function(x,y)
+	{
+		var pt1 = this.globalToLocal(x,y);
+		var left = pt1.x;
+		var right = pt1.x + 1;
+		var top = pt1.y;
+		var bottom = pt1.y + 1;
+		var under = null;
+		var child = null;
+		var children = this._root.get(left, right, top, bottom);
+		var i = children.length;
+		
+		children.sort(this._sortVisiblesChildren);
+		
+		while( --i > -1 )
+		{
+			child = children[i];
+			
+			if( child.mouseEnabled == false )
+				continue;
+					
+			if( child.isContainer )
+			{				
+				under = child.getObjectUnder(x,y);
+				
+				if( under != null )
+				{
+					return under;
+				}
+			}
+			else
+			{	
+				if( child.hitTest(x,y) == true )
+				{
+					return child;
+				}
+			}
+		}
+		
+		return null;
+	};
+	tomahawk_ns.QuadTreeContainer = QuadTreeContainer;
+})();
+
+
+
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+
+(function() {
+	
+	/**
+	 * @class QuadTreeNode
+	 * @memberOf tomahawk_ns
+	 * @description A QuadTreeNode Object defines a leaf of a quadtree structure. Quadtrees are a derived implementation of binary trees which are very efficient in 2d plans.
+	 * @constructor	
+	 **/
+	function QuadTreeNode(left,right,top,bottom, depth, maxChildren, maxDepth)
+	{
+		this.left = left;
+		this.top = top;
+		this.right = right;
+		this.bottom = bottom;
+		this.maxChildren = maxChildren;
+		this.maxDepth = maxDepth;
+		this.depth = depth;
+
+		this.limitX = this.left + ( this.right - this.left ) * 0.5;
+		this.limitY = this.top + ( this.bottom - this.top ) * 0.5;
+		
+		this.children = new Array();
+	}
+	
+	Tomahawk.registerClass( QuadTreeNode, "QuadTreeNode" );
+	
+	QuadTreeNode._tick = 0;
+	QuadTreeNode.prototype._cache = null;
+	
+	
+	// iterative  methods
+	
+	/**
+	* @description Adds a display object to the tree node
+	* @method add
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @param {tomahawk_ns.DisplayObject} element the display object you want to add to the tree node
+	**/
+	QuadTreeNode.prototype.add = function(element)
+	{
+		this.remove(element);
+		
+		if( element.updateNextFrame == true || element.autoUpdate == true )
+		{
+			element.updateMatrix();
+			element.updateBounds();
+		}
+		
+		var nodes = new Array();
+		var currentNode = this;
+		var bounds = element.bounds;
+		var out = false;
+		var left = bounds.left;
+		var right = bounds.right;
+		var top = bounds.top;
+		var bottom = bounds.bottom;
+		nodes.push(this);
+		
+		while( nodes.length > 0 )
+		{
+			currentNode = nodes.shift();
+			
+			out =	( 	left > currentNode.right || 
+						right < currentNode.left || 
+						top > currentNode.bottom || 
+						bottom < currentNode.top );
+						
+			if( out == true )
+				continue;
+			
+			if( currentNode.children.length > currentNode.maxChildren && currentNode.depth < currentNode.maxDepth)
+			{
+				currentNode.split();
+			}
+		
+			if( currentNode.full == false )
+			{
+				currentNode.children.push(element);
+			}
+			else
+			{
+				nodes.push(currentNode.node1);
+				nodes.push(currentNode.node2);
+				nodes.push(currentNode.node3);
+				nodes.push(currentNode.node4);
+			}
+		}
+	};
+	
+	/**
+	* @description Removes a display object from the tree node
+	* @method remove
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @param {tomahawk_ns.DisplayObject} element the display object you want to remove from the tree node
+	**/
+	QuadTreeNode.prototype.remove = function( element )
+	{
+		var index = -1;
+		var nodes = new Array();
+		var currentNode = this;
+		var bounds = element.bounds;
+		nodes.push(this);
+		
+		while( nodes.length > 0 )
+		{
+			currentNode = nodes.shift();
+			
+			if( currentNode.full == true )
+			{
+				nodes.push(currentNode.node1);
+				nodes.push(currentNode.node2);
+				nodes.push(currentNode.node3);
+				nodes.push(currentNode.node4);
+				continue;
+			}
+			
+			index = currentNode.children.indexOf(element);
+			if( index > -1 )
+				currentNode.children.splice(index,1);
+		}
+	};
+	
+	/**
+	* @description Returns an Array of DisplayObjects that are visible in the area defined by the left,right,top,bottom parameters.
+	* @method get
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @param {Number} left 
+	* @param {Number} right 
+	* @param {Number} top 
+	* @param {Number} bottom 
+	* @returns {Array} An array of DisplayObject
+	**/
+	QuadTreeNode.prototype.get = function( left, right, top, bottom )
+	{
+		var tick = tomahawk_ns.QuadTreeNode._tick + 1;
+		var result = new Array();
+		var nodes = new Array();
+		var currentNode = this;
+		var out = false;
+		var child = null;
+		var i = 0;
+		
+		nodes.push(this);
+		
+		while( nodes.length > 0 )
+		{
+			currentNode = nodes.shift();
+			
+			out = ( left > currentNode.right || 
+					right < currentNode.left || 
+					top > currentNode.bottom || 
+					bottom < currentNode.top );
+					
+			if( out == true )
+				continue;
+				
+			if( currentNode.full == true )
+			{
+				nodes.push(currentNode.node1);
+				nodes.push(currentNode.node2);
+				nodes.push(currentNode.node3);
+				nodes.push(currentNode.node4);
+				continue;
+			}
+				
+			i = currentNode.children.length;
+			
+			while( --i > -1 )
+			{
+				child = currentNode.children[i];
+				bounds = child.bounds;
+				
+				out = ( bounds.left > right || 
+						bounds.right < left ||
+						bounds.top > bottom ||
+						bounds.bottom < top || 
+						child.__tick__ == tick);
+						
+				if( out == true )
+					continue;
+				
+				result.push(child);
+				child.__tick__ = tick;
+			}
+		}
+		
+		tomahawk_ns.QuadTreeNode._tick = tick;
+		return result;
+	};
+	
+	/**
+	* @description Splits the current node into four child nodes. The children of the node will be redispatched throught those new four nodes.
+	* @method split
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	**/
+	QuadTreeNode.prototype.split = function()
+	{
+		var child = null;
+		var e = this.depth + 1;
+		var f = this.maxChildren;
+		var g = this.maxDepth;
+		
+		this.node1 = new tomahawk_ns.QuadTreeNode(this.left,	this.limitX	, this.top	 , this.limitY	,e,f,g);
+		this.node2 = new tomahawk_ns.QuadTreeNode(this.left,	this.limitX	, this.limitY, this.bottom	,e,f,g);
+		this.node3 = new tomahawk_ns.QuadTreeNode(this.limitX,	this.right	, this.top	 , this.limitY	,e,f,g);
+		this.node4 = new tomahawk_ns.QuadTreeNode(this.limitX,	this.right	, this.limitY, this.bottom	,e,f,g);
+		
+		while( this.children.length > 0)
+		{
+			child = this.children.shift();
+			this.node1.add(child);
+			this.node2.add(child);
+			this.node3.add(child);
+			this.node4.add(child);
+		}
+		
+		this.full = true;
+	};
+	
+	/**
+	* @member full
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {Boolean}
+	* @default false
+	* @description Indicates wether the node is full.
+	**/
+	QuadTreeNode.prototype.full = false;
+	
+	/**
+	* @default 0
+	* @member left
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {Number}
+	* @description The x coordinate of the top-left corner of the node's area.
+	**/
+	QuadTreeNode.prototype.left = 0;
+	
+	/**
+	* @default 0
+	* @member right
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {Number}
+	* @description The x coordinate of the bottom-right corner of the node's area.
+	**/
+	QuadTreeNode.prototype.right = 0;
+	
+	/**
+	* @default 0
+	* @member top
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {Number}
+	* @description The y coordinate of the top-left corner of the node's area.
+	**/
+	QuadTreeNode.prototype.top = 0;
+	
+	
+	/**
+	* @default 0
+	* @member bottom
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {Number}
+	* @description The y coordinate of the bottom-right corner of the node's area.
+	**/
+	QuadTreeNode.prototype.bottom = 0;
+	
+	/**
+	* @default 20
+	* @member maxChildren
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {Number}
+	* @description Indicates the maximum amount of children of that node can stores before splitting itself.
+	**/
+	QuadTreeNode.prototype.maxChildren = 20;
+	
+	/**
+	* @default 0
+	* @member depth
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {Number}
+	* @description Indicates the depth of the node within the quadtree structure
+	**/
+	QuadTreeNode.prototype.depth = 0;
+	
+	/**
+	* @default null
+	* @member node1
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {tomahawk_ns.QuadTreeNode}
+	* @description Indicates the top-left child node of the node.
+	**/
+	QuadTreeNode.prototype.node1 = null;
+	
+	/**
+	* @default null
+	* @member node2
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {tomahawk_ns.QuadTreeNode}
+	* @description Indicates the bottom-left child node of the node.
+	**/
+	QuadTreeNode.prototype.node2 = null;
+	
+	/**
+	* @default null
+	* @member node3
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {tomahawk_ns.QuadTreeNode}
+	* @description Indicates the top-right child node of the node.
+	**/
+	QuadTreeNode.prototype.node3 = null;
+	
+	/**
+	* @default null
+	* @member node4
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {tomahawk_ns.QuadTreeNode}
+	* @description Indicates the bottom-right child node of the node.
+	**/
+	QuadTreeNode.prototype.node4 = null;
+	
+	/**
+	* @default 0
+	* @member limitX
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {tomahawk_ns.QuadTreeNode}
+	* @description Indicates the x coordinate of the splitting boundary within this node.
+	**/
+	QuadTreeNode.prototype.limitX = 0;
+	
+	/**
+	* @default 0
+	* @member limitY
+	* @memberOf tomahawk_ns.QuadTreeNode.prototype
+	* @type {tomahawk_ns.QuadTreeNode}
+	* @description Indicates the y coordinate of the splitting boundary within this node.
+	**/
+	QuadTreeNode.prototype.limitY = 0;
+	
+	
+	tomahawk_ns.QuadTreeNode = QuadTreeNode;
+	
+})();
+
+
+
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+
+(function() {
+	
+	/**
 	* @class Bitmap
 	* @memberOf tomahawk_ns
 	* @description The Bitmap class represents display objects that represent bitmap images. 
@@ -2272,63 +2504,76 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		var context = null;
 		var filters = this.filters;
 		var i = 0;
+		var max = 0;
 		var offX = 0;
 		var offY = 0;
 		var bounds = this.getBoundingRectIn(this);
 		var cacheAsBitmap = this.cacheAsBitmap;
 		var filterBounds = null;
 		
+		var width = 0;
+		var height = 0;
 		
-		this._cache = this._cache || document.createElement("canvas");
+		if( this._cache == null || this._cache == undefined)
+		{
+			this._cache = document.createElement("canvas");
+		}
 		
 		buffer = this._cache;
-		buffer.width = ( bounds.width < 1 ) ? 1 : bounds.width ;
-		buffer.height = ( bounds.height < 1 ) ? 1 : bounds.height ;
-
-		offX = bounds.left;
-		offY = bounds.top;
-		
 		context = buffer.getContext("2d");
 		
 		
-		// increase the buffer size considering the filters
+		width = (bounds.width < 1) ? 1 : bounds.width >> 0;
+		height = (bounds.height < 1) ? 1 : bounds.height >> 0;
+		
 		if( filters != null )
-		{		
-			i = filters.length;
+		{
+			i = 0;
+			max = filters.length;
 			
-			while( --i > -1 )
+			for( i = 0; i < max; i++ )
 			{
-				filterBounds = filters[i].getOffsetBounds();
+				filterBounds = filters[i].getOffsetBounds(buffer,context,this);
 				
-				buffer.width += filterBounds.width;
-				buffer.height += filterBounds.height;
+				if( filterBounds == null )
+					continue;
+					
 				offX += filterBounds.x;
 				offY += filterBounds.y;
+				width += filterBounds.width;
+				height += filterBounds.height;
 			}
 		}
 		
+		width = Math.ceil(width / 100) * 100;
+		height =  Math.ceil(height / 100) * 100;
+		
+		buffer.width = width;
+		buffer.height = height;
+		
+		
 		context.save();
 		context.globalAlpha = this.alpha;
-		context.translate( -offX, -offY );
 		this.cacheAsBitmap = false;
 		this.draw(context);
 		this.cacheAsBitmap = cacheAsBitmap;
 		context.restore();
 		
-		// after drawing filters
+		//after drawing filters
 		if( filters != null )
 		{		
-			i = filters.length;
+			i = 0;
+			max = filters.length;
 			
-			while( --i > -1 )
+			for( i = 0; i < max; i++ )
 			{
-				filters[i].apply(buffer,context,this);
+				filters[i].applyFilter(buffer,context,this);
 			}
 		}
 		
 		this._cache = buffer;
-		this._cacheOffsetX = offX;
-		this._cacheOffsetY = offY;
+		this._cacheOffsetX = -offX;
+		this._cacheOffsetY = -offY;
 		return buffer;
 	};
 	
@@ -2351,7 +2596,8 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		
 		if( mask != null )
 		{
-			maskBuffer = this._maskBuffer || document.createElement("canvas");
+			this._maskBuffer = ( this._maskBuffer == null ) ? document.createElement("canvas") : this._maskBuffer;
+			maskBuffer = this._maskBuffer;
 			maskBuffer.width = this._cache.width;
 			maskBuffer.height = this._cache.height;
 			maskContext = maskBuffer.getContext("2d");
@@ -2691,7 +2937,19 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	**/
 	DisplayObjectContainer.prototype.setChildIndex = function(child,index)
 	{
-		this.addChildAt(child,index);
+		if( child.parent != this )
+			return;
+			
+		var tab1 = null;
+		var tab2 = null;
+		var currentIndex = this.children.indexOf(child);
+		
+		this.children.splice(currentIndex,1);
+		
+		tab1 = this.children.slice(0,index);
+		tab2 = this.children.slice(index);
+		
+		this.children = tab1.concat([child]).concat(tab2);
 	};
 	
 	/**
@@ -2702,11 +2960,14 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	* @description Adds a child DisplayObject instance to this DisplayObjectContainer instance. The child is added to the front (top) of all other children in this DisplayObjectContainer instance. (To add a child to a specific index position, use the addChildAt() method.) If you add a child object that already has a different display object container as a parent, the object is removed from the child list of the other display object container.
 	**/
 	DisplayObjectContainer.prototype.addChild = function(child)
-	{		
+	{	
 		if( child.parent == this )
+		{
+			this.setChildIndex(child, this.children.length);
 			return child;
-			
-		if( child.parent )
+		}
+		
+		if( child.parent != null )
 		{
 			child.parent.removeChild(child);
 		}
@@ -2760,10 +3021,18 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	**/
 	DisplayObjectContainer.prototype.addChildAt = function(child, index)
 	{
-		if( child.parent != null && child.parent != this)
+		if( child.parent == this )
+		{
+			this.setChildIndex(child, index);
+			return child;
+		}
+		
+		
+		if( child.parent != null )
 		{
 			child.parent.removeChild(child);
 		}
+		
 		var children = this.children;
 		var tab1 = this.children.slice(0,index);
 		var tab2 = this.children.slice(index);
@@ -3101,11 +3370,16 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	 * @description A Frame Object that represents a frame of a MovieClip Object
 	 * @constructor
 	 **/
-	function Frame(label)
+	function Frame(info)
 	{
-		this.label = label || null;
+		this.label = null;
 		this.children = new Array();
-		this._tweens = new Array();
+		
+		if( info != undefined )
+		{
+			this.label = info.label || null;
+			this.children = info.children || new Array();
+		}
 	}
 
 	Tomahawk.registerClass( Frame, "Frame" );
@@ -3316,6 +3590,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	function MovieClip()
 	{
 		tomahawk_ns.Sprite.apply(this);
+		this._symbols = new Array();
 		this._timeline = new tomahawk_ns.Timeline();
 	}
 
@@ -3323,13 +3598,18 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	Tomahawk.extend( "MovieClip", "Sprite" );
 	
 	
-	MovieClip.prototype.fps = 1;
-	MovieClip.prototype.isMovieClip = true;
-	MovieClip.prototype._timer = 0;
-	MovieClip.prototype._lastFrame = null;
-	MovieClip.prototype.reverse = false;
+	MovieClip.prototype.fps 				= 1;
+	MovieClip.prototype.isMovieClip 		= true;
+	MovieClip.prototype._timer 				= 0;
+	MovieClip.prototype._lastFrame 			= null;
+	MovieClip.prototype.reverse 			= false;
+	MovieClip.prototype._symbols 			= null;
 	
-	MovieClip.prototype._refresh = function()
+	MovieClip.prototype.setSymbols 			= function(symbols)
+	{
+	};
+	
+	MovieClip.prototype._refresh 			= function()
 	{
 		var i = 0
 		var frame = null;
@@ -3349,7 +3629,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 				
 				while( --i > -1 )
 				{
-					currentChild = frame.children[i];
+					currentChild = frame.children[i].symbol;
 					this.addChildAt(currentChild,0);
 				
 					if( currentChild.isMovieClip == true )
@@ -3363,21 +3643,21 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		}
 	};
 	
-	MovieClip.prototype.gotoLabelAndStop = function(label)
+	MovieClip.prototype.gotoLabelAndStop 	= function(label)
 	{
 		this.stop();
 		this._timeline.goToLabel(label);
 		this._refresh();
 	};
 	
-	MovieClip.prototype.gotoAndStop = function(index)
+	MovieClip.prototype.gotoAndStop 		= function(index)
 	{
 		this.stop();
 		this._timeline.setPosition(index);
 		this._refresh();
 	};
 	
-	MovieClip.prototype.gotoLabelAndPlay = function(label)
+	MovieClip.prototype.gotoLabelAndPlay 	= function(label)
 	{
 		this.stop();
 		this._timeline.goToLabel(label);
@@ -3385,7 +3665,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		this.play();
 	};	
 	
-	MovieClip.prototype.gotoAndPlay = function(index)
+	MovieClip.prototype.gotoAndPlay 		= function(index)
 	{
 		this.stop();
 		this._timeline.setPosition(index);
@@ -3393,24 +3673,24 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		this.play();
 	};
 
-	MovieClip.prototype.nextFrame = function()
+	MovieClip.prototype.nextFrame 			= function()
 	{
 		this._timeline.setPosition(this._timeline.getCurrentFrameIndex()+1);
 		this._refresh();
 	};
 	
-	MovieClip.prototype.prevFrame = function()
+	MovieClip.prototype.prevFrame 			= function()
 	{
 		this._timeline.setPosition(this._timeline.getCurrentFrameIndex()-1);
 		this._refresh();
 	};
 	
-	MovieClip.prototype.getTimeline = function()
+	MovieClip.prototype.getTimeline 		= function()
 	{
 		return this._timeline;
 	};
 	
-	MovieClip.prototype.play = function()
+	MovieClip.prototype.play 				= function()
 	{
 		this.stop();
 		
@@ -3426,12 +3706,12 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		this._timer = setTimeout(this.play.bind(this), 1000 / this.fps );
 	};
 
-	MovieClip.prototype.stop = function()
+	MovieClip.prototype.stop 				= function()
 	{
 		clearTimeout(this._timer); 
 	};
 	
-	MovieClip.prototype.destroy = function()
+	MovieClip.prototype.destroy 			= function()
 	{
 		this.stop();
 		this._timeline.destroy();
@@ -3443,6 +3723,296 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 })();
 
+
+
+
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+
+(function() {
+
+	/**
+	 * @author The Tiny Spark
+	 */
+ 
+	/**
+	 * @class SWFAnim
+	 * @memberOf tomahawk_ns
+	 * @description The SWFAnim class is a basic export 
+	 * @constructor
+	 * @augments tomahawk_ns.SWFAnim
+	 **/
+
+	function SWFAnim()
+	{
+		tomahawk_ns.Sprite.apply(this);
+		this._frames 	= new Array();
+		this._symbols 	= new Array();
+		this._labels 	= new Array();
+		this._scripts 	= new Array();
+	}
+
+	Tomahawk.registerClass( SWFAnim, "SWFAnim" );
+	Tomahawk.extend( "SWFAnim", "Sprite" );
+
+	SWFAnim.prototype._labels 				= null;
+	SWFAnim.prototype._frames 				= null;
+	SWFAnim.prototype._symbols 				= null;
+	SWFAnim.prototype.currentFrame 			= 0;
+	SWFAnim.prototype.minFrame 				= 0;
+	SWFAnim.prototype.maxFrame 				= 0;
+	SWFAnim.prototype.loop 					= false;
+	SWFAnim.prototype.reverse 				= false;
+	SWFAnim.prototype.yoyo 					= false;
+	SWFAnim.prototype.fps 					= 60;
+	SWFAnim.prototype._timer 				= -1;
+	SWFAnim.prototype._playing 				= false;
+	SWFAnim.prototype._scripts 				= null;
+
+	SWFAnim.prototype.getFrames 			= function()
+	{
+		return this._frames;
+	};
+	
+	SWFAnim.prototype.addFrameScript 		= function(frameIndex, callback)
+	{
+		this._scripts[frameIndex] = callback;
+	};
+	
+	SWFAnim.prototype.removeFrameScript 	= function(frameIndex)
+	{
+		this._scripts[frameIndex] = null;
+	};
+	
+	SWFAnim.prototype._enterFrameHandler 	= function()
+	{
+		var currentFrame = null;
+		var script = null;
+		var i = 0;
+		var max = 0;
+		var obj = null;
+		var child = null;
+		var mat = null;
+		
+		if( this.currentFrame > this.maxFrame )
+		{
+			if( this.yoyo == true )
+			{
+				this.reverse = true;
+				this.currentFrame = this.maxFrame - 1;
+			}
+			else if( this.loop == true )
+			{
+				this.currentFrame = this.minFrame;
+			}
+			else
+			{
+				this.currentFrame = this.maxFrame;
+				this.stop();
+				this._playing = false;
+				return;
+			}
+		}
+		
+		if( this.currentFrame < this.minFrame )
+		{
+			if( this.yoyo == true )
+			{
+				this.reverse = false;
+				this.currentFrame = this.minFrame + 1;
+			}
+			else if( this.loop == true )
+			{
+				this.currentFrame = this.maxFrame;
+			}
+			else
+			{
+				this.currentFrame = this.minFrame;
+				this._playing = false;
+				this.stop();
+				return;
+			}
+		}
+		
+		this.removeChildren();
+		
+		currentFrame = this._frames[this.currentFrame];
+		max = currentFrame.length;
+		script = this._scripts[this.currentFrame];
+		
+		if( script != undefined && script != null)
+		{
+			script.apply(this);
+		}
+		
+		for( i = 0; i < max; i++ )
+		{
+			
+			obj 					= currentFrame[i];
+			child 					= this._getSymbolByName(obj.symbol);
+			child.pixelPerfect 		= this.pixelPerfect;
+			child.pixelAlphaLimit 	= this.pixelAlphaLimit;
+			child.width 			= obj.width;
+			child.height 			= obj.height;
+			child.name 				= obj.name;
+			child.alpha 			= obj.alpha;
+			
+			if( child != null )
+			{
+				mat 		= new tomahawk_ns.Matrix2D();
+				mat.a 		= obj.a;
+				mat.b 		= obj.b;
+				mat.c 		= obj.c;
+				mat.d 		= obj.d;
+				mat.tx 		= obj.tx;
+				mat.ty 		= obj.ty;
+				
+				mat.decompose(child);
+				this.addChild(child);
+			}
+		}
+			
+		if( this._playing == true )
+		{
+			clearTimeout(this._timeout);
+			this._timeout = setTimeout( this.nextFrame.bind(this), 1000 / this.fps );
+		}
+	};
+	
+	SWFAnim.prototype.nextFrame 			= function()
+	{
+		this.currentFrame += ( this.reverse == true ) ? -1 : 1;
+		this._enterFrameHandler();
+	};
+	
+	SWFAnim.prototype._getLabelByName 		= function(labelName)
+	{
+		var i = this._labels.length;
+		while( --i > -1 )
+		{
+			if( this._labels[i].name == labelName )
+				return this._labels[i];
+		}
+		
+		return null;
+	};
+	
+	SWFAnim.prototype._getSymbolByName 		= function(name)
+	{
+		var i = this._symbols.length;
+		while( --i > -1 )
+		{
+			if( this._symbols[i].texture.name == name )
+			{
+				return this._symbols[i];
+			}
+		}
+		
+		return null;
+	};
+	
+	SWFAnim.prototype.setSymbols 			= function(symbols)
+	{
+		this._symbols = symbols;
+	};
+	
+	SWFAnim.prototype.setFrames 			= function(data)
+	{
+		this._frames = data;
+		this.maxFrame = this._frames.length - 1;
+	};
+	
+	SWFAnim.prototype.setLabels 			= function(labels)
+	{
+		this._labels = labels;
+	};
+	
+	SWFAnim.prototype.gotoAndStop 			= function(labelName)
+	{
+		var labelData = this._getLabelByName(labelName);
+		
+		if (labelData == null )
+		{
+			this.currentFrame = parseInt(labelName);
+			this.minFrame = 0;
+			this.maxFrame = this._frames.length - 1;
+		}
+		else
+		{			
+			this.minFrame = labelData.startFrame;
+			this.maxFrame = labelData.endFrame;
+		}
+		
+		this.stop();
+		this._enterFrameHandler();
+	};
+	
+	SWFAnim.prototype.play 					= function(labelName)
+	{
+		this.stop();
+		labelName = ( labelName == undefined ) ? this.currentFrame : labelName;
+		var labelData = this._getLabelByName(labelName);
+		
+		if (labelData == null )
+		{
+			this.currentFrame = parseInt(labelName);
+			this.minFrame = 0;
+			this.maxFrame = this._frames.length - 1;
+		}
+		else
+		{			
+			this.minFrame = labelData.startFrame;
+			this.maxFrame = labelData.endFrame;
+		}
+		
+		this._playing = true;
+		this._enterFrameHandler();
+	};
+	
+	SWFAnim.prototype.destroy 				= function()
+	{
+		this.stop();
+		this.removeChildren();
+		this.removeEventListeners();
+		this._symbols = new Array();
+		this._frames = new Array();
+		tomahawk_ns.Sprite.prototype.destroy.apply(this);
+	};
+
+	SWFAnim.prototype.stop 					= function()
+	{
+		clearTimeout( this._timeout );
+		this._playing = false;
+	};
+
+	tomahawk_ns.SWFAnim = SWFAnim;
+})();
 
 
 
@@ -3952,12 +4522,10 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	{
 		if( event.type == tomahawk_ns.MouseEvent.MOUSE_DOWN )
 		{
-			this.___dragging = true;
 			this.startDrag();
 		}
 		else
 		{
-			this.___dragging = false;
 			this.stopDrag();
 		}
 		
@@ -3993,8 +4561,9 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	**/
 	Sprite.prototype.startDrag 						= function()
 	{
+		this.___dragging = true;
 		this.stopDrag();
-		this.addEventListener(tomahawk_ns.MouseEvent.MOUSE_MOVE, this, this.___dragDropHandler___ );
+		this.addEventListener(tomahawk_ns.MouseEvent.MOUSE_MOVE, this, this.___dragDropHandler___,true );
 		this.mouseEnabled = true;
 	};
 	
@@ -4005,6 +4574,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	**/
 	Sprite.prototype.stopDrag 						= function()
 	{
+		this.___dragging = false;
 		this.removeEventListener(tomahawk_ns.MouseEvent.MOUSE_MOVE, this, this.___dragDropHandler___, true );
 	};
 
@@ -4125,6 +4695,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	Stage.prototype._focusedElement = null;
 	Stage.prototype._cache = null;
 	Stage.prototype._stop = false;
+	Stage.prototype.debug = false;
 
 	/**
 	* @description  Associates the canvas element specified by the "canvas" parameter  to this stage and runs the rendering loop.
@@ -4210,6 +4781,11 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		context.save();
 		this.draw(context);
 		context.restore();
+		
+		if( this.debug == true )
+		{
+			this.drawFPS();
+		}
 		
 		this.dispatchEvent(new tomahawk_ns.Event(tomahawk_ns.Event.ENTER_FRAME,true,true));
 		window.requestAnimationFrame(this._enterFrame);
@@ -4689,600 +5265,6 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 
 })();
 
-
-
-
-/*
-* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
-*
-* Copyright (c) 2014 the-tiny-spark.com, inc.
-*
-* Permission is hereby granted, free of charge, to any person
-* obtaining a copy of this software and associated documentation
-* files (the "Software"), to deal in the Software without
-* restriction, including without limitation the rights to use,
-* copy, modify, merge, publish, distribute, sublicense, and/or sell
-* copies of the Software, and to permit persons to whom the
-* Software is furnished to do so, subject to the following
-* conditions:
-*
-* The above copyright notice and this permission notice shall be
-* included in all copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-* OTHER DEALINGS IN THE SOFTWARE.
-
-* @author The Tiny Spark
-*/
-
-(function() {
-	
-	/**
-	 * @class QuadTreeContainer
-	 * @memberOf tomahawk_ns
-	 * @description The QuadTreeContainer class is a basic display list building block: a display list node that can contain children. The only difference with the basic Sprite class is that QuadTreeContainer orders his children in an internal quadtree structure. Each child which needs to be updated ( updateNextFrame || autoUpdate to true ) will be removed and added to the quadtree every frame. It means that the QuadTreeContainer is a very good container for a large subset of statics objects, so you can set the children autoUpdate property to false. It will results to a large gain of performances. Elsewhere, you can put a little subset of children with the autoUpdate property to true depending of the performances of the targeted devices.
-	 * @constructor
-	 * @augments tomahawk_ns.Sprite
-	 **/
-	function QuadTreeContainer(left,right,top,bottom,childrenPerNode, maxDepth)
-	{
-		tomahawk_ns.Sprite.apply(this);
-		
-		left = left || -2147483648;
-		right = right || 2147483648;
-		top = top || -2147483648;
-		bottom = bottom || 2147483648;
-		maxDepth = maxDepth || 24;
-		childrenPerNode = childrenPerNode || 100;
-		
-		this._root = new tomahawk_ns.QuadTreeNode(left,right,top,bottom,0,childrenPerNode,maxDepth);
-	}
-
-	Tomahawk.registerClass( QuadTreeContainer, "QuadTreeContainer" );
-	Tomahawk.extend( "QuadTreeContainer", "Sprite" );
-	
-	QuadTreeContainer.prototype._root = null;
-
-	/**
-	* @description Returns all the children of the QuadTreeContainer that are visibles on the canvas area.
-	* @method getVisiblesChildren
-	* @memberOf tomahawk_ns.QuadTreeContainer.prototype
-	* @returns {Array} an array of DisplayObject instances.
-	**/
-	QuadTreeContainer.prototype.getVisiblesChildren = function()
-	{
-		var i = this.children.length;
-		var child = null;
-		var visibles = null;
-		
-		if( this.stage == null )
-			return new Array();
-			
-		while( --i > -1 )
-		{
-			child = this.children[i];
-			child.__index__ = i;
-			
-			if( child.updateNextFrame == true || child.autoUpdate == true )
-			{
-				this._root.add(child);
-			}
-		}
-		
-		var width = this.stage.getCanvas().width;
-		var height = this.stage.getCanvas().height;
-		var pt1 = this.globalToLocal(0,0);
-		var pt2 = this.globalToLocal(width,height);
-		var left = pt1.x;
-		var right = pt2.x;
-		var top = pt1.y;
-		var bottom = pt2.y;
-		
-		visibles = this._root.get(left, right, top, bottom);
-		visibles.sort(this._sortVisiblesChildren);
-		
-		return visibles;
-	};
-	
-	/**
-	* @description Returns the top node of the internal quadtree structure.
-	* @method getRoot
-	* @memberOf tomahawk_ns.QuadTreeContainer.prototype
-	* @returns {tomahawk_ns.QuadTreeNode} the root node of the internal quadtree structure
-	**/
-	QuadTreeContainer.prototype.getRoot = function()
-	{
-		return this._root;
-	};
-
-	
-	QuadTreeContainer.prototype.addChild = function(child)
-	{
-		child.updateNextFrame = true;
-		this._root.add(child);
-		return tomahawk_ns.Sprite.prototype.addChild.apply(this,[child]);
-	};
-
-	QuadTreeContainer.prototype.addChildAt = function(child, index)
-	{
-		child.updateNextFrame = true;
-		this._root.add(child);
-		return tomahawk_ns.Sprite.prototype.addChildAt.apply(this,[child,index]);
-	};
-
-	QuadTreeContainer.prototype.removeChildAt = function(child, index)
-	{
-		child.updateNextFrame = true;
-		this._root.remove(child);
-		return tomahawk_ns.Sprite.prototype.removeChildAt.apply(this,[child,index]);
-	};
-	
-	QuadTreeContainer.prototype.removeChild = function(child)
-	{
-		child.updateNextFrame = true;
-		this._root.remove(child);
-		return tomahawk_ns.Sprite.prototype.removeChild.apply(this,[child]);
-	};
-	
-	QuadTreeContainer.prototype._sortVisiblesChildren = function(a,b)
-	{
-		return ( a.__index__ < b.__index__ ) ? -1 : 1;
-	};
-	
-	QuadTreeContainer.prototype.draw = function(context)
-	{
-		var all = this.children;
-		this.children = this.getVisiblesChildren();
-		tomahawk_ns.Sprite.prototype.draw.apply(this,[context]);
-		this.children = all;
-	};
-
-	QuadTreeContainer.prototype.hitTest = function(x,y)
-	{
-		var pt1 = this.globalToLocal(x,y);
-		var pt2 = this.globalToLocal(x + 5,y  + 5);
-		var left = pt1.x;
-		var right = pt1.x + 1;
-		var top = pt1.y;
-		var bottom = pt1.y + 1;
-		var child = null;
-		var children = this._root.get(left,right,top,bottom);
-		var i = children.length;
-		children.sort(this._sortVisiblesChildren);
-		
-		while( --i > -1 )
-		{
-			child = children[i];
-			
-			if( child.hitTest(x,y) )
-				return true;
-		}
-		
-		return false;
-	};
-	
-	QuadTreeContainer.prototype.getObjectUnder = function(x,y)
-	{
-		var pt1 = this.globalToLocal(x,y);
-		var left = pt1.x;
-		var right = pt1.x + 1;
-		var top = pt1.y;
-		var bottom = pt1.y + 1;
-		var under = null;
-		var child = null;
-		var children = this._root.get(left, right, top, bottom);
-		var i = children.length;
-		
-		children.sort(this._sortVisiblesChildren);
-		
-		while( --i > -1 )
-		{
-			child = children[i];
-			
-			if( child.mouseEnabled == false )
-				continue;
-					
-			if( child.isContainer )
-			{				
-				under = child.getObjectUnder(x,y);
-				
-				if( under != null )
-				{
-					return under;
-				}
-			}
-			else
-			{	
-				if( child.hitTest(x,y) == true )
-				{
-					return child;
-				}
-			}
-		}
-		
-		return null;
-	};
-	tomahawk_ns.QuadTreeContainer = QuadTreeContainer;
-})();
-
-
-
-/*
-* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
-*
-* Copyright (c) 2014 the-tiny-spark.com, inc.
-*
-* Permission is hereby granted, free of charge, to any person
-* obtaining a copy of this software and associated documentation
-* files (the "Software"), to deal in the Software without
-* restriction, including without limitation the rights to use,
-* copy, modify, merge, publish, distribute, sublicense, and/or sell
-* copies of the Software, and to permit persons to whom the
-* Software is furnished to do so, subject to the following
-* conditions:
-*
-* The above copyright notice and this permission notice shall be
-* included in all copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-* OTHER DEALINGS IN THE SOFTWARE.
-
-* @author The Tiny Spark
-*/
-
-(function() {
-	
-	/**
-	 * @class QuadTreeNode
-	 * @memberOf tomahawk_ns
-	 * @description A QuadTreeNode Object defines a leaf of a quadtree structure. Quadtrees are a derived implementation of binary trees which are very efficient in 2d plans.
-	 * @constructor	
-	 **/
-	function QuadTreeNode(left,right,top,bottom, depth, maxChildren, maxDepth)
-	{
-		this.left = left;
-		this.top = top;
-		this.right = right;
-		this.bottom = bottom;
-		this.maxChildren = maxChildren;
-		this.maxDepth = maxDepth;
-		this.depth = depth;
-
-		this.limitX = this.left + ( this.right - this.left ) * 0.5;
-		this.limitY = this.top + ( this.bottom - this.top ) * 0.5;
-		
-		this.children = new Array();
-	}
-	
-	Tomahawk.registerClass( QuadTreeNode, "QuadTreeNode" );
-	
-	QuadTreeNode._tick = 0;
-	QuadTreeNode.prototype._cache = null;
-	
-	
-	// iterative  methods
-	
-	/**
-	* @description Adds a display object to the tree node
-	* @method add
-	* @memberOf tomahawk_ns.QuadTreeNode.prototype
-	* @param {tomahawk_ns.DisplayObject} element the display object you want to add to the tree node
-	**/
-	QuadTreeNode.prototype.add = function(element)
-	{
-		this.remove(element);
-		
-		if( element.updateNextFrame == true || element.autoUpdate == true )
-		{
-			element.updateMatrix();
-			element.updateBounds();
-		}
-		
-		var nodes = new Array();
-		var currentNode = this;
-		var bounds = element.bounds;
-		var out = false;
-		var left = bounds.left;
-		var right = bounds.right;
-		var top = bounds.top;
-		var bottom = bounds.bottom;
-		nodes.push(this);
-		
-		while( nodes.length > 0 )
-		{
-			currentNode = nodes.shift();
-			
-			out =	( 	left > currentNode.right || 
-						right < currentNode.left || 
-						top > currentNode.bottom || 
-						bottom < currentNode.top );
-						
-			if( out == true )
-				continue;
-			
-			if( currentNode.children.length > currentNode.maxChildren && currentNode.depth < currentNode.maxDepth)
-			{
-				currentNode.split();
-			}
-		
-			if( currentNode.full == false )
-			{
-				currentNode.children.push(element);
-			}
-			else
-			{
-				nodes.push(currentNode.node1);
-				nodes.push(currentNode.node2);
-				nodes.push(currentNode.node3);
-				nodes.push(currentNode.node4);
-			}
-		}
-	};
-	
-	/**
-	* @description Removes a display object from the tree node
-	* @method remove
-	* @memberOf tomahawk_ns.QuadTreeNode.prototype
-	* @param {tomahawk_ns.DisplayObject} element the display object you want to remove from the tree node
-	**/
-	QuadTreeNode.prototype.remove = function( element )
-	{
-		var index = -1;
-		var nodes = new Array();
-		var currentNode = this;
-		var bounds = element.bounds;
-		nodes.push(this);
-		
-		while( nodes.length > 0 )
-		{
-			currentNode = nodes.shift();
-			
-			if( currentNode.full == true )
-			{
-				nodes.push(currentNode.node1);
-				nodes.push(currentNode.node2);
-				nodes.push(currentNode.node3);
-				nodes.push(currentNode.node4);
-				continue;
-			}
-			
-			index = currentNode.children.indexOf(element);
-			if( index > -1 )
-				currentNode.children.splice(index,1);
-		}
-	};
-	
-	/**
-	* @description Returns an Array of DisplayObjects that are visible in the area defined by the left,right,top,bottom parameters.
-	* @method get
-	* @memberOf tomahawk_ns.QuadTreeNode.prototype
-	* @param {Number} left 
-	* @param {Number} right 
-	* @param {Number} top 
-	* @param {Number} bottom 
-	* @returns {Array} An array of DisplayObject
-	**/
-	QuadTreeNode.prototype.get = function( left, right, top, bottom )
-	{
-		var tick = tomahawk_ns.QuadTreeNode._tick + 1;
-		var result = new Array();
-		var nodes = new Array();
-		var currentNode = this;
-		var out = false;
-		var child = null;
-		var i = 0;
-		
-		nodes.push(this);
-		
-		while( nodes.length > 0 )
-		{
-			currentNode = nodes.shift();
-			
-			out = ( left > currentNode.right || 
-					right < currentNode.left || 
-					top > currentNode.bottom || 
-					bottom < currentNode.top );
-					
-			if( out == true )
-				continue;
-				
-			if( currentNode.full == true )
-			{
-				nodes.push(currentNode.node1);
-				nodes.push(currentNode.node2);
-				nodes.push(currentNode.node3);
-				nodes.push(currentNode.node4);
-				continue;
-			}
-				
-			i = currentNode.children.length;
-			
-			while( --i > -1 )
-			{
-				child = currentNode.children[i];
-				bounds = child.bounds;
-				
-				out = ( bounds.left > right || 
-						bounds.right < left ||
-						bounds.top > bottom ||
-						bounds.bottom < top || 
-						child.__tick__ == tick);
-						
-				if( out == true )
-					continue;
-				
-				result.push(child);
-				child.__tick__ = tick;
-			}
-		}
-		
-		tomahawk_ns.QuadTreeNode._tick = tick;
-		return result;
-	};
-	
-	/**
-	* @description Splits the current node into four child nodes. The children of the node will be redispatched throught those new four nodes.
-	* @method split
-	* @memberOf tomahawk_ns.QuadTreeNode.prototype
-	**/
-	QuadTreeNode.prototype.split = function()
-	{
-		var child = null;
-		var e = this.depth + 1;
-		var f = this.maxChildren;
-		var g = this.maxDepth;
-		
-		this.node1 = new tomahawk_ns.QuadTreeNode(this.left,	this.limitX	, this.top	 , this.limitY	,e,f,g);
-		this.node2 = new tomahawk_ns.QuadTreeNode(this.left,	this.limitX	, this.limitY, this.bottom	,e,f,g);
-		this.node3 = new tomahawk_ns.QuadTreeNode(this.limitX,	this.right	, this.top	 , this.limitY	,e,f,g);
-		this.node4 = new tomahawk_ns.QuadTreeNode(this.limitX,	this.right	, this.limitY, this.bottom	,e,f,g);
-		
-		while( this.children.length > 0)
-		{
-			child = this.children.shift();
-			this.node1.add(child);
-			this.node2.add(child);
-			this.node3.add(child);
-			this.node4.add(child);
-		}
-		
-		this.full = true;
-	};
-	
-	/**
-	* @member full
-	* @memberOf tomahawk_ns.QuadTreeNode.prototype
-	* @type {Boolean}
-	* @default false
-	* @description Indicates wether the node is full.
-	**/
-	QuadTreeNode.prototype.full = false;
-	
-	/**
-	* @default 0
-	* @member left
-	* @memberOf tomahawk_ns.QuadTreeNode.prototype
-	* @type {Number}
-	* @description The x coordinate of the top-left corner of the node's area.
-	**/
-	QuadTreeNode.prototype.left = 0;
-	
-	/**
-	* @default 0
-	* @member right
-	* @memberOf tomahawk_ns.QuadTreeNode.prototype
-	* @type {Number}
-	* @description The x coordinate of the bottom-right corner of the node's area.
-	**/
-	QuadTreeNode.prototype.right = 0;
-	
-	/**
-	* @default 0
-	* @member top
-	* @memberOf tomahawk_ns.QuadTreeNode.prototype
-	* @type {Number}
-	* @description The y coordinate of the top-left corner of the node's area.
-	**/
-	QuadTreeNode.prototype.top = 0;
-	
-	
-	/**
-	* @default 0
-	* @member bottom
-	* @memberOf tomahawk_ns.QuadTreeNode.prototype
-	* @type {Number}
-	* @description The y coordinate of the bottom-right corner of the node's area.
-	**/
-	QuadTreeNode.prototype.bottom = 0;
-	
-	/**
-	* @default 20
-	* @member maxChildren
-	* @memberOf tomahawk_ns.QuadTreeNode.prototype
-	* @type {Number}
-	* @description Indicates the maximum amount of children of that node can stores before splitting itself.
-	**/
-	QuadTreeNode.prototype.maxChildren = 20;
-	
-	/**
-	* @default 0
-	* @member depth
-	* @memberOf tomahawk_ns.QuadTreeNode.prototype
-	* @type {Number}
-	* @description Indicates the depth of the node within the quadtree structure
-	**/
-	QuadTreeNode.prototype.depth = 0;
-	
-	/**
-	* @default null
-	* @member node1
-	* @memberOf tomahawk_ns.QuadTreeNode.prototype
-	* @type {tomahawk_ns.QuadTreeNode}
-	* @description Indicates the top-left child node of the node.
-	**/
-	QuadTreeNode.prototype.node1 = null;
-	
-	/**
-	* @default null
-	* @member node2
-	* @memberOf tomahawk_ns.QuadTreeNode.prototype
-	* @type {tomahawk_ns.QuadTreeNode}
-	* @description Indicates the bottom-left child node of the node.
-	**/
-	QuadTreeNode.prototype.node2 = null;
-	
-	/**
-	* @default null
-	* @member node3
-	* @memberOf tomahawk_ns.QuadTreeNode.prototype
-	* @type {tomahawk_ns.QuadTreeNode}
-	* @description Indicates the top-right child node of the node.
-	**/
-	QuadTreeNode.prototype.node3 = null;
-	
-	/**
-	* @default null
-	* @member node4
-	* @memberOf tomahawk_ns.QuadTreeNode.prototype
-	* @type {tomahawk_ns.QuadTreeNode}
-	* @description Indicates the bottom-right child node of the node.
-	**/
-	QuadTreeNode.prototype.node4 = null;
-	
-	/**
-	* @default 0
-	* @member limitX
-	* @memberOf tomahawk_ns.QuadTreeNode.prototype
-	* @type {tomahawk_ns.QuadTreeNode}
-	* @description Indicates the x coordinate of the splitting boundary within this node.
-	**/
-	QuadTreeNode.prototype.limitX = 0;
-	
-	/**
-	* @default 0
-	* @member limitY
-	* @memberOf tomahawk_ns.QuadTreeNode.prototype
-	* @type {tomahawk_ns.QuadTreeNode}
-	* @description Indicates the y coordinate of the splitting boundary within this node.
-	**/
-	QuadTreeNode.prototype.limitY = 0;
-	
-	
-	tomahawk_ns.QuadTreeNode = QuadTreeNode;
-	
-})();
 
 
 
@@ -6165,6 +6147,166 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 (function() {
 	
 	/**
+	 * @class BlendColorFilter
+	 * @description a basic BlendColorFilter
+	 * @memberOf tomahawk_ns
+	 * @augments tomahawk_ns.PixelFilter
+	 * @constructor
+	 **/
+	function BlendColorFilter(srcColor, destColor, intensity,deltaRed, deltaGreen, deltaBlue, deltaAlpha)
+	{
+		this.intensity = intensity || this.intensity;
+		this.deltaGreen = deltaGreen || this.deltaGreen;
+		this.deltaRed = deltaRed || this.deltaRed;
+		this.deltaBlue = deltaBlue || this.deltaBlue;
+		this.deltaAlpha = deltaAlpha || this.deltaAlpha;
+		this.srcColor = srcColor || this.srcColor;
+		this.destColor = destColor || this.destColor;
+		tomahawk_ns.PixelFilter.apply(this);
+	}
+	
+	Tomahawk.registerClass( BlendColorFilter, "BlendColorFilter" );
+	Tomahawk.extend( "BlendColorFilter", "PixelFilter" );
+
+	/**
+	* @member {Number} intensity value.
+	* @memberOf tomahawk_ns.BlendColorFilter.prototype
+	**/
+	BlendColorFilter.prototype.intensity = 0;
+	/**
+	* @member {Number} ARGB srcColor value.
+	* @memberOf tomahawk_ns.BlendColorFilter.prototype
+	**/
+	BlendColorFilter.prototype.srcColor = 0xFFFFFF;
+	/**
+	* @member {Number} ARGB destColor value.
+	* @memberOf tomahawk_ns.BlendColorFilter.prototype
+	**/
+	BlendColorFilter.prototype.destColor = 0xFFFFFF;
+	/**
+	* @member {Number} deltaRed value.
+	* @memberOf tomahawk_ns.BlendColorFilter.prototype
+	**/
+	BlendColorFilter.prototype.deltaRed = 0;
+	/**
+	* @member {Number} deltaGreen value.
+	* @memberOf tomahawk_ns.BlendColorFilter.prototype
+	**/
+	BlendColorFilter.prototype.deltaGreen = 0;
+	/**
+	* @member {Number} deltaBlue value.
+	* @memberOf tomahawk_ns.BlendColorFilter.prototype
+	**/
+	BlendColorFilter.prototype.deltaBlue = 0;
+	/**
+	* @member {Number} deltaAlpha value.
+	* @memberOf tomahawk_ns.BlendColorFilter.prototype
+	**/
+	BlendColorFilter.prototype.deltaAlpha = 0;
+	
+	/**
+	* @method process
+	* @memberOf tomahawk_ns.BlendColorFilter.prototype
+	* @description apply the filter process on the DisplayObject
+	**/
+	BlendColorFilter.prototype.process = function()
+	{
+		
+		if( this.intensity == 0 )
+			return;
+		
+		var pixels = this.getPixels(0,0,this._canvas.width,this._canvas.height);
+		var data = pixels.data;
+		var a1 = (this.srcColor >> 24) & 0xFF;
+		var r1 = (this.srcColor >> 16) & 0xFF;
+		var g1 = (this.srcColor >> 8) & 0xFF;
+		var b1 = this.srcColor & 0xFF;
+		var a2 = (this.destColor >> 24) & 0xFF;
+		var r2 = (this.destColor >> 16) & 0xFF;
+		var g2 = (this.destColor >> 8) & 0xFF;
+		var b2 = this.destColor & 0xFF;
+		var distRed = 0;
+		var distGreen = 0;
+		var distBlue = 0;
+		var distAlpha = 0;
+		
+		var i = 0, a = 0, r = 0, g = 0, b = 0, max = data.length;
+		
+		for ( i=0; i < max; i+=4) 
+		{
+			r = data[i];
+			g = data[i+1];
+			b = data[i+2];
+			a = data[i+3];
+			
+			distRed = r1 - r;
+			distRed = ( distRed < 0 ) ? -distRed : distRed;
+			
+			distGreen = g1 - g;
+			distGreen = ( distGreen < 0 ) ? -distGreen : distGreen;
+			
+			distBlue = b1 - b;
+			distBlue = ( distBlue < 0 ) ? -distBlue : distBlue;
+			
+			distAlpha = a1 - a;
+			distAlpha = ( distAlpha < 0 ) ? -distAlpha : distAlpha;
+			
+			if( distRed > this.deltaRed ||
+				distGreen > this.deltaGreen ||
+				distAlpha > this.deltaAlpha ||
+				distBlue > this.deltaBlue 
+			)
+			{
+				continue;
+			}
+			
+			data[i+0] = ((r2 * this.intensity) + r) / (this.intensity+1);
+			data[i+1] = ((g2 * this.intensity) + g) / (this.intensity+1);
+			data[i+2] = ((b2 * this.intensity) + b) / (this.intensity+1);
+			data[i+3] = ((a2 * this.intensity) + a) / (this.intensity+1);
+		}
+		
+		this.setPixels(pixels,0,0);
+	};
+
+	tomahawk_ns.BlendColorFilter = BlendColorFilter;
+
+})();
+
+
+
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+
+(function() {
+	
+	/**
 	 * @class BrightnessFilter
 	 * @description a basic BrightnessFilter
 	 * @memberOf tomahawk_ns
@@ -6210,6 +6352,108 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	};
 	
 	tomahawk_ns.BrightnessFilter = BrightnessFilter;
+
+})();
+
+
+
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+
+(function() {
+	
+	/**
+	 * @class ColorFilter
+	 * @description a basic ColorFilter
+	 * @memberOf tomahawk_ns
+	 * @augments tomahawk_ns.PixelFilter
+	 * @constructor
+	 **/
+	function ColorFilter(color, intensity)
+	{
+		this.intensity = intensity || 0;
+		this.color = color || this.color;
+		tomahawk_ns.PixelFilter.apply(this);
+	}
+	
+	Tomahawk.registerClass( ColorFilter, "ColorFilter" );
+	Tomahawk.extend( "ColorFilter", "PixelFilter" );
+
+	/**
+	* @member {Number} coloration intensity.
+	* @memberOf tomahawk_ns.ColorFilter.prototype
+	**/
+	ColorFilter.prototype.intensity = 0;
+	
+	/**
+	* @member {Number} color value.
+	* @memberOf tomahawk_ns.ColorFilter.prototype
+	**/
+	ColorFilter.prototype.color = "#004080";
+	
+	/**
+	* @method process
+	* @memberOf tomahawk_ns.ColorFilter.prototype
+	* @description apply the filter process on the DisplayObject
+	**/
+	ColorFilter.prototype.process = function()
+	{
+		
+		if( this.intensity == 0 )
+			return;
+		
+		var context = this._context;
+		var canvas = this._canvas;
+		
+		var buffer = tomahawk_ns.PixelFilter._buffer;
+		var bufferContext = buffer.getContext("2d");
+		
+		buffer.width =  canvas.width;
+		buffer.height =  canvas.height;
+		
+		bufferContext.save();
+		bufferContext.drawImage(canvas, 0, 0);
+		bufferContext.globalCompositeOperation = "source-in";
+		bufferContext.beginPath();
+		bufferContext.fillStyle = this.color;
+		bufferContext.globalAlpha = this.intensity;
+		bufferContext.fillRect(0,0,buffer.width, buffer.height);
+		bufferContext.fill();
+		bufferContext.restore();
+		
+		
+		context.save();
+		context.drawImage(buffer, 0, 0, buffer.width, buffer.height);
+		context.restore();
+	};
+
+	tomahawk_ns.ColorFilter = ColorFilter;
 
 })();
 
@@ -6420,13 +6664,19 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	 * @memberOf tomahawk_ns
 	 * @constructor
 	 **/
-	function PixelFilter(){}
+	function PixelFilter()
+	{
+		tomahawk_ns.PixelFilter._buffer = tomahawk_ns.PixelFilter._buffer || document.createElement("canvas");
+	}
 	
 	Tomahawk.registerClass( PixelFilter, "PixelFilter" );
 	
 	PixelFilter.prototype._canvas = null;
 	PixelFilter.prototype._context = null;
 	PixelFilter.prototype._object = null;
+	PixelFilter.prototype._offsetBounds = null;
+	
+	PixelFilter._buffer = null;
 	
 	/**
 	* @method getPixels
@@ -6474,7 +6724,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	* @param {CanvasRenderingContext2D} context the context used by the current filter.
 	* @param {tomahawk_ns.DisplayObject} object the DisplayObject on which the filter will be applied to
 	**/
-	PixelFilter.prototype.apply = function(canvas, context, object)
+	PixelFilter.prototype.applyFilter = function(canvas, context, object)
 	{
 		this._canvas = canvas;
 		this._object = object;
@@ -6486,15 +6736,250 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	* @method getOffsetBounds
 	* @memberOf tomahawk_ns.PixelFilter.prototype
 	* @description returns a rectangle that represents the extra pixels generated by the filter
+	* @param {HTMLCanvasElement} canvas the canvas used by the current filter.
+	* @param {CanvasRenderingContext2D} context the context used by the current filter.
+	* @param {tomahawk_ns.DisplayObject} object the DisplayObject on which the filter will be applied to
 	* @returns {Number}
 	**/
-	PixelFilter.prototype.getOffsetBounds = function()
+	PixelFilter.prototype.getOffsetBounds = function(canvas, context, object)
 	{ 
-		var rect = new tomahawk_ns.Rectangle(0,0,0,0);
-		return rect;
+		return this._offsetBounds;
 	};
 	
 	tomahawk_ns.PixelFilter = PixelFilter;
+
+})();
+
+
+
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+
+(function() {
+	
+	/**
+	 * @class PixelateFilter
+	 * @description a basic PixelateFilter
+	 * @memberOf tomahawk_ns
+	 * @augments tomahawk_ns.PixelFilter
+	 * @constructor
+	 **/
+	function PixelateFilter(value)
+	{
+		this.value = value || 0;
+		this._offsetBounds = new tomahawk_ns.Rectangle();
+		tomahawk_ns.PixelFilter.apply(this);
+	}
+	
+	Tomahawk.registerClass( PixelateFilter, "PixelateFilter" );
+	Tomahawk.extend( "PixelateFilter", "PixelFilter" );
+
+	/**
+	* @member {Number} value pixelisation intensity.
+	* @memberOf tomahawk_ns.PixelateFilter.prototype
+	**/
+	PixelateFilter.prototype.value = 0;
+	
+	/**
+	* @method process
+	* @memberOf tomahawk_ns.PixelateFilter.prototype
+	* @description apply the filter process on the DisplayObject
+	**/
+	PixelateFilter.prototype.process = function()
+	{
+		if( this.value <= 0 )
+			return;
+		
+		var context = this._context;
+		var canvas = this._canvas;
+		
+		var buffer = tomahawk_ns.PixelFilter._buffer;
+		var bufferContext = buffer.getContext("2d");
+		
+		buffer.width =  canvas.width;
+		buffer.height =  canvas.height;
+		
+		bufferContext.save();
+		bufferContext.scale( 1/this.value, 1/this.value);
+		bufferContext.drawImage(canvas, 0, 0);
+		bufferContext.restore();
+		
+		
+		context.clearRect(0,0,canvas.width,canvas.height);
+		context.save();
+		context.scale(this.value, this.value);
+		context.drawImage(buffer, 0, 0, buffer.width, buffer.height);
+		context.restore();
+	};
+
+	tomahawk_ns.PixelateFilter = PixelateFilter;
+
+})();
+
+
+
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+* @deprecated
+*/
+
+
+(function() {
+	
+	/**
+	 * @class RemanenceFilter
+	 * @description a basic RemanenceFilter
+	 * @memberOf tomahawk_ns
+	 * @augments tomahawk_ns.PixelFilter
+	 * @param {Number} x the x coordinates of top left corner of the region.
+	 * @constructor
+	 **/
+	function RemanenceFilter(time,power)
+	{
+		this.time = time || 1000;
+		this.power = power || 0.5;
+		this._cache = document.createElement("canvas");
+		this._cache.width = this._cache.height = 1;
+		tomahawk_ns.PixelFilter.apply(this);
+	}
+	
+	Tomahawk.registerClass( RemanenceFilter, "RemanenceFilter" );
+	Tomahawk.extend( "RemanenceFilter", "PixelFilter" );
+	
+
+	RemanenceFilter.prototype._cache = null;
+	
+	/**
+	* @member {Number} time in ms at which you want to have remanence displayed.
+	* @memberOf tomahawk_ns.RemanenceFilter.prototype
+	**/
+	RemanenceFilter.prototype.time = 1000;
+	
+	/**
+	* @member {Number} power the remanence power.
+	* @memberOf tomahawk_ns.RemanenceFilter.prototype
+	**/
+	RemanenceFilter.prototype.power = 0.5;
+	
+	RemanenceFilter.prototype._lastTime = 0;
+	RemanenceFilter.prototype._maxWidth = 0;
+	RemanenceFilter.prototype._maxHeight = 0;
+	
+	/**
+	* @method process
+	* @memberOf tomahawk_ns.RemanenceFilter.prototype
+	* @description apply the filter process on the DisplayObject
+	**/
+	RemanenceFilter.prototype.process = function()
+	{
+		var canvas = this._canvas;
+		var context = this._context;
+		var currentTime = new Date().getTime();
+		var width = ( canvas.width > this._cache.width ) ? canvas.width : this._cache.width;
+		var height = ( canvas.height > this._cache.height ) ? canvas.height : this._cache.height;
+		
+		var buffer = tomahawk_ns.PixelFilter._buffer;
+		var bufferContext = buffer.getContext("2d");
+		
+		// ugly hack, save memory on chrome
+		width = Math.ceil(width / 100) * 100;
+		height =  Math.ceil(height / 100) * 100;
+		
+		buffer.width = width;
+		buffer.height = height;
+		
+		bufferContext.save();
+		bufferContext.globalAlpha = this.power;
+		bufferContext.drawImage( this._cache, 0, 0 );
+		bufferContext.restore();
+		
+		bufferContext.save();
+		bufferContext.drawImage(canvas, 0, 0 );
+		bufferContext.restore();
+		
+		context.save();
+		context.globalCompositeOperation = "destination-over";
+		context.globalAlpha = this.power;
+		context.drawImage(this._cache,0,0);
+		context.restore();
+		
+		
+		canvas.width = buffer.width;
+		canvas.height = buffer.height;
+		
+		context.save();
+		context.drawImage( buffer, 0, 0 );
+		context.restore();
+		
+		if( currentTime - this._lastTime < this.time )
+		{
+			return;
+		}
+		
+		this._lastTime = currentTime;
+		
+		context = this._cache.getContext("2d");
+		
+		this._cache.width = buffer.width;
+		this._cache.height = buffer.height;
+			
+		context.save();
+		context.drawImage(canvas,0,0);
+		context.restore();
+	};
+
+	tomahawk_ns.RemanenceFilter = RemanenceFilter;
 
 })();
 
@@ -6538,33 +7023,39 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	 * @description a basic ShadowBlurFilter
 	 * @memberOf tomahawk_ns
 	 * @augments tomahawk_ns.PixelFilter
+	 * @param {Number} x the x coordinates of top left corner of the region.
+	 * @param {Number} y the y coordinates of top left corner of the region.
+	 * @param {String} color the css color of the shadow.
+	 * @param {Number} quality the blur quality.
 	 * @constructor
 	 **/
-	function ShadowBlurFilter()
+	function ShadowBlurFilter(x,y,color, quality)
 	{
+		this.shadowOffsetX = x || this.shadowOffsetX;
+		this.shadowOffsetY = y || this.shadowOffsetY;
+		this.shadowColor = color || this.shadowColor;
+		this.shadowBlur = quality || this.shadowBlur;
 		tomahawk_ns.PixelFilter.apply(this);
 	}
 	
 	Tomahawk.registerClass( ShadowBlurFilter, "ShadowBlurFilter" );
 	Tomahawk.extend( "ShadowBlurFilter", "PixelFilter" );
 	
-	ShadowBlurFilter.prototype._extraBounds = null;
-	
 	/**
 	* @member {Number} shadowOffsetX shadow offset on the x axis.
 	* @memberOf tomahawk_ns.ShadowBlurFilter.prototype
 	**/
-	ShadowBlurFilter.prototype.shadowOffsetX = 1;
+	ShadowBlurFilter.prototype.shadowOffsetX = 0;
 	/**
 	* @member {Number} shadowOffsetY shadow offset on the y axis.
 	* @memberOf tomahawk_ns.ShadowBlurFilter.prototype
 	**/
-	ShadowBlurFilter.prototype.shadowOffsetY = 1;
+	ShadowBlurFilter.prototype.shadowOffsetY = 0;
 	/**
 	* @member {Number} shadowBlur intensity of the shadow blur.
 	* @memberOf tomahawk_ns.ShadowBlurFilter.prototype
 	**/
-	ShadowBlurFilter.prototype.shadowBlur 	= 100;
+	ShadowBlurFilter.prototype.shadowBlur 	= 2;
 	/**
 	* @member {Number} shadowColor the color of the shadow.
 	* @memberOf tomahawk_ns.ShadowBlurFilter.prototype
@@ -6578,29 +7069,43 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	**/
 	ShadowBlurFilter.prototype.process = function()
 	{
-		var context = this._canvas.getContext("2d");
-		this._canvas.width += this.shadowBlur + this.shadowOffsetX;
-		this._canvas.height += this.shadowBlur + this.shadowOffsetY;
-		context.shadowBlur = this.shadowBlur;
-		context.shadowColor = this.shadowColor;
-		context.shadowOffsetX = this.shadowOffsetX;
-		context.shadowOffsetY = this.shadowOffsetY;
+		var context = this._context;
+		var canvas = this._canvas;
+		var buffer = tomahawk_ns.PixelFilter._buffer;
+		var bufferContext = buffer.getContext("2d");
+		var bounds = this._offsetBounds;
+		
+		buffer.width = canvas.width + bounds.width;
+		buffer.height = canvas.height + bounds.height;
+		
+		
+		bufferContext.save();
+		bufferContext.shadowBlur = this.shadowBlur;
+		bufferContext.shadowColor = this.shadowColor;
+		bufferContext.shadowOffsetX = this.shadowOffsetX;
+		bufferContext.shadowOffsetY = this.shadowOffsetY;
+		bufferContext.drawImage( canvas, bounds.x, bounds.y );
+		bufferContext.restore();
+		
+		context.clearRect(0,0,canvas.width,canvas.height);
+		
+		context.save();
+		context.drawImage( buffer, 0, 0 );
+		context.restore();
 	};
 	
-	ShadowBlurFilter.prototype.getOffsetBounds = function()
+	ShadowBlurFilter.prototype.getOffsetBounds = function(canvas, context, object)
 	{ 
-		var width = this.shadowBlur;
-		var mid = width >> 1;
+		var width = Math.abs( this.shadowOffsetX ) + (this.shadowBlur * 2);
+		var height = Math.abs( this.shadowOffsetY ) + (this.shadowBlur * 2);
 		
-		this._extraBounds = this._extraBounds || new tomahawk_ns.Rectangle();
-		this._extraBounds.x = this.shadowOffsetX - mid;
-		this._extraBounds.y = this.shadowOffsetY - mid;
-		this._extraBounds.width = Math.abs(this.shadowOffsetX) + width;
-		this._extraBounds.height = Math.abs(this.shadowOffsetY) + width;
-		this._extraBounds.x = ( this._extraBounds.x > 0 ) ? 0 : this._extraBounds.x;
-		this._extraBounds.y = ( this._extraBounds.y > 0 ) ? 0 : this._extraBounds.y;
+		this._offsetBounds = this._offsetBounds || new tomahawk_ns.Rectangle();
+		this._offsetBounds.x = width >> 1;
+		this._offsetBounds.y = height >> 1;
+		this._offsetBounds.width = Math.abs( this.shadowOffsetX ) + width;
+		this._offsetBounds.height = Math.abs( this.shadowOffsetY ) + height;
 		
-		return this._extraBounds;
+		return this._offsetBounds;
 	};
 
 	tomahawk_ns.ShadowBlurFilter = ShadowBlurFilter;
@@ -6662,36 +7167,7 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 		this._stack = new Array();
 	}
 
-	Tomahawk.registerClass( Matrix2D, "Matrix2D" );
-	
-	Matrix2D.prototype._stack = null;
-	
-	// static public properties:
-	/**
-	 * An identity matrix, representing a null transformation.
-	 * @memberOf tomahawk_ns.Matrix2D
-	 * @property identity
-	 * @static
-	 * @type Matrix2D
-	 * @memberOf tomhawk_ns.Matrix2D
-	 * @readonly
-	 **/
-	Matrix2D.identity = null;// set at bottom of class definition.
-
-	/**
-	 * Multiplier for converting degrees to radians. Used internally by Matrix2D.
-	 * @memberOf tomahawk_ns.Matrix2D
-	 * @property DEG_TO_RAD
-	 * @static
-	 * @final
-	 * @type Number
-	 * @readonly
-	 **/
-	Matrix2D.DEG_TO_RAD = Math.PI/180;
-
-	
-	
-	
+	Tomahawk.registerClass( Matrix2D, "Matrix2D" );	
 
 // public properties:
 	/**
@@ -6892,14 +7368,20 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
 	Matrix2D.prototype.prependTransform = function(x, y, scaleX, scaleY, rotation, skewX, skewY, regX, regY) {
-		if (rotation%360) {
-			var r = rotation*Matrix2D.DEG_TO_RAD;
-			var cos = Math.cos(r);
-			var sin = Math.sin(r);
-		} else {
-			cos = 1;
-			sin = 0;
-		}
+		
+		
+		var r = ( rotation % 360) >> 0;
+		var cos = tomahawk_ns.Matrix2D._fastCos[r];
+		var sin = tomahawk_ns.Matrix2D._fastSin[r];
+		
+		//if (rotation%360) {
+			//var r = rotation*Matrix2D.DEG_TO_RAD;
+			//var cos = Math.cos(r);
+			//var sin = Math.sin(r);
+		//} else {
+			//cos = 1;
+			//sin = 0;
+		//}
 
 		if (regX || regY) {
 			// append the registration offset:
@@ -6936,14 +7418,17 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	 **/
 	Matrix2D.prototype.appendTransform = function(x, y, scaleX, scaleY, rotation, skewX, skewY, regX, regY) {
 
-		if (rotation%360) {
-			var r = rotation*Matrix2D.DEG_TO_RAD;
-			var cos = Math.cos(r);
-			var sin = Math.sin(r);
-		} else {
-			cos = 1;
-			sin = 0;
-		}
+		var r = ( rotation % 360) >> 0;
+		var cos = tomahawk_ns.Matrix2D._fastCos[r];
+		var sin = tomahawk_ns.Matrix2D._fastSin[r];
+		//if (rotation%360) {
+			//var r = rotation*Matrix2D.DEG_TO_RAD;
+			//var cos = Math.cos(r);
+			//var sin = Math.sin(r);
+		//} else {
+			//cos = 1;
+			//sin = 0;
+		//}
 
 		if (skewX || skewY) {
 			// TODO: can this be combined into a single append?
@@ -6971,8 +7456,12 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
 	Matrix2D.prototype.rotate = function(angle) {
-		var cos = Math.cos(angle);
-		var sin = Math.sin(angle);
+		//var cos = Math.cos(angle);
+		//var sin = Math.sin(angle);
+		
+		var r = ( angle % 360) >> 0;
+		var cos = tomahawk_ns.Matrix2D._fastCos[r];
+		var sin = tomahawk_ns.Matrix2D._fastSin[r];
 
 		var a1 = this.a;
 		var c1 = this.c;
@@ -7178,7 +7667,55 @@ tomahawk_ns.AssetsLoader = AssetsLoader;
 	};
 
 	
+	
+	
+	
+		Matrix2D._fastCos = [];
+	Matrix2D._fastSin = [];
+	
+	Matrix2D._fastMath = function()
+	{
+		var i = 360;
+		var r = 0;
+		while( --i > -1 )
+		{
+			r = ( i % 360 ) >> 0;
+			Matrix2D._fastCos[r] = Math.cos(r*Matrix2D.DEG_TO_RAD);
+			Matrix2D._fastSin[r] = Math.sin(r*Matrix2D.DEG_TO_RAD);
+		}
+	};
+	
+	
+	
+	Matrix2D.prototype._stack = null;
+	
+	// static public properties:
+	/**
+	 * An identity matrix, representing a null transformation.
+	 * @memberOf tomahawk_ns.Matrix2D
+	 * @property identity
+	 * @static
+	 * @type Matrix2D
+	 * @memberOf tomhawk_ns.Matrix2D
+	 * @readonly
+	 **/
+	Matrix2D.identity = null;// set at bottom of class definition.
+
+	/**
+	 * Multiplier for converting degrees to radians. Used internally by Matrix2D.
+	 * @memberOf tomahawk_ns.Matrix2D
+	 * @property DEG_TO_RAD
+	 * @static
+	 * @final
+	 * @type Number
+	 * @readonly
+	 **/
+	Matrix2D.DEG_TO_RAD = Math.PI/180;
+
+	
+	Matrix2D._fastMath(); // init fastMath table
 	Matrix2D.identity = new Matrix2D();
+	
 	tomahawk_ns.Matrix2D = Matrix2D;
 	
 })();
@@ -8382,6 +8919,619 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	
 	
 })();
+
+
+
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+* @author The Tiny Spark
+*/
+ 
+ (function() {
+	
+/**
+ * @class AssetsLoader
+ * @memberOf tomahawk_ns
+ * @description The AssetsLoader class is a basic Image mass loader.
+ * @constructor
+ * @augments tomahawk_ns.EventDispatcher
+ **/
+function AssetsLoader()
+{
+	this._loadingList = new Array();
+};
+
+Tomahawk.registerClass( AssetsLoader, "AssetsLoader" );
+Tomahawk.extend("AssetsLoader", "EventDispatcher" );
+
+// singleton
+AssetsLoader._instance = null;
+
+/**
+* @description Returns a unique instance of AssetsLoader, singleton implementation.
+* @method getInstance
+* @memberOf tomahawk_ns.AssetsLoader
+* @returns {tomahawk_ns.AssetsLoader} returns a number
+**/
+AssetsLoader.getInstance = function()
+{
+	if( tomahawk_ns.AssetsLoader._instance == null )
+		tomahawk_ns.AssetsLoader._instance = new tomahawk_ns.AssetsLoader();
+		
+	return tomahawk_ns.AssetsLoader._instance;
+};
+
+AssetsLoader.prototype.onComplete = null;
+AssetsLoader.prototype._loadingList = null;
+AssetsLoader.prototype._data = null;
+AssetsLoader.prototype._numFiles = 0;
+
+/**
+* @description Returns a key indexed object which contains the loaded data.
+* @method getData
+* @memberOf tomahawk_ns.AssetsLoader.prototype
+* @returns {Object} a key indexed object
+**/
+AssetsLoader.prototype.getData = function()
+{
+	return this._data;
+};
+
+/**
+* @description Cleans the internal loaded data object, call it before another loading task in order to save memory.
+* @method clean
+* @memberOf tomahawk_ns.AssetsLoader.prototype
+**/
+AssetsLoader.prototype.clean = function()
+{
+	this._data = new Object();
+};
+
+/**
+* @description Adds an image to the loading list, with the url specified by the "fileURL" parameter and an alias specified by the "fileAlias" parameter.
+* @method load
+* @param {String] fileURL the url of the image.
+* @param {String] fileAlias The alias of the image used as a key within the object returned by the "getData()" method.
+* @memberOf tomahawk_ns.AssetsLoader.prototype
+**/
+AssetsLoader.prototype.addFile = function(fileURL, fileAlias)
+{
+	// on réinitialise les data
+	this.clean();
+	
+	// on stocke un objet contenant l"url et l'alias du fichier que l'on
+	// utilisera pour le retrouver
+	this._loadingList.push({url:fileURL,alias:fileAlias});
+	this._numFiles++;
+};
+
+/**
+* @description Starts the loading process.
+* @method load
+* @memberOf tomahawk_ns.AssetsLoader.prototype
+**/
+AssetsLoader.prototype.load = function()
+{
+	if( this._loadingList.length == 0 )
+	{
+		if( this.onComplete != null )
+		{
+			this.onComplete();
+		}
+		
+		this.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.COMPLETE, true, true) );
+		this._numFiles = 0;
+	}
+	else
+	{
+		var obj = this._loadingList.shift();
+		var scope = this;
+		var image = new Image();
+		
+		image.onerror = function()
+		{
+			scope._errorHandler();
+		};
+		
+		image.onload = function()
+		{
+			scope._progressHandler(image, obj.alias);
+		};
+		
+		image.src = obj.url;
+	}
+};
+
+/**
+* @description Returns the loading progression ( between 0.0 and 1.0 )
+* @method getProgression
+* @memberOf tomahawk_ns.AssetsLoader.prototype
+* @returns {Number}
+**/
+AssetsLoader.prototype.getProgression = function()
+{
+	var progression = ( this._numFiles - this._loadingList.length ) / this._numFiles;
+	return progression;
+};
+
+AssetsLoader.prototype._progressHandler = function(image,alias)
+{
+	this._data[alias] = image;
+	this.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.PROGRESS, true, true) );
+	this.load();
+};
+
+AssetsLoader.prototype._errorHandler = function()
+{
+	this.load();
+	this.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.IO_ERROR, true, true) );
+};
+
+tomahawk_ns.AssetsLoader = AssetsLoader;
+})();
+
+
+
+
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+* @author The Tiny Spark
+*/
+
+(function() {
+	
+	/**
+	 * @class AssetsManager
+	 * @memberOf tomahawk_ns
+	 * @description The AssetsManager class is used to stores and restitutes assets objects like Textures, TextureAtlases, Images.
+	 * @constructor
+	 **/
+	function AssetsManager()
+	{
+		this._images 	= new Object();
+		this._atlases 	= new Object();
+		this._data 		= new Object();
+		this._textures 	= new Object();
+	};
+
+	Tomahawk.registerClass( AssetsManager, "AssetsManager" );
+
+	// singleton
+	AssetsManager._instance 					= null;
+	
+	/**
+	* @description Returns a unique instance of AssetsManager, singleton implementation.
+	* @method getInstance
+	* @memberOf tomahawk_ns.AssetsManager
+	* @returns {tomahawk_ns.AssetsManager}
+	**/
+	AssetsManager.getInstance 					= function()
+	{
+		if( tomahawk_ns.AssetsManager._instance == null )
+			tomahawk_ns.AssetsManager._instance = new tomahawk_ns.AssetsManager();
+			
+		return tomahawk_ns.AssetsManager._instance;
+	};
+
+	AssetsManager.prototype._images 			= null;
+	AssetsManager.prototype._atlases 			= null;
+	AssetsManager.prototype._textures 			= null;
+	AssetsManager.prototype._data 				= null;
+
+
+	// images
+	
+	/**
+	* @description Returns a key indexed objects with all the HTMLImageElement stored within the manager
+	* @method getImages
+	* @memberOf tomahawk_ns.AssetsManager.prototype
+	* @returns {Object} a key indexed objects
+	**/
+	AssetsManager.prototype.getImages 			= function()
+	{
+		return this._images;
+	};
+	
+	/**
+	* @description returns an HTMLImageElement that matches with the "alias" parameter
+	* @method getImageByAlias
+	* @memberOf tomahawk_ns.AssetsManager.prototype
+	* @returns {DOMImageElement} an HTMLImageElement object
+	**/
+	AssetsManager.prototype.getImageByAlias 	= function(alias)
+	{
+		if( this._images[alias] )
+			return this._images[alias];
+			
+		return null;
+	};
+
+	/**
+	* @description Adds an HTMLImageElement object to the manager and register it with the alias specified by the "alias" parameter. This alias will be reused with the "getImageByAlias" method.
+	* @method addImage
+	* @memberOf tomahawk_ns.AssetsManager.prototype
+	* @param {HTMLImageElement} image an HTMLImageElement object
+	* @param {String} alias
+	**/
+	AssetsManager.prototype.addImage 			= function(image, alias)
+	{
+		this._images[alias] = image;
+	};
+
+	//atlases
+	
+	/**
+	* @description Adds a TextureAtlas object to the manager and register it with the alias specified by the "alias" parameter. This alias will be reused with the "getAtlasByAlias" method.
+	* @method addAtlas
+	* @memberOf tomahawk_ns.AssetsManager.prototype
+	* @param {tomahawk_ns.TextureAtlas} atlas a TextureAtlas object
+	* @param {String} alias
+	**/
+	AssetsManager.prototype.addAtlas 			= function(atlas, alias)
+	{
+		this._atlases[alias] = atlas;
+	};
+	
+	/**
+	* @method getAtlases
+	* @memberOf tomahawk_ns.AssetsManager.prototype
+	* @returns {Object} returns a key indexed objects with all the atlases stored within the manager
+	**/
+	AssetsManager.prototype.getAtlases 			= function()
+	{
+		return this._atlases;
+	};
+	
+	/**
+	* @description returns an TextureAtlas instance that matches with the "alias" parameter
+	* @method getAtlasByAlias
+	* @memberOf tomahawk_ns.AssetsManager.prototype
+	* @returns {tomahawk_ns.TextureAtlas} a TextureAtlas object
+	**/
+	AssetsManager.prototype.getAtlasByAlias 	= function(alias)
+	{
+		if( this._atlases[alias] )
+			return this._atlases[alias];
+			
+		return null;
+	};
+
+	//textures
+	/**
+	* @description Adds a Texture object to the manager and register it with the alias specified by the "alias" parameter. This alias will be reused with the "getTextureByAlias" method.
+	* @method addAtlas
+	* @memberOf tomahawk_ns.AssetsManager.prototype
+	* @param {tomahawk_ns.Texture} texture a Texture object
+	* @param {String} alias
+	**/
+	AssetsManager.prototype.addTexture 			= function(texture, alias)
+	{
+		this._textures[alias] = texture;
+	};
+
+	/**
+	* @method getTextures
+	* @memberOf tomahawk_ns.AssetsManager.prototype
+	* @returns {Object} returns a key indexed objects with all the textures stored within the manager
+	**/
+	AssetsManager.prototype.getTextures 		= function()
+	{
+		return this._textures;
+	};
+	
+	/**
+	* @description returns an Texture instance that matches with the "alias" parameter
+	* @method getTextureByAlias
+	* @memberOf tomahawk_ns.AssetsManager.prototype
+	* @returns {tomahawk_ns.Texture} a Texture object
+	**/
+	AssetsManager.prototype.getTextureByAlias 	= function(alias)
+	{
+		if( this._textures[alias] )
+			return this._textures[alias];
+			
+		return null;
+	};
+
+	//data objects
+	/**
+	* @description Add a data object to the manager and register it with the alias specified by the "alias" parameter. This alias will be reused with the "getDataObjectByAlias" method.
+	* @method addDataObject
+	* @memberOf tomahawk_ns.AssetsManager.prototype
+	* @param {Object} a data Object
+	* @param {String} alias
+	**/
+	AssetsManager.prototype.addDataObject 		= function(data, alias)
+	{
+		this._data[alias] = data;
+	};
+	
+	/**
+	* @description returns a data Object instance that matches with the "alias" parameter
+	* @method getDataObjectByAlias
+	* @memberOf tomahawk_ns.AssetsManager.prototype
+	* @returns {Object} a data object
+	**/
+	AssetsManager.prototype.getDataObjectByAlias = function(alias)
+	{
+		if( this._data[alias] )
+			return this._data[alias];
+			
+		return null;
+	};
+	
+	/**
+	* @method getDataObjects
+	* @memberOf tomahawk_ns.AssetsManager.prototype
+	* @returns {Object} returns a key indexed objects with all the data objects stored within the manager
+	**/
+	AssetsManager.prototype.getDataObjects 		= function()
+	{
+		return this._data;
+	};
+
+	tomahawk_ns.AssetsManager = AssetsManager;
+})();
+
+
+
+
+
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+* @author The Tiny Spark
+*/
+ 
+ (function() {
+	
+/**
+ * @class DataLoader
+ * @memberOf tomahawk_ns
+ * @description The DataLoader class is a basic data (text,json,xml,binary) mass loader.
+ * @constructor
+ * @augments tomahawk_ns.EventDispatcher
+ **/
+function DataLoader()
+{
+	this._loadingList = new Array();
+};
+
+Tomahawk.registerClass( DataLoader, "DataLoader" );
+Tomahawk.extend("DataLoader", "EventDispatcher" );
+
+// singleton
+DataLoader._instance 				= null;
+
+/**
+* @description Returns a unique instance of DataLoader, singleton implementation.
+* @method getInstance
+* @memberOf tomahawk_ns.DataLoader
+* @returns {tomahawk_ns.DataLoader} returns a number
+**/
+DataLoader.getInstance 				= function()
+{
+	if( tomahawk_ns.DataLoader._instance == null )
+		tomahawk_ns.DataLoader._instance = new tomahawk_ns.DataLoader();
+		
+	return tomahawk_ns.DataLoader._instance;
+};
+
+DataLoader.prototype.onComplete 	= null;
+DataLoader.prototype._loadingList 	= null;
+DataLoader.prototype._data 			= null;
+DataLoader.prototype._numFiles 		= 0;
+
+/**
+* @description Returns a key indexed object which contains the loaded data.
+* @method getData
+* @memberOf tomahawk_ns.DataLoader.prototype
+* @returns {Object} a key indexed object
+**/
+DataLoader.prototype.getData = function()
+{
+	return this._data;
+};
+
+/**
+* @description Cleans the internal loaded data object, call it before another loading task in order to save memory.
+* @method clean
+* @memberOf tomahawk_ns.DataLoader.prototype
+**/
+DataLoader.prototype.clean = function()
+{
+	this._data = new Object();
+};
+
+/**
+* @description Add a file to the loading list, with the url specified by the "fileURL" parameter and an alias specified by the "fileAlias" parameter.
+* @method load
+* @param {String] fileURL the distant file url.
+* @param {String] fileAlias The alias of the url used as a key within the object returned by the "getData()" method.
+* @param {String] mode the request mode [GET or POST]
+* @param {Object] params  the params sent to the distant url 
+* @memberOf tomahawk_ns.DataLoader.prototype
+**/
+DataLoader.prototype.addFile = function(fileURL, fileAlias, mode,params)
+{
+	// on réinitialise les data
+	this.clean();
+	
+	// on stocke un objet contenant l"url et l'alias du fichier que l'on
+	// utilisera pour le retrouver
+	this._loadingList.push({url:fileURL,alias:fileAlias,params:params,mode:mode});
+	this._numFiles++;
+};
+
+/**
+* @description Starts the loading process.
+* @method load
+* @memberOf tomahawk_ns.DataLoader.prototype
+**/
+DataLoader.prototype.load = function()
+{
+	var scope 	= this;
+	var obj 	= null;
+	var http 	= null;
+	var data 	= null;
+	var alias	= null;
+	var props	= null;
+	
+	if( this._loadingList.length == 0 )
+	{
+		if( this.onComplete != null )
+		{
+			this.onComplete();
+		}
+		
+		this.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.COMPLETE, true, true) );
+		this._numFiles = 0;
+	}
+	else
+	{
+		obj 	= this._loadingList.shift();
+		http 	= new XMLHttpRequest();
+		data 	= null;
+		alias 	= obj.alias
+		props	= new Array();
+		
+		
+		if( obj.params != undefined && obj.params != null )
+		{
+			for( prop in obj.params )
+			{
+				props.push( prop+"="+obj.params[prop] );
+			}
+			
+			data = props.join("&");
+		}
+		
+		if(obj.mode == "POST")
+		{
+			http.open( "POST" , obj.url, true);
+		}
+		else
+		{
+			http.open( "GET" , obj.url+"?"+data, true);
+		}
+
+		//Send the proper header information along with the request
+		http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		http.onreadystatechange = function() 
+		{
+			if(http.readyState == 4 && http.status == 200) 
+			{
+				scope._progressHandler(http.responseText, alias);
+			}
+		}
+		
+		if(obj.mode == "POST")
+		{
+			http.send(data);
+		}
+		else
+		{
+			http.send(null);
+		}
+	}
+};
+
+/**
+* @description Returns the loading progression ( between 0.0 and 1.0 )
+* @method getProgression
+* @memberOf tomahawk_ns.DataLoader.prototype
+* @returns {Number}
+**/
+DataLoader.prototype.getProgression = function()
+{
+	var progression = ( this._numFiles - this._loadingList.length ) / this._numFiles;
+	return progression;
+};
+
+DataLoader.prototype._progressHandler = function(data,alias)
+{
+	this._data[alias] = data;
+	this.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.PROGRESS, true, true) );
+	this.load();
+};
+
+DataLoader.prototype._errorHandler = function()
+{
+	this.load();
+	this.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.IO_ERROR, true, true) );
+};
+
+tomahawk_ns.DataLoader = DataLoader;
+})();
+
 
 
 
@@ -10765,57 +11915,65 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	* @type {String}
 	* @description The name of the Tween instance.
 	**/
-	Tween.prototype.name = null;
+	Tween.prototype.name 			= null;
 	/**
 	* @member target
 	* @memberOf tomahawk_ns.Tween.prototype
 	* @type {Object}
 	* @description The target object on which the tween is applied.
 	**/
-	Tween.prototype.target = null;
+	Tween.prototype.target 			= null;
 	/**
 	* @member delay
 	* @memberOf tomahawk_ns.Tween.prototype
 	* @type {Number}
 	* @description The amount of time before the tween effect is applied.
 	**/
-	Tween.prototype.delay = 0;
+	Tween.prototype.delay 			= 0;
 	/**
 	* @member from
 	* @memberOf tomahawk_ns.Tween.prototype
 	* @type {Object}
 	* @description Defines the starting values of the target properties.
 	**/
-	Tween.prototype.from = null;
+	Tween.prototype.from 			= null;
 	/**
 	* @member to
 	* @memberOf tomahawk_ns.Tween.prototype
 	* @type {Object}
 	* @description Defines the ending values of the target properties.
 	**/
-	Tween.prototype.to = null;
+	Tween.prototype.to 				= null;
 	/**
 	* @member duration
 	* @memberOf tomahawk_ns.Tween.prototype
 	* @type {Number}
-	* @description The duration of the tween ( in frames ).
+	* @description The duration of the tween ( in frames or ms ).
 	**/
-	Tween.prototype.duration = 0;
+	Tween.prototype.duration 		= 0;
 	/**
 	* @member easing
 	* @memberOf tomahawk_ns.Tween.prototype
 	* @type {Function}
 	* @description The easing function used to interpolate the values during the tween process.
 	**/
-	Tween.prototype.easing = null
+	Tween.prototype.easing 			= null;
+	/**
+	* @member measureUnit
+	* @memberOf tomahawk_ns.Tween.prototype
+	* @type {String}
+	* @description The unit measure used for time and duration, must be "frame" or "ms"
+	* @default "frame"
+	**/
+	Tween.prototype.measureUnit 	= "frame";
 	
 	/**
 	* @method update
 	* @description Updates the target values according to the time ( in frame ) passed in parameter.
 	* @memberOf tomahawk_ns.Tween.prototype
-	* @param {Number} time The current tween time ( in frame )
+	* @param {Number} time The current tween time ( in frame or ms )
 	**/
-	Tween.prototype.update = function(time)
+	Tween.prototype.update 			= function(time)
 	{
 		var prop = null;
 		var ratio = 1;
@@ -10843,10 +12001,6 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 		}
 	};
 	
-	
-	
-	
-	
 	/**
 	* @method destroy
 	* @description Stops and kill the tween properly.
@@ -10854,13 +12008,13 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	**/
 	Tween.prototype.destroy = function()
 	{
-		this.name = null;
-		this.target = null;
-		this.delay = null;
-		this.from = null;
-		this.to = null;
-		this.duration = null;
-		this.easing = null;
+		this.name 		= null;
+		this.target 	= null;
+		this.delay 		= null;
+		this.from 		= null;
+		this.to 		= null;
+		this.duration 	= null;
+		this.easing 	= null;
 	};
 	
 	tomahawk_ns.Tween = Tween;
@@ -11988,5 +13142,1910 @@ tomahawk_ns.Matrix4x4 			= Matrix4x4;
 	
 	tomahawk_ns.Strong = Strong;
 
+})();
+
+
+
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+
+(function() {
+	
+	/**
+	* @class Bitmap3D
+	* @memberOf tomahawk_ns
+	* @description The Bitmap3D class represents display objects that represent bitmap images. 
+	* @param {tomahawk_ns.Texture} [texture=undefined] the bitmap drawing texture.
+	* @augments tomahawk_ns.DisplayObject3D
+	* @constructor
+	*/
+	function Bitmap3D(texture)
+	{
+		tomahawk_ns.DisplayObject3D.apply(this);
+		
+		if( texture == undefined )
+			return;
+			
+		this.setTexture(texture);
+	}
+
+	Tomahawk.registerClass( Bitmap3D, "Bitmap3D" );
+	Tomahawk.extend( "Bitmap3D", "DisplayObject3D" );
+
+	/**
+	 * @description The current drawing texture.
+	 * @member texture
+	 * @type {tomahawk_ns.Texture}
+	 * @memberOf tomahawk_ns.Bitmap3D.prototype
+	 * @default null
+	 */
+	Bitmap3D.prototype.texture = null;
+	
+	/**
+	* @description Sets the Bitmap3D current Texture.
+	* @method setTexture
+	* @param {tomahawk_ns.Texture} texture 
+	* @memberOf tomahawk_ns.Bitmap3D.prototype
+	**/
+	Bitmap3D.prototype.setTexture = function(texture)
+	{
+		this.texture = texture;
+		this.width = this.texture.rect[2];
+		this.height = this.texture.rect[3];
+	};
+
+	Bitmap3D.prototype.draw = function( renderTask )
+	{	
+		this.updateMatrix();
+		renderTask.batchQuad(this);
+	};
+	
+	tomahawk_ns.Bitmap3D = Bitmap3D;
+
+})();
+
+
+
+
+
+
+/**
+ * ...
+ * @author Hatshepsout
+ */
+
+var tomahawk_ns = tomahawk_ns || new Object();
+
+(function() 
+{
+
+	function BlendMode(){}
+	
+	Tomahawk.registerClass( BlendMode, "BlendMode" );
+
+	tomahawk_ns.BlendMode = BlendMode;
+	
+	
+	BlendMode.init = function(gl)
+	{
+		tomahawk_ns.BlendMode.NORMAL         = [gl.ONE,       gl.ONE_MINUS_SRC_ALPHA];
+		//tomahawk_ns.BlendMode.NORMAL         = [gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA];
+        tomahawk_ns.BlendMode.ADD            = [gl.SRC_ALPHA, gl.DST_ALPHA];
+        tomahawk_ns.BlendMode.MULTIPLY       = [gl.DST_COLOR, gl.ONE_MINUS_SRC_ALPHA];
+        tomahawk_ns.BlendMode.SCREEN         = [gl.SRC_ALPHA, gl.ONE];
+        tomahawk_ns.BlendMode.OVERLAY        = [gl.ONE,       gl.ONE_MINUS_SRC_ALPHA];
+        tomahawk_ns.BlendMode.DARKEN         = [gl.ONE,       gl.ONE_MINUS_SRC_ALPHA];
+        tomahawk_ns.BlendMode.LIGHTEN        = [gl.ONE,       gl.ONE_MINUS_SRC_ALPHA];
+        tomahawk_ns.BlendMode.COLOR_DODGE    = [gl.ONE,       gl.ONE_MINUS_SRC_ALPHA];
+        tomahawk_ns.BlendMode.COLOR_BURN     = [gl.ONE,       gl.ONE_MINUS_SRC_ALPHA];
+        tomahawk_ns.BlendMode.HARD_LIGHT     = [gl.ONE,       gl.ONE_MINUS_SRC_ALPHA];
+        tomahawk_ns.BlendMode.SOFT_LIGHT     = [gl.ONE,       gl.ONE_MINUS_SRC_ALPHA];
+        tomahawk_ns.BlendMode.DIFFERENCE     = [gl.ONE,       gl.ONE_MINUS_SRC_ALPHA];
+        tomahawk_ns.BlendMode.EXCLUSION      = [gl.ONE,       gl.ONE_MINUS_SRC_ALPHA];
+        tomahawk_ns.BlendMode.HUE            = [gl.ONE,       gl.ONE_MINUS_SRC_ALPHA];
+        tomahawk_ns.BlendMode.SATURATION     = [gl.ONE,       gl.ONE_MINUS_SRC_ALPHA];
+        tomahawk_ns.BlendMode.COLOR          = [gl.ONE,       gl.ONE_MINUS_SRC_ALPHA];
+        tomahawk_ns.BlendMode.LUMINOSITY     = [gl.ONE,       gl.ONE_MINUS_SRC_ALPHA];
+	}
+	
+	BlendMode.NORMAL = 0;
+	BlendMode.ADD = 1;
+	BlendMode.MULTIPLY = 2;
+	BlendMode.SCREEN = 3;
+	BlendMode.OVERLAY = 4;
+	BlendMode.DARKEN = 5;
+	BlendMode.LIGHTEN = 6;
+	BlendMode.COLOR_DODGE = 7;
+	BlendMode.COLOR_BURN = 8;
+	BlendMode.HARD_LIGHT = 9;
+	BlendMode.SOFT_LIGHT = 10;
+	BlendMode.DIFFERENCE = 11;
+	BlendMode.EXCLUSION = 12;
+	BlendMode.HUE = 13;
+	BlendMode.SATURATION = 14;
+	BlendMode.COLOR = 15;
+	BlendMode.LUMINOSITY = 16;
+	
+})();
+
+
+
+/**
+ * ...
+ * @author Hatshepsout
+ */
+
+var tomahawk_ns = tomahawk_ns || new Object();
+
+(function() 
+{
+
+	function DefaultShader()
+	{
+		//this.init();
+	}
+	
+	Tomahawk.registerClass( DefaultShader, "DefaultShader" );
+
+	
+	DefaultShader.prototype.id = 0;
+	DefaultShader.prototype.fragmentShader = null;
+	DefaultShader.prototype.vertexShader = null;
+	DefaultShader.prototype.program = null;
+	DefaultShader.prototype.projectionPointer = null;
+	DefaultShader.VERTEX_SIZE = 6;
+	
+	
+	DefaultShader.prototype._compile = function(context, source, type)
+	{
+		var shader = context.createShader(type);
+	
+		context.shaderSource(shader, source);
+		context.compileShader(shader);
+
+		if (!context.getShaderParameter(shader, context.COMPILE_STATUS)) 
+		{
+			alert(context.getShaderInfoLog(shader));
+			return null;
+		}
+
+		return shader;
+	};
+	
+	DefaultShader.prototype.init = function(context, source, type)
+	{
+		
+		var vertexPosAttribPointer = 0;
+		var colorAttribPointer = 0;
+		var uvsAttribPointer = 0;
+		var samplerPointer = 0;
+		var projectionPointer = 0;
+		var stride = tomahawk_ns.DefaultShader.VERTEX_SIZE * 4;
+		
+		this.fragmentShader = this._compile(context, this._getFragmentSource(), context.FRAGMENT_SHADER );
+		this.vertexShader = this._compile(context, this._getVertexSource(), context.VERTEX_SHADER );
+		
+		if( this.program != null )
+		{
+			context.deleteProgram( this.program );
+		}
+		
+		this.program = context.createProgram();
+		
+		context.attachShader(this.program, this.vertexShader); // attach vertexShader
+		context.attachShader(this.program, this.fragmentShader); // attach fragmentShader
+		context.linkProgram(this.program); // links program to webgl context
+		
+		
+		/* if the program is not linked...*/
+		if (!context.getProgramParameter(this.program, context.LINK_STATUS)) 
+		{
+			alert("Could not initialise shaders");
+		}
+	
+		context.useProgram(this.program); // use the shaderProgram
+		
+		
+		vertexPosAttribPointer = context.getAttribLocation(this.program, "aVertexPosition"); 
+		colorAttribPointer = context.getAttribLocation(this.program, "aColor"); 
+		uvsAttribPointer = context.getAttribLocation(this.program, "aTextureCoord"); 
+		context.enableVertexAttribArray(vertexPosAttribPointer);
+		context.enableVertexAttribArray(colorAttribPointer);
+		context.enableVertexAttribArray(uvsAttribPointer);
+		
+		
+		context.vertexAttribPointer(vertexPosAttribPointer, 2, context.FLOAT, false, stride, 0);
+		context.vertexAttribPointer(colorAttribPointer, 2, context.FLOAT, false, stride, 2*4);
+		context.vertexAttribPointer(uvsAttribPointer, 2, context.FLOAT, false, stride, 4*4);
+		
+		samplerPointer = context.getUniformLocation(this.program,"uSampler");
+		projectionPointer = context.getUniformLocation(this.program,"uProjection");
+		context.uniform1i(samplerPointer, 0);
+		
+		this.projectionPointer = projectionPointer;
+	};
+	
+	DefaultShader.prototype._getVertexSource = function ()
+	{
+		var VERTEX_SRC = ''+
+		
+		'attribute vec2 aVertexPosition;'+
+		'attribute vec2 aColor;'+
+		'attribute vec2 aTextureCoord;'+
+		'varying vec4 vColor;'+
+		'varying vec2 vTextureCoord;'+
+		'uniform vec2 uProjection;'+
+		'const vec2 center = vec2(-1.0, 1.0);'+
+		
+		
+		'void main(void) {'+
+			//'gl_Position = vec4( ( aVertexPosition / uProjection) + center , 0.0, 1.0);'+
+			//'vTextureCoord = aTextureCoord;'+
+			//'vec3 color = mod(vec3(aColor.x/65536.0, aColor.x/256.0, aColor.x), 256.0) / 256.0;'+
+			//'vColor = vec4( color * aColor.y, aColor.y );'+
+			'gl_Position = vec4( ( aVertexPosition / uProjection) + center , 0.0, 1.0);'+
+			'vTextureCoord = aTextureCoord;'+
+			'vec3 color = mod(vec3(aColor.x/65536.0, aColor.x/256.0, aColor.x), 256.0) / 256.0;'+
+			'vColor = vec4( color * aColor.y, aColor.y );'+
+		'}';
+		
+		return VERTEX_SRC;
+	};
+	
+	DefaultShader.prototype._getFragmentSource = function ()
+	{
+		var FRAG_SRC = ''+
+		
+		'precision lowp float;'+
+		'varying vec4 vColor;'+
+		'varying vec2 vTextureCoord;'+
+		'uniform sampler2D uSampler;'+
+
+		'void main(void) {'+
+			'gl_FragColor = texture2D(uSampler,vTextureCoord) * vColor.a;'+
+		'}';
+		
+		return FRAG_SRC;
+	};
+	
+	tomahawk_ns.DefaultShader = DefaultShader;
+	
+	
+	
+})();
+
+
+
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+
+(function() {
+
+	/**
+	 * @abstract
+	 * @class DisplayObject3D
+	 * @memberOf tomahawk_ns
+	 * @constructor
+	 * @augments tomahawk_ns.EventDispatcher
+	 * @description The DisplayObject3D class is the base class for all objects that can be placed on the display list.
+	 * The DisplayObject3D class supports basic functionality like the x and y position of an object, as well as more advanced properties of the object such as its transformation matrix. DisplayObject3D is an abstract base class; therefore, you cannot call DisplayObject3D directly. All display objects inherit from the DisplayObject3D class.
+	 **/
+	function DisplayObject3D()
+	{
+		tomahawk_ns.EventDispatcher.apply(this);
+		this.matrix = new tomahawk_ns.Matrix2D();
+		this.concatenedMatrix = new tomahawk_ns.Matrix2D();
+		this.bounds = new tomahawk_ns.Rectangle();
+		this.color = 0xFFFFFF;
+	}
+
+	Tomahawk.registerClass( DisplayObject3D, "DisplayObject3D" );
+	Tomahawk.extend( "DisplayObject3D", "EventDispatcher" );
+
+	
+	/**
+	* @member name
+	* @memberOf tomahawk_ns.DisplayObject3D.prototype
+	* @type {String}
+	* @description Indicates the instance name of the DisplayObject3D.
+	* @default null
+	**/
+	DisplayObject3D.prototype.name 				= null;
+	
+	/**
+	* @member parent
+	* @memberOf tomahawk_ns.DisplayObject3D.prototype
+	* @type {tomahawk_ns.DisplayObject3DContainer}
+	* @description Indicates the DisplayObject3DContainer object that contains this display object.
+	* @default null
+	**/
+	DisplayObject3D.prototype.parent 				= null;
+	
+	/**
+	* @member x
+	* @memberOf tomahawk_ns.DisplayObject3D.prototype
+	* @type {Number}
+	* @default 0
+	* @description Indicates the x coordinate of the DisplayObject3D instance relative to the local coordinates of the parent DisplayObject3DContainer.
+	**/
+	DisplayObject3D.prototype.x 					= 0;
+	
+	/**
+	* @member y
+	* @memberOf tomahawk_ns.DisplayObject3D.prototype
+	* @type {Number}
+	* @default 0
+	* @description Indicates the y coordinate of the DisplayObject3D instance relative to the local coordinates of the parent DisplayObject3DContainer.
+	**/
+	DisplayObject3D.prototype.y 					= 0;
+	
+	/**
+	* @member pivotX
+	* @memberOf tomahawk_ns.DisplayObject3D.prototype
+	* @type {Number}
+	* @default 0
+	* @description Indicates the x coordinate of the DisplayObject3D instance registration point
+	**/
+	DisplayObject3D.prototype.pivotX 				= 0;
+	
+	/**
+	* @member pivotY
+	* @memberOf tomahawk_ns.DisplayObject3D.prototype
+	* @type {Number}
+	* @default 0
+	* @description Indicates the y coordinate of the DisplayObject3D instance registration point
+	**/
+	DisplayObject3D.prototype.pivotY 				= 0;
+	
+	/**
+	* @member skewX
+	* @memberOf tomahawk_ns.DisplayObject3D.prototype
+	* @type {Number}
+	* @default 0
+	* @description Indicates the skew on the x axis of the DisplayObject3D instance
+	**/
+	DisplayObject3D.prototype.skewX 				= 0;
+	
+	/**
+	* @member skewY
+	* @memberOf tomahawk_ns.DisplayObject3D.prototype
+	* @type {Number}
+	* @default 0
+	* @description Indicates the skew on the y axis of the DisplayObject3D instance
+	**/
+	DisplayObject3D.prototype.skewY 				= 0;
+	
+	/**
+	* @member scaleX
+	* @memberOf tomahawk_ns.DisplayObject3D.prototype
+	* @type {Number}
+	* @description Indicates the horizontal scale (percentage) of the object as applied from the registration point.
+	* @default 1
+	**/
+	DisplayObject3D.prototype.scaleX 				= 1;
+	
+	/**
+	* @member scaleY
+	* @memberOf tomahawk_ns.DisplayObject3D.prototype
+	* @type {Number}
+	* @default 1
+	* @description Indicates the vertical scale (percentage) of the object as applied from the registration point.
+	**/
+	DisplayObject3D.prototype.scaleY 				= 1;
+	
+	/**
+	* @default 0
+	* @member width
+	* @memberOf tomahawk_ns.DisplayObject3D.prototype
+	* @type {Number}
+	* @description Indicates the width of the display object, in pixels.
+	**/
+	DisplayObject3D.prototype.width 				= 0;
+	
+	/**
+	* @default 0
+	* @member height
+	* @memberOf tomahawk_ns.DisplayObject3D.prototype
+	* @type {Number}
+	* @description Indicates the height of the display object, in pixels.
+	**/
+	DisplayObject3D.prototype.height 				= 0;
+	
+	/**
+	* @member rotation
+	* @memberOf tomahawk_ns.DisplayObject3D.prototype
+	* @type {Number}
+	* @description Indicates the rotation of the DisplayObject3D instance, in degrees, from its original orientation.
+	* @default 0
+	**/
+	DisplayObject3D.prototype.rotation 				= 0;
+	
+	/**
+	* @member stage
+	* @memberOf tomahawk_ns.DisplayObject3D.prototype
+	* @type {tomahawk_ns.Stage}
+	* @description The Stage of the display object.
+	* @default null
+	**/
+	DisplayObject3D.prototype.stage 				= null;
+	
+	/**
+	* @member alpha
+	* @memberOf tomahawk_ns.DisplayObject3D.prototype
+	* @type {Number}
+	* @description Indicates the alpha transparency value of the object specified.
+	* @default 1
+	**/
+	DisplayObject3D.prototype.alpha 				= 1;
+	
+	/**
+	* @member mouseEnabled
+	* @memberOf tomahawk_ns.DisplayObject3D.prototype
+	* @type {Boolean}
+	* @description Specifies whether this object receives mouse, or other user input, messages.
+	* @default true
+	**/
+	DisplayObject3D.prototype.mouseEnabled 		= true;
+	
+	/**
+	* @member handCursor
+	* @memberOf tomahawk_ns.DisplayObject3D.prototype
+	* @type {Boolean}
+	* @description A Boolean value that indicates whether the pointing hand (hand cursor) appears when the pointer rolls over this sprite
+	* @default false
+	**/
+	DisplayObject3D.prototype.handCursor 		= false;
+	
+	/**
+	* @member visible
+	* @memberOf tomahawk_ns.DisplayObject3D.prototype
+	* @type {Boolean}
+	* @description Whether or not the display object is visible.
+	* @default true
+	**/
+	DisplayObject3D.prototype.visible 			= true;
+	
+	/**
+	* @member matrix
+	* @memberOf tomahawk_ns.DisplayObject3D.prototype
+	* @type {tomahawk_ns.Matrix2D}
+	* @description The transformation matrix of the DisplayObject3D
+	* @default null
+	**/
+	DisplayObject3D.prototype.matrix 			= null;
+	
+	/**
+	* @member bounds
+	* @memberOf tomahawk_ns.DisplayObject3D.prototype
+	* @type {tomahawk_ns.Rectangle}
+	* @description Indicates a rectangle that defines the area of the display object relative to his parent coordinate system. You must set the updateNextFrame ( or the autoUpdate ) property to true and call the updateBounds method to actualize this Rectangle.
+	* @default null
+	**/
+	DisplayObject3D.prototype.bounds 			= null;
+	DisplayObject3D.prototype.texture 			= null;
+	DisplayObject3D.prototype.color 			= null;
+	
+	/**
+	* @member pixelAlphaLimit
+	* @memberOf tomahawk_ns.DisplayObject3D.prototype
+	* @type {Number}
+	* @default 0
+	* @description The alpha channel limit under which a pixel is considered transparent while calling the hitTest method.
+	**/
+	
+	DisplayObject3D.prototype.concatenedMatrix 	= null;
+	
+	
+	
+	/**
+	* @method updateBounds
+	* @memberOf tomahawk_ns.DisplayObject3D.prototype
+	* @description Updates the bounds of the current DisplayObject3D if his updateNextFrame || autoUpdate = true
+	**/
+	DisplayObject3D.prototype.updateBounds = function()
+	{		
+		var rect = new tomahawk_ns.Rectangle();
+		var points = new Array();
+		var mat = this.matrix;
+	
+		points.push(mat.transformPoint(0,0));
+		points.push(mat.transformPoint(this.width,0));
+		points.push(mat.transformPoint(0,this.height));
+		points.push(mat.transformPoint(this.width, this.height));
+	
+		rect.left = 2147483648;
+		rect.top = 2147483648;
+		rect.bottom = -2147483648;
+		rect.right = -2147483648;
+	
+		var i = points.length;
+		while( --i > -1 )
+		{
+			rect.left = ( points[i].x < rect.left ) ? points[i].x : rect.left;
+			rect.right = ( points[i].x > rect.right ) ? points[i].x : rect.right;
+			rect.top = ( points[i].y < rect.top ) ? points[i].y : rect.top;
+			rect.bottom = ( points[i].y > rect.bottom ) ? points[i].y : rect.bottom;
+		}
+	
+		rect.x = rect.left;
+		rect.y = rect.top;
+		rect.width = rect.right - rect.left;
+		rect.height = rect.bottom - rect.top;
+		
+		this.bounds = rect;
+	};
+
+	/**
+	* @method updateMatrix
+	* @memberOf tomahawk_ns.DisplayObject3D.prototype
+	* @description Updates the matrix of the DisplayObject3D if his updateNextFrame || autoUpdate = true
+	**/
+	DisplayObject3D.prototype.updateMatrix = function()
+	{
+		var mat = this.matrix;
+		var mat2 = this.concatenedMatrix;
+		var mat3 = this.parent.concatenedMatrix;
+		
+		//if( this.autoUpdate == false && this.updateNextFrame == false )
+		
+		mat.d = mat.a = 1;
+		mat.b = mat.c = mat.tx = mat.ty = 0;
+		
+		mat2.d = mat2.a = 1;
+		mat2.b = mat2.c = mat2.tx = mat2.ty = 0;
+		
+		
+		mat.appendTransform(	this.x + this.pivotX, 
+								this.y + this.pivotY, 
+								this.scaleX, 
+								this.scaleY, 
+								this.rotation, 
+								this.skewX, 
+								this.skewY, 
+								this.pivotX, 
+								this.pivotY);
+	
+		mat2.appendMatrix(mat3).appendMatrix(mat);
+	};
+
+	
+	/**
+	* @method draw
+	* @description Draws the DisplayObject3D instance into the specified context
+	* @memberOf tomahawk_ns.DisplayObject3D.prototype
+	* @param {CanvasRenderingContext2D} drawContext the CanvasRenderingContext2D context on which you want to draw.
+	**/
+	DisplayObject3D.prototype.draw = function(renderTask)
+	{
+	};
+	
+	
+	/**
+	* @method localToGlobal
+	* @memberOf tomahawk_ns.DisplayObject3D.prototype
+	* @param {Number} x
+	* @param {Number} y
+	* @returns {tomahawk_ns.Point}
+	* @description Converts the point object specified by x,y parameters from the DisplayObject3D's (local) coordinates to the Stage (global) coordinates.
+	**/
+	DisplayObject3D.prototype.localToGlobal = function(x,y)
+	{
+		var matrix = this.concatenedMatrix;
+		var pt = matrix.transformPoint(x,y);
+		return new tomahawk_ns.Point(pt.x,pt.y);
+	};
+
+	/**
+	* @method globalToLocal
+	* @memberOf tomahawk_ns.DisplayObject3D.prototype
+	* @param {Number} x
+	* @param {Number} y
+	* @returns {tomahawk_ns.Point}
+	* @description Converts the point object specified by x,y parameters from the Stage (global) coordinates to the DisplayObject3D's (local) coordinates.
+	**/
+	DisplayObject3D.prototype.globalToLocal = function(x,y)
+	{
+		var matrix = this.concatenedMatrix.clone().invert();
+		var pt = matrix.transformPoint(x,y);
+		return new tomahawk_ns.Point(pt.x,pt.y);
+	};
+
+	/**
+	* @method hitTest
+	* @memberOf tomahawk_ns.DisplayObject3D.prototype
+	* @param {Number} x
+	* @param {Number} y
+	* @returns {Boolean}
+	* @description Evaluates the DisplayObject3D instance to see if it overlaps or intersects with the point specified by the x and y parameters. The x and y parameters specify a point in the coordinate space of the Stage, not the display object container that contains the display object (unless that display object container is the Stage).
+	**/
+	DisplayObject3D.prototype.hitTest = function(x,y)
+	{		
+		var pt1 = this.globalToLocal(x,y);
+		var mat = this.matrix;
+		var pixels = null;
+		
+		if( pt1.x < 0 || pt1.x > this.width || pt1.y < 0 || pt1.y > this.height )
+			return false;
+		
+		return true;
+	};
+
+	/**
+	* @method isChildOf
+	* @memberOf tomahawk_ns.DisplayObject3D.prototype
+	* @param {tomahawk_ns.DisplayObject3D} obj
+	* @returns {Boolean}
+	* @description Indicates if the DisplayObject3D "obj" is a child of the DisplayObject3D instance
+	**/
+	DisplayObject3D.prototype.isChildOf = function( obj )
+	{
+		var curParent = this.parent;
+		while( curParent != null )
+		{
+			if( curParent == obj )
+				return true;
+				
+			curParent = curParent.parent;
+		}
+		
+		return false;
+	};
+
+	/**
+	* @method getBoundingRectIn
+	* @memberOf tomahawk_ns.DisplayObject3D.prototype
+	* @param {tomahawk_ns.DisplayObject3D} spaceCoordinates
+	* @returns {tomahawk_ns.Rectangle}
+	* @description Returns a rectangle that defines the area of the display object relative to the coordinate system of the spaceCoordinates object.
+	**/
+	DisplayObject3D.prototype.getBoundingRectIn = function(spaceCoordinates)
+	{
+		this.updateNextFrame = true;
+		this.updateMatrix();
+		
+		var rect = new tomahawk_ns.Rectangle();
+		var points = new Array();
+		var pt1 = this.localToGlobal(0,0);
+		var pt2 = this.localToGlobal(this.width,0);
+		var pt3 = this.localToGlobal(0,this.height);
+		var pt4 = this.localToGlobal(this.width,this.height);
+		
+		pt1 = spaceCoordinates.globalToLocal(pt1.x,pt1.y);
+		pt2 = spaceCoordinates.globalToLocal(pt2.x,pt2.y);
+		pt3 = spaceCoordinates.globalToLocal(pt3.x,pt3.y);
+		pt4 = spaceCoordinates.globalToLocal(pt4.x,pt4.y);
+		
+		points.push(pt1,pt2,pt3,pt4);
+		
+		rect.left = 2147483648;
+		rect.top = 2147483648;
+		rect.bottom = -2147483648;
+		rect.right = -2147483648;
+		
+		var i = points.length;
+		while( --i > -1 )
+		{
+			rect.left = ( points[i].x < rect.left ) ? points[i].x : rect.left;
+			rect.right = ( points[i].x > rect.right ) ? points[i].x : rect.right;
+			rect.top = ( points[i].y < rect.top ) ? points[i].y : rect.top;
+			rect.bottom = ( points[i].y > rect.bottom ) ? points[i].y : rect.bottom;
+		}
+		
+		rect.x = rect.left;
+		rect.y = rect.top;
+		rect.width = rect.right - rect.left;
+		rect.height = rect.bottom - rect.top;
+		return rect;
+	};
+
+	/**
+	* @method destroy
+	* @memberOf tomahawk_ns.DisplayObject3D.prototype
+	* @description Kill the DisplayObject3D instance and free all his ressources
+	**/
+	DisplayObject3D.prototype.destroy = function()
+	{
+		if( this.parent != null )
+		{
+			this.parent.removeChild(this);
+		}
+		
+		this.texture = null;
+		
+		tomahawk_ns.EventDispatcher.prototype.destroy.apply(this);
+	};
+	
+	tomahawk_ns.DisplayObject3D = DisplayObject3D;
+
+})();
+
+
+
+
+
+
+
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+
+(function() {
+	
+	/**
+	 * @class DisplayObjectContainer3D
+	 * @memberOf tomahawk_ns
+	 * @description The DisplayObjectContainer3D class is the base class for all objects that can serve as display object containers on the display list. The display list manages all objects displayed in the canvas. Use the DisplayObjectContainer3D class to arrange the display objects in the display list. Each DisplayObjectContainer3D object has its own child list for organizing the z-order of the objects. The z-order is the front-to-back order that determines which object is drawn in front, which is behind, and so on. DisplayObjectContainer3D is an abstract base class; therefore, you cannot call DisplayObjectContainer3D directly.
+	 * @constructor
+	 * @augments tomahawk_ns.DisplayObject
+	 **/
+	function DisplayObjectContainer3D()
+	{
+		tomahawk_ns.DisplayObject.apply(this);
+		this.children = new Array();
+	}
+
+	Tomahawk.registerClass( DisplayObjectContainer3D, "DisplayObjectContainer3D" );
+	Tomahawk.extend( "DisplayObjectContainer3D", "DisplayObject" );
+
+	/**
+	* @member children
+	* @memberOf tomahawk_ns.DisplayObjectContainer3D.prototype
+	* @type {Array}
+	* @description the child list of the DisplayObjectContainer3D instance
+	* @default null
+	**/
+	DisplayObjectContainer3D.prototype.children = null;
+	
+	/**
+	* @member isContainer
+	* @memberOf tomahawk_ns.DisplayObjectContainer3D.prototype
+	* @type {Boolean}
+	* @description Defines if the current DisplayObjectContainer3D is a container or not ( actually always sets to true )
+	* @default true
+	**/
+	DisplayObjectContainer3D.prototype.isContainer = true;
+
+	/**
+	* @method setChildIndex
+	* @memberOf tomahawk_ns.DisplayObjectContainer3D.prototype
+	* @param {tomahawk_ns.DisplayObject} child The child DisplayObject instance for which you want to change the index number.
+	* @param {Number} index The resulting index number for the child display object.
+	* @description Changes the position of an existing child in the display object container.
+	**/
+	DisplayObjectContainer3D.prototype.setChildIndex = function(child,index)
+	{
+		this.addChildAt(child,index);
+	};
+	
+	/**
+	* @method addChild
+	* @memberOf tomahawk_ns.DisplayObjectContainer3D.prototype
+	* @param {tomahawk_ns.DisplayObject} child The DisplayObject instance to add as a child of this DisplayObjectContainer3D instance.
+	* @returns {tomahawk_ns.DisplayObject} The DisplayObject instance that you pass in the child parameter.
+	* @description Adds a child DisplayObject instance to this DisplayObjectContainer3D instance. The child is added to the front (top) of all other children in this DisplayObjectContainer3D instance. (To add a child to a specific index position, use the addChildAt() method.) If you add a child object that already has a different display object container as a parent, the object is removed from the child list of the other display object container.
+	**/
+	DisplayObjectContainer3D.prototype.addChild = function(child)
+	{		
+		if( child.parent == this )
+			return child;
+			
+		if( child.parent )
+		{
+			child.parent.removeChild(child);
+		}
+		
+		child.parent = this;
+		this.children.push(child);
+		child.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.ADDED, true, true) );
+		return child;
+	};
+
+	/**
+	* @method getChildAt
+	* @memberOf tomahawk_ns.DisplayObjectContainer3D.prototype
+	* @param {Number} index The index position of the child object.
+	* @returns {tomahawk_ns.DisplayObject} The child display object at the specified index position.
+	* @description Returns the child display object instance that exists at the specified index.
+	**/
+	DisplayObjectContainer3D.prototype.getChildAt = function (index)
+	{
+		return this.children[index];
+	};
+
+	/**
+	* @method getChildByName
+	* @memberOf tomahawk_ns.DisplayObjectContainer3D.prototype
+	* @param {String} name The name of the child to return.
+	* @returns {tomahawk_ns.DisplayObject} The child display object with the specified name.
+	* @description Returns the child display object that exists with the specified name. If more that one child display object has the specified name, the method returns the first object in the child list.
+	**/
+	DisplayObjectContainer3D.prototype.getChildByName = function(name)
+	{
+		var children = this.children;
+		var i = children.length;
+		
+		while( --i > -1 )
+		{
+			if( children[i].name == name )
+				return children[i];
+		}
+		
+		return null;
+	};
+
+	/**
+	* @method addChildAt
+	* @memberOf tomahawk_ns.DisplayObjectContainer3D.prototype
+	* @returns {tomahawk_ns.DisplayObject} The DisplayObject instance that you pass in the child parameter.
+	* @param {tomahawk_ns.DisplayObject} child The DisplayObject instance to add as a child of this DisplayObjectContainer3D instance.
+	* @param {Number} index The index position to which the child is added. If you specify a currently occupied index position, the child object that exists at that position and all higher positions are moved up one position in the child list.
+	* @description Adds a child DisplayObject instance to this DisplayObjectContainer3D instance. The child is added at the index position specified. An index of 0 represents the back (bottom) of the display list for this DisplayObjectContainer3D object.
+	**/
+	DisplayObjectContainer3D.prototype.addChildAt = function(child, index)
+	{
+		if( child.parent != null && child.parent != this)
+		{
+			child.parent.removeChild(child);
+		}
+		var children = this.children;
+		var tab1 = this.children.slice(0,index);
+		var tab2 = this.children.slice(index);
+		this.children = tab1.concat([child]).concat(tab2);
+		
+		child.parent = this;
+		child.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.ADDED, true, true) );
+		
+		return child;
+	};
+	
+	/**
+	* @method getChildIndex
+	* @memberOf tomahawk_ns.DisplayObjectContainer3D.prototype
+	* @param {tomahawk_ns.DisplayObject} child The DisplayObject instance to identify.
+	* @returns {Number}  The index position of the child display object to identify.
+	* @description Returns the index position of a child DisplayObject instance.
+	**/
+	DisplayObjectContainer3D.prototype.getChildIndex = function(child)
+	{
+		return this.children.indexOf(child);
+	};
+
+	/**
+	* @method removeChildAt
+	* @memberOf tomahawk_ns.DisplayObjectContainer3D.prototype
+	* @param {Number} index The child index of the DisplayObject to remove.
+	* @returns {tomahawk_ns.DisplayObject} The DisplayObject instance that was removed.
+	* @description Removes a child DisplayObject from the specified index position in the child list of the DisplayObjectContainer3D.
+	**/
+	DisplayObjectContainer3D.prototype.removeChildAt = function(index)
+	{
+		var child = this.children[index];
+		if( child == undefined )
+			return null;
+			
+		child.parent = null;
+		this.children.splice(index,1);
+		child.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.REMOVED, true, true) );
+		return child;
+	};
+	
+	/**
+	* @method removeChildren
+	* @memberOf tomahawk_ns.DisplayObjectContainer3D.prototype
+	* @description Removes all child DisplayObject instances from the child list of the DisplayObjectContainer3D instance.
+	**/
+	DisplayObjectContainer3D.prototype.removeChildren = function()
+	{
+		while( this.children.length > 0 )
+		{
+			this.removeChildAt(0);
+		}
+	};
+	
+	/**
+	* @method removeChild
+	* @memberOf tomahawk_ns.DisplayObjectContainer3D.prototype
+	* @param {tomahawk_ns.DisplayObject} child The DisplayObject instance to remove
+	* @returns {tomahawk_ns.DisplayObject} The DisplayObject instance to remove
+	* @description Removes the specified child DisplayObject instance from the child list of the DisplayObjectContainer3D instance.
+	**/
+	DisplayObjectContainer3D.prototype.removeChild = function(child)
+	{
+		var index = this.children.indexOf(child);
+		var child = null;
+		
+		if( index > -1 )
+		{
+			child = this.children[index];
+			this.children.splice(index,1);
+			child.parent = null;
+			child.dispatchEvent( new tomahawk_ns.Event(tomahawk_ns.Event.REMOVED, true, true) );
+		}
+		
+		return child;
+	};
+
+	/**
+	* @method getObjectUnder
+	* @memberOf tomahawk_ns.DisplayObjectContainer3D.prototype
+	* @returns {Array}
+	* @description Returns an Array with the first nested child of the DisplayObjectContainer3D instance which overlaps or intersects with the point specified by the x and y parameters. The x and y parameters specify a point in the coordinate space of the Stage, not the display object container that contains the display object (unless that display object container is the Stage).
+	**/
+	DisplayObjectContainer3D.prototype.getObjectUnder = function(x,y)
+	{
+		var under = null;
+		var children = this.children;
+		var i = children.length;
+		var child = null;
+		
+		while( --i > -1 )
+		{
+			child = children[i];
+			
+			if( child.mouseEnabled == false )
+				continue;
+					
+			if( child.isContainer )
+			{				
+				under = child.getObjectUnder(x,y);
+				
+				if( under != null )
+				{
+					return under;
+				}
+			}
+			else
+			{	
+				if( child.hitTest(x,y) == true )
+				{
+					return child;
+				}
+			}
+		}
+		
+		return null;
+	};
+	
+	/**
+	* @method getNestedChildren
+	* @memberOf tomahawk_ns.DisplayObjectContainer3D.prototype
+	* @returns {Array}
+	* @description Returns an Array with all the nested children of the DisplayObjectContainer3D instance 
+	**/
+	DisplayObjectContainer3D.prototype.getNestedChildren = function()
+	{
+		var list = new Array();
+		var subChild = null;
+		var i = this.children.length;
+		
+		while( --i > -1 )
+		{
+			subChild = this.children[i];
+			if( subChild.isContainer == true )
+			{
+				list = list.concat(subChild.getNestedChildren());
+			}
+			
+			list.push(subChild);
+		}
+		
+		return list;
+	}
+	
+	DisplayObjectContainer3D.prototype.draw = function( renderTask )
+	{
+		var children = this.children;
+		var i = 0;
+		var max = children.length;
+		var child = null;
+		
+		this.updateMatrix();
+		
+		for( i = 0; i < max; i++ )
+		{
+			child = children[i];
+			child.draw(renderTask);
+		}
+	};
+
+	DisplayObjectContainer3D.prototype.updateBounds = function()
+	{
+		var children = this.children;
+		var i = children.length;
+		var child = null;
+		var rect = new tomahawk_ns.Rectangle();
+		var childRect = null;
+		var mat = this.matrix;
+		var points = new Array();
+		
+		i = children.length;
+		
+		while( --i > -1 )
+		{
+			child = children[i];
+			
+			if( child.updateNextFrame == true || child.autoUpdate == true )
+			{
+				child.updateMatrix();
+				child.updateBounds();
+			}
+			
+			childRect = child.bounds;
+			rect.left = ( childRect.left < rect.left ) ? childRect.left : rect.left;
+			rect.right = ( childRect.right > rect.right ) ? childRect.right : rect.right;
+			rect.top = ( childRect.top < rect.top ) ? childRect.top : rect.top;
+			rect.bottom = ( childRect.bottom > rect.bottom ) ? childRect.bottom : rect.bottom;
+		}
+		
+		rect.x = rect.left;
+		rect.y = rect.top;
+		rect.width = rect.right - rect.left;
+		rect.height = rect.bottom - rect.top;
+		
+		this.width = rect.width;
+		this.height = rect.height;
+		
+		tomahawk_ns.DisplayObject.prototype.updateBounds.apply(this);
+	};	
+	
+	DisplayObjectContainer3D.prototype.getBoundingRectIn = function(spaceCoordinates)
+	{
+		var children = this.children;
+		var i = children.length;
+		var child = null;
+		var rect = new tomahawk_ns.Rectangle();
+		var childRect = null;
+		
+		i = children.length;
+		
+		while( --i > -1 )
+		{
+			child = children[i];
+			childRect = child.getBoundingRectIn(spaceCoordinates);
+			rect.left = ( childRect.left < rect.left ) ? childRect.left : rect.left;
+			rect.right = ( childRect.right > rect.right ) ? childRect.right : rect.right;
+			rect.top = ( childRect.top < rect.top ) ? childRect.top : rect.top;
+			rect.bottom = ( childRect.bottom > rect.bottom ) ? childRect.bottom : rect.bottom;
+		}
+		
+		rect.x = rect.left;
+		rect.y = rect.top;
+		rect.width = rect.right - rect.left;
+		rect.height = rect.bottom - rect.top;
+		
+		return rect;
+	};
+	
+	DisplayObjectContainer3D.prototype.hitTest = function(x,y)
+	{
+		var children = this.children;
+		var i = children.length;
+		var child = null;
+		
+		while( --i > -1 )
+		{
+			child = children[i];
+			
+			if( child.hitTest(x,y) )
+				return true;
+		}
+		
+		return false;
+	};
+
+	DisplayObjectContainer3D.prototype.destroy = function()
+	{
+		var child = null;
+		
+		while( this.children.length > 0 )
+		{
+			child = this.getChildAt(0);
+			child.destroy();
+		}
+		
+		tomahawk_ns.DisplayObject.prototype.destroy.apply(this);
+	};
+	
+	tomahawk_ns.DisplayObjectContainer3D = DisplayObjectContainer3D;
+})();
+
+
+
+/**
+ * ...
+ * @author Hatshepsout
+ */
+
+
+	function RenderTask (){}
+	
+	RenderTask.prototype._currentTexture = null;
+	RenderTask.prototype._vertexArray = null;
+	RenderTask.prototype._indexArray = null;
+	RenderTask.prototype._maxSpritePerSession = 2000;
+	RenderTask.prototype.currentShader = null;
+	RenderTask.prototype.context = null;
+	RenderTask.prototype.counter = 0;
+	RenderTask.prototype._numQuads = 0;
+	
+	
+	RenderTask.prototype.init = function(context)
+	{
+		var vertPerQuad = 4;
+		var vertSize = tomahawk_ns.DefaultShader.VERTEX_SIZE;
+		var numIndices = 6;
+		
+		var verticesSize = this._maxSpritePerSession * vertPerQuad * vertSize;
+		var indicesSize = this._maxSpritePerSession * numIndices;
+		
+		var i = 0;
+		var j = 0;
+		var max = indicesSize;
+		
+		this.context = context;
+		
+		this._vertexArray = new Float32Array(verticesSize);
+		this._indexArray = new Uint16Array(indicesSize);
+		
+		this._vertexBuffer = context.createBuffer();
+		this._indexBuffer = context.createBuffer();
+		
+		for( i = 0; i < indicesSize; i+=6 )
+		{
+			this._indexArray[i+0] = 0+j;
+			this._indexArray[i+1] = 1+j;
+			this._indexArray[i+2] = 2+j;
+			this._indexArray[i+3] = 1+j;
+			this._indexArray[i+4] = 2+j;
+			this._indexArray[i+5] = 3+j;
+			j+=4;
+		}
+		
+		
+		context.bindBuffer(context.ARRAY_BUFFER, this._vertexBuffer);
+		context.bindBuffer(context.ELEMENT_ARRAY_BUFFER, this._indexBuffer );
+		context.bufferData(context.ELEMENT_ARRAY_BUFFER, this._indexArray, context.STATIC_DRAW);
+		context.bufferData(context.ARRAY_BUFFER, this._vertexArray, context.DYNAMIC_DRAW );
+	};
+	
+	RenderTask.prototype.start = function(projectionVector)
+	{
+		var context = this.context;
+		var shader = new tomahawk_ns.DefaultShader();
+		
+		this._numQuads = 0;
+		this.counter = 0;
+		
+		this.currentShader = shader;
+		shader.init(this.context);
+		context.uniform2f( this.currentShader.projectionPointer, projectionVector.x, projectionVector.y );
+	};
+	
+	RenderTask.prototype.end = function()
+	{
+		this.flush();
+	};
+	
+
+	RenderTask.prototype.flush = function()
+	{
+		var context = this.context;		
+		
+		if( this._numQuads == 0 )
+			return;
+		
+		context.activeTexture(context.TEXTURE0);
+		context.bindTexture(context.TEXTURE_2D, this._currentTexture);
+			
+		if( this._numQuads > this._maxSpritePerSession * 0.5 )
+		{
+			context.bufferSubData(context.ARRAY_BUFFER, 0, this._vertexArray);
+		}
+		else
+		{
+			var view = this._vertexArray.subarray(0, this._numQuads * 4 * tomahawk_ns.DefaultShader.VERTEX_SIZE);
+			context.bufferSubData(context.ARRAY_BUFFER, 0, view);
+		}
+		
+		//
+		context.drawElements(context.TRIANGLES, this._numQuads * 6, context.UNSIGNED_SHORT, 0 );
+
+		this.counter++;
+		this._numQuads = 0;
+	}
+	
+	RenderTask.prototype.batchQuad = function(quad)
+	{
+		var m = quad.concatenedMatrix;
+		var x = 0;
+		var y = 0;
+		var a = m.a;
+		var b = m.b;
+		var c = m.c;
+		var d = m.d;
+		var width = quad.width;
+		var height = quad.height;
+		var tx = m.tx;
+		var ty = m.ty;
+		var i = 0;
+		var tint = quad.color;
+		var alpha = quad.alpha;
+		var texture = quad.texture;
+		var uvs = texture.uvs;
+		var index = 0;
+		var vertices = this._vertexArray;
+		var context = this.context;
+		
+		if( this._currentTexture == texture.data || this._numQuads >= this._maxSpritePerSession )
+		{
+			this._currentTexture = texture.getGLTexture(context);
+			this.flush();
+		}
+		
+		index = this._numQuads * 4 * tomahawk_ns.DefaultShader.VERTEX_SIZE;
+	
+		vertices[index++] = x * a + y * c + tx;
+		vertices[index++] = x * b + y * d + ty;
+		vertices[index++] = tint;
+		vertices[index++] = alpha;
+		vertices[index++] = uvs.x1;
+		vertices[index++] = uvs.y1;
+		
+		x = width;
+		y = 0.0;
+		
+		vertices[index++] = x * a + y * c + tx;
+		vertices[index++] = x * b + y * d + ty;
+		vertices[index++] = tint;
+		vertices[index++] = alpha;
+		
+
+		vertices[index++] = uvs.x2;
+		vertices[index++] = uvs.y2;
+		
+		x = 0.0;
+		y = height;
+		
+		vertices[index++] = x * a + y * c + tx;
+		vertices[index++] = x * b + y * d + ty;
+		vertices[index++] = tint;
+		vertices[index++] = alpha;
+		
+		vertices[index++] = uvs.x3;
+		vertices[index++] = uvs.y3;
+		
+		x = width;
+		y = height;
+		
+		
+		vertices[index++] = x * a + y * c + tx;
+		vertices[index++] = x * b + y * d + ty;
+		vertices[index++] = tint;
+		vertices[index++] = alpha;
+		
+		vertices[index++] = uvs.x4;
+		vertices[index++] = uvs.y4;
+		
+		this._numQuads++;
+	};
+
+	
+	
+
+
+
+
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+* @author The Tiny Spark
+*/
+
+(function() {
+	
+	/**
+	 * @class texture2D
+	 * @memberOf tomahawk_ns
+	 * @description The Stage3D class represents the main drawing area, it is the top of the display list.
+	 * @constructor
+	 * @augments tomahawk_ns.DisplayObjectContainer3D
+	 **/
+	function Stage3D()
+	{
+		tomahawk_ns.DisplayObjectContainer3D.apply(this);
+		this.setFPS(60);
+		this.stage = this;
+	}
+
+	Tomahawk.registerClass( Stage3D, "Stage3D" );
+	Tomahawk.extend( "Stage3D", "DisplayObjectContainer3D" );
+
+	Stage3D._instances = new Object();
+	
+	/**
+	* @method getInstance
+	* @memberOf tomahawk_ns.Stage3D
+	* @param {string} stageName 
+	* @returns {tomahawk_ns.Stage3D} returns a Stage3D object that matches the "stageName" parameter. If none of the Stage3D instances corresponds to the "stageName" parameter, one is automatically created and returned. It is a (Multiton || Factory) implementation of the Stage3D class.
+	**/
+	Stage3D.getInstance = function(stageName)
+	{
+		stageName = stageName || "defaultStage";
+		
+		if( !tomahawk_ns.Stage3D._instances[stageName] )
+			tomahawk_ns.Stage3D._instances[stageName] = new tomahawk_ns.Stage3D();
+			
+		return tomahawk_ns.Stage3D._instances[stageName];
+	};
+
+	/**
+	* @member mouseX
+	* @memberOf tomahawk_ns.Stage3D.prototype
+	* @type {Number}
+	* @description the x mouse coordinates on the stage.
+	**/
+	Stage3D.prototype.mouseX = 0;
+	
+	/**
+	* @member mouseY
+	* @memberOf tomahawk_ns.Stage3D.prototype
+	* @type {Number}
+	* @description the y mouse coordinates on the stage.
+	**/
+	Stage3D.prototype.mouseY = 0;
+	
+	/**
+	* @member background
+	* @memberOf tomahawk_ns.Stage3D.prototype
+	* @type {Boolean}
+	* @default false
+	* @description Specifies whether the stage has a background fill. If true, the stage has a background fill. If false, stage has no background fill. Use the backgroundColor property to set the background color of the stage instance.
+	**/
+	Stage3D.prototype.background = false;
+	
+	/**
+	* @member backgroundColor
+	* @memberOf tomahawk_ns.Stage3D.prototype
+	* @type {string}
+	* @description The color of the stage background.
+	* @default "#0080C0"
+	**/
+	Stage3D.prototype.backgroundColor = 0xFF0080C0;
+	
+	Stage3D.prototype._renderTask = null;
+	Stage3D.prototype._lastTime = 0;
+	Stage3D.prototype._frameCount = 0;
+	Stage3D.prototype._fps = 0;
+	Stage3D.prototype._canvas = null;
+	Stage3D.prototype._context = null;
+	Stage3D.prototype._lastActiveChild = null;
+	Stage3D.prototype._focused = false;
+	Stage3D.prototype._focusedElement = null;
+	Stage3D.prototype._cache = null;
+	Stage3D.prototype._stop = false;
+	Stage3D.prototype.debug = false;
+
+	/**
+	* @description  Associates the canvas element specified by the "canvas" parameter  to this stage and runs the rendering loop.
+	* @method init
+	* @memberOf tomahawk_ns.Stage3D.prototype
+	* @param {HTMLCanvasElement} canvas the HTMLCanvasElement element associated to this stage object.
+	**/
+	Stage3D.prototype.init = function(canvas)
+	{
+		var callback = this._mouseHandler.bind(this);
+		var context = null;
+
+		this._renderTask = new RenderTask();
+		this._canvas = canvas;
+		this._context = this._getContext();
+		this._renderTask.init(this._context);
+		
+		context = this._context;
+		
+		this.addEventListener(tomahawk_ns.Event.ADDED, this, this._eventHandler,true);
+		this.addEventListener(tomahawk_ns.Event.FOCUSED, this, this._eventHandler,true);
+		this.addEventListener(tomahawk_ns.Event.UNFOCUSED, this, this._eventHandler,true);
+		
+		canvas.addEventListener("click",callback);
+		canvas.addEventListener("touchstart",callback);
+		canvas.addEventListener("touchmove",callback);
+		canvas.addEventListener("touchend",callback);
+		canvas.addEventListener("mousemove",callback);
+		canvas.addEventListener("mousedown",callback);
+		canvas.addEventListener("mouseup",callback);
+		canvas.addEventListener("dblclick",callback);
+		
+		
+		tomahawk_ns.BlendMode.init(this._context);
+		
+		context.clearColor(0,0,0,1);
+		context.disable(context.DEPTH_TEST);
+		context.disable(context.CULL_FACE);
+		context.blendFunc( tomahawk_ns.BlendMode.NORMAL[0], tomahawk_ns.BlendMode.NORMAL[1] );
+		context.enable(context.BLEND);
+		
+		this._enterFrame = this.enterFrame.bind(this);
+		this.enterFrame();		
+	};
+	
+	/**
+	* @description Returns a point object which determines the movement on x and y axises since the last frame ( in local stage coordinates system ).
+	* @method getMovement
+	* @memberOf tomahawk_ns.Stage3D.prototype
+	* @returns {tomahawk_ns.Point} a Point object
+	**/
+	Stage3D.prototype.getMovement = function()
+	{
+		var pt = new Object();
+		pt.x = this.mouseX - this._lastMouseX;
+		pt.y = this.mouseY - this._lastMouseY;
+		
+		return pt;
+	};
+
+	/**
+	* @description The main rendering loop, automatically called at each frame.
+	* @method enterFrame
+	* @memberOf tomahawk_ns.Stage3D.prototype
+	**/
+	Stage3D.prototype.enterFrame = function()
+	{
+		var curTime = new Date().getTime();
+		var scope = this;
+		var context = this._context;
+		var canvas = this._canvas;
+		
+		var renderTask = this._renderTask;
+		var unit = 1/255;
+		var a = ( this.backgroundColor >> 24 ) & 0xFF;
+		var r = ( this.backgroundColor >> 16 ) & 0xFF;
+		var g = ( this.backgroundColor >> 8 ) & 0xFF;
+		var b = ( this.backgroundColor >> 0 ) & 0xFF;
+		
+		this.width = canvas.width;
+		this.height = canvas.height;
+		this._frameCount++;
+		
+		if( curTime - this._lastTime > 1000 )
+		{
+			this._fps = this._frameCount;
+			this._frameCount = 0;
+			this._lastTime = curTime;
+		}
+		
+
+		context.clearColor(r*unit,g*unit,b*unit,a*unit);
+		context.viewport(0, 0, canvas.width, canvas.height);
+		context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
+		
+		
+		renderTask.start( new tomahawk_ns.Point(this.width/2,  -this.height/2 ) );
+		
+		this.draw(renderTask);
+		
+		renderTask.end();
+		
+		this.dispatchEvent(new tomahawk_ns.Event(tomahawk_ns.Event.ENTER_FRAME,true,true));
+		window.requestAnimationFrame(this._enterFrame);
+	};
+
+	/**
+	* @description Sets the current fps but only if the browser doesn't have a valid implementation of window.requestAnimationFrame or equivalent. If there's one, it will be used instead even if you specify another fps value.
+	* @method setFPS
+	* @memberOf tomahawk_ns.Stage3D.prototype
+	* @param {Number} value the new current fps
+	**/
+	Stage3D.prototype.setFPS = function(value)
+	{
+		this._fps = value;
+		
+		window.requestAnimationFrame = (function()
+		{
+			
+			return  window.requestAnimationFrame       ||  //Chromium 
+					window.webkitRequestAnimationFrame ||  //Webkit
+					window.mozRequestAnimationFrame    || //Mozilla Geko
+					window.oRequestAnimationFrame      || //Opera Presto
+					window.msRequestAnimationFrame     || //IE Trident?
+					function(callback, element){ //Fallback function
+						window.setTimeout(callback, parseInt(1000/value));                
+					}
+			 
+		})();
+	};
+
+	/**
+	* @method getCanvas
+	* @memberOf tomahawk_ns.Stage3D.prototype
+	* @returns {HTMLCanvasElement} An HTMLCanvasElement DOM object
+	* @description Returns the HTMLCanvasElement associated to this stage.
+	**/
+	Stage3D.prototype.getCanvas = function()
+	{
+		return this._canvas;
+	};
+	
+	/**
+	* @method getContext
+	* @memberOf tomahawk_ns.Stage3D.prototype
+	* @returns {CanvasRenderingContext2D} A CanvasRenderingContext2D object
+	* @description Returns the CanvasRenderingContext2D associated to this stage's canvas.
+	**/
+	Stage3D.prototype.getContext = function()
+	{
+		return this._context;
+	};
+
+	/**
+	* @member getFPS
+	* @memberOf tomahawk_ns.Stage3D.prototype
+	* @description Returns the current fps.
+	* @returns {Number} the current fps
+	**/
+	Stage3D.prototype.getFPS = function()
+	{
+		return this._fps;
+	};
+
+	
+	Stage3D.prototype._getContext  = function()
+	{
+		return this._canvas.getContext("experimental-webgl");
+	};
+
+	Stage3D.prototype._mouseHandler = function(event)
+	{
+		var bounds = this._canvas.getBoundingClientRect();
+		var x = 0;
+		var y = 0;
+		var touch = null;
+		
+		if( event.type == "touchstart" || 
+			event.type == "touchmove" || 
+			event.type == "touchend" 
+		)
+		{
+			touch = event.touches[0];
+			
+			if( event.type == "touchmove" )
+			{
+				event.preventDefault();
+				//event.stopImmediatePropagation();
+				//event.stopPropagation();
+			}
+			
+			
+			if( event.type != "touchend" )
+			{			
+				x = parseInt(touch.clientX) - bounds.left;
+				y = parseInt(touch.clientY) - bounds.top;
+			}
+			else
+			{
+				x = this.mouseX;
+				y = this.mouseY;
+			}
+			
+		}
+		else
+		{
+			event.preventDefault();
+			event.stopImmediatePropagation();
+			event.stopPropagation();
+			x = event.clientX - bounds.left;
+			y = event.clientY - bounds.top;
+		}
+		var activeChild = this.getObjectUnder(x,y);
+		var mouseEvent = null;
+		var i = 0;
+		this._lastMouseX = this.mouseX >> 0;
+		this._lastMouseY = this.mouseY >> 0;
+		this.mouseX = x >> 0;
+		this.mouseY = y >> 0;
+		
+		if( activeChild == null )
+			activeChild = this;
+		
+			
+		if( event.type == "mousemove" && this._lastActiveChild != activeChild )
+		{
+			if( activeChild != null )
+			{		
+				mouseEvent = tomahawk_ns.MouseEvent.fromNativeMouseEvent(event,true,true,x,y);
+				mouseEvent.type = tomahawk_ns.MouseEvent.ROLL_OVER;
+				activeChild.dispatchEvent(mouseEvent);
+			}
+			
+			if( this._lastActiveChild != null )
+			{		
+				mouseEvent = tomahawk_ns.MouseEvent.fromNativeMouseEvent(event,true,true,x,y);
+				mouseEvent.type = tomahawk_ns.MouseEvent.ROLL_OUT;
+				this._lastActiveChild.dispatchEvent(mouseEvent);
+			}
+		}
+		else
+		{
+			if( activeChild != null )
+			{
+				mouseEvent = tomahawk_ns.MouseEvent.fromNativeMouseEvent(event,true,true,x,y);			
+				activeChild.dispatchEvent(mouseEvent);
+			}
+		}
+		
+		if( event.type == "mousedown" )
+		{
+			this._lastMouseDownChild = activeChild;
+		}
+		
+		if( 	event.type == "mouseup" && 
+				activeChild != this._lastMouseDownChild && 
+				this._lastMouseDownChild != null
+		)
+		{
+			mouseEvent = tomahawk_ns.MouseEvent.fromNativeMouseEvent(event,true,true,x,y);	
+			mouseEvent.type == tomahawk_ns.MouseEvent.RELEASE_OUTSIDE;
+			this._lastMouseDownChild.dispatchEvent(mouseEvent);
+			this._lastMouseDownChild = null;
+		}
+		
+		this._lastActiveChild = activeChild;
+		
+		var handCursor = false;
+		var current = activeChild;
+		
+		while( current != null )
+		{
+			handCursor = handCursor || current.handCursor;
+			current = current.parent;
+		}
+		
+		if( activeChild != null && handCursor == true )
+			tomahawk_ns.Mouse.setCursor(tomahawk_ns.Mouse.POINTER, this.getCanvas());
+		else
+			tomahawk_ns.Mouse.setCursor(tomahawk_ns.Mouse.DEFAULT, this.getCanvas());
+		
+		
+		if( event.type != "mousemove" && this._focusedElement != null && activeChild != this._focusedElement )
+		{
+			this._focusedElement.setFocus(false);
+			this._focusedElement = null;
+			this._focused = false;
+		}
+	};
+
+	Stage3D.prototype._eventHandler = function(event)
+	{
+		var list = null;
+		var i = 0;
+		var max = 0;
+		var child = null;
+		var type = null;
+		
+		switch( event.type )
+		{
+			case tomahawk_ns.Event.FOCUSED: 
+				this._focused = true;
+				this._focusedElement = event.target;
+				break;
+				
+			case tomahawk_ns.Event.UNFOCUSED: 
+				this._focused = false;
+				break;
+				
+			case tomahawk_ns.Event.ADDED: 
+			case tomahawk_ns.Event.REMOVED: 
+				
+				
+				if( event.target.isContainer == true )
+				{
+					list = event.target.getNestedChildren();
+				}
+				else
+				{
+					list = new Array();
+				}
+				
+				list.push(event.target);
+				max = list.length;
+				
+				for( i= 0; i < max; i++ )
+				{
+					list[i].stage = this;
+				}
+				
+				type = ( event.type == tomahawk_ns.Event.ADDED ) ? tomahawk_ns.Event.ADDED_TO_STAGE : tomahawk_ns.Event.REMOVED_FROM_STAGE;
+				
+				for( i= 0; i < max; i++ )
+				{
+					list[i].dispatchEvent( new tomahawk_ns.Event(type, true, true) ); 
+				}
+				
+				break;
+		}
+	};
+
+	
+	/**
+	* @method updateMatrix
+	* @memberOf tomahawk_ns.DisplayObject3D.prototype
+	* @description Updates the matrix of the DisplayObject3D if his updateNextFrame || autoUpdate = true
+	**/
+	Stage3D.prototype.updateMatrix = function()
+	{
+		var mat = this.matrix;
+		
+		mat.d = mat.a = 1;
+		mat.b = mat.c = mat.tx = mat.ty = 0;
+									
+		this.concatenedMatrix = this.matrix;
+		this.updateNextFrame = false;
+	};
+
+	tomahawk_ns.Stage3D = Stage3D;
+
+})();
+
+
+
+
+
+
+/**
+ * ...
+ * @author Hatshepsout
+ */
+
+var tomahawk_ns = tomahawk_ns || new Object();
+
+(function() 
+{
+
+	function Texture3D(data,rect,name)
+	{
+		tomahawk_ns.Texture.apply(this, [data, rect, name]);
+		
+		this.uvs = { 
+			x1:0, y1:0,
+			x2:1, y2:0,
+			x3:0, y3:1,
+			x4:1, y4:1 
+		};
+	}
+	
+	Tomahawk.registerClass( Texture3D, "Texture3D" );
+	Tomahawk.extend( "Texture3D", "Texture" );
+	
+	
+	Texture3D.prototype.uvs = null;
+	Texture3D.prototype._glTexture = null;
+	
+	Texture3D.prototype.getGLTexture = function(context)
+	{
+		if( this._glTexture == null )
+		{
+			var texture = context.createTexture();
+			context.activeTexture(context.TEXTURE0);
+			context.bindTexture(context.TEXTURE_2D, texture);
+			//context.pixelStorei(context.UNPACK_FLIP_Y_WEBGL, true);
+			context.pixelStorei(context.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
+			context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, this.data);
+			context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MAG_FILTER, context.LINEAR);
+			context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MIN_FILTER, context.LINEAR);
+			
+			//gl.NEAREST is also allowed, instead of gl.LINEAR, as neither mipmap.
+			//context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MIN_FILTER, context.LINEAR); 
+			//Prevents s-coordinate wrapping (repeating).
+			//context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_S, context.CLAMP_TO_EDGE); 
+			//Prevents t-coordinate wrapping (repeating).
+			//context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_T, context.CLAMP_TO_EDGE);
+			
+			this._glTexture = texture;
+		}
+		
+		return this._glTexture;
+	};
+
+	tomahawk_ns.Texture3D = Texture3D;
+	
 })();
 

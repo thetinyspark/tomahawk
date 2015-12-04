@@ -36,8 +36,28 @@ Main.prototype._completeHandler = function()
 	mc.fps = 60;
 	mc.x = mc.y = 100;
 	
-	mc.getTimeline().addFrameAt(new tomahawk_ns.Frame("start"), 0);
-	mc.getTimeline().getFrameAt(0).addChild(bmp);
+	mc.setSymbols([bmp]);
+	
+	var info = 
+	mc.getTimeline().addFrameAt(	new tomahawk_ns.Frame(	{
+																label:"start",
+																children:[
+																	{	
+																		"symbol":"perso1",
+																		"alpha":1,
+																		"a":1,
+																		"b":0,
+																		"ty":58,
+																		"height":123,
+																		"name":"mon_perso",
+																		"c":0,
+																		"width":45,
+																		"d":1,
+																		"tx":32
+																	}
+																]
+															}
+														), 0);
 	
 	mc.getTimeline().addFrameAt( mc.getTimeline().getFrameAt(0).clone(), 60 );
 	mc.getTimeline().getFrameAt(60).label = "middle";

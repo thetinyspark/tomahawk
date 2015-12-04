@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="fr-FR">
+    <head>
+        <meta charset="utf-8"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+        <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0"/>
+
+        <!-- ref -->
+        <meta name="robots" content="Index,Follow"/>
+        <meta name="description" content="Découvrez Tomahawk, un moteur 2D HTML5 avec la balise canvas."/>
+        <meta name="keywords" content="HTML5, iOS, canvas, games, android, javascript, php, jeux, css"/>
+        <meta name="publisher" content="Nicolas Legrand"/>
+
+        <!--[if IE]>
+        <meta http-equiv="imagetoolbar" content="no" />
+        <![endif]-->
+
+        <!--  social sharing -->
+        <meta name="identifier-url" content="http://the-tiny-spark.com/" />
+        <meta name="revisit-after" content="7 days" />
+
+        <meta property="fb:admins" content="TheTinySpark"/>
+        <meta property="og:type" content="website"/>
+        <meta property="og:locale" content="fr_FR"/>
+        <meta property="og:title" content="Tomahawk, moteur 2D"/>
+        <meta property="og:description" content="Documentation du moteur d'affichage 2D : Tomahawk"/>
+        <meta property="og:url" content="http://the-tiny-spark.com/tomahawk/documentation/index.html"/>
+        <meta property="og:site_name" content="The Tiny Spark"/>
+        <meta property='og:image' content='http://the-tiny-spark.com/tomahawk/assets/images/tomahawk.jpg'/>
+        <meta property='og:image' content='http://the-tiny-spark.com/tomahawk/assets/images/ground.png'/>
+        <meta property='og:image' content='http://the-tiny-spark.com/tomahawk/assets/images/hero.png'/>
+        <meta property='og:image' content='http://the-tiny-spark.com/social/connect.jpg'/>
+
+        <title>Tomahawk Engine: Source: webgl/Stage3D.js</title>
+		
+		<link rel="stylesheet" media="screen" href="http://the-tiny-spark.com/assets/css/font-awesome.min.css" type="text/css"/>
+        <link rel="stylesheet" media="screen" href="http://the-tiny-spark.com/assets/css/studio.css" type="text/css"/>
+        <link rel="shortcut icon" href="http://the-tiny-spark.com/favicon.ico">
+
+		<script src="scripts/prettify/prettify.js"> </script>
+		<script src="scripts/prettify/lang-css.js"> </script>
+		<!--[if lt IE 9]>
+		  <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+		<link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+		<link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+			
+        <script type="text/javascript">
+
+            function gaq(cat, action, optValue) {
+                _gaq.push(['_trackEvent', cat, action, optValue]);
+            }
+
+            function openMenu(event) {
+
+                if (event.type == 'click') {
+                    var menu = document.getElementById("menuList");
+
+                    if (menu.style.display == 'none' || menu.style.display == '')
+                        menu.style.display = 'block';
+                    else
+                        menu.style.display = 'none';
+
+                }
+            }
+
+            (function(i, s, o, g, r, a, m) {
+                i['GoogleAnalyticsObject'] = r;
+                i[r] = i[r] || function() {
+                    (i[r].q = i[r].q || []).push(arguments)
+                }, i[r].l = 1 * new Date();
+                a = s.createElement(o),
+                        m = s.getElementsByTagName(o)[0];
+                a.async = 1;
+                a.src = g;
+                m.parentNode.insertBefore(a, m)
+            })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+            ga('create', 'UA-45878258-1', 'the-tiny-spark.com');
+            ga('send', 'pageview');
+
+            ///////-----------------------------------------------------------------------------////////
+            var _gaq = _gaq || [];
+            _gaq.push(['_setAccount', 'UA-45878258-1']);
+            _gaq.push(['_trackPageview']);
+
+            (function() {
+                var ga = document.createElement('script');
+                ga.type = 'text/javascript';
+                ga.async = true;
+                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                var s = document.getElementsByTagName('script')[0];
+                s.parentNode.insertBefore(ga, s);
+            })();
+
+        </script>
+    </head>
+	
+	<body class="tomahawk colour documentationJS">
+    <div class="contentBig">
+
+        <div id="header">
+		
+		<div class="content">
+			<h1>
+				<a href="http://the-tiny-spark.com/" onclick="gaq('home', 'click', 'returnto');">
+					The Tiny Spark
+				</a>
+			</h1>
+			
+			<ul id="menuList" class="pc">
+				<li><a href="http://the-tiny-spark.com/about.php" onclick="gaq('toplink', 'click', 'about');" class="">A propos</a></li>
+				<li><a href="http://the-tiny-spark.com/competences.php" onclick="gaq('toplink', 'click', 'competences');" class="">Comp&eacute;tences</a></li>
+				<li><a href="http://the-tiny-spark.com/work.php" onclick="gaq('toplink', 'click', 'references');" class="">R&eacute;alisations</a></li>
+				<li><a href="http://the-tiny-spark.com/labs.php" onclick="gaq('toplink', 'click', 'labs');" class="current">Labs</a></li>
+				<li><a href="http://the-tiny-spark.com/tools/index.php" onclick="gaq('toplink', 'click', 'tools');" class="">Outils</a></li>
+			</ul>
+			
+			<p class="mobile floatR menuMobile"><a href="javascript:;" id="menuDisplay" onclick="openMenu(event);return false;"><i class="icon-align-justify"></i></a></p>
+		</div>        
+		
+		</div>
+		
+		<h1 class="page-title">Tomahawk, moteur d'affichage 2D</h1>
+		<div class="buttonsSide">
+            <a href="javascript:history.back();" class="buttons"><i class="icon-1x icon-caret-left"></i> Retour</a>
+        </div>
+		
+		<div id="doc_nav">
+			<nav>
+				<h2><a href="index.html">Index</a></h2><ul class="toplist"><li><h3>Classes</h3><ul><li><a href="Tomahawk.html">Tomahawk</a></li><li><a href="tomahawk_ns.AssetsLoader.html">AssetsLoader</a></li><li><a href="tomahawk_ns.AssetsManager.html">AssetsManager</a></li><li><a href="tomahawk_ns.Back.html">Back</a></li><li><a href="tomahawk_ns.Bitmap.html">Bitmap</a></li><li><a href="tomahawk_ns.Bitmap3D.html">Bitmap3D</a></li><li><a href="tomahawk_ns.BitmapMesh.html">BitmapMesh</a></li><li><a href="tomahawk_ns.BlendColorFilter.html">BlendColorFilter</a></li><li><a href="tomahawk_ns.Bounce.html">Bounce</a></li><li><a href="tomahawk_ns.BrightnessFilter.html">BrightnessFilter</a></li><li><a href="tomahawk_ns.Circ.html">Circ</a></li><li><a href="tomahawk_ns.ColorFilter.html">ColorFilter</a></li><li><a href="tomahawk_ns.ContrastFilter.html">ContrastFilter</a></li><li><a href="tomahawk_ns.Cubic.html">Cubic</a></li><li><a href="tomahawk_ns.DataLoader.html">DataLoader</a></li><li><a href="tomahawk_ns.DisplayObject.html">DisplayObject</a></li><li><a href="tomahawk_ns.DisplayObject3D.html">DisplayObject3D</a></li><li><a href="tomahawk_ns.DisplayObjectContainer.html">DisplayObjectContainer</a></li><li><a href="tomahawk_ns.DisplayObjectContainer3D.html">DisplayObjectContainer3D</a></li><li><a href="tomahawk_ns.Elastic.html">Elastic</a></li><li><a href="tomahawk_ns.Event.html">Event</a></li><li><a href="tomahawk_ns.EventDispatcher.html">EventDispatcher</a></li><li><a href="tomahawk_ns.Expo.html">Expo</a></li><li><a href="tomahawk_ns.Font.html">Font</a></li><li><a href="tomahawk_ns.Frame.html">Frame</a></li><li><a href="tomahawk_ns.GrayScaleFilter.html">GrayScaleFilter</a></li><li><a href="tomahawk_ns.InputTextField.html">InputTextField</a></li><li><a href="tomahawk_ns.Keyboard.html">Keyboard</a></li><li><a href="tomahawk_ns.KeyboardEvent.html">KeyboardEvent</a></li><li><a href="tomahawk_ns.Letter.html">Letter</a></li><li><a href="tomahawk_ns.Linear.html">Linear</a></li><li><a href="tomahawk_ns.Matrix2D.html">Matrix2D</a></li><li><a href="tomahawk_ns.Matrix4x4.html">Matrix4x4</a></li><li><a href="tomahawk_ns.Mouse.html">Mouse</a></li><li><a href="tomahawk_ns.MouseEvent.html">MouseEvent</a></li><li><a href="tomahawk_ns.MovieClip.html">MovieClip</a></li><li><a href="tomahawk_ns.PixelateFilter.html">PixelateFilter</a></li><li><a href="tomahawk_ns.PixelFilter.html">PixelFilter</a></li><li><a href="tomahawk_ns.Point.html">Point</a></li><li><a href="tomahawk_ns.Point3D.html">Point3D</a></li><li><a href="tomahawk_ns.Quad.html">Quad</a></li><li><a href="tomahawk_ns.QuadTreeContainer.html">QuadTreeContainer</a></li><li><a href="tomahawk_ns.QuadTreeNode.html">QuadTreeNode</a></li><li><a href="tomahawk_ns.Quart.html">Quart</a></li><li><a href="tomahawk_ns.Quint.html">Quint</a></li><li><a href="tomahawk_ns.Rectangle.html">Rectangle</a></li><li><a href="tomahawk_ns.RemanenceFilter.html">RemanenceFilter</a></li><li><a href="tomahawk_ns.Screen.html">Screen</a></li><li><a href="tomahawk_ns.SelectableTextField.html">SelectableTextField</a></li><li><a href="tomahawk_ns.ShadowBlurFilter.html">ShadowBlurFilter</a></li><li><a href="tomahawk_ns.Shape.html">Shape</a></li><li><a href="tomahawk_ns.Sine.html">Sine</a></li><li><a href="tomahawk_ns.Sprite.html">Sprite</a></li><li><a href="tomahawk_ns.Sprite3D.html">Sprite3D</a></li><li><a href="tomahawk_ns.Stage.html">Stage</a></li><li><a href="tomahawk_ns.Stage3D.html">Stage3D</a></li><li><a href="tomahawk_ns.Strong.html">Strong</a></li><li><a href="tomahawk_ns.SWFAnim.html">SWFAnim</a></li><li><a href="tomahawk_ns.TextField.html">TextField</a></li><li><a href="tomahawk_ns.TextFormat.html">TextFormat</a></li><li><a href="tomahawk_ns.Texture.html">Texture</a></li><li><a href="tomahawk_ns.TextureAtlas.html">TextureAtlas</a></li><li><a href="tomahawk_ns.Timeline.html">Timeline</a></li><li><a href="tomahawk_ns.Tween.html">Tween</a></li><li><a href="tomahawk_ns.Vector3D.html">Vector3D</a></li><li><a href="tomahawk_ns.Word.html">Word</a></li></ul></li><li><h3>Namespaces</h3><ul><li><a href="global.html#tomahawk_ns">tomahawk_ns</a></li></ul></li><li><h3>Global</h3><ul><li><a href="global.html#RenderTask">RenderTask</a></li></ul></li><li><h3><a href="http://the-tiny-spark.com/tomahawk/example/perfs.php" title="demos">Demos</a></h3></li><li><h3><a target="_github" href="https://github.com/thetinyspark/tomahawk/" title="download">Download</a></h3></li></ul>
+			</nav>
+		</div>
+
+        <div id="main_content">
+		
+			<div id="main">
+				<div class="left-content">
+					<h2>Source: webgl/Stage3D.js</h2>
+					
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+* @author The Tiny Spark
+*/
+
+(function() {
+	
+	/**
+	 * @class texture2D
+	 * @memberOf tomahawk_ns
+	 * @description The Stage3D class represents the main drawing area, it is the top of the display list.
+	 * @constructor
+	 * @augments tomahawk_ns.DisplayObjectContainer3D
+	 **/
+	function Stage3D()
+	{
+		tomahawk_ns.DisplayObjectContainer3D.apply(this);
+		this.setFPS(60);
+		this.stage = this;
+	}
+
+	Tomahawk.registerClass( Stage3D, "Stage3D" );
+	Tomahawk.extend( "Stage3D", "DisplayObjectContainer3D" );
+
+	Stage3D._instances = new Object();
+	
+	/**
+	* @method getInstance
+	* @memberOf tomahawk_ns.Stage3D
+	* @param {string} stageName 
+	* @returns {tomahawk_ns.Stage3D} returns a Stage3D object that matches the "stageName" parameter. If none of the Stage3D instances corresponds to the "stageName" parameter, one is automatically created and returned. It is a (Multiton || Factory) implementation of the Stage3D class.
+	**/
+	Stage3D.getInstance = function(stageName)
+	{
+		stageName = stageName || "defaultStage";
+		
+		if( !tomahawk_ns.Stage3D._instances[stageName] )
+			tomahawk_ns.Stage3D._instances[stageName] = new tomahawk_ns.Stage3D();
+			
+		return tomahawk_ns.Stage3D._instances[stageName];
+	};
+
+	/**
+	* @member mouseX
+	* @memberOf tomahawk_ns.Stage3D.prototype
+	* @type {Number}
+	* @description the x mouse coordinates on the stage.
+	**/
+	Stage3D.prototype.mouseX = 0;
+	
+	/**
+	* @member mouseY
+	* @memberOf tomahawk_ns.Stage3D.prototype
+	* @type {Number}
+	* @description the y mouse coordinates on the stage.
+	**/
+	Stage3D.prototype.mouseY = 0;
+	
+	/**
+	* @member background
+	* @memberOf tomahawk_ns.Stage3D.prototype
+	* @type {Boolean}
+	* @default false
+	* @description Specifies whether the stage has a background fill. If true, the stage has a background fill. If false, stage has no background fill. Use the backgroundColor property to set the background color of the stage instance.
+	**/
+	Stage3D.prototype.background = false;
+	
+	/**
+	* @member backgroundColor
+	* @memberOf tomahawk_ns.Stage3D.prototype
+	* @type {string}
+	* @description The color of the stage background.
+	* @default "#0080C0"
+	**/
+	Stage3D.prototype.backgroundColor = 0xFF0080C0;
+	
+	Stage3D.prototype._renderTask = null;
+	Stage3D.prototype._lastTime = 0;
+	Stage3D.prototype._frameCount = 0;
+	Stage3D.prototype._fps = 0;
+	Stage3D.prototype._canvas = null;
+	Stage3D.prototype._context = null;
+	Stage3D.prototype._lastActiveChild = null;
+	Stage3D.prototype._focused = false;
+	Stage3D.prototype._focusedElement = null;
+	Stage3D.prototype._cache = null;
+	Stage3D.prototype._stop = false;
+	Stage3D.prototype.debug = false;
+
+	/**
+	* @description  Associates the canvas element specified by the "canvas" parameter  to this stage and runs the rendering loop.
+	* @method init
+	* @memberOf tomahawk_ns.Stage3D.prototype
+	* @param {HTMLCanvasElement} canvas the HTMLCanvasElement element associated to this stage object.
+	**/
+	Stage3D.prototype.init = function(canvas)
+	{
+		var callback = this._mouseHandler.bind(this);
+		var context = null;
+
+		this._renderTask = new RenderTask();
+		this._canvas = canvas;
+		this._context = this._getContext();
+		this._renderTask.init(this._context);
+		
+		context = this._context;
+		
+		this.addEventListener(tomahawk_ns.Event.ADDED, this, this._eventHandler,true);
+		this.addEventListener(tomahawk_ns.Event.FOCUSED, this, this._eventHandler,true);
+		this.addEventListener(tomahawk_ns.Event.UNFOCUSED, this, this._eventHandler,true);
+		
+		canvas.addEventListener("click",callback);
+		canvas.addEventListener("touchstart",callback);
+		canvas.addEventListener("touchmove",callback);
+		canvas.addEventListener("touchend",callback);
+		canvas.addEventListener("mousemove",callback);
+		canvas.addEventListener("mousedown",callback);
+		canvas.addEventListener("mouseup",callback);
+		canvas.addEventListener("dblclick",callback);
+		
+		
+		tomahawk_ns.BlendMode.init(this._context);
+		
+		context.clearColor(0,0,0,1);
+		context.disable(context.DEPTH_TEST);
+		context.disable(context.CULL_FACE);
+		context.blendFunc( tomahawk_ns.BlendMode.NORMAL[0], tomahawk_ns.BlendMode.NORMAL[1] );
+		context.enable(context.BLEND);
+		
+		this._enterFrame = this.enterFrame.bind(this);
+		this.enterFrame();		
+	};
+	
+	/**
+	* @description Returns a point object which determines the movement on x and y axises since the last frame ( in local stage coordinates system ).
+	* @method getMovement
+	* @memberOf tomahawk_ns.Stage3D.prototype
+	* @returns {tomahawk_ns.Point} a Point object
+	**/
+	Stage3D.prototype.getMovement = function()
+	{
+		var pt = new Object();
+		pt.x = this.mouseX - this._lastMouseX;
+		pt.y = this.mouseY - this._lastMouseY;
+		
+		return pt;
+	};
+
+	/**
+	* @description The main rendering loop, automatically called at each frame.
+	* @method enterFrame
+	* @memberOf tomahawk_ns.Stage3D.prototype
+	**/
+	Stage3D.prototype.enterFrame = function()
+	{
+		var curTime = new Date().getTime();
+		var scope = this;
+		var context = this._context;
+		var canvas = this._canvas;
+		
+		var renderTask = this._renderTask;
+		var unit = 1/255;
+		var a = ( this.backgroundColor >> 24 ) &amp; 0xFF;
+		var r = ( this.backgroundColor >> 16 ) &amp; 0xFF;
+		var g = ( this.backgroundColor >> 8 ) &amp; 0xFF;
+		var b = ( this.backgroundColor >> 0 ) &amp; 0xFF;
+		
+		this.width = canvas.width;
+		this.height = canvas.height;
+		this._frameCount++;
+		
+		if( curTime - this._lastTime > 1000 )
+		{
+			this._fps = this._frameCount;
+			this._frameCount = 0;
+			this._lastTime = curTime;
+		}
+		
+
+		context.clearColor(r*unit,g*unit,b*unit,a*unit);
+		context.viewport(0, 0, canvas.width, canvas.height);
+		context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
+		
+		
+		renderTask.start( new tomahawk_ns.Point(this.width/2,  -this.height/2 ) );
+		
+		this.draw(renderTask);
+		
+		renderTask.end();
+		
+		this.dispatchEvent(new tomahawk_ns.Event(tomahawk_ns.Event.ENTER_FRAME,true,true));
+		window.requestAnimationFrame(this._enterFrame);
+	};
+
+	/**
+	* @description Sets the current fps but only if the browser doesn't have a valid implementation of window.requestAnimationFrame or equivalent. If there's one, it will be used instead even if you specify another fps value.
+	* @method setFPS
+	* @memberOf tomahawk_ns.Stage3D.prototype
+	* @param {Number} value the new current fps
+	**/
+	Stage3D.prototype.setFPS = function(value)
+	{
+		this._fps = value;
+		
+		window.requestAnimationFrame = (function()
+		{
+			
+			return  window.requestAnimationFrame       ||  //Chromium 
+					window.webkitRequestAnimationFrame ||  //Webkit
+					window.mozRequestAnimationFrame    || //Mozilla Geko
+					window.oRequestAnimationFrame      || //Opera Presto
+					window.msRequestAnimationFrame     || //IE Trident?
+					function(callback, element){ //Fallback function
+						window.setTimeout(callback, parseInt(1000/value));                
+					}
+			 
+		})();
+	};
+
+	/**
+	* @method getCanvas
+	* @memberOf tomahawk_ns.Stage3D.prototype
+	* @returns {HTMLCanvasElement} An HTMLCanvasElement DOM object
+	* @description Returns the HTMLCanvasElement associated to this stage.
+	**/
+	Stage3D.prototype.getCanvas = function()
+	{
+		return this._canvas;
+	};
+	
+	/**
+	* @method getContext
+	* @memberOf tomahawk_ns.Stage3D.prototype
+	* @returns {CanvasRenderingContext2D} A CanvasRenderingContext2D object
+	* @description Returns the CanvasRenderingContext2D associated to this stage's canvas.
+	**/
+	Stage3D.prototype.getContext = function()
+	{
+		return this._context;
+	};
+
+	/**
+	* @member getFPS
+	* @memberOf tomahawk_ns.Stage3D.prototype
+	* @description Returns the current fps.
+	* @returns {Number} the current fps
+	**/
+	Stage3D.prototype.getFPS = function()
+	{
+		return this._fps;
+	};
+
+	
+	Stage3D.prototype._getContext  = function()
+	{
+		return this._canvas.getContext("experimental-webgl");
+	};
+
+	Stage3D.prototype._mouseHandler = function(event)
+	{
+		var bounds = this._canvas.getBoundingClientRect();
+		var x = 0;
+		var y = 0;
+		var touch = null;
+		
+		if( event.type == "touchstart" || 
+			event.type == "touchmove" || 
+			event.type == "touchend" 
+		)
+		{
+			touch = event.touches[0];
+			
+			if( event.type == "touchmove" )
+			{
+				event.preventDefault();
+				//event.stopImmediatePropagation();
+				//event.stopPropagation();
+			}
+			
+			
+			if( event.type != "touchend" )
+			{			
+				x = parseInt(touch.clientX) - bounds.left;
+				y = parseInt(touch.clientY) - bounds.top;
+			}
+			else
+			{
+				x = this.mouseX;
+				y = this.mouseY;
+			}
+			
+		}
+		else
+		{
+			event.preventDefault();
+			event.stopImmediatePropagation();
+			event.stopPropagation();
+			x = event.clientX - bounds.left;
+			y = event.clientY - bounds.top;
+		}
+		var activeChild = this.getObjectUnder(x,y);
+		var mouseEvent = null;
+		var i = 0;
+		this._lastMouseX = this.mouseX >> 0;
+		this._lastMouseY = this.mouseY >> 0;
+		this.mouseX = x >> 0;
+		this.mouseY = y >> 0;
+		
+		if( activeChild == null )
+			activeChild = this;
+		
+			
+		if( event.type == "mousemove" &amp;&amp; this._lastActiveChild != activeChild )
+		{
+			if( activeChild != null )
+			{		
+				mouseEvent = tomahawk_ns.MouseEvent.fromNativeMouseEvent(event,true,true,x,y);
+				mouseEvent.type = tomahawk_ns.MouseEvent.ROLL_OVER;
+				activeChild.dispatchEvent(mouseEvent);
+			}
+			
+			if( this._lastActiveChild != null )
+			{		
+				mouseEvent = tomahawk_ns.MouseEvent.fromNativeMouseEvent(event,true,true,x,y);
+				mouseEvent.type = tomahawk_ns.MouseEvent.ROLL_OUT;
+				this._lastActiveChild.dispatchEvent(mouseEvent);
+			}
+		}
+		else
+		{
+			if( activeChild != null )
+			{
+				mouseEvent = tomahawk_ns.MouseEvent.fromNativeMouseEvent(event,true,true,x,y);			
+				activeChild.dispatchEvent(mouseEvent);
+			}
+		}
+		
+		if( event.type == "mousedown" )
+		{
+			this._lastMouseDownChild = activeChild;
+		}
+		
+		if( 	event.type == "mouseup" &amp;&amp; 
+				activeChild != this._lastMouseDownChild &amp;&amp; 
+				this._lastMouseDownChild != null
+		)
+		{
+			mouseEvent = tomahawk_ns.MouseEvent.fromNativeMouseEvent(event,true,true,x,y);	
+			mouseEvent.type == tomahawk_ns.MouseEvent.RELEASE_OUTSIDE;
+			this._lastMouseDownChild.dispatchEvent(mouseEvent);
+			this._lastMouseDownChild = null;
+		}
+		
+		this._lastActiveChild = activeChild;
+		
+		var handCursor = false;
+		var current = activeChild;
+		
+		while( current != null )
+		{
+			handCursor = handCursor || current.handCursor;
+			current = current.parent;
+		}
+		
+		if( activeChild != null &amp;&amp; handCursor == true )
+			tomahawk_ns.Mouse.setCursor(tomahawk_ns.Mouse.POINTER, this.getCanvas());
+		else
+			tomahawk_ns.Mouse.setCursor(tomahawk_ns.Mouse.DEFAULT, this.getCanvas());
+		
+		
+		if( event.type != "mousemove" &amp;&amp; this._focusedElement != null &amp;&amp; activeChild != this._focusedElement )
+		{
+			this._focusedElement.setFocus(false);
+			this._focusedElement = null;
+			this._focused = false;
+		}
+	};
+
+	Stage3D.prototype._eventHandler = function(event)
+	{
+		var list = null;
+		var i = 0;
+		var max = 0;
+		var child = null;
+		var type = null;
+		
+		switch( event.type )
+		{
+			case tomahawk_ns.Event.FOCUSED: 
+				this._focused = true;
+				this._focusedElement = event.target;
+				break;
+				
+			case tomahawk_ns.Event.UNFOCUSED: 
+				this._focused = false;
+				break;
+				
+			case tomahawk_ns.Event.ADDED: 
+			case tomahawk_ns.Event.REMOVED: 
+				
+				
+				if( event.target.isContainer == true )
+				{
+					list = event.target.getNestedChildren();
+				}
+				else
+				{
+					list = new Array();
+				}
+				
+				list.push(event.target);
+				max = list.length;
+				
+				for( i= 0; i &lt; max; i++ )
+				{
+					list[i].stage = this;
+				}
+				
+				type = ( event.type == tomahawk_ns.Event.ADDED ) ? tomahawk_ns.Event.ADDED_TO_STAGE : tomahawk_ns.Event.REMOVED_FROM_STAGE;
+				
+				for( i= 0; i &lt; max; i++ )
+				{
+					list[i].dispatchEvent( new tomahawk_ns.Event(type, true, true) ); 
+				}
+				
+				break;
+		}
+	};
+
+	
+	/**
+	* @method updateMatrix
+	* @memberOf tomahawk_ns.DisplayObject3D.prototype
+	* @description Updates the matrix of the DisplayObject3D if his updateNextFrame || autoUpdate = true
+	**/
+	Stage3D.prototype.updateMatrix = function()
+	{
+		var mat = this.matrix;
+		
+		mat.d = mat.a = 1;
+		mat.b = mat.c = mat.tx = mat.ty = 0;
+									
+		this.concatenedMatrix = this.matrix;
+		this.updateNextFrame = false;
+	};
+
+	tomahawk_ns.Stage3D = Stage3D;
+
+})();
+
+
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+				</div>
+				
+				<div class="rigth-ad">
+					<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+					<!-- Skyscraper 120 x 600 -->
+					<ins class="adsbygoogle"
+						 style="display:inline-block;width:120px;height:600px"
+						 data-ad-client="ca-pub-8931349961961991"
+						 data-ad-slot="7816447068"></ins>
+					<script>
+					(adsbygoogle = window.adsbygoogle || []).push({});
+					</script>
+				</div>
+			</div>
+			
+			<div class="footer-ad" style="text-align:center">
+				<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+				<ins class="adsbygoogle"
+					 style="display:inline-block;width:728px;height:90px"
+					 data-ad-client="ca-pub-8931349961961991"
+					 data-ad-slot="3381404260"></ins>
+				<script>
+				(adsbygoogle = window.adsbygoogle || []).push({});
+				</script>
+			</div>
+
+		</div>
+		
+        <div id="footer">
+            <div class="contact">
+				<div class="section">
+					<p>
+						Vous avez un projet ? Contactez-nous, nous serons ravis de faire votre connaissance ! 
+						<a href="http://the-tiny-spark.com/contact.php" class="buttons" onclick="gaq('footerlink', 'click', 'contact');">CONTACT</a>
+					</p>
+				</div>
+			</div>
+
+			<div class="middle">
+				<div class="content overflow">
+					<div class="w35 floatL">
+						<h3>The Tiny Spark</h3>
+						<p>Collectif d'ind&eacute;pendants proche de Paris.</p>
+						<p>The Tiny Spark, sous ce nom se cachent des passionn&eacute;s du web qui mettent tous leurs talents &agrave; votre service.</p>
+					</div>
+
+					<div class="w60 overflow floatR">
+						<div class="sectionFooter floatL">
+							<h4>A propos</h4>
+							<ul>
+								<li><a href="http://the-tiny-spark.com/about.php" onclick="gaq('footerlink', 'click', 'about');">Pr&eacute;sentation</a></li>
+								<li><a href="http://the-tiny-spark.com/contact.php" onclick="gaq('footerlink', 'click', 'contact');">Contact</a></li>
+							</ul>
+						</div>
+						<div class="sectionFooter floatL">
+							<h4>Comp&eacute;tences</h4>
+							<ul>
+								<li><a href="http://the-tiny-spark.com/about.php#conseil" onclick="gaq('footerlink', 'click', 'about');">Conseil</a></li>
+								<li><a href="http://the-tiny-spark.com/projects/applications.php" onclick="gaq('footerlink', 'click', 'prj_us');">R&eacute;alisation</a></li>
+								<li><a href="http://the-tiny-spark.com/competences.php" onclick="gaq('footerlink', 'click', 'competences');">Offre</a></li>
+							</ul>
+						</div>
+						<div class="sectionFooter floatL">
+							<h4>R&eacute;alisations</h4>
+							<ul>
+								<li><a href="http://the-tiny-spark.com/projects/applications.php" onclick="gaq('footerlink', 'click', 'prj_us');">Notre travail</a></li>
+								<li><a href="http://the-tiny-spark.com/projects/pitch.php" onclick="gaq('footerlink', 'click', 'prj_pitch');">Magic Park</a></li>
+								<li><a href="http://the-tiny-spark.com/projects/ogos.php" onclick="gaq('footerlink', 'click', 'prj_ogos');">Ogos</a></li>
+								<li><a href="http://the-tiny-spark.com/projects/everlife.php" onclick="gaq('footerlink', 'click', 'prj_everlife');">Everlife</a></li>
+							</ul>
+						</div>
+						<div class="sectionFooter floatL">
+							<h4>Labs</h4>
+							<ul>
+								<li><a href="http://www.totem.the-tiny-spark.com/" onclick="gaq('footerlink', 'click', 'TOTEM');">Totem</a></li>
+								<li><a href="http://the-tiny-spark.com/tomahawk/index.php" onclick="gaq('footerlink', 'click', 'TOMAHAWK');">Tomahawk</a></li>
+								<li><a href="https://docs.google.com/document/d/1Ye1Ow72rHtskR3Lf_FdOPl4MsqWAl-rEsnt0K3QO05M/edit#" onclick="gaq('footerlink', 'click', 'book');">Cr&eacute;er un moteur d'affichage, <em>Livre blanc</em></a></li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="lastLayer overflow">
+				<p class="floatL">The Tiny Spark &COPY; 2014</p>
+				<ul class="social floatR">
+					<li>
+						<a href="https://www.facebook.com/TheTinySpark" target="_blank" title="Facebook" onclick="gaq('footerlink', 'click', 'facebook');">
+							<i class="icon-facebook"></i>
+						</a>
+					</li>                    
+					<li>
+						<a href="http://www.pinterest.com/tinylittlespark/" target="_blank" title="Pinterest" onclick="gaq('footerlink', 'click', 'pinterest');">
+							<i class="icon-pinterest"></i>
+						</a>
+					</li>
+					<li>
+						<a href="http://the-tiny-spark.com/mentions.php" title="Mentions L&eacute;gales" onclick="gaq('footerlink', 'click', 'mentions');" class="">
+							<i class="icon-bookmark"></i>
+						</a>
+					</li>
+					<li>
+						<a href="http://www.totem.the-tiny-spark.com" title="Totem" target="_blank" onclick="gaq('footerlink', 'click', 'totem');">
+							<i class="icon-gamepad"></i>
+						</a>
+					</li>
+				</ul>
+			</div>        
+		</div>
+
+	</div>
+	<script> prettyPrint(); </script>
+	<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

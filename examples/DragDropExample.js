@@ -28,12 +28,7 @@ Main.prototype.init = function()
 	stage.addChild(sprite);
 	
 	sprite.enableDragAndDrop(true);
-	stage.addEventListener(tomahawk_ns.Event.ENTER_FRAME,this,this._enterFrame);
-};
-
-Main.prototype._enterFrame = function(event)
-{
-	event.target.drawFPS();
+	stage.debug = true; //  display fps at every frame
 };
 
 window.onload = function()
