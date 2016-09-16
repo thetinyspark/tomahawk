@@ -28,7 +28,7 @@
 					window.oRequestAnimationFrame      || //Opera Presto
 					window.msRequestAnimationFrame     || //IE Trident?
 					function(callback, element){ //Fallback function
-						window.setTimeout(callback, 10);                
+						window.setTimeout(callback, 1);                
 					}
 			 
 		})();
@@ -70,8 +70,9 @@
 			var time = new Date().getTime();
 			var numChildren = container.length;
 			var scope = this;
+			var child = null;
 			
-			if( time - lastTime> 1000 )
+			if( time - lastTime > 1000 )
 			{
 				lastTime = time;
 				fps = counter;
@@ -82,14 +83,16 @@
 			stepX = ( offsetX > 100 ) ? -stepX : stepX;
 			stepX = ( offsetX < -100 ) ? -stepX : stepX;
 			canvas.width = canvas.width; // faster than clearRect
+			
 			context.save();
 			context.translate(offsetX,offsetY);
 			
 			while( --i > -1 )
 			{
-				var child = container[i];
+				child = container[i];
 				context.save();
-				context.transform(1,0,0,1,child.x,child.y);
+				context.translate( child.x, child.y );
+				//context.transform(1,0,0,1,child.x,child.y);
 				context.globalAlpha *= child.alpha;
 				context.drawImage(child.texture,0,0,child.width,child.height);
 				context.restore();
@@ -101,16 +104,13 @@
 			context.fillStyle = "black";
 			context.fillRect(0,0,100,30);
 			context.fill();
+			context.closePath();
 			
 			context.fillStyle = "red";
 			context.textBaseline = "top";
 			context.fillText("children: "+numChildren+", "+ fps + " fps",0,0);
-			window.requestAnimationFrame(
-				function()
-				{
-					scope.tick();
-				}
-			);
+			
+			window.requestAnimationFrame(	tick.bind(scope) );
 		}
 	
 		window.onload = init;

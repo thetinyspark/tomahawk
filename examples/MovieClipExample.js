@@ -36,7 +36,7 @@ Main.prototype._completeHandler = function()
 	mc.fps = 60;
 	mc.x = mc.y = 100;
 	
-	mc.setSymbols([bmp]);
+	mc.setSymbols({"perso1":bmp});
 	
 	var info = 
 	mc.getTimeline().addFrameAt(	new tomahawk_ns.Frame(	{

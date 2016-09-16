@@ -31,12 +31,17 @@ Main.prototype.init = function()
 	
 	spr.filters = new Array();
 	bmp.filters = new Array();
+	bmp2.filters = new Array();
 	//bmp2.filters = new Array();
 	
-	bmp.filters.push( new tomahawk_ns.ShadowBlurFilter(15,15,"#333333", 20) );
-	//bmp.filters.push( new tomahawk_ns.PixelateFilter(6) );
-	//spr.filters.push( new tomahawk_ns.RemanenceFilter(100,0.2) );
+	//bmp.filters.push( new tomahawk_ns.ShadowBlurFilter(15,15,"#333333", 20) );
+	//bmp.filters.push( new tomahawk_ns.PixelateFilter(10) );
+	//spr.filters.push( new tomahawk_ns.RemanenceFilter(100,0.5) );
+	//bmp2.filters.push( new tomahawk_ns.BlurFilter() );
+	//bmp2.filters.push( new tomahawk_ns.ConvolutionFilter([1/16,2/16,1/16,2/16,4/16,2/16,1/16,2/16,1/16]) );
+	//bmp2.filters.push( new tomahawk_ns.ConvolutionFilter([0,0,0,-1,1,0,0,0,0]) );
 	stage.addChild( spr ); // add a child to the stage
+	stage.debug = true;
 	
 	
 	stage.addEventListener( tomahawk_ns.Event.ENTER_FRAME, this, this._enterFrameHandler );

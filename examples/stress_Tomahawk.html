@@ -5,26 +5,32 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
 	<title></title>
 	<link rel="stylesheet" type="text/css" href="assets/style.css"/>
-	<script type="text/javascript" src="tomahawk_engine.js"></script>
+	<script type="text/javascript" src="./build/tomahawk_engine.js"></script>
 	<script type="text/javascript">
 	
 		var lastTime = 0; 
 		var counter = 0;
 		var stepX = 2;
 		var fps = 0;
+		var myTexture = null;
 		
 		function clickHandler()
 		{
 			var stage = tomahawk_ns.Stage.getInstance("stress");
 			var image = document.getElementById("perso");
 			var container = stage.getChildByName("container");
-			var texture = new tomahawk_ns.Texture();
+			var texture = tomahawk_ns.AssetsManager.getInstance().getTextureByAlias("myTexture");
 			var i = 100;
 			var bmp = null;
 			
-			texture.rect = [0,0,image.naturalWidth,image.naturalHeight];
-			texture.data = image;
-			texture.name = "perso";
+			if( texture == null )
+			{
+				texture = new tomahawk_ns.Texture();
+				texture.rect = [0,0,image.naturalWidth,image.naturalHeight];
+				texture.data = image;
+				texture.name = "perso";
+				tomahawk_ns.AssetsManager.getInstance().addTexture(texture,"myTexture");
+			}
 			
 			while( --i > -1 )
 			{
@@ -33,6 +39,8 @@
 				bmp.height = image.naturalHeight;
 				bmp.x = parseInt(Math.random() * 800);
 				bmp.y = parseInt(Math.random() * 600);
+				bmp.updateNextFrame = true;
+				bmp.autoUpdate = false;
 				container.addChild(bmp);
 			}
 		}
@@ -49,6 +57,7 @@
 			
 			stage.init(document.getElementById("tomahawk"));
 			stage.addChild(container);
+			
 			stage.addEventListener(tomahawk_ns.Event.ENTER_FRAME, this, this.onFrame);
 		}
 		
