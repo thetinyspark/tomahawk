@@ -2350,7 +2350,7 @@ catch(e)
 	
 	/**
 	* @method getConcatenedMatrix
-	* @description Returns the combined transformation matrixes of the DisplayObject instance and all of its parent objects, back to the stage level.
+	* @description Returns the combined transformation matrices of the DisplayObject instance and all of its parent objects, back to the stage level.
 	* @memberOf tomahawk_ns.DisplayObject.prototype
 	* @param {Boolean} forceUpdate Forces the update of the current DisplayObject and all his parents
 	**/
@@ -2970,7 +2970,7 @@ catch(e)
 		var child = null;
 		var mat = null;
 		
-		for( ; i < max; i++ )
+		for( i = 0; i < max; i++ )
 		{
 			child = children[i];
 			
@@ -4466,7 +4466,6 @@ catch(e)
 			this.draw(context);
 		}
 		
-		this.draw(context);
 		context.restore();
 		
 		if( this.debug == true )
@@ -4477,7 +4476,7 @@ catch(e)
 		this.dispatchEvent(new tomahawk_ns.Event(tomahawk_ns.Event.ENTER_FRAME,true,true));
 		
 		if( this._stop != true )
-			window.requestAnimationFrame(this.enterFrame.smartBind(this));
+			window.requestAnimationFrame(this.enterFrame.bind(this));
 	};
 
 	/**
@@ -10743,7 +10742,7 @@ function()
 	
 	
 	
-		Matrix2D._fastCos = [];
+	Matrix2D._fastCos = [];
 	Matrix2D._fastSin = [];
 	
 	Matrix2D._fastMath = function()

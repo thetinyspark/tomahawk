@@ -25,18 +25,13 @@
 			
 			if( texture == null )
 			{
-				texture = new tomahawk_ns.Texture();
-				texture.rect = [0,0,image.naturalWidth,image.naturalHeight];
-				texture.data = image;
-				texture.name = "perso";
+				texture = new tomahawk_ns.Texture( image, [0,0,image.naturalWidth,image.naturalHeight], "perso");
 				tomahawk_ns.AssetsManager.getInstance().addTexture(texture,"myTexture");
 			}
 			
 			while( --i > -1 )
 			{
 				bmp = new tomahawk_ns.Bitmap(texture);
-				bmp.width = image.naturalWidth;
-				bmp.height = image.naturalHeight;
 				bmp.x = parseInt(Math.random() * 800);
 				bmp.y = parseInt(Math.random() * 600);
 				bmp.updateNextFrame = true;
@@ -52,44 +47,25 @@
 			var container = new tomahawk_ns.Sprite();
 			var button = document.getElementById("add");
 			
+			stage.debug = true;
+			
 			button.addEventListener("click", clickHandler);
 			container.name = "container";
 			
 			stage.init(document.getElementById("tomahawk"));
 			stage.addChild(container);
 			
-			stage.addEventListener(tomahawk_ns.Event.ENTER_FRAME, this, this.onFrame);
+			stage.addEventListener(tomahawk_ns.Event.ENTER_FRAME, this, this.onFrame.bind(this));
 		}
 		
-		function onFrame()
+		function onFrame(event)
 		{
-			counter++;
-			var stage = tomahawk_ns.Stage.getInstance("stress");
+			var stage = event.target;
 			var container = stage.getChildByName("container");
-			var numChildren = container.children.length;
-			var context = stage.getContext();
-			var time = new Date().getTime();
-			
-			if( time - lastTime> 1000 )
-			{
-				lastTime = time;
-				fps = counter;
-				counter = 0;
-			}
 			
 			container.x += stepX;
 			stepX = ( container.x > 100 ) ? -stepX : stepX;
 			stepX = ( container.x < -100 ) ? -stepX : stepX;
-			
-			context.save();
-			context.beginPath();
-			context.fillStyle = "black";
-			context.fillRect(0,0,100,30);
-			context.fill();
-			context.fillStyle = "red";
-			context.textBaseline = "top";
-			context.fillText("children: "+numChildren+", "+ fps + " fps",0,0);
-			context.restore();
 		}
 	
 		window.onload = init;

@@ -612,7 +612,7 @@ function()
 	
 	
 	
-		Matrix2D._fastCos = [];
+	Matrix2D._fastCos = [];
 	Matrix2D._fastSin = [];
 	
 	Matrix2D._fastMath = function()

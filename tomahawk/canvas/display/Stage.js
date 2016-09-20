@@ -347,7 +347,6 @@
 			this.draw(context);
 		}
 		
-		this.draw(context);
 		context.restore();
 		
 		if( this.debug == true )
@@ -358,7 +357,7 @@
 		this.dispatchEvent(new tomahawk_ns.Event(tomahawk_ns.Event.ENTER_FRAME,true,true));
 		
 		if( this._stop != true )
-			window.requestAnimationFrame(this.enterFrame.smartBind(this));
+			window.requestAnimationFrame(this.enterFrame.bind(this));
 	};
 
 	/**
