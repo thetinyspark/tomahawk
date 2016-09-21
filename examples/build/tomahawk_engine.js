@@ -4157,6 +4157,10 @@ catch(e)
 	function Stage()
 	{
 		tomahawk_ns.DisplayObjectContainer.apply(this);
+		
+		this._renderer = new tomahawk_ns.FrameRenderer();
+		this._renderer.setCallback( this.enterFrame.smartBind(this) );
+		
 		this.setFPS(60);
 		this.stage = this;
 	}
@@ -4300,17 +4304,19 @@ catch(e)
 	**/
 	Stage.prototype.resizeMode = "autoResize";
 	
-	Stage.prototype._lastTime = 0;
-	Stage.prototype._frameCount = 0;
-	Stage.prototype._fps = 0;
-	Stage.prototype._canvas = null;
-	Stage.prototype._context = null;
-	Stage.prototype._lastActiveChild = null;
-	Stage.prototype._focused = false;
-	Stage.prototype._focusedElement = null;
-	Stage.prototype._cache = null;
-	Stage.prototype._stop = false;
-	Stage.prototype._responsive = false;
+	Stage.prototype._lastTime 			= 0;
+	Stage.prototype._frameCount 		= 0;
+	Stage.prototype._fps 				= 0;
+	
+	Stage.prototype._timeout 			= 0;
+	Stage.prototype._renderer 			= null;
+	Stage.prototype._canvas 			= null;
+	Stage.prototype._context 			= null;
+	Stage.prototype._lastActiveChild 	= null;
+	Stage.prototype._focused 			= false;
+	Stage.prototype._focusedElement 	= null;
+	Stage.prototype._cache 				= null;
+	Stage.prototype._responsive 		= false;
 
 	/**
 	* @description  Associates the canvas element specified by the "canvas" parameter  to this stage and runs the rendering loop.
@@ -4328,9 +4334,6 @@ catch(e)
 		
 		window.removeEventListener("resize",this._resizeHandler.smartBind(this));
 		window.addEventListener("resize",this._resizeHandler.smartBind(this));
-		
-		
-		this.enterFrame();		
 	};
 	
 	Stage.prototype.setCanvas		= function(canvas)
@@ -4360,6 +4363,9 @@ catch(e)
 		this._canvas.addEventListener("mousedown",callback);
 		this._canvas.addEventListener("mouseup",callback);
 		this._canvas.addEventListener("dblclick",callback);
+		
+		
+		this.resume();
 	};
 	
 	/**
@@ -4369,7 +4375,7 @@ catch(e)
 	**/
 	Stage.prototype.stop			= function()
 	{
-		this._stop = true;
+		this._renderer.stop();
 	};
 	
 	/**
@@ -4379,8 +4385,7 @@ catch(e)
 	**/
 	Stage.prototype.resume			= function()
 	{
-		this._stop = false;
-		window.requestAnimationFrame(this.enterFrame.smartBind(this));
+		this._renderer.resume();
 	};
 	
 	/**
@@ -4474,9 +4479,6 @@ catch(e)
 		}
 		
 		this.dispatchEvent(new tomahawk_ns.Event(tomahawk_ns.Event.ENTER_FRAME,true,true));
-		
-		if( this._stop != true )
-			window.requestAnimationFrame(this.enterFrame.bind(this));
 	};
 
 	/**
@@ -4487,21 +4489,9 @@ catch(e)
 	**/
 	Stage.prototype.setFPS 			= function(value)
 	{
-		this._fps = value;
-		
-		window.requestAnimationFrame = (function()
-		{
-			
-			return  window.requestAnimationFrame       ||  //Chromium 
-					window.webkitRequestAnimationFrame ||  //Webkit
-					window.mozRequestAnimationFrame    || //Mozilla Geko
-					window.oRequestAnimationFrame      || //Opera Presto
-					window.msRequestAnimationFrame     || //IE Trident?
-					function(callback, element){ //Fallback function
-						window.setTimeout(callback, parseInt(1000/value));                
-					}
-			 
-		})();
+		value 				= ( value > 60 ) ? 60 : value;
+		this._fps 			= value;
+		this._renderer.fps 	= value;
 	};
 
 	/**
@@ -4638,6 +4628,7 @@ catch(e)
 		this._canvas = null;
 		this._context = null;
 		this.stop();
+		this._renderer.destroy();
 		this.removeEventListeners();
 		
 		this._mouseHandler.removeSmartBind(this);
@@ -14741,6 +14732,83 @@ tomahawk_ns.DataLoader = DataLoader;
 	tomahawk_ns.Strong = Strong;
 
 })();
+
+
+
+
+(function() {
+	
+	function FrameRenderer()
+	{
+		window.requestAnimationFrame = 	window.requestAnimationFrame       ||  //Chromium 
+										window.webkitRequestAnimationFrame ||  //Webkit
+										window.mozRequestAnimationFrame    || //Mozilla Geko
+										window.oRequestAnimationFrame      || //Opera Presto
+										window.msRequestAnimationFrame     || //IE Trident?
+										null;
+	}
+
+	Tomahawk.registerClass( FrameRenderer, "FrameRenderer" );
+	
+
+	FrameRenderer.prototype._callback 	= null;
+	FrameRenderer.prototype._playing 	= true;
+	FrameRenderer.prototype._timeout 	= 0;
+	FrameRenderer.prototype.fps			= 60;
+	
+	FrameRenderer.prototype.stop = function()
+	{
+		clearTimeout(this._timeout);
+		this._playing = false;
+	};
+	
+	FrameRenderer.prototype.resume = function()
+	{
+		this.stop();
+		this._playing = true;
+		this.nextFrame();
+	};
+	
+	FrameRenderer.prototype.nextFrame = function()
+	{
+		if( this._playing != true )
+			return;
+			
+		if( this._callback != null )
+		{
+			this._callback();
+		}
+					
+		if( window.requestAnimationFrame == null )
+		{
+			clearTimeout(this._timeout);
+			this._timeout = setTimeout( this.nextFrame.bind(this), 1000 / this.fps );
+		}
+		else
+		{
+			var toto = window.requestAnimationFrame(this.nextFrame.bind(this));
+		}
+	};
+	
+	FrameRenderer.prototype.setCallback = function(callback)
+	{
+		this._callback = callback;
+	};
+	
+	FrameRenderer.prototype.destroy = function()
+	{
+		this.stop();
+		this._callback = null;
+	};
+	
+	tomahawk_ns.FrameRenderer = FrameRenderer;
+	
+	
+
+})();
+
+
+
 
 
 

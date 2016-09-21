@@ -38,6 +38,10 @@
 	function Stage()
 	{
 		tomahawk_ns.DisplayObjectContainer.apply(this);
+		
+		this._renderer = new tomahawk_ns.FrameRenderer();
+		this._renderer.setCallback( this.enterFrame.smartBind(this) );
+		
 		this.setFPS(60);
 		this.stage = this;
 	}
@@ -181,17 +185,19 @@
 	**/
 	Stage.prototype.resizeMode = "autoResize";
 	
-	Stage.prototype._lastTime = 0;
-	Stage.prototype._frameCount = 0;
-	Stage.prototype._fps = 0;
-	Stage.prototype._canvas = null;
-	Stage.prototype._context = null;
-	Stage.prototype._lastActiveChild = null;
-	Stage.prototype._focused = false;
-	Stage.prototype._focusedElement = null;
-	Stage.prototype._cache = null;
-	Stage.prototype._stop = false;
-	Stage.prototype._responsive = false;
+	Stage.prototype._lastTime 			= 0;
+	Stage.prototype._frameCount 		= 0;
+	Stage.prototype._fps 				= 0;
+	
+	Stage.prototype._timeout 			= 0;
+	Stage.prototype._renderer 			= null;
+	Stage.prototype._canvas 			= null;
+	Stage.prototype._context 			= null;
+	Stage.prototype._lastActiveChild 	= null;
+	Stage.prototype._focused 			= false;
+	Stage.prototype._focusedElement 	= null;
+	Stage.prototype._cache 				= null;
+	Stage.prototype._responsive 		= false;
 
 	/**
 	* @description  Associates the canvas element specified by the "canvas" parameter  to this stage and runs the rendering loop.
@@ -209,9 +215,6 @@
 		
 		window.removeEventListener("resize",this._resizeHandler.smartBind(this));
 		window.addEventListener("resize",this._resizeHandler.smartBind(this));
-		
-		
-		this.enterFrame();		
 	};
 	
 	Stage.prototype.setCanvas		= function(canvas)
@@ -241,6 +244,9 @@
 		this._canvas.addEventListener("mousedown",callback);
 		this._canvas.addEventListener("mouseup",callback);
 		this._canvas.addEventListener("dblclick",callback);
+		
+		
+		this.resume();
 	};
 	
 	/**
@@ -250,7 +256,7 @@
 	**/
 	Stage.prototype.stop			= function()
 	{
-		this._stop = true;
+		this._renderer.stop();
 	};
 	
 	/**
@@ -260,8 +266,7 @@
 	**/
 	Stage.prototype.resume			= function()
 	{
-		this._stop = false;
-		window.requestAnimationFrame(this.enterFrame.smartBind(this));
+		this._renderer.resume();
 	};
 	
 	/**
@@ -355,9 +360,6 @@
 		}
 		
 		this.dispatchEvent(new tomahawk_ns.Event(tomahawk_ns.Event.ENTER_FRAME,true,true));
-		
-		if( this._stop != true )
-			window.requestAnimationFrame(this.enterFrame.bind(this));
 	};
 
 	/**
@@ -368,21 +370,9 @@
 	**/
 	Stage.prototype.setFPS 			= function(value)
 	{
-		this._fps = value;
-		
-		window.requestAnimationFrame = (function()
-		{
-			
-			return  window.requestAnimationFrame       ||  //Chromium 
-					window.webkitRequestAnimationFrame ||  //Webkit
-					window.mozRequestAnimationFrame    || //Mozilla Geko
-					window.oRequestAnimationFrame      || //Opera Presto
-					window.msRequestAnimationFrame     || //IE Trident?
-					function(callback, element){ //Fallback function
-						window.setTimeout(callback, parseInt(1000/value));                
-					}
-			 
-		})();
+		value 				= ( value > 60 ) ? 60 : value;
+		this._fps 			= value;
+		this._renderer.fps 	= value;
 	};
 
 	/**
@@ -519,6 +509,7 @@
 		this._canvas = null;
 		this._context = null;
 		this.stop();
+		this._renderer.destroy();
 		this.removeEventListeners();
 		
 		this._mouseHandler.removeSmartBind(this);
