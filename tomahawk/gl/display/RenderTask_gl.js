@@ -9,12 +9,14 @@
 	
 	RenderTask.prototype._currentTexture 		= null;
 	RenderTask.prototype._vertexArray 			= null;
+	RenderTask.prototype._vdata 				= null;
 	RenderTask.prototype._indexArray 			= null;
 	RenderTask.prototype._maxSpritePerSession 	= 2730;
 	RenderTask.prototype.currentShader 			= null;
 	RenderTask.prototype.context 				= null;
 	RenderTask.prototype.counter 				= 0;
 	RenderTask.prototype._numQuads 				= 0;
+	RenderTask.prototype._vertexSize 			= 0;
 	
 	
 	RenderTask.prototype.init 					= function(context)
@@ -32,8 +34,8 @@
 		
 		this.context = context;
 		
-		this._vertexArray = new Float32Array(verticesSize);
-		this._indexArray = new Uint16Array(indicesSize);
+		this._vertexArray 	= new Float32Array(verticesSize);
+		this._indexArray 	= new Uint16Array(indicesSize);
 		
 		this._vertexBuffer = context.createBuffer();
 		this._indexBuffer = context.createBuffer();
@@ -60,12 +62,14 @@
 	RenderTask.prototype.start 					= function(projectionVector)
 	{
 		var context = this.context;
-		var shader = new tomahawk_ns.DefaultShader();
+		var shader = this.currentShader || new tomahawk_ns.DefaultShader();
 		
 		this._numQuads = 0;
 		this.counter = 0;
 		
 		this.currentShader = shader;
+		
+		this._vertexSize = tomahawk_ns.DefaultShader.VERTEX_SIZE;
 		shader.init(this.context);
 		context.uniform2f( this.currentShader.projectionPointer, projectionVector.x, projectionVector.y );
 	};
@@ -149,7 +153,7 @@
 		
 		if( this._numQuads == 0 )
 			return;
-		
+			
 		context.activeTexture(context.TEXTURE0);
 		context.bindTexture(context.TEXTURE_2D, this._currentTexture.getGLTexture(context));
 			
@@ -159,11 +163,11 @@
 		}
 		else
 		{
-			var view = this._vertexArray.subarray(0, this._numQuads * 4 * tomahawk_ns.DefaultShader.VERTEX_SIZE);
+			var view = this._vertexArray.subarray(0, this._numQuads * 4 * this._vertexSize);
 			context.bufferSubData(context.ARRAY_BUFFER, 0, view);
 		}
 		
-		//
+		
 		context.drawElements(context.TRIANGLES, this._numQuads * 6, context.UNSIGNED_SHORT, 0 );
 
 		this.counter++;
@@ -172,29 +176,29 @@
 	
 	RenderTask.prototype.batchQuad 				= function(quad, transformMatrix)
 	{
-		//var m = quad.concatenedMatrix;
-		var m = transformMatrix;
-		var x = 0;
-		var y = 0;
-		var a = m.a;
-		var b = m.b;
-		var c = m.c;
-		var d = m.d;
-		var width = quad.width;
-		var height = quad.height;
-		var tx = m.tx;
-		var ty = m.ty;
-		var i = 0;
-		var tint = quad.color;
-		var alpha = quad.alpha;
-		var texture = quad.texture;
-		var uvs = texture.uvs;
-		var index = 0;
-		var vertices = this._vertexArray;
-		var context = this.context;
+		var m 			= transformMatrix;
+		var a 			= m.a;
+		var b 			= m.b;
+		var c 			= m.c;
+		var d 			= m.d;
+		var width 		= quad.width;
+		var height 		= quad.height;
+		var x1 			= width * a;
+		var x2 			= width * b;
+		var y1 			= height * c;
+		var y2 			= height * d;
+		var tx 			= m.tx;
+		var ty 			= m.ty;
+		var tint 		= quad.color;
+		var alpha 		= quad.alpha;
+		var texture 	= quad.texture;
+		var uvs 		= texture.uvs;
+		var index 		= 0;
+		var vertices 	= this._vertexArray;
+		var context 	= this.context;
 		
-		if( this._currentTexture == null 			|| 
-			this._currentTexture.id != texture.id 	|| 
+		if( this._currentTexture == null 				|| 
+			this._currentTexture.id != texture.id 		|| 
 			this._numQuads >= this._maxSpritePerSession 
 		)
 		{
@@ -202,49 +206,36 @@
 			this.flush();
 		}
 		
-		index = this._numQuads * 4 * tomahawk_ns.DefaultShader.VERTEX_SIZE;
+		index = this._numQuads * 4 * this._vertexSize;
+		
+		
+		vertices[index++] = 1*(tx);
+		vertices[index++] = 1*(ty);
+		vertices[index++] = 1*(tint);
+		vertices[index++] = 1*(alpha);
+		vertices[index++] = 1*(uvs.x1);
+		vertices[index++] = 1*(uvs.y1);
+		
+		vertices[index++] = 1*(x1 + tx);
+		vertices[index++] = 1*(x2 + ty);
+		vertices[index++] = 1*(tint);
+		vertices[index++] = 1*(alpha);
+		vertices[index++] = 1*(uvs.x2);
+		vertices[index++] = 1*(uvs.y2);
+		
+		vertices[index++] = 1*(y1 + tx);
+		vertices[index++] = 1*(y2 + ty);
+		vertices[index++] = 1*(tint);
+		vertices[index++] = 1*(alpha);
+		vertices[index++] = 1*(uvs.x3);
+		vertices[index++] = 1*(uvs.y3);
 	
-		vertices[index++] = x * a + y * c + tx;
-		vertices[index++] = x * b + y * d + ty;
-		vertices[index++] = tint;
-		vertices[index++] = alpha;
-		vertices[index++] = uvs.x1;
-		vertices[index++] = uvs.y1;
-		
-		x = width;
-		y = 0.0;
-		
-		vertices[index++] = x * a + y * c + tx;
-		vertices[index++] = x * b + y * d + ty;
-		vertices[index++] = tint;
-		vertices[index++] = alpha;
-		
-
-		vertices[index++] = uvs.x2;
-		vertices[index++] = uvs.y2;
-		
-		x = 0.0;
-		y = height;
-		
-		vertices[index++] = x * a + y * c + tx;
-		vertices[index++] = x * b + y * d + ty;
-		vertices[index++] = tint;
-		vertices[index++] = alpha;
-		
-		vertices[index++] = uvs.x3;
-		vertices[index++] = uvs.y3;
-		
-		x = width;
-		y = height;
-		
-		
-		vertices[index++] = x * a + y * c + tx;
-		vertices[index++] = x * b + y * d + ty;
-		vertices[index++] = tint;
-		vertices[index++] = alpha;
-		
-		vertices[index++] = uvs.x4;
-		vertices[index++] = uvs.y4;
+		vertices[index++] = 1*(x1 + y1 + tx);
+		vertices[index++] = 1*(x2 + y2 + ty);
+		vertices[index++] = 1*(tint);
+		vertices[index++] = 1*(alpha);
+		vertices[index++] = 1*(uvs.x4);
+		vertices[index++] = 1*(uvs.y4);
 		
 		this._numQuads++;
 	};

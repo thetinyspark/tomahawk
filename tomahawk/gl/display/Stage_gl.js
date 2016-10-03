@@ -42,7 +42,7 @@
 		this._context.blendFunc( tomahawk_ns.BlendMode.NORMAL[0], tomahawk_ns.BlendMode.NORMAL[1] );
 		this._context.enable(this._context.BLEND);
 		
-		this.enterFrame();		
+		this.resume();		
 	};
 	
 	tomahawk_ns.Stage.prototype._getContext 	= function(canvas)
@@ -52,7 +52,7 @@
 	
 	tomahawk_ns.Stage.prototype.drawFPS 		= function()
 	{
-		console.log(this._fps);
+		//console.log(this._fps, this._renderTask._numQuads);
 	};
 	
 	tomahawk_ns.Stage.prototype.enterFrame 		= function()
@@ -67,7 +67,6 @@
 		var r 			= ( this.backgroundColor >> 16 ) & 0xFF;
 		var g 			= ( this.backgroundColor >> 8 ) & 0xFF;
 		var b 			= ( this.backgroundColor >> 0 ) & 0xFF;
-		
 		
 		
 		this.width 		= canvas.width;
@@ -89,9 +88,7 @@
 		
 		
 		renderTask.start( new tomahawk_ns.Point(this.width/2,  -this.height/2 ) );
-		
 		this.draw(renderTask);
-		
 		renderTask.end();
 		
 		this.dispatchEvent(new tomahawk_ns.Event(tomahawk_ns.Event.ENTER_FRAME,true,true));
@@ -101,8 +98,6 @@
 			this.drawFPS();
 		}
 		
-		if( this._stop != true )
-			window.requestAnimationFrame(this.enterFrame.smartBind(this));
 	};
 
 })();

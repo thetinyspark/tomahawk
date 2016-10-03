@@ -49,7 +49,7 @@
 		}
 		else
 		{
-			var toto = window.requestAnimationFrame(this.nextFrame.bind(this));
+			window.requestAnimationFrame(this.nextFrame.bind(this));
 		}
 	};
 	

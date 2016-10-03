@@ -118,35 +118,61 @@ Tomahawk._getParentClass 	= function(child)
 	return null;
 };
 
+Tomahawk._transfer		= function(child,ancestor)
+{
+	for ( var prop in ancestor ) 
+	{
+		var getter = ancestor.__lookupGetter__(prop);
+		var setter = ancestor.__lookupSetter__(prop);
+
+		if ( getter || setter ) 
+		{
+			if ( getter )
+			{
+				child.__defineGetter__(prop, getter);
+			}
+			if ( setter )
+			{
+				child.__defineSetter__(prop, setter);
+			}
+		} 
+		else
+		{
+			child[prop] = ancestor[prop];
+		}
+	}
+	
+	return child;
+};
+
 Tomahawk._inherits 			= function( obj )
 {
-	var child = null;
-	var ancestor = null;
+	var child 		= null;
+	var ancestor 	= null;
 	var superParent = Tomahawk._getParentClass(obj["ancestor"]);
+	var proxy 		= null;
 	
 	if( superParent != null && superParent.done == false)
 		Tomahawk._inherits(superParent);
 
-	child = Tomahawk._classes[obj["child"]];
-	ancestor = Tomahawk._classes[obj["ancestor"]];
-	obj.done = true;
+	proxy 			= new Object();
+	child 			= Tomahawk._classes[obj["child"]];
+	ancestor 		= Tomahawk._classes[obj["ancestor"]];
+	obj.done 		= true;
 	
-	var obj = new Object();
+	
 
-	if( child != null && ancestor != null )
+	if( 	child != null 		&& 
+			child != undefined 	&& 
+			ancestor != null 	&& 
+			ancestor != undefined
+	)
 	{	
-		for( var prop in ancestor.prototype )
-		{
-			obj[prop] = ancestor.prototype[prop];
-		}
 		
-		for( var prop in child.prototype )
-		{
-			obj[prop] = child.prototype[prop];
-		}
+		Tomahawk._transfer( proxy, ancestor.prototype );
+		Tomahawk._transfer( proxy, child.prototype );
+		child.prototype = proxy;
 	}
-	
-	child.prototype = obj;
 };
 
 

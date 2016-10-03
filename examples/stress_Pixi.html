@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="assets/style.css"/>
+	
+	<script src="vendors/pixi.js-master/pixi.js-master/bin/pixi.js"></script>
+	<script type="text/javascript">
+	
+		var container	= null;
+		var stage 		= null;
+		var renderer 	= null;
+		var num			= 0;
+		var stepX 		= 2;
+		
+		function clickHandler()
+		{
+			var counter = document.getElementById("counter");
+			var texture = PIXI.Texture.fromImage("assets/bunny.png");
+			var bmp 	= null;
+			var i 		= 10000;
+			
+			num 		+= i;
+			
+			while( --i > -1 )
+			{
+				bmp = new PIXI.Sprite(texture);
+				bmp.position.x = ( Math.random() * 800 ) >> 0;
+				bmp.position.y = ( Math.random() * 600 ) >> 0;
+				container.addChild(bmp);
+			}
+			
+		
+			counter.innerText = num + " children";
+		}
+		
+		function renderFrame()
+		{
+			renderer.render(stage);
+			requestAnimFrame(renderFrame);
+			
+			container.x += stepX;
+			stepX = ( container.x > 100 ) ? -stepX : stepX;
+			stepX = ( container.x < -100 ) ? -stepX : stepX;
+		}
+		
+		function init()
+		{
+			container 		= new PIXI.DisplayObjectContainer();
+			stage 			= new PIXI.Stage(0x66FF99);
+			renderer 		= PIXI.autoDetectRenderer(800, 600);
+			
+			document.body.appendChild(renderer.view);
+			requestAnimFrame(renderFrame);
+			stage.interactive = true;
+			stage.addChild(container);
+		}
+	
+		window.onload = init;
+		
+	</script>
+</head>
+<body>
+	<span id="counter"></span>
+	<button id="add" onclick="clickHandler();">Add 100 Bitmap</button>
+	<img src="assets/perso1.png" id="perso" style="display: none;" />
+</body>
+</html>

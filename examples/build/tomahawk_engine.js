@@ -120,35 +120,61 @@ Tomahawk._getParentClass 	= function(child)
 	return null;
 };
 
+Tomahawk._transfer		= function(child,ancestor)
+{
+	for ( var prop in ancestor ) 
+	{
+		var getter = ancestor.__lookupGetter__(prop);
+		var setter = ancestor.__lookupSetter__(prop);
+
+		if ( getter || setter ) 
+		{
+			if ( getter )
+			{
+				child.__defineGetter__(prop, getter);
+			}
+			if ( setter )
+			{
+				child.__defineSetter__(prop, setter);
+			}
+		} 
+		else
+		{
+			child[prop] = ancestor[prop];
+		}
+	}
+	
+	return child;
+};
+
 Tomahawk._inherits 			= function( obj )
 {
-	var child = null;
-	var ancestor = null;
+	var child 		= null;
+	var ancestor 	= null;
 	var superParent = Tomahawk._getParentClass(obj["ancestor"]);
+	var proxy 		= null;
 	
 	if( superParent != null && superParent.done == false)
 		Tomahawk._inherits(superParent);
 
-	child = Tomahawk._classes[obj["child"]];
-	ancestor = Tomahawk._classes[obj["ancestor"]];
-	obj.done = true;
+	proxy 			= new Object();
+	child 			= Tomahawk._classes[obj["child"]];
+	ancestor 		= Tomahawk._classes[obj["ancestor"]];
+	obj.done 		= true;
 	
-	var obj = new Object();
+	
 
-	if( child != null && ancestor != null )
+	if( 	child != null 		&& 
+			child != undefined 	&& 
+			ancestor != null 	&& 
+			ancestor != undefined
+	)
 	{	
-		for( var prop in ancestor.prototype )
-		{
-			obj[prop] = ancestor.prototype[prop];
-		}
 		
-		for( var prop in child.prototype )
-		{
-			obj[prop] = child.prototype[prop];
-		}
+		Tomahawk._transfer( proxy, ancestor.prototype );
+		Tomahawk._transfer( proxy, child.prototype );
+		child.prototype = proxy;
 	}
-	
-	child.prototype = obj;
 };
 
 
@@ -14786,7 +14812,7 @@ tomahawk_ns.DataLoader = DataLoader;
 		}
 		else
 		{
-			var toto = window.requestAnimationFrame(this.nextFrame.bind(this));
+			window.requestAnimationFrame(this.nextFrame.bind(this));
 		}
 	};
 	
@@ -14809,6 +14835,1004 @@ tomahawk_ns.DataLoader = DataLoader;
 
 
 
+
+
+
+(function() {
+	
+	if( Tomahawk.glEnabled == false )
+		return;
+	
+	tomahawk_ns.Bitmap.prototype.draw 	= function( renderTask )
+	{
+		renderTask.batchQuad(this, this._concatenedMatrix);
+	};
+
+})();
+
+
+
+/**
+ * ...
+ * @author Hatshepsout
+ */
+
+var tomahawk_ns = tomahawk_ns || new Object();
+
+(function() 
+{
+
+	function BlendMode(){}
+	
+	Tomahawk.registerClass( BlendMode, "BlendMode" );
+
+	tomahawk_ns.BlendMode = BlendMode;
+	
+	
+	BlendMode.init = function(gl)
+	{
+		tomahawk_ns.BlendMode.NORMAL         = [gl.ONE,       gl.ONE_MINUS_SRC_ALPHA];
+		//tomahawk_ns.BlendMode.NORMAL         = [gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA];
+        tomahawk_ns.BlendMode.ADD            = [gl.SRC_ALPHA, gl.DST_ALPHA];
+        tomahawk_ns.BlendMode.MULTIPLY       = [gl.DST_COLOR, gl.ONE_MINUS_SRC_ALPHA];
+        tomahawk_ns.BlendMode.SCREEN         = [gl.SRC_ALPHA, gl.ONE];
+        tomahawk_ns.BlendMode.OVERLAY        = [gl.ONE,       gl.ONE_MINUS_SRC_ALPHA];
+        tomahawk_ns.BlendMode.DARKEN         = [gl.ONE,       gl.ONE_MINUS_SRC_ALPHA];
+        tomahawk_ns.BlendMode.LIGHTEN        = [gl.ONE,       gl.ONE_MINUS_SRC_ALPHA];
+        tomahawk_ns.BlendMode.COLOR_DODGE    = [gl.ONE,       gl.ONE_MINUS_SRC_ALPHA];
+        tomahawk_ns.BlendMode.COLOR_BURN     = [gl.ONE,       gl.ONE_MINUS_SRC_ALPHA];
+        tomahawk_ns.BlendMode.HARD_LIGHT     = [gl.ONE,       gl.ONE_MINUS_SRC_ALPHA];
+        tomahawk_ns.BlendMode.SOFT_LIGHT     = [gl.ONE,       gl.ONE_MINUS_SRC_ALPHA];
+        tomahawk_ns.BlendMode.DIFFERENCE     = [gl.ONE,       gl.ONE_MINUS_SRC_ALPHA];
+        tomahawk_ns.BlendMode.EXCLUSION      = [gl.ONE,       gl.ONE_MINUS_SRC_ALPHA];
+        tomahawk_ns.BlendMode.HUE            = [gl.ONE,       gl.ONE_MINUS_SRC_ALPHA];
+        tomahawk_ns.BlendMode.SATURATION     = [gl.ONE,       gl.ONE_MINUS_SRC_ALPHA];
+        tomahawk_ns.BlendMode.COLOR          = [gl.ONE,       gl.ONE_MINUS_SRC_ALPHA];
+        tomahawk_ns.BlendMode.LUMINOSITY     = [gl.ONE,       gl.ONE_MINUS_SRC_ALPHA];
+	}
+	
+	BlendMode.NORMAL = 0;
+	BlendMode.ADD = 1;
+	BlendMode.MULTIPLY = 2;
+	BlendMode.SCREEN = 3;
+	BlendMode.OVERLAY = 4;
+	BlendMode.DARKEN = 5;
+	BlendMode.LIGHTEN = 6;
+	BlendMode.COLOR_DODGE = 7;
+	BlendMode.COLOR_BURN = 8;
+	BlendMode.HARD_LIGHT = 9;
+	BlendMode.SOFT_LIGHT = 10;
+	BlendMode.DIFFERENCE = 11;
+	BlendMode.EXCLUSION = 12;
+	BlendMode.HUE = 13;
+	BlendMode.SATURATION = 14;
+	BlendMode.COLOR = 15;
+	BlendMode.LUMINOSITY = 16;
+	
+})();
+
+
+
+/**
+ * ...
+ * @author Hatshepsout
+ */
+
+var tomahawk_ns = tomahawk_ns || new Object();
+
+(function() 
+{
+
+	function DefaultShader()
+	{
+		//this.init();
+	}
+	
+	Tomahawk.registerClass( DefaultShader, "DefaultShader" );
+
+	
+	DefaultShader.prototype.id 					= 0;
+	DefaultShader.prototype.fragmentShader 		= null;
+	DefaultShader.prototype.vertexShader 		= null;
+	DefaultShader.prototype.program 			= null;
+	DefaultShader.prototype.projectionPointer 	= null;
+	DefaultShader.prototype.inited 				= false;
+	DefaultShader.VERTEX_SIZE 					= 6;
+	
+	
+	DefaultShader.prototype._compile = function(context, source, type)
+	{
+		var shader = context.createShader(type);
+	
+		context.shaderSource(shader, source);
+		context.compileShader(shader);
+
+		if (!context.getShaderParameter(shader, context.COMPILE_STATUS)) 
+		{
+			alert(context.getShaderInfoLog(shader));
+			return null;
+		}
+
+		return shader;
+	};
+	
+	DefaultShader.prototype.init = function(context, source, type)
+	{
+		
+		if( this.inited == true )
+			return;
+			
+		this.inited = true;
+		
+		var vertexPosAttribPointer = 0;
+		var colorAttribPointer = 0;
+		var uvsAttribPointer = 0;
+		var samplerPointer = 0;
+		var projectionPointer = 0;
+		var stride = tomahawk_ns.DefaultShader.VERTEX_SIZE * 4;
+		
+		this.fragmentShader = this._compile(context, this._getFragmentSource(), context.FRAGMENT_SHADER );
+		this.vertexShader = this._compile(context, this._getVertexSource(), context.VERTEX_SHADER );
+		
+		if( this.program != null )
+		{
+			context.deleteProgram( this.program );
+		}
+		
+		this.program = context.createProgram();
+		
+		context.attachShader(this.program, this.vertexShader); // attach vertexShader
+		context.attachShader(this.program, this.fragmentShader); // attach fragmentShader
+		context.linkProgram(this.program); // links program to webgl context
+		
+		
+		/* if the program is not linked...*/
+		if (!context.getProgramParameter(this.program, context.LINK_STATUS)) 
+		{
+			alert("Could not initialise shaders");
+		}
+	
+		context.useProgram(this.program); // use the shaderProgram
+		
+		
+		vertexPosAttribPointer = context.getAttribLocation(this.program, "aVertexPosition"); 
+		colorAttribPointer = context.getAttribLocation(this.program, "aColor"); 
+		uvsAttribPointer = context.getAttribLocation(this.program, "aTextureCoord"); 
+		context.enableVertexAttribArray(vertexPosAttribPointer);
+		context.enableVertexAttribArray(colorAttribPointer);
+		context.enableVertexAttribArray(uvsAttribPointer);
+		
+		
+		context.vertexAttribPointer(vertexPosAttribPointer, 2, context.FLOAT, false, stride, 0);
+		context.vertexAttribPointer(colorAttribPointer, 2, context.FLOAT, false, stride, 2*4);
+		context.vertexAttribPointer(uvsAttribPointer, 2, context.FLOAT, false, stride, 4*4);
+		
+		samplerPointer = context.getUniformLocation(this.program,"uSampler");
+		projectionPointer = context.getUniformLocation(this.program,"uProjection");
+		context.uniform1i(samplerPointer, 0);
+		
+		this.projectionPointer = projectionPointer;
+	};
+	
+	DefaultShader.prototype._getVertexSource = function ()
+	{
+		var VERTEX_SRC = ''+
+		
+		'attribute vec2 aVertexPosition;'+
+		'attribute vec2 aColor;'+
+		'attribute vec2 aTextureCoord;'+
+		'varying vec4 vColor;'+
+		'varying vec2 vTextureCoord;'+
+		'uniform vec2 uProjection;'+
+		'const vec2 center = vec2(-1.0, 1.0);'+
+		
+		
+		'void main(void) {'+
+			//'gl_Position = vec4( ( aVertexPosition / uProjection) + center , 0.0, 1.0);'+
+			//'vTextureCoord = aTextureCoord;'+
+			//'vec3 color = mod(vec3(aColor.x/65536.0, aColor.x/256.0, aColor.x), 256.0) / 256.0;'+
+			//'vColor = vec4( color * aColor.y, aColor.y );'+
+			'gl_Position = vec4( ( aVertexPosition / uProjection) + center , 0.0, 1.0);'+
+			'vTextureCoord = aTextureCoord;'+
+			'vec3 color = mod(vec3(aColor.x/65536.0, aColor.x/256.0, aColor.x), 256.0) / 256.0;'+
+			'vColor = vec4( color * aColor.y, aColor.y );'+
+		'}';
+		
+		return VERTEX_SRC;
+	};
+	
+	DefaultShader.prototype._getFragmentSource = function ()
+	{
+		var FRAG_SRC = ''+
+		
+		'precision lowp float;'+
+		'varying vec4 vColor;'+
+		'varying vec2 vTextureCoord;'+
+		'uniform sampler2D uSampler;'+
+
+		'void main(void) {'+
+			'gl_FragColor = texture2D(uSampler,vTextureCoord) * vColor.a;'+
+		'}';
+		
+		return FRAG_SRC;
+	};
+	
+	tomahawk_ns.DefaultShader = DefaultShader;
+	
+	
+	
+})();
+
+
+
+/*
+* Visit http://the-tiny-spark.com/tomahawk/ for documentation, updates and examples.
+*
+* Copyright (c) 2014 the-tiny-spark.com, inc.
+*
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+*
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+
+* @author The Tiny Spark
+*/
+
+(function() {
+	
+	if( Tomahawk.glEnabled == false )
+		return;
+	
+	
+	tomahawk_ns.DisplayObjectContainer.prototype.draw = function( renderTask )
+	{
+		var children 	= this.children;
+		var i 			= 0;
+		var max 		= children.length;
+		var child 		= null;
+		
+		//this.updateMatrix();
+		
+		for( i = 0; i < max; i++ )
+		{
+			child = children[i];
+			child.updateMatrix();
+			child.draw(renderTask);
+		}
+	};
+
+})();
+
+
+
+(function() {
+	
+	if( Tomahawk.glEnabled == false )
+		return;
+	
+	tomahawk_ns.DisplayObject._buffer2D						= null;
+	tomahawk_ns.DisplayObject.prototype.color 				= null;
+	tomahawk_ns.DisplayObject.prototype.drawComposite 		= function(){};
+	tomahawk_ns.DisplayObject.prototype.snapshot 			= function(transformMatrix){};
+	tomahawk_ns.DisplayObject.prototype.updateCache 		= function(){};
+	tomahawk_ns.DisplayObject.prototype.draw 				= function( renderTask ){};
+	tomahawk_ns.DisplayObject.prototype.updateNextFrame		= true;
+	tomahawk_ns.DisplayObject.prototype.autoUpdate			= false;
+	
+	
+	tomahawk_ns.DisplayObject.prototype._x 							= 0;
+	tomahawk_ns.DisplayObject.prototype._y 							= 0;
+	tomahawk_ns.DisplayObject.prototype._pivotX 					= 0;
+	tomahawk_ns.DisplayObject.prototype._pivotY 					= 0;
+	tomahawk_ns.DisplayObject.prototype._skewX 						= 0;
+	tomahawk_ns.DisplayObject.prototype._skewY 						= 0;
+	tomahawk_ns.DisplayObject.prototype._scaleX 					= 1;
+	tomahawk_ns.DisplayObject.prototype._scaleY 					= 1;
+	tomahawk_ns.DisplayObject.prototype._width 						= 0;
+	tomahawk_ns.DisplayObject.prototype._height 					= 0;
+	tomahawk_ns.DisplayObject.prototype._rotation 					= 0;
+	
+	
+	// reste à refaire le pixel perfect
+	tomahawk_ns.DisplayObject.prototype.hitTest				= function(x,y)
+	{
+		var pt1 	= this.globalToLocal(x,y);
+		var buffer 	= null;
+		var mat 	= null;
+		var pixels 	= null;
+		var task 	= null;
+		
+		if( pt1.x < 0 || pt1.x > this.width || pt1.y < 0 || pt1.y > this.height )
+			return false;
+			
+		if( this.pixelPerfect == false )
+			return true;
+		
+		//mat = this.matrix.clone();
+		//mat.identity();
+		//mat.tx = -pt1.x;
+		//mat.ty = -pt1.y;
+		
+		//
+		//task = this.stage.getRenderTask();
+		//pixels = task.getPixels(this, mat, this.width, this.height);
+		
+		
+		//console.log(pixels);
+		//pixels = context.getImageData(0,0,1,1).data;
+		//
+		//return ( pixels[3] > this.pixelAlphaLimit );
+		
+		
+		return true;
+	};
+	
+	tomahawk_ns.DisplayObject.prototype.updateMatrix 		= function()
+	{
+		var mat 	= this.matrix;
+		var cmat	= this._concatenedMatrix;
+		var pmat	= null;
+		
+		if( this.autoUpdate == true || this.updateNextFrame == true )
+		{
+			mat 	= this.matrix;
+			mat.d 	= mat.a = 1;
+			mat.b 	= mat.c = mat.tx = mat.ty = 0;
+			
+			
+			mat.appendTransform(	this._x + this._pivotX, 
+									this._y + this._pivotY, 
+									this._scaleX, 
+									this._scaleY, 
+									this._rotation, 
+									this._skewX, 
+									this._skewY, 
+									this._pivotX, 
+									this._pivotY);
+		
+		}
+		
+		
+		cmat.a 	= mat.a;
+		cmat.b 	= mat.b;
+		cmat.c 	= mat.c;
+		cmat.d 	= mat.d;
+		cmat.tx = mat.tx;
+		cmat.ty = mat.ty;
+		
+		if( this.parent != null )
+		{
+			pmat = this.parent._concatenedMatrix;
+			cmat.prepend(pmat.a, pmat.b, pmat.c, pmat.d, pmat.tx, pmat.ty);
+		}
+		
+		this.updateNextFrame = false;
+	};
+	
+	tomahawk_ns.DisplayObject.prototype.getConcatenedMatrix = function()
+	{
+		return this._concatenedMatrix;
+	};
+	
+	
+	
+	
+	Object.defineProperty(
+		tomahawk_ns.DisplayObject.prototype, 
+		"x", 
+		{
+			get: function(){return this._x;},
+			set: function(value)
+			{
+				this._x = value; 
+				this.updateNextFrame = true;
+			}
+		}
+	);
+	
+	Object.defineProperty(
+		tomahawk_ns.DisplayObject.prototype, 
+		"y", 
+		{
+			get: function(){return this._y;},
+			set: function(value)
+			{
+				this._y = value; 
+				this.updateNextFrame = true;
+			}
+		}
+	);
+	
+	Object.defineProperty(
+		tomahawk_ns.DisplayObject.prototype, 
+		"width", 
+		{
+			get: function(){return this._width;},
+			set: function(value)
+			{
+				this._width = value; 
+				this.updateNextFrame = true;
+			}
+		}
+	);
+	
+	Object.defineProperty(
+		tomahawk_ns.DisplayObject.prototype, 
+		"height", 
+		{
+			get: function(){return this._height;},
+			set: function(value)
+			{
+				this._height = value; 
+				this.updateNextFrame = true;
+			}
+		}
+	);
+	
+	Object.defineProperty(
+		tomahawk_ns.DisplayObject.prototype, 
+		"rotation", 
+		{
+			get: function(){return this._rotation;},
+			set: function(value)
+			{
+				this._rotation = value; 
+				this.updateNextFrame = true;
+			}
+		}
+	);
+	
+	Object.defineProperty(
+		tomahawk_ns.DisplayObject.prototype, 
+		"pivotX", 
+		{
+			get: function(){return this._pivotX;},
+			set: function(value)
+			{
+				this._pivotX = value; 
+				this.updateNextFrame = true;
+			}
+		}
+	);
+	
+	Object.defineProperty(
+		tomahawk_ns.DisplayObject.prototype, 
+		"pivotY", 
+		{
+			get: function(){return this._pivotY;},
+			set: function(value)
+			{
+				this._pivotY = value; 
+				this.updateNextFrame = true;
+			}
+		}
+	);
+	
+	Object.defineProperty(
+		tomahawk_ns.DisplayObject.prototype, 
+		"scaleX", 
+		{
+			get: function(){return this._scaleX;},
+			set: function(value)
+			{
+				this._scaleX = value; 
+				this.updateNextFrame = true;
+			}
+		}
+	);
+	
+	Object.defineProperty(
+		tomahawk_ns.DisplayObject.prototype, 
+		"scaleY", 
+		{
+			get: function(){return this._scaleY;},
+			set: function(value)
+			{
+				this._scaleY = value; 
+				this.updateNextFrame = true;
+			}
+		}
+	);
+	
+	Object.defineProperty(
+		tomahawk_ns.DisplayObject.prototype, 
+		"skewY", 
+		{
+			get: function(){return this._skewY;},
+			set: function(value)
+			{
+				this._skewY = value; 
+				this.updateNextFrame = true;
+			}
+		}
+	);
+	
+	Object.defineProperty(
+		tomahawk_ns.DisplayObject.prototype, 
+		"skewX", 
+		{
+			get: function(){return this._skewX;},
+			set: function(value)
+			{
+				this._skewX = value; 
+				this.updateNextFrame = true;
+			}
+		}
+	);
+	
+})();
+
+
+
+/**
+ * ...
+ * @author Hatshepsout
+ */
+
+(function() {
+	
+	function RenderTask (){}
+	
+	RenderTask.prototype._currentTexture 		= null;
+	RenderTask.prototype._vertexArray 			= null;
+	RenderTask.prototype._vdata 				= null;
+	RenderTask.prototype._indexArray 			= null;
+	RenderTask.prototype._maxSpritePerSession 	= 2730;
+	RenderTask.prototype.currentShader 			= null;
+	RenderTask.prototype.context 				= null;
+	RenderTask.prototype.counter 				= 0;
+	RenderTask.prototype._numQuads 				= 0;
+	RenderTask.prototype._vertexSize 			= 0;
+	
+	
+	RenderTask.prototype.init 					= function(context)
+	{
+		var vertPerQuad = 4;
+		var vertSize = tomahawk_ns.DefaultShader.VERTEX_SIZE;
+		var numIndices = 6;
+		
+		var verticesSize = this._maxSpritePerSession * vertPerQuad * vertSize;
+		var indicesSize = this._maxSpritePerSession * numIndices;
+		
+		var i = 0;
+		var j = 0;
+		var max = indicesSize;
+		
+		this.context = context;
+		
+		this._vertexArray 	= new Float32Array(verticesSize);
+		this._indexArray 	= new Uint16Array(indicesSize);
+		
+		this._vertexBuffer = context.createBuffer();
+		this._indexBuffer = context.createBuffer();
+		
+		for( i = 0; i < indicesSize; i+=6 )
+		{
+			this._indexArray[i+0] = 0+j;
+			this._indexArray[i+1] = 1+j;
+			this._indexArray[i+2] = 2+j;
+			this._indexArray[i+3] = 1+j;
+			this._indexArray[i+4] = 2+j;
+			this._indexArray[i+5] = 3+j;
+			j+=4;
+		}
+		
+		
+		context.bindBuffer(context.ARRAY_BUFFER, this._vertexBuffer);
+		context.bufferData(context.ARRAY_BUFFER, this._vertexArray, context.DYNAMIC_DRAW );
+		
+		context.bindBuffer(context.ELEMENT_ARRAY_BUFFER, this._indexBuffer );
+		context.bufferData(context.ELEMENT_ARRAY_BUFFER, this._indexArray, context.STATIC_DRAW);
+	};
+	
+	RenderTask.prototype.start 					= function(projectionVector)
+	{
+		var context = this.context;
+		var shader = this.currentShader || new tomahawk_ns.DefaultShader();
+		
+		this._numQuads = 0;
+		this.counter = 0;
+		
+		this.currentShader = shader;
+		
+		this._vertexSize = tomahawk_ns.DefaultShader.VERTEX_SIZE;
+		shader.init(this.context);
+		context.uniform2f( this.currentShader.projectionPointer, projectionVector.x, projectionVector.y );
+	};
+	
+	RenderTask.prototype.end 					= function()
+	{
+		this.flush();
+	};
+	
+	
+	RenderTask.prototype.renderToTexture 		= function(quad, transformMatrix, width, height)
+	{
+		var ctx = this.context;
+		var texture = ctx.createTexture();
+		var frameBuffer = ctx.createFramebuffer();
+		var renderBuffer = ctx.createRenderbuffer();
+		
+		ctx.bindFramebuffer(ctx.FRAMEBUFFER, frameBuffer);
+		
+		ctx.bindTexture(ctx.TEXTURE_2D, texture);
+		ctx.texParameteri(ctx.TEXTURE_2D, ctx.TEXTURE_MAG_FILTER, ctx.LINEAR);
+		ctx.texParameteri(ctx.TEXTURE_2D, ctx.TEXTURE_MIN_FILTER, ctx.LINEAR_MIPMAP_NEAREST);
+		ctx.texImage2D(ctx.TEXTURE_2D, 0, ctx.RGBA, width, height, 0, ctx.RGBA, ctx.UNSIGNED_BYTE, null)
+		
+		ctx.bindRenderbuffer(ctx.RENDERBUFFER, renderBuffer);
+		ctx.renderbufferStorage(ctx.RENDERBUFFER, ctx.DEPTH_COMPONENT16, width, height);
+		
+		ctx.framebufferTexture2D(ctx.FRAMEBUFFER, ctx.COLOR_ATTACHMENT0, ctx.TEXTURE_2D, texture, 0);
+		ctx.framebufferRenderbuffer(ctx.FRAMEBUFFER, ctx.DEPTH_ATTACHMENT, ctx.RENDERBUFFER, renderBuffer);
+		
+		quad.draw(this, transformMatrix);
+		
+		ctx.bindTexture(ctx.TEXTURE_2D, texture);
+		ctx.generateMipmap(ctx.TEXTURE_2D);
+		
+		ctx.bindTexture(ctx.TEXTURE_2D, null);
+		ctx.bindRenderbuffer(ctx.RENDERBUFFER, null);
+		ctx.bindFramebuffer(ctx.FRAMEBUFFER, null);
+		
+		return texture;
+	};
+	
+	RenderTask.prototype.getPixels 				= function(quad, transformMatrix, width, height)
+	{
+		var ctx = this.context;
+		var texture = ctx.createTexture();
+		var frameBuffer = ctx.createFramebuffer();
+		var renderBuffer = ctx.createRenderbuffer();
+		var pixels = new Uint8Array(width * height * 4);
+		
+		ctx.bindFramebuffer(ctx.FRAMEBUFFER, frameBuffer);
+		
+		ctx.bindTexture(ctx.TEXTURE_2D, texture);
+		ctx.texParameteri(ctx.TEXTURE_2D, ctx.TEXTURE_MAG_FILTER, ctx.LINEAR);
+		ctx.texParameteri(ctx.TEXTURE_2D, ctx.TEXTURE_MIN_FILTER, ctx.LINEAR_MIPMAP_NEAREST);
+		ctx.texImage2D(ctx.TEXTURE_2D, 0, ctx.RGBA, width, height, 0, ctx.RGBA, ctx.UNSIGNED_BYTE, null)
+		
+		ctx.bindRenderbuffer(ctx.RENDERBUFFER, renderBuffer);
+		ctx.renderbufferStorage(ctx.RENDERBUFFER, ctx.DEPTH_COMPONENT16, width, height);
+		
+		ctx.framebufferTexture2D(ctx.FRAMEBUFFER, ctx.COLOR_ATTACHMENT0, ctx.TEXTURE_2D, texture, 0);
+		ctx.framebufferRenderbuffer(ctx.FRAMEBUFFER, ctx.DEPTH_ATTACHMENT, ctx.RENDERBUFFER, renderBuffer);
+		
+		ctx.bindTexture(ctx.TEXTURE_2D, texture);
+		ctx.generateMipmap(ctx.TEXTURE_2D);
+		
+		quad.draw(this, transformMatrix);
+		
+		ctx.readPixels(0,0,width,height,ctx.RGBA, ctx.UNSIGNED_BYTE,pixels);
+		
+		ctx.bindTexture(ctx.TEXTURE_2D, null);
+		ctx.bindRenderbuffer(ctx.RENDERBUFFER, null);
+		ctx.bindFramebuffer(ctx.FRAMEBUFFER, null);
+		
+		return pixels;
+	};
+	
+	RenderTask.prototype.flush 					= function()
+	{
+		var context = this.context;		
+		
+		if( this._numQuads == 0 )
+			return;
+			
+		context.activeTexture(context.TEXTURE0);
+		context.bindTexture(context.TEXTURE_2D, this._currentTexture.getGLTexture(context));
+			
+		if( this._numQuads > this._maxSpritePerSession >> 1 )
+		{
+			context.bufferSubData(context.ARRAY_BUFFER, 0, this._vertexArray);
+		}
+		else
+		{
+			var view = this._vertexArray.subarray(0, this._numQuads * 4 * this._vertexSize);
+			context.bufferSubData(context.ARRAY_BUFFER, 0, view);
+		}
+		
+		
+		context.drawElements(context.TRIANGLES, this._numQuads * 6, context.UNSIGNED_SHORT, 0 );
+
+		this.counter++;
+		this._numQuads = 0;
+	}
+	
+	RenderTask.prototype.batchQuad 				= function(quad, transformMatrix)
+	{
+		var m 			= transformMatrix;
+		var a 			= m.a;
+		var b 			= m.b;
+		var c 			= m.c;
+		var d 			= m.d;
+		var width 		= quad.width;
+		var height 		= quad.height;
+		var x1 			= width * a;
+		var x2 			= width * b;
+		var y1 			= height * c;
+		var y2 			= height * d;
+		var tx 			= m.tx;
+		var ty 			= m.ty;
+		var tint 		= quad.color;
+		var alpha 		= quad.alpha;
+		var texture 	= quad.texture;
+		var uvs 		= texture.uvs;
+		var index 		= 0;
+		var vertices 	= this._vertexArray;
+		var context 	= this.context;
+		
+		if( this._currentTexture == null 				|| 
+			this._currentTexture.id != texture.id 		|| 
+			this._numQuads >= this._maxSpritePerSession 
+		)
+		{
+			this._currentTexture = texture;
+			this.flush();
+		}
+		
+		index = this._numQuads * 4 * this._vertexSize;
+		
+		
+		vertices[index++] = 1*(tx);
+		vertices[index++] = 1*(ty);
+		vertices[index++] = 1*(tint);
+		vertices[index++] = 1*(alpha);
+		vertices[index++] = 1*(uvs.x1);
+		vertices[index++] = 1*(uvs.y1);
+		
+		vertices[index++] = 1*(x1 + tx);
+		vertices[index++] = 1*(x2 + ty);
+		vertices[index++] = 1*(tint);
+		vertices[index++] = 1*(alpha);
+		vertices[index++] = 1*(uvs.x2);
+		vertices[index++] = 1*(uvs.y2);
+		
+		vertices[index++] = 1*(y1 + tx);
+		vertices[index++] = 1*(y2 + ty);
+		vertices[index++] = 1*(tint);
+		vertices[index++] = 1*(alpha);
+		vertices[index++] = 1*(uvs.x3);
+		vertices[index++] = 1*(uvs.y3);
+	
+		vertices[index++] = 1*(x1 + y1 + tx);
+		vertices[index++] = 1*(x2 + y2 + ty);
+		vertices[index++] = 1*(tint);
+		vertices[index++] = 1*(alpha);
+		vertices[index++] = 1*(uvs.x4);
+		vertices[index++] = 1*(uvs.y4);
+		
+		this._numQuads++;
+	};
+	
+	
+	tomahawk_ns.RenderTask = RenderTask;
+	
+})();
+
+	
+	
+
+
+
+
+(function() {
+
+	if( Tomahawk.glEnabled == false )
+		return;
+		
+	tomahawk_ns.Stage.prototype.backgroundColor = 0xFF0080C0;
+	tomahawk_ns.Stage.prototype._renderTask 	= null;
+		
+	tomahawk_ns.Stage.prototype.getRenderTask	= function()
+	{
+		return this._renderTask;
+	};
+	
+	tomahawk_ns.Stage.prototype.init 			= function(canvas)
+	{
+		var callback = this._mouseHandler.smartBind(this);
+		
+		this._renderTask = new tomahawk_ns.RenderTask();
+		this._canvas = canvas;
+		this._context = this._getContext();
+		this._renderTask.init(this._context);
+		
+		this.addEventListener(tomahawk_ns.Event.ADDED, this, this._eventHandler,true);
+		this.addEventListener(tomahawk_ns.Event.FOCUSED, this, this._eventHandler,true);
+		this.addEventListener(tomahawk_ns.Event.UNFOCUSED, this, this._eventHandler,true);
+		this._canvas.addEventListener("click",callback);
+		this._canvas.addEventListener("touchstart",callback);
+		this._canvas.addEventListener("touchmove",callback);
+		this._canvas.addEventListener("touchend",callback);
+		this._canvas.addEventListener("mousemove",callback);
+		this._canvas.addEventListener("mousedown",callback);
+		this._canvas.addEventListener("mouseup",callback);
+		this._canvas.addEventListener("dblclick",callback);
+		
+		window.addEventListener("resize",this._resizeHandler.smartBind(this));
+		
+		
+		tomahawk_ns.BlendMode.init(this._context);		
+		this._context.clearColor(0,0,0,1);
+		this._context.disable(this._context.DEPTH_TEST);
+		this._context.disable(this._context.CULL_FACE);
+		this._context.blendFunc( tomahawk_ns.BlendMode.NORMAL[0], tomahawk_ns.BlendMode.NORMAL[1] );
+		this._context.enable(this._context.BLEND);
+		
+		this.resume();		
+	};
+	
+	tomahawk_ns.Stage.prototype._getContext 	= function(canvas)
+	{
+		return this._canvas.getContext("experimental-webgl");
+	};
+	
+	tomahawk_ns.Stage.prototype.drawFPS 		= function()
+	{
+		//console.log(this._fps, this._renderTask._numQuads);
+	};
+	
+	tomahawk_ns.Stage.prototype.enterFrame 		= function()
+	{
+		var curTime 	= new Date().getTime();
+		var scope 		= this;
+		var context 	= this._context;
+		var canvas 		= this._canvas;
+		var renderTask 	= this._renderTask;
+		var unit 		= 1/255;
+		var a 			= ( this.backgroundColor >> 24 ) & 0xFF;
+		var r 			= ( this.backgroundColor >> 16 ) & 0xFF;
+		var g 			= ( this.backgroundColor >> 8 ) & 0xFF;
+		var b 			= ( this.backgroundColor >> 0 ) & 0xFF;
+		
+		
+		this.width 		= canvas.width;
+		this.height 	= canvas.height;
+		
+		this._frameCount++;
+		
+		if( curTime - this._lastTime > 1000 )
+		{
+			this._fps = this._frameCount;
+			this._frameCount = 0;
+			this._lastTime = curTime;
+		}
+		
+
+		context.clearColor(r*unit,g*unit,b*unit,a*unit);
+		context.viewport(0, 0, canvas.width, canvas.height);
+		context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
+		
+		
+		renderTask.start( new tomahawk_ns.Point(this.width/2,  -this.height/2 ) );
+		this.draw(renderTask);
+		renderTask.end();
+		
+		this.dispatchEvent(new tomahawk_ns.Event(tomahawk_ns.Event.ENTER_FRAME,true,true));
+		
+		if( this.debug == true )
+		{
+			this.drawFPS();
+		}
+		
+	};
+
+})();
+
+
+
+/**
+ * ...
+ * @author Hatshepsout
+ */
+
+var tomahawk_ns = tomahawk_ns || new Object();
+
+(function() 
+{
+	
+	if( Tomahawk.glEnabled == false )
+		return;
+		
+	tomahawk_ns.Texture.prototype._glTexture 		= null;
+	tomahawk_ns.Texture.prototype._lastDataId 		= null;
+
+	tomahawk_ns.Texture.prototype._init = function(data,rect,name)
+	{ 
+		var width 	= 0;
+		var height 	= 0;
+		var canvas	= null;
+		
+		this.data = data || null;
+		this.rect = rect || null;
+		this.name = name || null;
+		
+		this.uvs = { 	x1:0, y1:0,
+						x2:1, y2:0,
+						x3:0, y3:1,
+						x4:1, y4:1 
+		};
+		
+		
+		this._buildPowerOf2Data();
+	};
+	
+	tomahawk_ns.Texture.prototype._buildPowerOf2Data = function()
+	{
+		var width 	= 0;
+		var height 	= 0;
+		var canvas	= null;
+		
+		if( this.rect != null && this.data != null)
+		{
+			width 	= this.rect[2];
+			height 	= this.rect[3];
+			width 	= tomahawk_ns.MathUtils.getNextPowerOf2( width );
+			height 	= tomahawk_ns.MathUtils.getNextPowerOf2( height );
+			
+			this.rect[2] = width;
+			this.rect[3] = height;
+			
+			canvas = document.createElement("canvas");
+			canvas.width = width;
+			canvas.height = height;
+			canvas.getContext("2d").drawImage(this.data, 0, 0);
+			
+			this.data = canvas;
+			this.data.id = Tomahawk._UNIQUE_OBJECT_ID++;
+		}
+	};
+	
+	tomahawk_ns.Texture.prototype.getGLTexture = function(context)
+	{
+		if( this._glTexture == null || this._lastDataId != this.data.id )
+		{
+			this._buildPowerOf2Data();
+			var texture = context.createTexture();
+			
+			context.activeTexture(context.TEXTURE0);
+			context.bindTexture(context.TEXTURE_2D, texture);
+			context.pixelStorei(context.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
+			context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, this.data);
+			context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MAG_FILTER, context.LINEAR);
+			context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MIN_FILTER, context.LINEAR);
+			context.bindTexture(context.TEXTURE_2D, null);
+			
+			this._glTexture = texture;
+			this._lastDataId = this.data.id;
+			
+			//context.pixelStorei(context.UNPACK_FLIP_Y_WEBGL, true);
+			//gl.NEAREST is also allowed, instead of gl.LINEAR, as neither mipmap.
+			//context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MIN_FILTER, context.LINEAR); 
+			//Prevents s-coordinate wrapping (repeating).
+			//context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_S, context.CLAMP_TO_EDGE); 
+			//Prevents t-coordinate wrapping (repeating).
+			//context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_T, context.CLAMP_TO_EDGE);
+		}
+		
+		return this._glTexture;
+	};
+
+	
+})();
 
 
 

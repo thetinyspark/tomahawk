@@ -35,18 +35,17 @@
 	
 	tomahawk_ns.DisplayObjectContainer.prototype.draw = function( renderTask )
 	{
-		this.getConcatenedMatrix();
+		var children 	= this.children;
+		var i 			= 0;
+		var max 		= children.length;
+		var child 		= null;
 		
-		var children = this.children;
-		var i = 0;
-		var max = children.length;
-		var child = null;
-		
-		this.updateMatrix();
+		//this.updateMatrix();
 		
 		for( i = 0; i < max; i++ )
 		{
 			child = children[i];
+			child.updateMatrix();
 			child.draw(renderTask);
 		}
 	};

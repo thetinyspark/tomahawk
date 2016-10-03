@@ -16,11 +16,12 @@
 		
 		function clickHandler()
 		{
+			var counter = document.getElementById("counter");
 			var stage = tomahawk_ns.Stage.getInstance("stress");
 			var image = document.getElementById("perso");
 			var container = stage.getChildByName("container");
 			var texture = tomahawk_ns.AssetsManager.getInstance().getTextureByAlias("myTexture");
-			var i = 100;
+			var i = 10000;
 			var bmp = null;
 			
 			if( texture == null )
@@ -38,6 +39,8 @@
 				bmp.autoUpdate = false;
 				container.addChild(bmp);
 			}
+			
+			counter.innerText = container.children.length + " children";
 		}
 		
 		function init()
@@ -73,8 +76,9 @@
 	</script>
 </head>
 <body>
+	<span id="counter"></span>
 	<button id="add">Add 100 Bitmap</button>
 	<canvas id="tomahawk" width="800" height="600"></canvas>
-	<img src="assets/perso1.png" id="perso" style="display: none;" />
+	<img src="assets/bunny.png" id="perso" style="display: none;" />
 </body>
 </html>

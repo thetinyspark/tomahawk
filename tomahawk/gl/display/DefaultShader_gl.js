@@ -16,12 +16,13 @@ var tomahawk_ns = tomahawk_ns || new Object();
 	Tomahawk.registerClass( DefaultShader, "DefaultShader" );
 
 	
-	DefaultShader.prototype.id = 0;
-	DefaultShader.prototype.fragmentShader = null;
-	DefaultShader.prototype.vertexShader = null;
-	DefaultShader.prototype.program = null;
-	DefaultShader.prototype.projectionPointer = null;
-	DefaultShader.VERTEX_SIZE = 6;
+	DefaultShader.prototype.id 					= 0;
+	DefaultShader.prototype.fragmentShader 		= null;
+	DefaultShader.prototype.vertexShader 		= null;
+	DefaultShader.prototype.program 			= null;
+	DefaultShader.prototype.projectionPointer 	= null;
+	DefaultShader.prototype.inited 				= false;
+	DefaultShader.VERTEX_SIZE 					= 6;
 	
 	
 	DefaultShader.prototype._compile = function(context, source, type)
@@ -42,6 +43,11 @@ var tomahawk_ns = tomahawk_ns || new Object();
 	
 	DefaultShader.prototype.init = function(context, source, type)
 	{
+		
+		if( this.inited == true )
+			return;
+			
+		this.inited = true;
 		
 		var vertexPosAttribPointer = 0;
 		var colorAttribPointer = 0;
